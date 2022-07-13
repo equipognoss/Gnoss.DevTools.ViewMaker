@@ -2,6 +2,7 @@
 
 # Gnoss.DevTools.ViewMaker
 
+[![.NET](https://github.com/equipognoss/Gnoss.DevTools.ViewMaker/actions/workflows/dotnet.yml/badge.svg)](https://github.com/equipognoss/Gnoss.DevTools.ViewMaker/actions/workflows/dotnet.yml)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=equipognoss_Gnoss.DevTools.ViewMaker&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=equipognoss_Gnoss.DevTools.ViewMaker)
 [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=equipognoss_Gnoss.DevTools.ViewMaker&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=equipognoss_Gnoss.DevTools.ViewMaker)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=equipognoss_Gnoss.DevTools.ViewMaker&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=equipognoss_Gnoss.DevTools.ViewMaker)
