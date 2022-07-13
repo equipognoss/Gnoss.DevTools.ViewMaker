@@ -1,0 +1,41 @@
+﻿@model AdminCatEspacioPersonalModel
+@*
+    Descripción
+    -----------------------------------------------
+    Vista parcial de "Listar categorías" que se carga dentro del modal de "Editar categorias" del perfil del usuario
+
+    Variables
+    ----------------------------------------------------------------
+*@
+
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Vista parcial dentro del modal del Espacio de Recursos --------------------
+*@
+
+<div id="seccion-categorias" class="seccion">
+
+    @* Datos ocultos para funcionamiento correcto de acciones *@
+    <input type="hidden" id="txtHackAccionActual" />
+    <input type="hidden" id="txtCategoriasSeleccionadas" />
+    <input type="hidden" id="txtCategoriasExpandidas" />
+    <input type="hidden" id="txtHackSaltarValidacion" />
+    <input type="hidden" id="txtAccionesTesauroHack" value="@Model.ActionsBackUp" />
+
+    @Html.PartialView("EditorTesauro/_EditorTesauro", Model.ThesaurusEditorModel)
+
+    @* Botón para guardar los items
+        <div class="form-actions">
+            <a href="#" class="btn btn-primary text-uppercase">@Html.GetText("COMMON", "GUARDAR")</a>
+        </div>
+    *@
+
+    @* Inicializar los SELECT js-select ya que son creadod dinámicamente *@
+    <div class="acciones">
+        <a id="btnGuardarInf" class="btn btn-primary text-uppercase guardar">@Html.GetText("COMMON", "GUARDAR")</a>
+        <a id="btnCancelarInf" class="btn btn-link text-uppercase volver pl-3">@Html.GetText("COMMON", "CANCELAR")</a>
+    </div>
+
+</div>
+

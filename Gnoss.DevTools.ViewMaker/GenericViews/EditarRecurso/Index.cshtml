@@ -1,0 +1,106 @@
+﻿@model EditResourceModel
+@*
+Descripción
+-----------------------------------------------
+Vista principal donde se muestran subvistas para poder crear o editar un nuevo recurso.
+El tipo de recurso es creado en la comunidad en la que el usuario se encuentra logueado.
+En esta vista de creación/edición de un recurso, se utilizan otras subvistas como son:
+_SubirRecurso.cshtml
+_ModificarRecurso.cshtml
+
+Variables
+----------------------------------------------------------------
+*@
+@{ 
+
+    CommunityModel Comunidad = Html.GetComunidad();
+
+    Html.SetBodyClass("edicionRecurso usuarioConectado comunidad page-modal no-clonarMenuUsuario");
+    Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/jsUnificar/MVC.EditarRecurso.js?v=" + Html.GetVersion());
+
+    string titulo = "";
+    string tipoRecurso = "recurso";
+
+
+    string urlCancelar = "";
+
+    if (Model.ModifyResourceModel != null && Model.ModifyResourceModel.DocumentType == ResourceModel.DocumentType.Semantico)
+    {
+        tipoRecurso = Model.ModifyResourceModel.SemanticResourceModel.RootEntities[0].EntityNameForTitle.ToLower();
+    }
+    else if (Model.ModifyResourceModel != null)
+    {
+        //tipoRecurso = Model.ModifyResourceModel.DocumentType.ToString().ToLower();
+        tipoRecurso = Html.ObtenerNombreRecursoConTildes(Model.ModifyResourceModel.DocumentType);
+        urlCancelar = Model.ModifyResourceModel.UrlCancelButton;
+    }
+
+    if (Model.TypePage == Es.Riam.Gnoss.Web.MVC.Models.EditResourceModel.TypePageEditResource.CreateResource || Model.TypePage == Es.Riam.Gnoss.Web.MVC.Models.EditResourceModel.TypePageEditResource.CreateSemanticResource)
+    {
+        titulo = "Nuevo " + tipoRecurso;
+
+        //Model.CreateResourceModel.UrlCancelButton
+    }
+    else
+    {
+        titulo = "Editar " + tipoRecurso;
+    }
+
+    if (Context.Request.Headers["Referer"].ToString() != "" || Context.Request.Headers["Referer"].ToString().Length > 1)
+    {
+        urlCancelar = Context.Request.Headers["Referer"].ToString();
+    }
+
+    /* Controlar UrlVuelta */
+    if (Context.Request.Headers["Referer"].ToString() != "")
+    {
+        // Acceso desde página existente
+        urlCancelar = Context.Request.Headers["Referer"].ToString();
+    }
+    else
+    {
+        // Acceso directo al recurso
+        urlCancelar = Model.ModifyResourceModel.UrlCancelButton;
+    }
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista principal para la edición/creación de un recurso nuevo -------------------- *@
+
+<div class="row">
+    <div class="col col-12 header-tipo-modal texto-blanco">
+        <div class="container">
+            <div class="modal-header">
+                <p class="modal-title">
+                    <span class="material-icons">mode_edit</span>@titulo - @Comunidad.Name
+                </p>                
+                <a href="@urlCancelar" class="cerrar texto-blanco">
+                    <span class="material-icons">close</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+        @if (Model.TypePage == Es.Riam.Gnoss.Web.MVC.Models.EditResourceModel.TypePageEditResource.CreateResource)
+        {
+            <div class="col col-12 col-edicion">
+                <div class="wrapCol container">
+                    @Html.PartialView("_SubirRecurso", Model.CreateResourceModel)
+                </div>
+            </div>            
+            /* Modales de creación. Posicionarlos aquí */
+            @* Modal subir recurso de tipo "File"*@
+            if (Model.CreateResourceModel.FileAvailable) { @Html.PartialView("../Shared/_cabecera/_modal-views/_add-resource-file") }
+            @* Modal subir recurso de tipo "Url"*@    
+            if (Model.CreateResourceModel.LinkAvailable) { @Html.PartialView("../Shared/_cabecera/_modal-views/_add-resource-url") }                       
+        }
+        else
+        { @* Crear un recurso desde 0 *@            
+            <div class="col col-12 col-edicion">
+                <div class="wrapCol container">
+                    @Html.PartialView("_ModificarRecurso", Model.ModifyResourceModel)
+                </div>
+            </div>
+        }         
+</div>

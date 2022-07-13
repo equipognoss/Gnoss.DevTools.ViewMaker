@@ -1,0 +1,39 @@
+﻿@model CMSComponentMoreView
+@if(Model != null)
+{   
+    <div class=" tabsGroup">
+        <div class="acciones tabspresentation">
+            <ul>
+                <li class="active"><a rel="0" href="#">@Html.Translate("Esta semana")</a></li>
+                <li class=""><a rel="1" href="#">@Html.Translate("Este mes")</a></li>
+                <li class=""><a rel="2" href="#">@Html.Translate("Siempre")</a></li>
+            </ul>
+        </div>
+        <div class="resources estaSemana block" rel="0">
+            <div class="resource-list">
+                @foreach (ResourceModel fichaModel in Model.MoreVisitedWeek)
+                {
+                    @Html.PartialView(Model.ViewNameResources, fichaModel)
+                }
+            </div>
+        </div>
+        <div class="resources esteMes block" rel="1">
+            <div class="resource-list">
+                @foreach (ResourceModel fichaModel in Model.MoreVisitedMonth)
+                {
+                    @Html.PartialView(Model.ViewNameResources, fichaModel)
+                }
+            </div>
+        </div>
+        <div class="resources siempre block" rel="2">
+            <div class="resource-list">
+                @foreach (ResourceModel fichaModel in Model.MoreVisited)
+                {
+                    @Html.PartialView(Model.ViewNameResources, fichaModel)
+                }
+            </div>
+        </div>
+    </div>
+
+}
+      

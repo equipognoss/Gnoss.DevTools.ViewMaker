@@ -1,0 +1,313 @@
+﻿@model GroupEditViewModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista en la que se puede crear o editar un grupo para una determinada comunidad.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+GroupCardModel Grupo = ((GroupEditViewModel)Model).Group;
+
+CommunityModel Comunidad = Html.GetComunidad();
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+
+string titulo = string.Empty;
+string descripcion = string.Empty;
+string tags = string.Empty;
+string participantes = string.Empty;
+
+string textoTituloPagina = "";
+string textoBotonGuardar = "";
+
+// Url a la que se realizará la petición de guardar los datos
+string urlSaveGroup = @Model.UrlSaveGroup;
+
+// Url si se desea cancelar la creación de un grupo
+string urlCancelar = @Html.GetComunidad().Url;
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista principal para la edición/creación de un grupo -------------------- *@
+@{
+
+Html.SetBodyClass("layout03 comGnoss edicionRecurso page-modal no-clonarMenuUsuario");
+
+//Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/ckeditor.js?v=" + Html.GetVersion());
+//Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/adapters/jquery.js?v=" + Html.GetVersion());
+// Añadir funciones de EditarRecurso (Cuando se haga click en un resultado de Usuarios Grupo)
+Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/jsUnificar/MVC.EditarRecurso.js?v=" + Html.GetVersion());
+
+
+@* Control de nombre del grupo y título que tendrá la página *@
+if (Grupo != null)
+{
+    titulo = Grupo.Name;
+    descripcion = Grupo.Description;
+    foreach (string tag in Grupo.Tags)
+    {
+        tags += tag + ',';
+    }
+
+    if (Model.EsGrupoDeOrganizacion)
+    {
+        textoTituloPagina = Html.GetText("GRUPO", "EDITARGRUPOORGANIZACION");
+    }
+    else
+    {
+        textoTituloPagina = Html.GetText("GRUPO", "EDITARGRUPOCOMUNIDAD");
+    }
+    textoBotonGuardar = Html.GetText("COMMON", "GUARDAR");
+}
+else
+{
+    if (Model.EsGrupoDeOrganizacion)
+    {
+        textoTituloPagina = Html.GetText("GRUPO", "CREARGRUPOORGANIZACION");
+    }
+    else
+    {
+        textoTituloPagina = Html.GetText("GRUPO", "CREARGRUPOCOMUNIDAD");
+    }
+
+    textoBotonGuardar = Html.GetText("GRUPO", "CREARGRUPO");
+}
+}
+
+<div class="row">
+    @* Cabecera Modal de creación de grupo *@
+    <div class="col col-12 header-tipo-modal texto-blanco">
+        <div class="container">
+            <div class="modal-header">
+                <p class="modal-title">
+                    <span class="material-icons">mode_edit</span>@textoTituloPagina
+                </p>
+                <a href="@urlCancelar" class="cerrar texto-blanco">
+                    <span class="material-icons">close</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    @* Contenedor de Creación/Edición de Grupo *@
+    <div class="col col-12 col-edicion">
+        <form class="formulario-edicion background-blanco">
+            @* Contenedor del título 
+            <div class="wrapCol container mt-5">
+                @* Título inicial de la página
+                <h1 id="lblTituloPagina" class="mb-3">@textoTituloPagina</h1>
+            </div>
+            *@
+
+            @* Sección Título y Label del recurso *@
+            <div class="form-group mb-5 edit-titulo">
+                <label class="control-label d-block" id="lblTitulo" for="txtTitulo">@Html.GetText("PERFILBASESUBIRRECURSO", "TITULO")</label>
+                <input placeholder=""
+                       type="text"
+                       id="txtTitulo"
+                       name="txtTitulo"
+                       value="@(titulo.Equals(string.Empty)?"":titulo)"
+                       class="form-control not-outline" />
+                <input type="text" style="display: none;" id="txtHackTagsTitulo" name="txtHackTagsTitulo">
+            </div>
+
+            @* Label de Descripción del Recurso *@
+            <div class="form-group mb-5 edit-descripcion">
+                <label id="lblDescripcion" class="control-label d-block" for="txtDescripcion">@Html.GetText("PERFILBASESUBIRRECURSO", "DESCRIPCION")</label>
+                @* TextArea de Descripción *@
+                <div id="divDescripcion">
+                    <textarea rows="2" cols="20" class="cke ckeSimple recursos" id="txtDescripcion" name="txtDescripcion" style="visibility: hidden; display: none;">@(descripcion.Equals(string.Empty)?"":descripcion)</textarea>
+                    <input type="text" style="display: none;" id="txtHackTagsDescripcion" name="txtHackTagsDescripcion">
+                </div>
+            </div>
+
+            @* Sección Añadir Etiquetas/Tags *@
+            <div class="form-group mb-5 edit-etiquetas">
+                <label id="lblEtiquetas" for="txtTags" class="control-label d-block">@Html.GetText("PERFILBASESUBIRRECURSO", "ETIQUETAS")</label>
+                <div class="autocompletar-tags form-group">
+                    <div class="input-wrap form-sticky-button autocompletar" onclick="$('#txtTags').focus();">
+                        @* Input de Tags *@
+                        <input type="text"
+                               placeholder="Introduce una etiqueta y pulsa AÑADIR"
+                               id="txtTags"
+                               class="form-control txtAutocomplete"
+                               value="@(tags.Equals(string.Empty)?"":tags)"
+                               autocomplete="off" />
+
+                        @* Botón de Añadir Etiqueta/Tag *@
+                        <a href="" id="anadir-tag" class="btn btn-grey uppercase">Añadir</a>
+
+                        @* Campo oculto que almacenará los Tags del recurso *@
+                        <input type="hidden" id="txtTags_Hack" />
+                    </div>
+                    @* Tags añadidas por el usuario o por auto *@
+                    <span class="contenedor tag-list mb-4"></span>
+                </div>
+            </div>
+
+            <div class="form-group mb-4 edit-agregar-miembros">
+
+            </div>
+
+            @* Contenedor miembros que formarán parte de la comunidad *@
+            <div class="form-group mb-5 edit-miembros">
+                <label id="lblMiembros" class="control-label d-block">
+                    @if (Model.EsGrupoDeOrganizacion)
+                    {
+                        @Html.GetText("GRUPO", "INFOMIEMBROSORGANIZACION")
+                    }
+                    else
+                    {
+                        @Html.GetText("GRUPO", "INFOMIEMBROSCOMUNIDAD")
+                    }
+                </label>
+                @Html.PartialView("_partial-views/_people-searcher", Model)
+            </div>
+
+            @* Panel de mensajes con errores *@
+            <div id="divContLblError">
+                <div class="ko" id="divKoError">
+                    <span id="lblError"></span>
+                </div>
+            </div>
+
+            @* Panel con la botonera *@
+            <div id="divContPanelBotonera">
+                <fieldset id="panelBotonera">
+                    <p>
+                        @if (Grupo != null)
+                        {
+                            <input type="button" class="btn btn-outline-primary" onclick="redirigirAlGrupo()" value="@Html.GetText("COMMON", "CANCELAR")">
+                        }
+                        <input type="button" class="btn btn-primary" onclick="EnviarDatosServidorCrearEditarGrupoComunidad(inputs, labelError, '@urlSaveGroup')" value="@textoBotonGuardar">
+                    </p>
+                </fieldset>
+            </div>
+        </form>
+    </div>
+
+    <script>
+
+        @if (Grupo != null){
+            <text>
+            function redirigirAlGrupo()
+            {
+                window.location = '@Grupo.UrlGroup';
+            }
+            </text>
+        }
+
+    @* Activación servicio Autocompletar *@
+        $(document).ready(function () {
+            $('#txtFiltro').autocomplete(
+            null,
+            {
+                @{
+                    string metodo = "AutoCompletarLectoresEditores";
+                    if (Model.EsGrupoDeOrganizacion)
+                    {
+                        metodo = "AutocompletarMiembrosOrganizacion";
+                    }
+                }
+                url: $('#inpt_urlServicioAutocompletar').val() + "/@metodo",
+                delay: 0,
+                multiple: true,
+                scroll: false,
+                selectFirst: false,
+                minChars: 1,
+                width: 300,
+                cacheLength: 0,
+                NoPintarSeleccionado: true,
+                txtValoresSeleccID: 'txtHackInvitados',
+                extraParams: {
+                    grupo: '',
+                    identidad: '@IdentidadActual.KeyIdentity',
+                    identidadMyGnoss: '@IdentidadActual.KeyMetaProyectIdentity',
+                    identidadOrg: '@(IdentidadActual.KeyOrganization == Guid.Empty?"":IdentidadActual.KeyIdentityOrg.ToString())',
+                    proyecto: '@Comunidad.Key',
+                    organizacion: '@(IdentidadActual.KeyOrganization == Guid.Empty?"":IdentidadActual.KeyOrganization.ToString())',
+                    bool_esPrivada: '@(Comunidad.AccessType == CommunityModel.TypeAccessProject.Private || Comunidad.AccessType == CommunityModel.TypeAccessProject.Reserved?"True":"False")',
+                    bool_edicion: 'True',
+                    bool_traerperfiles: true,
+                    bool_traergrupos: 'False'
+                }
+            }
+        );
+        @* Configuración click de resultado de autocompletar *@
+        $('#txtFiltro').result(function (event, data, formatted) {
+            AceptarUsuarioMiembroComunidad(this, data[0], data[1]);
+        });
+
+    });
+    $(document).ready(function () {
+        ActivarAutocompletarRec('txtTags', 'sioc_t:Tag');
+    });
+    function ActivarAutocompletarRec(pTxt, pNombreFaceta) {
+        $('#' + pTxt).autocomplete(
+        null,
+        {
+            url: $('#inpt_urlServicioAutocompletar').val() + "/AutoCompletarFacetas",
+            type: "POST",
+            delay: 300,
+            multiple: true,
+            scroll: false,
+            selectFirst: false,
+            minChars: 1,
+            width: 300,
+            cacheLength: 0,
+            extraParams: {
+                proyecto: '@Comunidad.Key',
+                bool_esMyGnoss: 'False',
+                bool_estaEnProyecto: 'True',
+                bool_esUsuarioInvitado: 'False',
+                identidad: '@IdentidadActual.KeyIdentity',
+                nombreFaceta: pNombreFaceta,
+                orden: '',
+                filtrosContexto: '',
+                languageCode: 'es',
+                parametros: '',
+                tipo: '',
+                perfil: '',
+                organizacion: ''
+            }
+        }
+        );
+    }
+    // Inputs a validar que se mandarán a validar y posteriormente al servidor para guardar
+    const inputs = [
+        {
+            // Titulo / Nombre del grupo
+            inputId: 'txtTitulo',
+            name: 'Título',
+            label: 'lblTitulo',
+            checkValue: true,
+        },
+        {
+            // Input de la descripción del grupo
+            inputId: 'txtDescripcion',
+            name: "Descripción",
+            label: 'lblDescripcion',
+            checkValue: false,
+        },
+        {
+            // Input del los Tags
+            inputId: 'txtTags_Hack',
+            name: null,
+            label: null,
+            checkValue: false,
+        },
+        {
+            // Input oculto donde se guardarán los invitados
+            inputId: 'txtHackInvitados',
+            name: null,
+            label: null,
+            checkValue: false,
+        }
+    ];
+    // Label donde se mostrará posible error
+    const labelError = $('#lblError');
+    </script>

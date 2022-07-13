@@ -1,0 +1,77 @@
+﻿@model ThesaurusEditorModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista parcial que se utilizará para mostrar las opciones para poder compartir o seleccionar el tesauro de una comunidad. Se pueden visualizar a modo de árbol o lista.
+Se utiliza (por ejemplo) en la página ""ModificarRecurso"" para la edición o creación de un nuevo tipo de recurso.
+
+Variables
+----------------------------------------------
+*@
+@{
+
+}
+
+@*----------------------------------------------------------------
+-------------------- Vista para mostrar las diferentes categorías del Tesauro en modo Vista o Árbol --------------------*@
+
+@{
+    string displayBox = "";
+
+    if (Model.HideTreeListSelector)
+    {
+        displayBox = "style=display:none";
+    }
+}
+
+<div id="panDesplegableSelCat">
+    @* Oculto la etiqueta para el nuevo Front por si no se desea. <p>@Html.GetText("CONTROLESSELCATEGORIASBUSQUEDDAS", "SELCATEGORIAS"): </p>*@
+    @* Selector del tipo de visualización de Tesauro*@
+    @* Quitar modo Lista de momento
+    <ul class="nav nav-tabs grey" id="myTab" role="tablist" @displayBox>
+        @* Quitar modo Lista de momento
+        <li class="nav-item">
+            <a class="nav-link active"
+               id="ver-arbol-tab"
+               data-toggle="tab"
+               href="#ver-arbol"
+               role="tab"
+               aria-controls="ver-arbol"
+               aria-selected="true">@Html.GetText("TESAURO", "VERARBOL")</a>
+        </li>
+        @* Quitar modo Lista de momento
+        <li class="nav-item">
+            <a class="nav-link"
+               id="ver-list-tab"
+               data-toggle="tab"
+               href="#ver-lista"
+               role="tab"
+               aria-controls="ver-lista"
+               aria-selected="false">@Html.GetText("TESAURO", "VERLISTA")</a>
+        </li>
+       
+    </ul>
+    *@
+    @* Quitar ya que no se desea ver los tabs al haber solo una opción 
+    <div class="tab-content">*@         
+        @* Visualización Tesauro en modo ÁRBOL *@
+        @Html.PartialView("EditorTesauro/_EditorTesauro_CatArbol", Model)        
+        @* Visualización Tesauro en modo LISTA - Quitarlo de momento *@
+        @* @Html.PartialView("EditorTesauro/_EditorTesauro_CatLista", Model) *@
+    @*</div>*@
+    
+    @* Categorías de un recurso*@
+    @{string valoresAg = "";
+        foreach (Guid catID in Model.SelectedCategories)
+        {
+            valoresAg += catID + ",";
+        }
+    }
+    @* Input para guardar las selecciones de categorías *@
+    <div id="panel_hackCatTesSel" style="visibility:hidden">
+        <input type="hidden" id="txtHackCatTesSel" class="hackCatTesSel" value="@valoresAg" />
+    </div>
+
+</div>
+

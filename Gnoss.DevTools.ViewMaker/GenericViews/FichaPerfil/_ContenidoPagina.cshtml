@@ -1,0 +1,145 @@
+﻿@model ProfilePageViewModel
+
+<div id="panContPagina" class="">
+    @if (Model.RecentActivity != null)
+    {
+		<div class="recentActivity" @Html.Raw((Model.PageType == ProfilePageViewModel.ProfilePageType.RecentActivity?"":"style=\"display:none\""))>
+            <div class="resource-list listView social-events-list">
+                <p class="tituloComponente"></p>
+                <div class="resource-list social-events-list widthTabs">
+                    @Html.PartialView("ControlesMVC/_ActividadRecientePerfil", Model.RecentActivity)
+                </div>
+            </div>
+        </div>
+    }
+    
+    @if (!string.IsNullOrEmpty(Model.HtmlBio) || !string.IsNullOrEmpty(Model.HtmlTrayectoria) || !string.IsNullOrEmpty(Model.HtmlNosDedicamos))
+    {
+        <div class="extendedBio">
+        @if (!string.IsNullOrEmpty(Model.HtmlBio))
+        {
+            @Html.Raw(Model.HtmlBio)
+        }
+        @if (!string.IsNullOrEmpty(Model.HtmlTrayectoria))
+        {
+            string tituloTrayectoria = Html.GetText("PERFIL", "TRAYECTORIA");
+            if (Model.Profile.IsClass)
+            {
+                tituloTrayectoria = Html.GetText("PERFIL", "PRESENTACION");
+            }
+            <h3>@tituloTrayectoria</h3>
+            <div class="head">
+                @Html.Raw(Model.HtmlTrayectoria)
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(Model.HtmlNosDedicamos))
+        {
+
+            string tituloNosDedicamos = Html.GetText("PERFIL", "NOSDEDICAMOS");
+            if (Model.Profile.IsClass)
+            {
+                tituloNosDedicamos = Html.GetText("PERFIL", "VAMOSA");
+            }
+            <h3>@tituloNosDedicamos</h3>
+            <div class="head">
+                @Html.Raw(Model.HtmlNosDedicamos)
+            </div>
+        }
+        </div>
+    }
+    
+    @if (Model.ShowResources)
+    {
+        <div class="profileResources"  @Html.Raw((Model.PageType == ProfilePageViewModel.ProfilePageType.Resources?"":"style=\"display:none\""))>
+           <div>
+                <div style="" class="finderUtils" id="divCajaBusqueda">
+                    <div class="group filterSpace">
+                        <p id="panNumResultados"></p>
+                    </div>
+                </div>
+                <div class="group listado-productos">
+                    <div class="listadoRecursos" id="panResultados">
+                    </div>
+                </div>
+            </div>
+            <div id="panNavegador">
+                <div id="NavegadorPaginasCorreo" class="paginadorResultados"></div>
+            </div>
+        </div>
+    }
+
+	@if( Model.HasGrups)
+    {
+        <div class="profileGroups"  @Html.Raw((Model.PageType == ProfilePageViewModel.ProfilePageType.Grups?"":"style=\"display:none\""))>
+            @Html.PartialView("_GruposPerfil", Model)
+        </div>
+    }
+
+	@if (Model.ProfileContacts != null && Model.ProfileContacts.Count > 0)
+    {
+        <div class="profileContacts"  @Html.Raw((Model.PageType == ProfilePageViewModel.ProfilePageType.Contacts?"":"style=\"display:none\""))>
+            <h2>Contactos</h2>
+            <div class="listadoPersonas">
+                <div class="resource-list">
+                    @foreach (ProfileModel ficha in Model.ProfileContacts)
+                    { 
+                        @Html.PartialView("ControlesMVC/_FichaPerfilMini", ficha)
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+	@if( Model.ProfileFollowers != null && Model.ProfileFollowers.Count > 0 )
+    {
+        <div class="profileFollowers"  @Html.Raw((Model.PageType == ProfilePageViewModel.ProfilePageType.Followers?"":"style=\"display:none\""))>
+            <h2>@Html.GetText("PERFIL", "SEGUIDORES")</h2>
+            <div class="listadoPersonas">
+                <div class="resource-list">
+                    @foreach (ProfileModel ficha in Model.ProfileFollowers)
+                    { 
+                        @Html.PartialView("ControlesMVC/_FichaPerfilMini", ficha)
+                    }
+                </div>
+            </div>
+            @if (Model.ProfileFollowers.Count < Model.NumProfileFollowers)
+            {
+            <div class="verMas"><a onclick="AccionVerMas(this, 'seguidores')" aux="2">@Html.Translate("Ver más")</a></div>
+            }
+        </div>
+    }
+
+	@if( Model.ProfileFollowed != null && Model.ProfileFollowed.Count > 0 )
+    {
+        <div class="profileFollowed" @Html.Raw((Model.PageType == ProfilePageViewModel.ProfilePageType.Followed?"":"style=\"display:none\""))>
+            <h2>@Html.GetText("PERFIL", "SIGUIENDO")</h2>
+            <div class="listadoPersonas">
+                <div class="resource-list">
+                    @foreach (ProfileModel ficha in Model.ProfileFollowed)
+                    { 
+                        @Html.PartialView("ControlesMVC/_FichaPerfilMini", ficha)
+                    }
+                </div>
+            </div>
+            @if(Model.ProfileFollowed.Count < Model.NumProfileFollowed)
+            {
+                <div class="verMas"><a onclick="AccionVerMas(this, 'sigue-a')" aux="2">@Html.Translate("Ver más")</a></div>
+            }
+        </div>
+    }
+
+	@if( Model.PeopleInOrganization != null && Model.PeopleInOrganization.Count > 0 )
+    {
+        <div class="profilePeople" @Html.Raw((Model.PageType == ProfilePageViewModel.ProfilePageType.People?"":"style=\"display:none\""))>
+            <h2>Personas</h2>
+            <div class="listadoPersonas">
+                <div class="resource-list">
+                    @foreach (ProfileModel ficha in Model.PeopleInOrganization)
+                    { 
+                        @Html.PartialView("ControlesMVC/_FichaPerfilMini", ficha)
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,217 @@
+﻿@model FacetModel
+@*
+Descripción
+-----------------------------------------------
+Vista contenedora que albergará cada una de las facetas disponibles para realizar búsqueda de recursos. Esta vista se encuentra dentro del servicio "Servicio Facetas".
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+string claveFacetaSinObjetoConocimiento = Model.FacetKey;
+
+// Variables para tesauro y contenidoID 
+string tesauroID = "";
+string contenidoID = "";
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Cada una de las Facetas que se mostrarán para realizar búsquedas de recursos --------------------
+*@
+
+@if (Model != null && (Model.FacetItemList.Count > 0 || Model.AutocompleteBehaviour.Equals(AutocompleteBehaviours.OnlyTextBox) || Model.ShowWithoutItems))
+{    
+    @* Control de claveFacetaSinObjetoConocimiento *@
+    if (claveFacetaSinObjetoConocimiento.Contains(";"))
+    {
+        claveFacetaSinObjetoConocimiento = claveFacetaSinObjetoConocimiento.Substring(claveFacetaSinObjetoConocimiento.IndexOf(";") + 1);
+    }
+
+    if (Model.ThesaurusID != Guid.Empty)
+    {
+        tesauroID = "";
+        contenidoID = "contenido_" + Model.Key;
+
+        if (!string.IsNullOrEmpty(Model.Filter))
+        {
+            contenidoID += "_" + Model.Filter;
+            tesauroID = "--" + Model.Filter;
+        }
+
+        @* Contenedor de la faceta en sí*@
+        <div id="@contenidoID">
+            <div class="box" id="@(Model.Key + tesauroID)">
+                @* Título de faceta + Icono de búsqueda *@
+                <div class="faceta-name">
+                    <span class="faceta-title">
+                        @Model.Name
+                        @* Desplegar o no el contenido del panel *@
+                        <span class="facet-arrow"></span>
+                        @* Incluir o no la lupa de búsqueda dependiendo del tipo de faceta (Diferente a tipo Arbol) 
+                        @if (!(Model.SearchBoxType.Equals(SearchBoxType.ListTree) || Model.SearchBoxType.Equals(SearchBoxType.TreeList)))
+                        {
+                            <span class="material-icons search-icon"></span>
+                        }*@
+                    </span>
+                    @* Carga de Caja de búsqueda si hiciera falta *@
+                    @Html.PartialView("_CajaBusqueda", Model)
+                </div>
+                               
+                @if (Model.AutocompleteBehaviour == AutocompleteBehaviours.Default)
+                {
+                    <ul class="listadoFacetas">
+                        @foreach (FacetItemModel item in Model.FacetItemList)
+                        {                                
+                            @Html.PartialView("_ItemFaceta", item)
+                        }
+                    </ul>
+                }          
+
+                @* Este tipo de Facetas (Tesauro) se pintan SIEMPRE TODAS 
+                @if (Model.SeeMore)
+                {
+                    <p class="moreResults">
+                        <a class="verMasFacetas" href="#" rel="@claveFacetaSinObjetoConocimiento|@Model.Key">@Html.GetText("COMBUSQUEDAAVANZADA", "VERMAS")</a>                            
+                    </p>
+                }                
+                *@
+                
+                @* Llamada del modal para "VER MÁS" *@
+                <p class="moreResults allResults">
+                    <a class="no-close open-popup-link verMasFacetas verMasFacetasModalLista"
+                       data-toggle="modal"
+                       data-target="#modal-resultados-lista"
+                       data-facetkey="@Model.FacetKey"
+                       data-facetname="@Model.Name">@Html.GetText("COMBUSQUEDAAVANZADA", "VERMAS")</a>
+                </p>
+
+            </div>
+        </div>
+    }
+    @* Pintar otro tipo de componente para la Faceta (Faceta simple de búsqueda) *@
+    else
+    {
+        string noCollapse = "";
+        // Por defecto las facetas no tienen color azul de link. Añado la clase listadoFacetas para la lista de elementos.
+        string ulClass = "listadoFacetas";
+        if (Model.Key == "rdf_type")
+        {
+            noCollapse = "noCollapse";
+        }
+        else if (Model.SearchBoxType.Equals(SearchBoxType.RankCalendar) || Model.SearchBoxType.Equals(SearchBoxType.Calendar))
+        {
+            ulClass = "oculto nevershow";
+        }
+        else
+        {
+            ulClass = "listadoFacetas";
+        }
+
+        string contenidoOut = "out_" + Model.Key;
+        string contenidoIn = "in_" + Model.Key;
+
+        if (Model.FacetGrouped)
+        {
+
+            @functions
+            {
+                public string obtenerNombreSemFaceta(FacetItemModel itemFaceta)
+                {
+                    string nombreSem = itemFaceta.Name.Replace("rdf:type=", "");
+                    if (nombreSem.Contains(";"))
+                    {
+                        nombreSem = nombreSem.Substring(nombreSem.IndexOf(";") + 1);
+                    }
+                    return nombreSem;
+                }
+            }
+
+            string auxAgrupado = "";
+            FacetItemModel itemSeleccionado = Model.FacetItemList.Find(item => item.Selected == true);
+            if (itemSeleccionado != null)
+            {
+                auxAgrupado = "in_" + obtenerNombreSemFaceta(itemSeleccionado);
+            }
+
+            <div id="@contenidoOut" class="listadoAgrupado" @(auxAgrupado != "" ? "aux=" + auxAgrupado : "")>
+
+                @if (Model.GroupedGroups != null && Model.GroupedGroups.Count > 0)
+                {
+                    <ul class="oculto">
+                        @foreach (string grupo in Model.GroupedGroups.Keys)
+                        {
+                            string classGroup = "";
+                            foreach (string tipo in Model.GroupedGroups[grupo])
+                            {
+                                classGroup += " in_" + tipo;
+                            }
+                            <li><a class="@classGroup">@grupo</a></li>
+                        }
+                    </ul>
+                }
+
+                @foreach (FacetItemModel item in Model.FacetItemList)
+                {
+                    <div id="in_@obtenerNombreSemFaceta(item)">
+                        <a rel="nofollow" href="@item.Filter" class="faceta grupo" name="@item.Name" title="@item.Tittle">@item.Tittle (@item.Number)</a>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            @* Pintar tipo de caja simple de búsqueda *@
+            <div id="@contenidoOut">
+                <div id="@contenidoIn">
+                    <div class="box @noCollapse" id="@Model.Key">
+                        @* Título de faceta + Icono de búsqueda *@
+                        <div class="faceta-name">                            
+                            <span class="faceta-title">@Model.Name
+                                @* Desplegar o no el contenido del panel *@
+                                <span class="facet-arrow"></span>
+                                @* Icono de búsqueda para ocultar o no el panel de búsqueda solo para campos "Input normales" *@
+                                @*@if (Model.SearchBoxType.Equals(SearchBoxType.Simple)){
+                                    <span class="material-icons search-icon"></span> 
+                                } *@                           
+                            </span>
+                            @* Caja de búsqueda *@
+                            @Html.PartialView("_CajaBusqueda", Model)
+                        </div>
+                                               
+                        @if (Model.AutocompleteBehaviour == AutocompleteBehaviours.Default)
+                        {
+                            <ul class="@ulClass">
+                                @foreach (FacetItemModel item in Model.FacetItemList)
+                                {
+                                    @Html.PartialView("_ItemFaceta", item)
+                                }
+                            </ul>
+                        }
+                        @if (Model.SeeMore)
+                        {
+                            @* La faceta "Ver más" se realizará en modal 
+                            <p class="moreResults">
+                                <a class="verMasFacetas" href="#" rel="@claveFacetaSinObjetoConocimiento|@Model.Key">@Html.GetText("COMBUSQUEDAAVANZADA", "VERMAS")</a>
+                            </p>
+                            *@
+
+                            @* Llamada del modal para "VER MÁS" *@
+                            <p class="moreResults allResults">                        
+                                <a class="no-close open-popup-link verMasFacetas verMasFacetasModal"
+                                   data-toggle="modal"                                   
+                                   data-target="#modal-resultados-paginado"
+                                   data-facetkey="@Model.FacetKey"
+                                   data-facetname="@Model.Name"
+                                   >@Html.GetText("COMBUSQUEDAAVANZADA", "VERMAS")</a>
+                            </p> 
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+}

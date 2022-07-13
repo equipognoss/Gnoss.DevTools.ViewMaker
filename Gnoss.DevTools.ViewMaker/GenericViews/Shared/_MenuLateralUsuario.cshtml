@@ -1,0 +1,160 @@
+﻿@using Es.Riam.Gnoss.Web.MVC.Models;
+@{
+    UserProfileModel perfil = Html.GetPerfil();
+    HeaderModel cabecera = Html.GetCabecera();
+    UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+    CommunityModel Comunidad = Html.GetComunidad();
+    CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
+
+    string urlFoto = "";
+    if (!string.IsNullOrEmpty(perfil.Foto))
+    {
+        urlFoto = Html.GetBaseUrlContent() + perfil.Foto;
+    }
+}
+
+    
+    
+<aside id="menuLateralUsuario" class="menuLateral pmd-sidebar sidebar-default pmd-sidebar-right pmd-sidebar-right-fixed" role="navigation">
+
+    <div class="header">
+        <div class="wrap-header">
+            <div class="img-usuario">
+                <span @Html.Raw(string.IsNullOrEmpty(urlFoto) ? "" : "style=\"background: url(" + urlFoto + ") no-repeat center\"")></span>
+            </div>
+            <div class="info-usuario">
+                <p class="nombre">@perfil.PersonName</p>
+                <p>@perfil.Name</p>
+                <p>@perfil.NameOrg</p>
+            </div>
+        </div>
+        <span class="material-icons cerrar">close</span>
+    </div>
+
+    <div class="body">
+        <p>Avisos</p>
+        <ul class="pmd-sidebar-nav ulAvisos">
+            <li class="liMensajes nuevos">
+                <a title="@Html.GetText("MENU", "BANDEJAMEN")" href="@perfil.Url@Html.GetText("URLSEM", "MENSAJES")">@Html.GetText("MENU", "BANDEJAMEN")</a>
+                <span style="display: none;" class="novedades" id="infoNumMensajes"><span class="indentado">nuevos</span></span>
+                <span style="display: none" class="avisos" id="infNumMensajesSinLeer"><span class="indentado">sin leer</span></span>
+            </li>
+            <li class="liNotificaciones">
+                <a title="@Html.GetText("MENU", "COMENTARIOS")" href="@perfil.Url@Html.GetText("URLSEM", "COMENTARIOS")">@Html.GetText("MENU", "COMENTARIOS")</a>
+                <span style="display: none;" class="novedades" id="infoNumComentarios"><span class="indentado">nuevos</span></span>
+                <span style="display: none" class="avisos" id="infNumComentariosSinLeer"><span class="indentado">sin leer</span></span>
+            </li>
+            <li class="liNotificaciones">
+                <a title="@Html.GetText("MENU", "INVITACIONES")" href="@perfil.Url@Html.GetText("URLSEM", "INVITACIONES")">@Html.GetText("MENU", "INVITACIONES")</a>
+                <span style="display: none;" class="novedades" id="infoNumInvitaciones"><span class="indentado">nuevos</span></span>
+                <span style="display: none;" class="avisos" id="infNumInvitacionesSinLeer"><span class="indentado">sin leer</span></span>
+            </li>
+            @if (cabecera.SubscriptionsAvailable)
+            {
+                <li class="liNotificaciones novedades" id="infoNumSuscriopciones">
+                    <a title="@Html.GetText("MENU", "SUSCRIPCIONES")" href="@perfil.Url@Html.GetText("URLSEM", "SUSCRIPCIONES")">@Html.GetText("MENU", "SUSCRIPCIONES")</a>
+                    <span style="display: none;" class="novedades" id="infoNumSuscriopciones"><span class="indentado">nuevos</span></span>
+                    <span style="display: none;" class="avisos" id="infNumSuscripcionesSinLeer"><span class="indentado">sin leer</span></span>
+                </li>
+            }
+        </ul>
+        <p>Ver</p>
+        <ul class="pmd-sidebar-nav">
+            <li class="liPerfil">
+                <a href="@perfil.Url@Html.GetText("URLSEM", "EDITARPERFIL")">@Html.GetText("MENU", "EDITARPERFIL")</a>
+            </li>
+            <li class="liEspacio">
+                <a href="@perfil.UrlViewProfile">@Html.GetText("MENU", "VERPERFIL")</a>
+            </li>
+            <li class="liContribuciones">
+                <a href="@perfil.Url@Html.GetText("URLSEM", "MISCONTRIBUCIONES")">@Html.GetText("PERFIL", "MISCONTRIBUCIONES")</a>
+            </li>
+            <li class="liBorradores">
+                <a href="@perfil.Url@Html.GetText("URLSEM", "BORRADORES")">@Html.GetText("BANDEJAENTRADA", "MISBORRADORES")</a>
+            </li>
+            <li class="liContrasena">
+                <a href="@Html.GetBaseUrlIdioma()/@Html.GetText("URLSEM", "CAMBIARPASSWORD")">@Html.GetText("MENU", "CAMBIOCONTRAS")</a>
+            </li>
+            <li class="liCerrarSesion">
+                <a href="@Html.GetUrlLogout()">@Html.GetText("MENU", "SALIR")</a>
+            </li>
+        </ul>
+        <p>Identidades</p>
+        <ul class="pmd-sidebar-nav ulIdentidades">
+            @{
+                int contadorPerfilesPerfil = 0;
+
+                if (perfil.TypeProfile != ProfileType.Personal)
+                {
+                    IEnumerable<UserProfileModel> listaPerfilesPers = (perfil.UserProfiles).Where(perfilAux => perfilAux.TypeProfile == ProfileType.Personal);
+                    if (listaPerfilesPers.Count() > 0)
+                    {
+                        UserProfileModel perfilPersonal = listaPerfilesPers.First();
+
+                        <li>
+                            <a href="@perfilPersonal.Url" title="@perfilPersonal.Name">
+                                @*@if (!string.IsNullOrEmpty(perfilPersonal.Foto))
+                                {
+                                    <img alt="@perfilPersonal.Name" src="@Html.GetBaseUrlContent()@perfilPersonal.Foto" />
+                                }*@
+                                <span>@perfilPersonal.Name</span>
+                            </a>
+                            <span style="display: none;" title="nuevos" class="novedades novPerfilOtraIdent" id="infoNov_@perfilPersonal.Key">
+                                0<span class="indentadoIdentidades">nuevos</span>
+                            </span>
+                        </li>
+                        contadorPerfilesPerfil++;
+                    }
+                }
+
+                if (perfil.TypeProfile != ProfileType.Teacher)
+                {
+                    IEnumerable<UserProfileModel> listaPerfilesProf = ((List<UserProfileModel>)perfil.UserProfiles).Where(perfilAux => perfilAux.TypeProfile == ProfileType.Teacher);
+                    if (listaPerfilesProf.Count() > 0)
+                    {
+                        UserProfileModel perfilProfesor = listaPerfilesProf.First();
+                        <li>
+                            <a class="profesor" href="@perfilProfesor.Url" title="@perfilProfesor.Name">
+                                @*@if (!string.IsNullOrEmpty(perfilProfesor.Foto))
+                                {
+                                    <img alt="@perfilProfesor.Name" src="@Html.GetBaseUrlContent()@perfilProfesor.Foto" />
+                                }*@
+                                <span>@perfilProfesor.Name</span>
+                            </a>
+                            <span style="display: none;" title="nuevos" class="novedades novPerfilOtraIdent alertasIdentidades" id="infoNov_@perfilProfesor.Key">
+                                0<span class="indentadoIdentidades">nuevos</span>
+                            </span>
+                        </li>
+                        contadorPerfilesPerfil++;
+                    }
+                }
+
+                foreach (UserProfileModel perfilActual in (perfil.UserProfiles))
+                {
+                    //if (contadorPerfilesPerfil == 10) { break; }
+
+                    if (perfilActual.TypeProfile == ProfileType.Teacher || perfilActual.TypeProfile == ProfileType.Personal || perfilActual.Key == perfil.Key)
+                    {
+                        continue;
+                    }
+                    <li>
+                        <a class="organizacion" href="@perfilActual.Url" title="@perfilActual.Name">
+                            @*@if (!string.IsNullOrEmpty(perfilActual.Foto) && (contadorPerfilesPerfil < 3 || perfil.UserProfiles.Count == 4))
+                            {
+                                <img alt="@perfilActual.Name" src="@Html.GetBaseUrlContent()@perfilActual.Foto" />
+                            }*@
+                            <span>@perfilActual.Name</span>
+                        </a>
+                        <span style="display: none;" title="nuevos" class="novedades novPerfilOtraIdent alertasIdentidades" id="infoNov_@perfilActual.Key">
+                            <span class="indentadoIdentidades">nuevos</span>
+                        </span>
+                    </li>
+                    contadorPerfilesPerfil++;
+                }
+            }
+            <li class="ver-todas">
+                <a href="javascript: void(0);" data-target="menuLateralIdentidades" data-placement="right" data-position="slidepush" class="pmd-sidebar-toggle">Ver todas</a>
+            </li>
+        </ul>
+    </div>
+</aside>

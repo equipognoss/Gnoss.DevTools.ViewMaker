@@ -1,0 +1,337 @@
+﻿@model GroupPageViewModel
+@*
+Descripción
+----------------------------------------------------------------
+Vista que muestra la página para editar un grupo de una comunidad pudiendo añadir, eliminar usuarios, enviar mensaje a grupo...
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+GroupCardModel grupo = Model.Group;
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+CommunityModel Comunidad = Html.GetComunidad();
+}
+@*
+----------------------------------------------------------------
+-------------------- Vista para editar un grupo de una comunidad ------------------
+*@
+@{ 
+    @* Carga de ckEditor para enviar mensajes *@
+    if (grupo.AllowSendMessage)
+    {
+        //Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/ckeditor.js?v=" + Html.GetVersion());
+        //Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/adapters/jquery.js?v=" + Html.GetVersion());
+    }
+}
+
+<div class="row">
+    @if (Comunidad.Key != ProyectoAD.MetaProyecto)
+    {
+        @*Breadcrumb / Migas de pan en la ficha del recurso*@
+        <div class="col col-12 col-breadcrumb" id="breadcrumb">
+            <ul>
+                <li><a href="@Comunidad.Url"><strong>@Html.GetText("COMMON", "HOME")</strong></a></li>
+                <li><a href="@Comunidad.Url/@Html.GetText("URLSEM", "PERSONASYORGANIZACIONES")">@Html.GetText("COMMON", "PERSONASYORGANIZACIONES")</a></li>
+                <li>@grupo.Name</li>
+            </ul>
+        </div>
+    }
+    else
+    {
+        @*Breadcrumb / Migas de pan en la home*@
+        <div class="col col-12 col-breadcrumb" id="breadcrumb">
+            <ul>
+                @if (@Comunidad.Url != null)
+                {
+                    <li><a href="@Comunidad.Url"><strong>@Html.GetText("COMMON", "HOME")</strong></a></li>
+                }
+                else
+                {
+                    <li><strong>@Html.GetText("COMMON", "HOME")</strong></li>
+                }
+                <li><a href="@Comunidad.Url/@Html.GetText("URLSEM", "PERSONASYORGANIZACIONES")">@Html.GetText("COMMON", "PERSONASYORGANIZACIONES")</a></li>
+                <li>@Html.Translate("Grupo")</li>
+            </ul>
+        </div>
+    }
+
+    @* Header o cabecera donde aparecen los resultados o recursos de una comunidad *@
+    @Html.PartialView("../FichaGrupoComunidad/_partial-views/_list-header", Model)
+
+
+    @* Panel derecho-central donde estará el contenido del "buscador"*@
+    <div class="col col-12 col-xl-12 col-contenido izquierdo">
+        @* Div que envuelve todo el contenido central-derecho*@
+        <div class="wrapCol">
+            @* Buscador de recursos *@
+            @Html.PartialView("../FichaGrupoComunidad/_partial-views/_searcher", Model)
+
+            @* Listado de resultados (resource-list) donde aparecerán los recursos-items *@
+            <div id="contenedor-perfiles">
+                @Html.PartialView("../FichaGrupoComunidad/_ContenedorPerfiles", Model)
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Añadir modales *@
+@* Modal para añadir usuarios a grupo *@
+@Html.PartialView("../FichaGrupoComunidad/_modal-views/_add_identity-group")
+
+
+<script>
+    $(document).ready(function () {
+        // Gestionar clicks de  paginador        
+        $('#contenedor-perfiles').on('click', '#NavegadorPaginas_Pag a', function () {
+            console.log("CLickeado");
+            var numPag = $(this).attr('aux');
+            console.log(numPag)
+            $('#numPagina').val(numPag);
+            Filtrar();
+        });
+
+        /* Buscador de personas en el grupo actual */
+        $(".col-buscador").find("form").keydown(function (event) {
+            if (event.keyCode == 13) {
+                // Acción de buscar 
+                Filtrar();
+                event.preventDefault();
+                return false;
+            }
+        });
+    });
+
+    /* Función para filtrar datos: Ej: Cuando se pulse en paginador */
+    function Filtrar() {
+        // Loading
+        MostrarUpdateProgress();
+
+        var numPage = 1;
+
+        if ($('#numPagina').length > 0)
+        {            
+            numPage = $('#numPagina').val();            
+        }
+
+        // Construir el objeto para petición
+        const dataPost = {
+            Search: $('#txtFiltrarMiembros').val(),
+            NumPage: numPage
+        }
+        console.log(dataPost);
+        // Realizar la petición
+        $.post('@Model.UrlLoadMore', dataPost, function (data) {
+            
+            if (data.length > 0) {
+                $('#contenedor-perfiles').html(data);
+            }
+            OcultarUpdateProgress();
+        });
+    }
+
+
+    /* Método para abandonar un grupo de una comunidad */
+    function AbandonarGrupo() {
+        // Mostrar Loading
+        MostrarUpdateProgress();
+        // Hacer petición para abandonar el grupo
+        GnossPeticionAjax('@Model.UrlLeaveGroup', null, true);
+
+    }
+
+    /* Acción de eliminar el grupo actual */
+        function EliminarGrupo() {
+            MostrarUpdateProgress();
+            GnossPeticionAjax('@Model.UrlDeleteGroup', null, true);
+    }
+
+    /* Acción para solicitar acceso al grupo por parte de un usuario de la comunidad */
+    function SolicitarPertenecerGrupo(boton) {
+        // Mostrar loading
+        MostrarUpdateProgress();
+        // Petición realizada
+        GnossPeticionAjax('@Model.UrlRequestAccess', null, true).done(function (data) {
+            // Eliminar el botón de "Solicitar acceso a la comunidad" y ocultar Loading
+            $(boton).remove();
+            OcultarUpdateProgress();
+            mostrarNotificacion("success", "Solicitud de acceso realizada. El acceso al grupo será gestionada por el administrador.");
+        });
+    }
+
+    /* Acción de crear un usuario/invitado para ser mostrado en la caja de "Invitados" antes de ser enviado al servidor */
+    function crearInvitado(ficha, nombre, identidad) {
+        // Vaciar el input de búsqueda
+        $('#txtFiltro').val('');
+        // Contenedor donde irán los usuarios seleccionados
+        const contenedor = $('#panContenedorInvitados');
+
+        const identidadUsuarioBox = `
+            <div class="tag" title = "${nombre}" id="${identidad}" >
+                <div class="tag-wrap">
+                    <span class="tag-text">${nombre}</span>
+                    <span class="tag-remove material-icons" onclick="javascript:eliminarInvitado(null,this, '${identidad}');">close</span>
+                </div>
+                <input type="hidden" value="${identidad}" />
+            </div>
+        `;
+        /* Añadir el usuario a la caja de "invitados" */
+        contenedor.append(identidadUsuarioBox);
+        /* Añadir la identidad al inputOculto*/
+        $('#txtHackInvitados').val($('#txtHackInvitados').val() + "," + identidad);
+    }
+
+    // Eliminar un usuario que se ha seleccionado para ser añadido al grupo.
+    function eliminarInvitado(fichaId, nombre, identidad) {
+        // Caja donde estaría el usuario
+        const contenedor = $('#panContenedorInvitados');
+        // Buscar y eliminar el item de la caja
+        //contenedor.children()[0].removeChild(nombre.parentNode);
+        contenedor.find(`#${identidad}`).remove();
+        // Eliminarlo del txtHackInvitados
+        $('#txtHackInvitados').val($('#txtHackInvitados').val().replace(',' + identidad, ''));
+    }
+
+    /**
+     * Método para Aceptar a miembros que solicitan el alta a este grupo
+    */
+    function AceptarMiembros() {
+        
+        // Mostrar Loading
+        MostrarUpdateProgress();
+
+        // Objeto que se enviará en petición
+        const miembros = {};
+        // Usuarios que serán añadidos al grupo
+        var txtMiembros = $('#txtHackInvitados').val();
+        // Comprobar que hay usuarios añadidos
+        if (txtMiembros.length > 0) {
+            const listaMiembros = txtMiembros.split(',');
+            let contMiembros = 0;
+            for (var i = 0; i < listaMiembros.length; i++) {
+                if (listaMiembros[i].trim() != "") {
+                    miembros[contMiembros] = listaMiembros[i];
+                    contMiembros++;
+                }
+            }
+        }
+        // Construcción del objeto para realizar la petición
+        const dataPost = {
+            Members: miembros
+        }
+
+        // Petición de Añadir usuarios
+        GnossPeticionAjax('@Model.UrlAddMember', dataPost, true).done(function (data) {
+            if (!Array.isArray(data)) {
+                // V5 -> Objeto de arrays -> Acceder al elemento 2 del objeto
+                 if (data.$values.length > 0) {
+                    for (var i in data.$values) {
+                        if (data.$values[i].updateTargetId.indexOf("fichaPerfil_") == 0) {
+                            var htmlFicha = data.$values[i].html;
+                            // Añadir el item creado a la lista de usuarios
+                            $('.resource-list-wrap').prepend(htmlFicha);
+                        }
+                    }
+                }
+
+            } else {
+                // V4 -> Array solo ha sido devuelto
+                if (data.length > 0) {
+                    for (var i in data) {
+                        if (data[i].updateTargetId.indexOf("fichaPerfil_") == 0) {
+                            var htmlFicha = data[i].html;
+                            // Añadir el item creado a la lista de usuarios
+                            $('.resource-list-wrap').prepend(htmlFicha);
+                        }
+                    }
+                }
+            }
+            
+            OcultarUpdateProgress();
+            // Ocultar el modal
+            $("#add-identity-group").modal('hide');
+            // Vaciar el HTML de usuarios invitados - Ya añadidos
+            $('#panContenedorInvitados').html('');
+            // Vaciar input de usuarios invitados
+            $('#txtHackInvitados').val('');
+        });
+    }
+
+    /**
+     * Método para enviar mensajes a los miembros del grupo de la comunidad
+    */
+    function EnviarMensajeMiembrosGrupo(grupoID) {
+        $('#panAgregarMiembros').hide();
+        @*AccionEnviarMensajeMVC('@grupo.UrlGroup', grupoID)*@
+        AccionEnviarMensajeMVC('@grupo.UrlGroup', grupoID, '@Html.GetText("PERSONAS", "ENVIARMENSAJE")');
+    }
+
+    /**
+     * Método para eliminar una determinada identidad de un grupo de una comunidad
+    */
+    function EliminarIdentidadDeGrupo(identidad) {
+        MostrarUpdateProgress();
+
+        const dataPost = {
+            IdentidadID: identidad
+        }
+
+        GnossPeticionAjax('@Model.UrlRemoveMember', dataPost, true).done(function (data) {
+            $('#perfilGrupo_' + identidad).remove();
+            OcultarUpdateProgress();
+            // Ocultar el modal al haber finalizado la acción
+            $("#modal-container").modal('hide');
+        });
+    }
+
+    /* Autocompletar para añadir a usuarios */
+    $('#txtFiltro').bind('keydown', function (evento) {
+        if ((evento.which == 9) || (evento.keyCode == 9) || (evento.which == 13) || (evento.keyCode == 13)) {
+            return false;
+        }
+    });
+
+    /* Configuración del autocompletar para poder añadir invitados al grupo */
+    $(document).ready(function () {
+        $('#txtFiltro').autocomplete(
+        null,
+        {
+            @{
+                string metodo = "AutoCompletarLectoresEditores";
+                if (grupo.GroupType == GroupCardModel.GroupTypes.Organization)
+                {
+                    metodo = "AutocompletarMiembrosOrganizacion";
+                }
+            }
+            url: $('#inpt_urlServicioAutocompletar').val() + "/@metodo",
+            delay: 0,
+            multiple: true,
+            scroll: false,
+            selectFirst: false,
+            minChars: 1,
+            width: 300,
+            cacheLength: 0,
+            NoPintarSeleccionado: true,
+            txtValoresSeleccID: 'txtHackInvitados',
+            extraParams: {
+                grupo: '@grupo.ShortName',
+                identidad: '@IdentidadActual.KeyIdentity',
+                identidadMyGnoss: '@IdentidadActual.KeyMetaProyectIdentity',
+                identidadOrg: '@(IdentidadActual.KeyOrganization == Guid.Empty ? "" : IdentidadActual.KeyIdentityOrg.ToString())',
+                proyecto: '@Comunidad.Key',
+                organizacion: '@(IdentidadActual.KeyOrganization == Guid.Empty ? "" : IdentidadActual.KeyOrganization.ToString())',
+                bool_esPrivada: '@(Comunidad.AccessType == CommunityModel.TypeAccessProject.Private || Comunidad.AccessType == CommunityModel.TypeAccessProject.Reserved ? "True" : "False")',
+                bool_edicion: 'True',
+                bool_traerperfiles: true,
+                bool_traergrupos: 'False'
+            }
+        }
+    );
+
+    // Asignar el método que se ejecutará cuando se encuentre a un usuario por autocompletar
+    $('#txtFiltro').result(function (event, data, formatted) {
+        crearInvitado(null, data[0], data[1]);
+    });
+});
+</script>

@@ -1,0 +1,13 @@
+﻿@model List<GadgetModel>
+
+<h2 style="display: none;">Contexto</h2>
+
+@if (Model != null && Model.Count > 0)
+{
+    <div id="divContPanGadgets">
+        @foreach (GadgetModel gadget in Model.OrderBy(gadget => gadget.Order))
+        {
+            @Html.PartialView("ControlesMVC/_FichaGadget", gadget)
+        }
+    </div>
+}

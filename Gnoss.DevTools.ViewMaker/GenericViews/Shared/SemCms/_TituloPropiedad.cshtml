@@ -1,0 +1,35 @@
+﻿@model SemanticPropertyModel
+
+@if (!string.IsNullOrEmpty(Model.OntologyPropInfo.LabelTitle))
+{
+    string claseTitulo = "control-label d-block lb lb_" + Model.Element.Propiedad.NombreGeneracionClases;
+
+    if (Model.Element.Propiedad.EspecifPropiedad.ClaseCssPanelTitulo != null)
+    {
+        claseTitulo = Model.Element.Propiedad.EspecifPropiedad.ClaseCssPanelTitulo;
+    }
+    
+    string textoLabel = Model.OntologyPropInfo.LabelTitle;
+
+    if (!Model.ReadMode && Model.OntologyPropInfo.MultiLanguage && !Model.OntologyPropInfo.MultiLanguageWithTabs)
+    {
+        textoLabel += " (*" + Model.EntityParent.SemanticResourceModel.AvailableLanguages[Model.EntityParent.SemanticResourceModel.DefaultLanguage] + ")";
+    }
+
+    if (!Model.ReadMode && Model.Element.Propiedad.EspecifPropiedad.TagNameTituloEdicion != null)
+    {
+        @Html.Raw("<" + Model.Element.Propiedad.EspecifPropiedad.TagNameTituloEdicion + " class=\"" + claseTitulo + "\">" + textoLabel + "</" + Model.Element.Propiedad.EspecifPropiedad.TagNameTituloEdicion + ">")
+    }
+    else if (Model.ReadMode && Model.Element.Propiedad.EspecifPropiedad.TagNameTituloLectura != null)
+    {
+        @Html.Raw("<" + Model.Element.Propiedad.EspecifPropiedad.TagNameTituloLectura + " class=\"" + claseTitulo + "\">" + textoLabel + "</" + Model.Element.Propiedad.EspecifPropiedad.TagNameTituloLectura + ">")
+    }
+    else if (Model.ReadMode)
+    {
+        <strong class="@claseTitulo">@textoLabel</strong>
+    }
+    else
+    {
+        <label class="@claseTitulo">@textoLabel</label>
+    }
+}

@@ -1,0 +1,48 @@
+﻿@using Es.Riam.Gnoss.Web.MVC.Models;
+@model CMSComponentGroupComponents
+@if (Model != null)
+{
+    string estilos = Model.Styles;
+    <div class="block @estilos" id="@Model.Key.ToString()">  
+        @if (!string.IsNullOrEmpty(Model.Title))
+        {
+            <div class="titulo"><h2>@Model.Title</h2></div>
+        }
+        <div class="contenido">
+            <div class="navegacion">
+                @{
+                    int i = 0;
+                    foreach (CMSComponent fichaComponente in Model.ComponentList)
+                    {
+                        string estilo="item-tab item-"+i;
+                        if (i == 0)
+                        {
+                            estilo += " activo ";
+                        }
+                        <div class="@estilo">
+                            @fichaComponente.Title
+                        </div>       
+                        i++;
+                    }
+                }
+            </div>
+            <div class="items">
+                @{
+                    int j = 0;
+                    foreach (CMSComponent fichaComponente in Model.ComponentList)
+                    {                    
+                        if (j == 0)
+                        {
+                            <div class="item item-@j" style="display: block;">@Html.PartialView("_ComponenteCMS", fichaComponente)</div>
+                        }
+                        else
+                        {
+                            <div class="item item-@j" style="display: none;">@Html.PartialView("_ComponenteCMS", fichaComponente)</div>
+                        }                    
+                        j++;
+                    }
+                }
+            </div>
+        </div>    
+    </div>
+}

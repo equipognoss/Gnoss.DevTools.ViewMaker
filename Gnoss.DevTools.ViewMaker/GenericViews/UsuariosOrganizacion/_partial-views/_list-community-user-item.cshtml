@@ -1,0 +1,255 @@
+﻿@model AdministrarUsuariosOrganizacionViewModel.UserOrganizationModel
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra cada item de tipo Grupo  para ser mostrado en la sección de "Administrar Comunidades".
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+AdministrarUsuariosOrganizacionViewModel.UserOrganizationModel usuario = Model;
+// Tipo de usuario
+string tipoUsuario = "";
+// Detectar si dispone de fotografía el usuario
+bool containsUrlFoto = !string.IsNullOrEmpty(usuario.Foto);
+
+// Obtengo el las acciones posibles (urlfilter) obtenidas de la vista "_list-content"
+var urlBaseAccionesUsuariosOrganizacion = (String)ViewData["BaseAccionesUsuariosOrganizacion"];
+
+}
+
+@* Obtener el tipo de usuario *@
+@{     
+    switch (usuario.Type)
+    {
+        case TipoAdministradoresOrganizacion.Administrador:
+            tipoUsuario = Html.GetText("USUARIOS", "ADMINISTRADOR");
+            break;
+        case TipoAdministradoresOrganizacion.Editor:
+        tipoUsuario = Html.GetText("USUARIOS", "EDITOR");
+            break;
+        case TipoAdministradoresOrganizacion.Comentarista:
+            tipoUsuario = Html.GetText("USUARIOS", "USUARIO");
+            break;
+    }
+}
+
+
+<article class="resource" id="@usuario.Person_Key">
+    <div class="wrap">       
+        <div class="user-miniatura">
+            @* Imagen del usuario *@
+            <div class="imagen-usuario-wrap">
+                <div class="imagen @( (containsUrlFoto == false) ? "sinImagen" : null) ">                                
+                    @if (containsUrlFoto == false)
+                    {
+                        <span class="material-icons">person</span>
+                    }
+                    else {
+                        <span style="background-image: url(@Html.GetBaseUrlContent()@usuario.Foto)"></span>
+                } 
+                </div>
+            </div>
+
+            @* Nombre del usuario *@
+            <div class="nombre-usuario-wrap">
+                <a href="@Html.GetPerfil().Url@usuario.Url">
+                    <p class="nombre">@usuario.Name</p>
+                    @*<p class="nombre-completo tipoUsuario" rel="@((short)usuario.Type)"
+                       >@tipoUsuario</p>*@
+                </a>
+            </div>
+
+            @* Acciónes de Usuarios *@
+            <div class="acciones-usuario-wrap">
+                <ul class="no-list-style">
+                    <li>
+                        @* Acción para Añadir Uusarios el perfil *@
+                        <a class="btn btn-outline-grey"
+                           data-toggle="modal"
+                           data-target="#modal-container"                           
+                           data-keyitem="@usuario.Person_Key"
+                           onclick="DeployActionInModalPanel('@urlBaseAccionesUsuariosOrganizacion/load-asign-community/@usuario.Person_Key', this, 'modal-dinamic-content', '');">
+                            @* Acción / Opción para Añadir usuarios a la comunidad *@
+                            <span class="material-icons">person_add_alt_1</span>
+                            <span>Asignar a comunidad</span>
+                        </a>
+                    </li>
+                </ul>
+                <div class="acciones-recurso-listado">
+                    @* Más opciones de acciones sobre ese usuario *@
+                    <div class="dropdown">
+                        <a href="#"
+                           class="dropdown-toggle"
+                           role="button"
+                           id="dropdownMasOpciones"
+                           data-toggle="dropdown"
+                           aria-haspopup="true"
+                           aria-expanded="false">
+                            <span class="material-icons">more_vert</span>
+                        </a>
+                        <div class="dropdown-menu basic-dropdown dropdown-icons dropdown-menu-right dropdown-sobre-toggle"
+                             aria-labelledby="dropdownMasOpciones">
+                            <p class="dropdown-title pl-3 ml-3">Acciones</p>
+                            <span class="material-icons cerrar-dropdown">close</span>
+                            <ul class="no-list-style">
+                                @* Cambiar Rol *@                                                                
+                                <li>
+                                    <a class="item-dropdown"
+                                        data-toggle="modal"
+                                        data-target="#modalCambiarRolUser_@usuario.Person_Key"
+                                        data-keyitem="@usuario.Person_Key">
+                                        <span class="material-icons">edit</span>
+                                        <span class="texto">Cambiar rol</span>
+                                    </a>
+                                </li>                                
+                                @* Eliminar Usuario *@
+                                <li>
+                                    <a class="item-dropdown"
+                                       data-toggle="modal"
+                                       data-target="#modalEliminarUser_@usuario.Person_Key"
+                                       data-keyitem="@usuario.Person_Key">
+                                        <span class="material-icons">person_remove</span>
+                                        <span class="texto">Eliminar</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>            
+        </div>
+    </div>
+</article>
+
+
+
+
+@* Modal Eliminar usuario *@
+<div id="modalEliminarUser_@usuario.Person_Key"
+     class="modal modal-top fade show modalExpulsarUser getExternalIdFromModal"     
+     tabindex="-1"
+     role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            @* Header del Modal *@
+            <div class="modal-header">
+                <p class="modal-title">
+                    <span class="material-icons">person_remove</span>                                        
+                        Expulsar usuario
+                </p>
+                <span class="material-icons cerrar" data-dismiss="modal" aria-label="Close">close</span>
+            </div>
+            @* Contenido donde se mostrará el contenido del Modal cargado *@
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="control-label">                                                
+                        <span>¿Deseas expulsar al usuario de la organización?</span>                        
+                    </label>
+                </div>
+
+                @* Botón de acciones *@
+                <div class="form-actions">
+                    <button data-dismiss="modal" class="btn btn-primary">@Html.GetText("COMMON", "NO")</button>
+                    <button class="btn btn-outline-primary ml-1 btnAceptarExpulsarUser"
+                            data-userkey="@usuario.Person_Key">
+                        @Html.GetText("COMMON", "SI")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@* Modal Cambiar Rol usuario *@
+<div id="modalCambiarRolUser_@usuario.Person_Key"
+     class="modal modal-top fade show modalCambiarRolUser getExternalIdFromModal"     
+     tabindex="-1"
+     role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            @* Header del Modal *@
+            <div class="modal-header">
+                <p class="modal-title">
+                    <span class="material-icons">edit</span>                                        
+                        Cambiar rol
+                </p>
+                <span class="material-icons cerrar" data-dismiss="modal" aria-label="Close">close</span>
+            </div>
+            @* Contenido donde se mostrará el contenido del Modal cargado *@
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="control-label">                                                
+                        <span>Selecciona el nuevo rol del usuario:</span>                        
+                    </label>
+                </div>
+
+                @* Opciones para editar el rol del usuario*@
+                <div class="form-group">
+                    @* Opción Administrador *@
+                    <div class="custom-control themed little custom-radio">
+                      <input
+                        type="radio"
+                        class="custom-control-input"
+                        id="optAdministrador_@usuario.Person_Key"
+                        name="SelectorRolUsuario_@usuario.Person_Key"
+                        rel="0"
+                        aux="@Html.GetText("USUARIOS", "ADMINISTRADOR")"
+                        @Html.Raw(usuario.Type == TipoAdministradoresOrganizacion.Administrador ? "checked=\"checked\"" : "")
+                      />
+                      <label for="optAdministrador_@usuario.Person_Key"
+                             class="custom-control-label">
+                          @Html.GetText("USUARIOS", "ADMINISTRADOR")
+                      </label>
+                    </div>
+
+                    @* Opción Editor *@
+                    <div class="custom-control themed little custom-radio">
+                      <input
+                        type="radio"
+                        class="custom-control-input"
+                        id="optEditor_@usuario.Person_Key"
+                        name="SelectorRolUsuario_@usuario.Person_Key"
+                        rel="1"
+                        aux="@Html.GetText("USUARIOS", "EDITOR")"
+                        @Html.Raw(usuario.Type == TipoAdministradoresOrganizacion.Editor ? "checked=\"checked\"" : "")                            
+                      />
+                      <label for="optEditor_@usuario.Person_Key"
+                             class="custom-control-label">
+                          @Html.GetText("USUARIOS", "EDITOR")
+                      </label>
+                    </div>
+
+                    @* Opción Usuario *@
+                    <div class="custom-control themed little custom-radio">
+                      <input
+                        type="radio"
+                        class="custom-control-input"
+                        id="optUsuario_@usuario.Person_Key"
+                        name="SelectorRolUsuario_@usuario.Person_Key"
+                        rel="2"
+                        aux="@Html.GetText("USUARIOS", "USUARIO")"
+                        @Html.Raw(usuario.Type == TipoAdministradoresOrganizacion.Comentarista ? "checked=\"checked\"" : "")                               
+                      />
+                      <label for="optUsuario_@usuario.Person_Key"
+                             class="custom-control-label">
+                          @Html.GetText("USUARIOS", "USUARIO")
+                      </label>
+                    </div>
+                </div>
+
+                @* Botón de acciones *@
+                <div class="form-actions">
+                    <button data-dismiss="modal" class="btn btn-primary">@Html.GetText("COMMON", "CANCELAR")</button>
+                    <button class="btn btn-outline-primary ml-1 btnAceptarCambiarRolUser"
+                            data-userkey="@usuario.Person_Key">
+                        @Html.GetText("COMMON", "ACEPTAR")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

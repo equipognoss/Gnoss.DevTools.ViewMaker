@@ -1,0 +1,18 @@
+﻿@model SemanticPropertyModel
+
+@if (Model.Element.DatosEspecial["TipoEspecial"].Equals("Faceta"))
+{
+    CommunityModel Comunidad = Html.GetComunidad();
+    UserIdentityModel IdententidadActual = Html.GetIdentidadActual();
+    string idPanel = "panFac_" + Guid.NewGuid();
+    
+    <script type="text/javascript">
+        $(function () { MontarFacetaFichaFormSem($('.inpt_UrlServicioFacetas').val(), '@Model.EspecialPropInfo.Graph', '@Model.EspecialPropInfo.Facet', '@Model.EspecialPropInfo.Parameters', '@IdententidadActual.KeyIdentity', $('.inpt_Idioma').val(), '@idPanel'); });
+    </script>
+    <div id="@idPanel"></div>
+}
+else if (Model.Element.DatosEspecial["TipoEspecial"].Equals("Boton"))
+{
+    string idBoton = "btn_" + Model.EspecialPropInfo.ActionID;
+    <input type="button" id="@idBoton" class="btnAccionSemCms @idBoton" rel="@Model.EspecialPropInfo.ActionEntityID" value="@Model.EspecialPropInfo.ButtonName" />
+}

@@ -1,0 +1,79 @@
+﻿@model OlvidePasswordViewModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra un pequeño formulario para solicitar el cambio de contraseña mediante la introducción del email.
+El sistema enviará un email al correo indicado por el usuario
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+// Id que tendrá el inputText para insertar el correo que recibirá el link para cambiar la contraseña
+string idTxtuserLogin = "userLogin";
+// Id del panel que recibirá posibles mensajes de error
+string idForgetPasswordInfoPanel = "forgetPasswordInfoPanel";
+// Id del botón para solicitar cambio de password o envío de link para solicitar cambiar password
+string idBtnEnviar = "btnEnviar";
+
+}
+@*
+----------------------------------------------------------------
+-------------------- Vista para solicitar nueva contraseña por olvido --------------------
+*@
+
+@{
+    Html.SetBodyClass("layout03 password-page myGnoss no-min-height-content");
+}
+
+<div id="col02" class="col">
+    <div class="panel-centrado">
+        <h1>@Html.GetText("SOLICITARCAMBIOPASSWORD", "PASSWORDOLVIDADO")</h1>
+        <div class="fieldset">
+            <fieldset class="busquedaEstandar">
+                <div class="fieldsetContent">
+                    <div class="texto-gris-medio">
+                        @Html.Raw(Html.GetText("SOLICITARCAMBIOPASSWORD", "INFO"))
+                    </div>
+                    <div class="form-group">
+                        <label for="@idTxtuserLogin" class="control-label">@Html.GetText("SOLICITARCAMBIOPASSWORD", "NOMBREUSU") </label>
+                        <input placeholder="Introduce tu correo electrónico" type="text" id="@idTxtuserLogin" class="form-control" value="@Model.Login">
+                    </div>
+                    @* Divs con los mensajes de informativos o de error *@
+                    <div id="@idForgetPasswordInfoPanel" style="display: none;" class="alert alert-danger" role="alert">
+
+                    </div>
+
+                </div>
+            </fieldset>
+        </div>
+        <div class="fieldset actionButtons">
+            <fieldset>
+                <div class="fieldsetContent">
+                    <input type="button" value="Enviar" class="submit principal btn btn-primary" id="@idBtnEnviar">
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+
+    (function ($) {
+        // Parámetros para operativaOlvidoPassword
+        const pParams = {
+            idTxtuserLogin: "@idTxtuserLogin",
+            idForgetPasswordInfoPanel: "@idForgetPasswordInfoPanel",
+            idBtnEnviar: "@idBtnEnviar",
+            urlForgetPasswordRequest: "@Model.Url",
+            msgInfoEmptyField: "@Html.GetText("SOLICITARCAMBIOPASSWORD", "INTRODUCENOMBREUSU")",
+            msgErrorForgetPasswordRequest: "@Html.GetText("SOLICITARCAMBIOPASSWORD", "NOPOSIBLECAMBIO", Html.GetNombreProyectoEcosistema())",
+        };
+        // Gestión de operativa para cambio de contraseña
+        operativaOlvidoPassword.init(pParams);
+    })();
+
+</script>
+

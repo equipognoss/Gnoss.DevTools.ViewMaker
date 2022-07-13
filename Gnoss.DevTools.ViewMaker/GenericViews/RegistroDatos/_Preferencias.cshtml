@@ -1,0 +1,78 @@
+﻿@model RegisterDataViewModel
+
+
+@*
+Descripción
+-----------------------------------------------
+Vista que se utilizará para contener un panel de tipo Collapse que explica el porque de tener un perfil público en Gnoss.
+Esta vista se utiliza, por ejemplo, en el proceso de Registro. Si una Comunidad pertenece a GNOSS, este mensaje puede ser desplegado por el usuario.
+Este mensaje se muetra en el paso de creación de perfil número 3.
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista donde se mostrarán las preferencias de las comunidades de un usuario en el proceso de registro --------------------
+*@
+
+@* Selección de lista de categorías *@
+<div class="panDesplegableSelCat">
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        @* Opción Ver listado en Arbol*@
+        <li class="nav-item">
+            <a class="nav-link active"
+               id="ver-arbol-tab"
+               data-toggle="tab"
+               href="#ver-arbol"
+               role="tab"
+               aria-controls="ver-arbol"
+               aria-selected="true">@Html.GetText("TESAURO", "ARBOL")</a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        @* Listado en "ARBOL" *@        
+        @Html.PartialView("../RegistroDatos/_partial-views/_community-preferences-register", Model)
+    </div>
+
+    @* Acciones del formulario Envío de preferencias*@
+    <form method="post" id="formPreferenciasRegistro">
+        <div class="fieldset actionButtons">
+            <fieldset>
+                <p>
+                    <input type="hidden" name="paginaOriginal" value="@Model.ReferrerPage" />
+                    <input type="hidden" name="listaCategorias" id="listaCategorias" />
+                    <input type="hidden" name="paginaPreferencias" value="true" />
+                    <input type="hidden" name="tienePaginaDatosRegistro" value="@Model.TabData.ToString().ToLower()" />                    
+                    <input id="submit" type="submit" value="Guardar y siguiente" class="btn btn-primary principal submit principal uppercase" onclick="Registro_EnviarPreferencias()">
+                </p>
+            </fieldset>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    // Envio del formulario con las preferencias recogidas
+    function Registro_EnviarPreferencias() {
+        MostrarUpdateProgress();
+        var arg = "";
+        $('.categoriaPreferencia').each(function () {
+            var chk = $(this);
+            if (chk.is(":checked")) {
+                arg += '&' + chk.attr("categoriaid");
+            }
+        })
+        $('#listaCategorias').val(arg);
+    }
+</script>
+
+
+
+
+

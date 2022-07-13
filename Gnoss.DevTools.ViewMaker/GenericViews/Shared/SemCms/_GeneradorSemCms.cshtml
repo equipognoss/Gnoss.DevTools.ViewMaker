@@ -1,0 +1,176 @@
+﻿@model SemanticResourceModel
+
+@{
+    string classPrincipal = null;
+
+    if (Model.ReadMode)
+    {
+        classPrincipal = "formSemLectura";
+
+        if (Model.RootEntities != null && Model.RootEntities.Count > 0)
+        {
+            classPrincipal += " formSemLectura_" + Model.RootEntities[0].Entity.TipoEntidadGeneracionClases;
+        }
+
+        if (Model.HideInfoIsNotMember)
+        {
+            classPrincipal += " onlyMembersContent";
+        }
+    }
+    else
+    {
+        Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/jsUnificar/MVC.EditarSEMCMS.js?v=" + Html.GetVersion());
+        classPrincipal = "formSemEdicion";
+
+        if (Model.RootEntities != null && Model.RootEntities.Count > 0)
+        {
+            classPrincipal += " formSemEdicion_" + Model.RootEntities[0].Entity.TipoEntidadGeneracionClases;
+        }
+
+        if (Model.DateWithTimeAvailable)
+        {
+            Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/jsNuevo/datetime/jquery.datetimepicker.js?v=" + Html.GetVersion());
+            Html.GetListaCSS().Add(Html.GetBaseUrlStatic() + "/jsNuevo/datetime/jquery.datetimepicker.css?v=" + Html.GetVersion());
+        }
+    }
+
+    if (!string.IsNullOrEmpty(Model.OntologyJS))
+    {
+        Html.GetListaJS().Add(Model.OntologyJS);
+    }
+
+    if (!string.IsNullOrEmpty(Model.OntologyCSS))
+    {
+        Html.GetListaCSS().Add(Model.OntologyCSS);
+    }
+}
+
+<div class="@classPrincipal">
+    @if (!string.IsNullOrEmpty(Model.AdminGenerationError))
+    {
+        <div class="ko" style="display:block;"><p>@Html.Raw(Model.AdminGenerationError)</p></div>
+        
+        if (!Model.ReadMode)
+        {
+            <script type="text/javascript">
+                $(function () { $('#divContPanelBotonera').remove();});
+            </script>
+        }
+    }
+    else if (!Model.ReadMode)
+    {
+        <fieldset id="Gen_Principal">
+            @foreach (SemanticEntityModel semEnti in Model.RootEntities)
+            {
+                if (semEnti.Entity.SuperclasesUtiles.Count == 0)
+                {
+                    @Html.PartialView("SemCms/_TituloEntidad", semEnti)
+                }
+                @Html.PartialView("SemCms/_Entidad", semEnti)
+            }
+        </fieldset>
+    }
+    else
+    {
+        string xmlns = "xmlns:" + Model.OntologyNamespace + "=\"" + Model.OntologyUrl + "\"";
+
+        foreach (string keyName in Model.OntologyNamespaces.Keys)
+        {
+            if (Model.OntologyNamespaces[keyName] != "rdf" && Model.OntologyNamespaces[keyName] != "owl" && Model.OntologyNamespaces[keyName] != "xsd" && Model.OntologyNamespaces[keyName] != "rdfs")
+            {
+                xmlns += " xmlns:" + Model.OntologyNamespaces[keyName] + "=\"" + keyName + "\"";
+            }
+        }
+
+        string rel = "rel=\"" + Model.DocSemCmsProperty + "\"";
+        string about = "about=\"" + Html.GetUrlPagina() + "\"";
+        
+        <div @Html.Raw(xmlns) xmlns:sioc="http://rdfs.org/sioc/ns#" xmlns:gnoss="http://gnoss.com/gnoss.owl#" @Html.Raw(rel) @Html.Raw(about)>
+            @foreach (SemanticEntityModel semEnti in Model.RootEntities)
+            {
+                if (semEnti.Entity.SuperclasesUtiles.Count == 0)
+                {
+                    @Html.PartialView("SemCms/_TituloEntidad", semEnti)
+                }
+                @Html.PartialView("SemCms/_Entidad", semEnti);
+            }
+        </div>
+        
+            if (Model.HideInfoIsNotMember)
+            {
+                string titulo = Model.TitleInfoIsNotMember;
+                if (!string.IsNullOrEmpty(titulo))
+                {
+                    titulo = "<p class=\"title\">" + titulo + "</p>";
+                }
+
+                string linkRegistrarse = Model.RegisterLinkInfoIsNotMember;
+                if (!string.IsNullOrEmpty(linkRegistrarse))
+                {
+                    linkRegistrarse = Html.GetText("COMMON", "LINKREGISTRARSE", linkRegistrarse);
+                }
+                
+            
+            <div class="mensajePersonalizadoSoloMiembros">
+                @Html.Raw(Html.GetText("PERFILBASERECURSOSFICHA", "VELADOSOLOMIEMBROS", titulo, linkRegistrarse))
+            </div>
+            }
+    }
+</div>
+
+@if (!Model.ReadMode)
+{
+    <input type="hidden" id="mTxtRegistroIDs" value="@Model.AuxiliaryIDRegisterInfo" />
+    <input type="hidden" id="mTxtValorRdf" value="@Model.AuxiliaryRDFInfo" />
+    <input type="hidden" id="mTxtCaracteristicasElem" value="@Model.AuxiliaryElementsFeaturesInfo" />
+    <input type="hidden" id="mTxtElemEditados" />
+    <input type="hidden" id="mTxtDeplegablesIDs" />
+    <input type="hidden" id="mTxtValorRdfHerencias" value="@Model.AuxiliaryInheritancesInfo" />
+    <input type="hidden" id="mTxtNombreCatTesSem" value="@Model.AuxiliaryCategoryTesSemNameInfo" />
+    <input type="hidden" id="txtHackValorImgRepresentante" value="@Model.ImageRepresentativeValue" />
+    <input type="hidden" id="txtValoresGrafoDependientes" value="@Model.AuxiliaryDependentGraphValuesInfo" />
+    <input type="hidden" id="txtSubOntologias" value="@Model.AuxiliarySubOntologiesExtInfo" />
+    <input type="hidden" id="txtHackControlRep" />
+    <input type="hidden" id="txtEntidadesOntoIDs" value="@Model.AuxiliaryEntityIDRegisterInfo" />
+
+    if (!string.IsNullOrEmpty(Model.DefaultLanguage))
+    {
+        string idiomasDis = "";
+
+        foreach (string idioma in Model.AvailableLanguages.Keys)
+        {
+            idiomasDis += idioma + ",";
+        }
+
+        idiomasDis = idiomasDis.Substring(0, idiomasDis.Length - 1);
+        
+        <script type="text/javascript">
+            var IdiomaDefectoFormSem = '@Model.DefaultLanguage';
+            var IdiomasConfigFormSem = '@idiomasDis';
+        </script>
+    }
+    
+    <div id="divPreguntaConfirmacionEventos" class="confirmar" style="display:none;">
+        <div class="pregunta">
+            <span id="lblPregunta_ConfirmacionEventos"></span>
+            <input id="lbSi_ConfirmacionEventos" type="button" class="btn btn-primary mt-2" value="@Html.GetText("COMMON", "SI")" onclick="" />
+            <input type="button" class="btn btn-outline-primary mt-2" value="@Html.GetText("COMMON", "NO")" onclick="$('#divPreguntaConfirmacionEventos').css('display', 'none');" />
+        </div>
+    </div>
+    
+    <input type="hidden" id="txtHackArchivoSelecc" />
+    if (!Model.MassiveResourceLoad)
+    {
+        <div id="divContArchiInicio" class="confirmar divSelecArchFormSem" style="display:none;">
+            <div id="divContArchiInicioInt" class="pregunta">
+                <label> @Html.GetText("PERFILBASESUBIR", "NUEVOARCHIVO_T")</label>
+                <input type="file" id="fuExaminarSemCms" />
+            </div>
+        </div>
+    }
+
+    if (Model.JcropAvailable)
+    {
+        @Html.PartialView("SemCms/_JcropSemCms", Model)
+    }
+}

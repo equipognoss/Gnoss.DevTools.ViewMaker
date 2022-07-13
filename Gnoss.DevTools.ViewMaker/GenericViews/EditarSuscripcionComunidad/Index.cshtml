@@ -1,0 +1,119 @@
+﻿@model EditSuscriptionViewModel
+
+@{
+    Html.SetBodyClass("layout03 comGnoss");
+}
+
+<div id="col02">
+    <h3>
+        <span>@Html.GetText("SUSCRIPCIONES", "SUSCRIPCIONESENCOMUNIDAD")</span>
+    </h3>
+    <div>
+
+        <div class="box">
+            <div>
+                <div id="selectorCategoriasSusc">
+                    <div>
+                        <input type="checkbox" id="chkSeleccionarTodos" onclick="MVCMarcarTodosElementosCat(this, 'selectorCategoriasSusc');" />
+                        <label for="">@Html.GetText("SUSCRIPCIONES", "ATODASCATEGORIAS")</label>
+                    </div>
+                    <div class="box">
+                        <label>@Html.GetText("CONTROLESSELCATEGORIASBUSQUEDDAS", "SELCATEGORIAS"): </label>
+                        <input type="radio" onclick="$('#divSelCatLista').hide(); $('#divSelCatTesauro').show();" name="ModoSelector" checked="checked" />
+                        <label for="">@Html.GetText("TESAURO", "VERARBOL")</label>
+                        <input type="radio" onclick="$('#divSelCatLista').show(); $('#divSelCatTesauro').hide();" name="ModoSelector" />
+                        <label for="">@Html.GetText("TESAURO", "VERLISTA")</label>
+                    </div>
+                    @{
+                        string categorias = "";
+                        foreach (CategoryModel CategoriaTesauro in Model.Categories)
+                        {
+                            if (CategoriaTesauro.Selected)
+                            {
+                                categorias += CategoriaTesauro.Key + ",";
+                            }
+                        }
+                    }
+                    <input type="hidden" id="txtSeleccionados" value="@categorias" />
+
+                    <div id="divSelCatTesauro" class="box">
+                        @Html.PartialView("_FichaCategoriaTesauroArbol", Model)
+                    </div>
+                    <div style="display: none;" id="divSelCatLista">
+                        <fieldset>
+                            <p>
+                                <input type="text" onkeydown="javascript:if(event.which || event.keyCode){if ((event.which == 13) || (event.keyCode == 13)) {return false;}}" onkeyup="javascript:MVCFiltrarListaSelCat(this, 'selectorCategoriasSusc');" class="filtroRapido" />
+                                <input type="button" class="encontrar findAction" value="filtrar"/>
+                            </p>
+                        </fieldset>
+                        @Html.PartialView("_FichaCategoriaTesauroLista", Model)
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        @if (Model.ActiveNotifications)
+        {
+            <div>
+                <input type="checkbox" onclick="VerFrecuencia(this);" id="chkRecibirBoletin" @(Model.ReceiveSubscription?"checked=checked":"")/>
+                <label for="chBoletinesSuscripciones">@Html.GetText("CONFIGURACIONGNOSS", "BOLETINESSUSCRIPCIONES")</label>
+                <input type="radio" value="rbtnSuscripcionDiaria" name="suscripcion" id="rbtnSuscripcionDiaria" @(Model.DailySubscription?"checked=checked":"")/>
+                <label for="rbtnSuscripcionDiaria">@Html.GetText("CONFIGURACIONGNOSS", "DIARIA")</label>
+                <input type="radio" value="rbtnSuscripcionSemanal" name="suscripcion" id="rbtnSuscripcionSemanal" @(Model.WeeklySubscription?"checked=checked":"")/>
+                <label for="rbtnSuscripcionSemanal">@Html.GetText("CONFIGURACIONGNOSS", "SEMANAL")</label>
+            </div>
+        }
+
+        <div style="display: block">
+            <div style="display: none" id="respuesta"></div>
+        </div>
+
+        <div class="fieldset actionButtons">
+            <fieldset>
+                <p>
+                    <input type="button" class="submit principal" value="@Html.GetText("PERFIL", "GUARDARPREFERENCIAS")" onclick="enviarFormularioPagina()" />
+                </p>
+            </fieldset>
+        </div>
+
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        MVCComprobarChecks("selectorCategoriasSusc");
+        VerFrecuencia($('#chkRecibirBoletin'));
+    });
+
+    function VerFrecuencia(check) {
+        $("#rbtnSuscripcionDiaria").prop('disabled', !$(check).is(':checked'));
+        $("#rbtnSuscripcionSemanal").prop('disabled', !$(check).is(':checked'));
+    }
+
+    function enviarFormularioPagina() {
+        MostrarUpdateProgress();
+        $('#respuesta').hide();
+
+        var dataPost = {
+            SelectedCategories: $('#txtSeleccionados').val(),
+            ReceiveSubscription: $('#chkRecibirBoletin').is(':checked'),
+            DailySubscription: $('#rbtnSuscripcionDiaria').is(':checked'),
+            WeeklySubscription: $('#rbtnSuscripcionSemanal').is(':checked')
+        }
+
+        GnossPeticionAjax(
+            '@Html.GetUrlPagina()/save-changes',
+            dataPost,
+            true
+        ).done(function () {
+            claseDiv = "ok";
+        }).fail(function () {
+            claseDiv = "ko";
+        }).always(function (response) {
+            $('#respuesta').attr("class", claseDiv);
+            $('#respuesta').html("<p>" + response + "</p>");
+            $('#respuesta').show();
+            OcultarUpdateProgress();
+        });
+    }
+</script>

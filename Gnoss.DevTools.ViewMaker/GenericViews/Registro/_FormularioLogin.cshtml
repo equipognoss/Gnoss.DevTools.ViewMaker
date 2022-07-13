@@ -1,0 +1,116 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista que contiene únicamente el formulario utilizado para hacer login a la plataforma de Gnoss.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+CommunityModel Comunidad = Html.GetComunidad();
+}
+@*
+----------------------------------------------------------------
+-------------------- Vista del Login de una comunidad --------------------
+*@
+
+
+
+<form method="post"
+      id="formPaginaLogin"
+      action="@Html.GetUrlActionLogin()">
+    <div class="fieldset fieldset01">
+        <fieldset>
+            <div class="fieldsetContent">
+                <div class="form-group">
+                    <label for="usuario_Login" class="control-label">@Html.GetText("LOGIN", "NOMBREUSUARIOOCORREO")</label>
+                    <input placeholder="Introduce tu correo electrónico"
+                           type="text"
+                           name="usuario"
+                           id="usuario_Login"
+                           class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label for="password_login" class="control-label">@Html.GetText("LOGIN", "CONTRASEÑA")</label>
+                    <input placeholder="Introduce tu contraseña"
+                           type="password"
+                           name="password"
+                           id="password_login"
+                           class="form-control" />
+                </div>
+                @{
+                    UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+
+                    if (IdentidadActual.IsGuestUser && !string.IsNullOrEmpty(@Html.GetTokenLoginUsuario()) && IdentidadActual.NumberOfLoginAttemptsIP >= 2)
+                    {
+                        string srcCaptcha = @Html.GetUrlServicioLogin() + "/LoginCaptcha.aspx?token=" + System.Net.WebUtility.UrlEncode(@Html.GetTokenLoginUsuario());
+                        <p id="panCaptcha">
+                            <label>
+                                @Html.GetText("LOGIN", "TEXTOCAPTCHA")
+                                <img id="imgCaptcha" src="@srcCaptcha" />
+                            </label>
+                            <input name="captcha" type="captcha" id="captcha" class="text medium" onkeydown="if(event.which || event.keyCode){if ((event.which == 13) || (event.keyCode == 13)) {Entrar(); return false;}}" />
+                        </p>
+                    }
+                }
+                <div id="loginError" class="error-wrap">
+                    <div class="ko">
+                        <p id="mensajeError">@Html.GetText("LOGIN", "CLAVEERRONEA")</p>
+                    </div>
+                </div>
+                <div id="loginErrorAutenticacionExterna" class="error-wrap">
+                    <div class="ko">                        
+                        <p>@Html.GetText("LOGIN", "AUTENTICACIONEXTERNA")</p>
+                    </div>
+                </div>
+                <div id="logintwice" class="error-wrap">
+                    <div class="ko">
+                        <p id="mensajeErrorLoginTwice">@Html.GetText("LOGIN", "LOGINTWICE", @Html.GetSessionTimeout())</p>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    @* Contenedor de botón "Iniciar Sesión" / No puedes iniciar sesión *@
+    <div class="fieldset actionButtons fieldset03 actionButtons">
+        <fieldset>
+            <div class="fieldsetContent">
+                @* Link para recuperar contraseña olvidada *@
+                <a class="olvidaste-password" href="@Comunidad.Url/@Html.GetText("URLSEM", "OLVIDEPASSWORD")">@Html.GetText("INICIO", "OLVIDOPASSWORD")</a>
+
+                <input class="principal submit btn btn-primary"
+                       id="btnSubmit"
+                       type="button"
+                       title="@Html.GetText("COMMON", "INICIARSESION")"
+                       value="@Html.GetText("COMMON", "INICIARSESION")" />
+            </div>
+            
+            @* Opción de Crease una cuenta si lo permite la comunidad*@
+            @if (!Comunidad.MetaProyect && ((Comunidad.ProyectType != CommunityModel.TypeProyect.CatalogoNoSocial) || (Comunidad.AccessType == CommunityModel.TypeAccessProject.Public)))
+            {
+                <p class="actionRegister">
+                    @* Permitir registrase o solicitar registro dependiendo del tipo de Comunidad *@
+                    @if (Comunidad.ProyectType != CommunityModel.TypeProyect.CatalogoNoSocial)
+                    {
+
+                        if (Comunidad.AccessType == CommunityModel.TypeAccessProject.Restricted && (!Comunidad.MetaProyect))
+                        {
+                            <span>Si todavía no tienes cuenta</span>
+                            <a id="link_hazte-miembro" class="olvidaste-password" href="@Comunidad.Url/@Html.GetText("URLSEM", "SOLICITARACCESO")">@Html.GetText("COMINICIOLOGIN", "SOLICITARACCESO")</a>
+                        }
+                        else if (Comunidad.AccessType == CommunityModel.TypeAccessProject.Public && (!Comunidad.MetaProyect))
+                        {
+                            <span>Si todavía no tienes cuenta</span>
+                            <a id="link_hazte-miembro" class="olvidaste-password" href="@Comunidad.Url/@Html.GetText("URLSEM", "HAZTEMIEMBRO")">@Html.GetText("COMMON", "REGISTRARSE")</a>
+                        }
+                    }
+                </p>
+            }
+        </fieldset>
+    </div>
+</form>
+
+<script type="text/javascript">
+    // Gestión de operativa Login -> Este Login aprovecha la Lógica de la operativa Login Emergente
+    operativaLoginEmergente.init();
+</script>

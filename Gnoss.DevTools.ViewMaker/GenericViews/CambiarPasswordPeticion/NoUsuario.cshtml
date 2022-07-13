@@ -1,0 +1,51 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista que muestra un pequeño mensaje de "Error" siempre y cuando se accede a la URL para cambio de contraseña pero
+no el email o usuario introducido para cambiar la contraseña.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+CommunityModel Comunidad = Html.GetComunidad();
+UserProfileModel Perfil = Html.GetPerfil();
+string urlInicio = "";
+}
+@*
+----------------------------------------------------------------
+-------------------- Vista informativa de no existencia de petición para cambio de contraseña --------------------
+*@
+
+@{
+    Html.SetBodyClass("layout03 myGnoss");
+}
+
+@* Crear el enlace para ir a la Home *@
+@if (Comunidad.Key.Equals(ProyectoAD.MetaProyecto))
+{
+    urlInicio = Perfil.Url + Html.GetText("URLSEM", "HOME");
+}
+else
+{
+    urlInicio = Comunidad.Url;
+}
+
+<div class="row">
+    @* Panel informativo de no usuario *@
+    <div class="col">
+        <div class="form panel-centrado">
+            <h1>@Html.GetText("CONFIRMACIONCAMBIOPASSWORD", "TITULONOUSUARIO")</h1>
+            <div class="fieldset">
+                <fieldset class="busquedaEstandar">
+                    <div class="fieldsetContent">
+                        <div class="texto-gris-medio">
+                            <p>@Html.GetText("CONFIRMACIONCAMBIOPASSWORD", "MENSAJENOUSUARIO")</p>
+                            <a href="@urlInicio">@Html.GetText("CAMBIARPASSWORD", "IRINICIO")</a>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+</div>

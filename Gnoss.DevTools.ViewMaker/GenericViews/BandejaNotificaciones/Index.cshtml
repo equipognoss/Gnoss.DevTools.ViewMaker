@@ -1,0 +1,111 @@
+﻿@model NotificationViewModel
+@{
+    Html.SetBodyClass("layout02 listadoMyGnoss");
+}
+
+<div id="col01">
+    <div class="mgHerramientas">
+        @Html.PartialView("../Shared/ControlesMVC/_Novedades", "Notificaciones")
+        <div style="display: none" class="resaltarAccion" id="facetaEncuentra">
+            <h2>@Html.GetText("BUSCADORFACETADO", "ENCUENTRA")</h2>
+        </div>
+        <div id="divFac">
+        </div>
+    </div>
+</div>
+<div id="col02">
+    <h2>@Html.GetText("BANDEJAENTRADA", "NOTIFICACIONES")</h2>
+    <div class="operativa widthTabs">        
+        <div id="finderUtils" class="finderUtils">
+            <div class="group filterSpace">
+                <div id="divFiltros">
+                    <p style="display: none;" class="searchBy">
+                        <span>@Html.GetText("COMBUSQUEDAAVANZADA", "FILTROS"): </span>
+                        <a style="margin-left: 5px;" class="limpiarfiltros">@Html.GetText("COMBUSQUEDAAVANZADA", "LIMPIARFILTROS")</a>
+                    </p>
+                </div>
+                <ul class="facetedSearch tags" id="panListadoFiltrosPulgarcito"></ul>
+                <p id="divNumResultadosBusqueda"></p>
+            </div>
+        </div>
+        <div class="resource-list">
+            <div id="divRel">
+            </div>
+        </div>
+        <div id="navegadorBusqueda">
+        </div>
+    </div>
+</div>
+<script defer="defer" lang="javascript" type="text/javascript">
+
+    $(function () {
+        FiltrarPorFacetas(ObtenerHash2());
+        MontarFechas();
+    });
+
+    function MarcarComentarioLeidoPorID(comentarioID) {
+        MostrarUpdateProgress();
+        var params = {
+            listComments: comentarioID
+        }
+        GnossPeticionAjax("@Model.UrlActionMarkReadComment", params, false).done(function () {
+            $("#comment_" + comentarioID).find("div.group.acciones").remove();
+            OcultarUpdateProgress();
+        })
+    }
+
+    function MarcarComentariosLeidos() {
+        var comentarios = ''
+        $.each($('div.resource.comment'), function () {
+            if ($(this).find("div.group.acciones").length > 0) {
+                comentarios += this.id.substr(8) + ',';
+            }
+        });
+
+        if (comentarios.length > 0) {
+            MostrarUpdateProgress();
+
+            var params = {
+                listComments: comentarios
+            }
+            GnossPeticionAjax("@Html.GetUrlPagina()/markRead", params, false).done(function () {
+                $.each(comentarios.split(','), function () {
+                    if (this != "") {
+                        $("#comment_" + this).find("div.group.acciones").remove();
+                    }
+                });
+                OcultarUpdateProgress();
+            })
+        }
+    }
+
+    function AceptarInvitacion(pInvitacion) {
+        mostrarConfirmacionSencillaEnPanel($('#invitation_' + pInvitacion), '@Html.GetText("ACEPTARINVITACION", "QUIERESACEPTAR")', function () {
+            MostrarUpdateProgress();
+
+            var params = {
+                invitationID: pInvitacion
+            }
+            GnossPeticionAjax("@Model.UrlActionAcceptInvitation", params, false).done(function () {
+                FiltrarPorFacetas(ObtenerHash2());
+                OcultarUpdateProgress();
+            })
+        }, 'invitation_' + pInvitacion);
+    }
+
+    function IgnorarInvitacion(pInvitacion) {
+        mostrarConfirmacionSencillaEnPanel($('#invitation_' + pInvitacion), '@Html.GetText("ACEPTARINVITACION", "RECHAZARINVITACION")', function () {
+            MostrarUpdateProgress();
+
+            var params = {
+                invitationID: pInvitacion
+            }
+            GnossPeticionAjax("@Model.UrlActionRejectInvitation", params, false).done(function () {
+                FiltrarPorFacetas(ObtenerHash2());
+                OcultarUpdateProgress();
+            })
+        }, 'invitation_' + pInvitacion);
+    }
+
+    @Html.Raw(Html.GetJSExtra());
+</script>

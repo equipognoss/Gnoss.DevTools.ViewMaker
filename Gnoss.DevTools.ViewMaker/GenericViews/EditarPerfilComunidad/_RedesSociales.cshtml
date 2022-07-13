@@ -1,0 +1,135 @@
+﻿@model EditProfileViewModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista que se utiliza para mostrar información del usuario relativa a sus redes sociales o páginas web que estén relacionadas con él.
+
+Variables
+----------------------------------------------------------------
+*@
+@{   
+// Id input para escribir una determinada URL
+string idUrlUsuario = "UrlUsuario";
+// Id Tabla donde estarán los enlaces URL del usuario
+string idTblRedesSociales = "tblRedesSociales";
+// Id Botón para añadir una URL en el perfil del usuario
+string idBtnRedSocial = "btnRedSocial";
+// Id Botón para eliminar una determinada URL en el perfil del usuario
+string idBtnBorrarUrl = "btnBorrarUrl";
+
+@*ID de inputs de Redes sociales (Twitter, Facebook y Linkedin) *@
+string idTwitterSocial = "twitterSocialUrl";
+string idLinkedinSocial = "linkedinSocialUrl";
+string idFacebookSocial = "facebookSocialUrl";
+
+// Valor de las urls guardadas en BD
+string urlTwitter = "";
+string urlFacebook = "";
+string urlLinkedin = "";
+
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Editar sección de redes sociales del usuario --------------------
+*@
+
+@* Encontrar las URLS que sean Linkedin, Facebook o Twitter*@
+@foreach (EditProfileViewModel.SocialNetwork RedSocial in Model.SocialNetworks)
+{
+
+    if (@RedSocial.Url.Contains("twitter"))
+    {
+        urlTwitter = RedSocial.Url;
+    }
+    else if (@RedSocial.Url.Contains("facebook"))
+    {
+        urlFacebook = RedSocial.Url;
+    }
+    else if (@RedSocial.Url.Contains("linkedin"))
+    {
+        urlLinkedin = RedSocial.Url;
+    }
+}
+<div class="form-group mb-4 edit-red-social">
+    <label class="control-label d-block">Twitter</label>
+    <div class="input-wrap form-social">
+        <input placeholder="Introduce tu cuenta de Twitter"
+               type="text"
+               name=""
+               value="@urlTwitter"
+               id=@idTwitterSocial
+               class="form-control not-outline inputRedSocial" />
+        <div class="icono-social twitter">
+            <i class="fab fa-twitter"></i>
+        </div>
+    </div>
+</div>
+<div class="form-group mb-4 edit-red-social">
+    <label class="control-label d-block">Facebook</label>
+    <div class="input-wrap form-social">
+        <input placeholder="Introduce tu cuenta de Facebook"
+               type="text"
+               name=""
+               value="@urlFacebook"
+               id=@idFacebookSocial
+               class="form-control not-outline inputRedSocial" />
+        <div class="icono-social facebook">
+            <i class="fab fa-facebook-f"></i>
+        </div>
+    </div>
+</div>
+<div class="form-group mb-4 edit-red-social">
+    <label class="control-label d-block">Linkedin</label>
+    <div class="input-wrap form-social">
+        <input placeholder="Introduce tu cuenta de Linkedin"
+               type="text"
+               name=""
+               value="@urlLinkedin"
+               id=@idLinkedinSocial
+               class="form-control not-outline inputRedSocial" />
+        <div class="icono-social linkedin">
+            <i class="fab fa-linkedin-in"></i>
+        </div>
+    </div>
+</div>
+
+@* Sección añadir sitios web de interés *@
+<div class="form-group mb-5 edit-etiquetas">
+    <div class="form-group">
+        <label class="control-label d-block">Otros sitios web de interés</label>
+        <div class="input-wrap form-sticky-button autocompletar">
+            <span class="icon material-icons">insert_link</span>
+            @* Input de sitios web *@
+            <input type="text"
+                   placeholder="Introduce una url y añádela"                   
+                   class="form-control"
+                   id="@idUrlUsuario"                   
+                   autocomplete="off" />
+
+            @* Botón de Añadir Etiqueta/Tag *@
+            <a id="@idBtnRedSocial" class="btn btn-grey uppercase">Añadir</a>                        
+        </div>
+        @* Tabla con el listado de URLs del usuario *@      
+        <table id="@idTblRedesSociales" class="table @( (@Model.SocialNetworks.Count == 0) ? "d-none" : "") ">          
+          <thead>
+            <tr>
+              <th scope="col" colspan="2">@Html.GetText("PERFIL", "NOMBREREDSOCIAL")</th>
+              <th scope="col">@Html.GetText("PERFIL", "URLUSUARIOTABLA")</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody>
+              @foreach (EditProfileViewModel.SocialNetwork RedSocial in Model.SocialNetworks) { 
+                  <tr>
+                      <td><img src="https://www.google.com/s2/favicons?domain=@RedSocial.Domain" /></td>                  
+                      <td class="urlName">@RedSocial.Name</td>
+                      <td class="urlTitle">@RedSocial.Url</td>
+                      <td><span data-urlname="@RedSocial.Name" class="material-icons-outlined @idBtnBorrarUrl" title="Eliminar" alt="Eliminar" style="cursor: pointer">delete</span></td>
+                  </tr>
+              }                  
+          </tbody>
+        </table>        
+    </div>
+</div>

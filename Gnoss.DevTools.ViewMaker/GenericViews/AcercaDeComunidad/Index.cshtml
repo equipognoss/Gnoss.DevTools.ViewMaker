@@ -1,0 +1,152 @@
+﻿@model AboutTheCommunityViewModel
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra información de la comunidad: "Acerca de comunidad"
+
+
+Variables
+----------------------------------------------
+*@
+@{
+CommunityModel Comunidad = Html.GetComunidad();
+UserProfileModel Perfil = Html.GetPerfil();
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista que muestra Acerca de la comunidad --------------------*@
+@{
+    Html.SetBodyClass("layout04 pagina about comGnoss"); 
+}
+
+    @* Row principal *@
+    <div class="row">
+        @*Breadcrumb / Migas de pan en la home*@
+        <div class="col col-12 col-breadcrumb" id="breadcrumb">
+            <ul>
+                <li><a href="@Comunidad.Url"><strong>@Html.GetText("COMMON", "HOME")</strong></a></li>
+                <li>@Html.GetText("COMMON", "ACERCADE")</li>
+            </ul>
+        </div>
+
+        @* Contenedor izquierda/central del Home *@
+        <div class="col col-12 col-xl-8 col-contenido izquierda">
+            <div class="wrapCol">
+                @* Título de la página: Acerca de *@
+                <div class="header-contenido">
+                    <div class="h1-container">
+                        @if (Comunidad.ProyectType == CommunityModel.TypeProyect.Catalogo || Comunidad.ProyectType == CommunityModel.TypeProyect.CatalogoNoSocial || Comunidad.ProyectType == CommunityModel.TypeProyect.CatalogoNoSocialConUnTipoDeRecurso)
+                        {
+                            <h1>@Html.GetText("COMACERCADE", "ACERCACATALOGO")</h1>
+                        }
+                        else
+                        {
+                            <h1>@Html.GetText("COMACERCADE", "ACERCACOMUNIDAD") @Comunidad.Name</h1>
+                        }                        
+                    </div>
+                </div>
+                
+                @* Contenido de la comunidad *@
+                <div class="form-group mt-3 mb-5">
+                    @* Descripción de la comunidad *@
+                    <h2>@Html.GetText("COMMON", "DESCRIPCION")</h2>
+                    <p class="text-muted">@Html.Raw(Model.Description)</p>
+                    @* Fecha de creación de la comunidad *@
+                    <h2>@Html.GetText("COMACERCADE", "COMCREADAEL")</h2>
+                    <p class="text-muted">@Model.FoundationDate.Day @Html.GetText("COMACERCADE", "FECHADE" + Model.FoundationDate.Month.ToString()) @Model.FoundationDate.Year</p>                
+                    
+                    @if (Model.Categories != null &&  Model.Categories.Count > 0)
+                    {
+                        @* Bloque de Categorías *@
+                        <div class="box community-categorias">
+                            <h2>@Html.GetText("COMMON", "CATEGORIAS"):</h2>
+                                <ul>
+                                    @foreach (CategoryModel categoria in Model.Categories)
+                                    {
+                                        string urlBaseCategorias = Perfil.Url + Html.GetText("URLSEM", "COMUNIDADES") + "/" + Html.GetText("URLSEM", "CATEGORIA");
+                                        <li><a href="@urlBaseCategorias/@Html.EliminarCaracteresUrlSem(categoria.Name)/@categoria.Key">@categoria.Name</a>, </li>
+                                    }
+                                </ul>
+                        </div>
+                    }
+                    @if (Model.Tags != null && Model.Tags.Count > 0)
+                    {
+                        @* Bloque de Etiquetas *@
+                        <div class="box community-etiquetas">
+                            <h2>@Html.GetText("COMMON", "ETIQUETAS"):</h2>
+                                <ul>
+                                    @foreach (string etiqueta in Model.Tags)
+                                    {
+                                        string urlBaseEtiquetas = Perfil.Url + Html.GetText("URLSEM", "COMUNIDADES") + "?sioc_t:Tag=";
+                                        <li><a href="@urlBaseEtiquetas@etiqueta">@etiqueta</a>, </li>
+                                    }
+                                </ul>
+                        </div> 
+                    }
+
+                    @if (Model.CertificationLevels != null && Model.CertificationLevels.Count > 0)
+                    {
+                        <div class="box community-certificacion">
+                            <h2>@Html.GetText("COMACERCADE", "POLICERTI")</h2>
+                            <div class="box community-etiquetas">
+                                <ul>
+                                    <li>@Html.GetText("COMACERCADE","NIVELESCERTIFICACION"): </li>
+                                    @foreach (string nivelCertificacion in Model.CertificationLevels)
+                                    { 
+                                        <li>@nivelCertificacion, </li>
+                                    }
+                                </ul>
+                            </div>
+                            <div class="politica-cer" id="ctl00_ctl00_CPH1_CPHContenido_divDesCerti">
+                                <p class="text-muted">@Html.GetText("COMACERCADE", "DEFINICIONPOLITICA"): </p>
+                                <p class="text-muted">@Html.Raw(Model.CertificationPolicy)</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @* Contenedor derecho (Nº de Recursos, Nº Personas, Administradores, Lo más interesante, Últimos usuarios Regitrados...) *@
+        <div class="col col-12 col-xl-4 col-contexto col-lateral derecha">
+            @* Contenedor de información de la comunidad (Nº de Recursos, Personas, Admins)*@
+            <div class="wrapCol">
+                <div class="resumen-comunidad">
+                    @* Bloque de Nº de Recursos *@
+                    <div class="bloque">
+                        <div class="titulo">@Html.GetText("COMMON", "RECURSOS")</div>
+                        <div class="contenido">
+                            <a href="@Comunidad.Url/@Html.GetText("URLSEM", "RECURSOS")">@Comunidad.NumberOfResources</a>                               
+                        </div>
+                    </div>
+                    @* Bloque Nº de Personas y Organizaciones *@
+                    <div class="bloque">
+                        <div class="titulo">@Html.GetText("COMMON", "PERSONAS")</div>
+                        <div class="contenido">
+                            <a href="@Comunidad.Url/@Html.GetText("URLSEM", "PERSONASYORGANIZACIONES")"><span class="count">@(Comunidad.NumberOfPerson + Comunidad.NumberOfOrganizations)</span></a>
+                        </div>
+                    </div>
+                    @* Bloque Nº de Administradores *@
+                    <div class="bloque">
+                        <div class="titulo">@Html.GetText("COMINICIO", "ADMININSTRADORES")</div>
+                        <div class="contenido">
+                            <span>@Comunidad.Administrators.Count</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* Contenedor de usuarios Administradores*@
+            <div class="wrapCol grupo-personas">
+                <h2 class="section-title">@Html.GetText("COMINICIO", "ADMININSTRADORES")</h2>
+                <div class="resource-list usuarios con-borde">
+                    @foreach (ProfileModel usuario in Comunidad.Administrators)
+                    {                        
+                        @* Cada uno de los usuarios *@
+                        @Html.PartialView("../HomeComunidad/_partial-views/_list-user-item", usuario)
+                    }
+                </div>
+            </div>
+        </div>
+    </div>

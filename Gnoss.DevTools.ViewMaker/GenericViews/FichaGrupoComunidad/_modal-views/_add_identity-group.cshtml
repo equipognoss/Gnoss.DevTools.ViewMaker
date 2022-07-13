@@ -1,0 +1,65 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista modal que servirá añadir identidades a un determinado grupo de una comunidad.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista Modal para Añadir identidades o usuarios a un grupo de una comunidad --------------------
+*@
+
+<div id="add-identity-group" class="modal modal-top fade show" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            @* Título del modal *@
+            <div class="modal-header">
+                <p class="modal-title">
+                    <span class="material-icons">person_add</span>@Html.GetText("GRUPO", "ASIGNARMIEMBRO")
+                </p>
+                <span class="material-icons cerrar"
+                      data-dismiss="modal"
+                      aria-label="Close">close</span>
+            </div>
+            @* Cuerpo del modal *@
+            <div class="modal-body">
+                <div class="formulario-edicion">
+                    <div class="form-group">
+                        <label id="litInstrucciones">Busca y selecciona a los miembros para añadir al grupo de la comunidad.</label>
+                    </div>
+                    @* Filtrado de usuarios en modal *@
+                    <div class="input-wrap filtroRapido position-static">
+                        <input type="text"
+                               id="txtFiltro"
+                               class="filtroFaceta ac_input form-control"
+                               placeholder="@Html.GetText("METABUSCADOR","BUSCAR")"
+                               autocomplete="off" />
+                        <span class="searchButton"></span>
+                    </div>
+                    <div class="form-group">
+                        <div style="display: none" class="contactos" id="selector">
+                            <div id="panContactos"></div>
+                        </div>
+                    </div>
+                    @* Panel de usuarios que se han invitado al grupo *@
+                    <div id="panContenedorInvitados" class="tag-list mb-4 mt-3">
+                    
+                    </div>
+                    <input type="hidden" class="oculto" id="txtHackInvitados" />
+                </div>
+
+                <div class="form-actions" style="margin-top:100px">
+                    <a class="btn btn-outline-primary" data-dismiss="modal" aria-label="Close" >@Html.GetText("COMMON", "CANCELAR")</a>
+                    <a id="btnAceptarAgregarMiembros" class="btn btn-primary" onclick="AceptarMiembros()">@Html.GetText("COMMON", "ACEPTAR")</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

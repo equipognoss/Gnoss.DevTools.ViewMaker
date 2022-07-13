@@ -1,0 +1,257 @@
+﻿@model ProfileModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista que se utiliza para mostrar los resultados de tipo "Perfil". Este tipo de vista aparecerá cuando se realice una búsqueda y los resultados sean de tipo "Perfil"
+
+Variables
+----------------------------------------------
+*@
+@{
+string nombrePerfil = "";
+string urlPerfil = "";
+string urlFoto = "";
+string tipoPerfil = "";
+
+// Identidad del usuario actual
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+// Controlar si se puede o no seguir un determinado Perfil
+Boolean permitirFollow = false;
+// Nombre extraido del ProfileModel para poner en la acción 
+String nombreASeguir = "";
+String funcion_seguir = "";
+String icono_seguir = "";
+String titulo_seguir = "";
+// Controlar si dispone o no de fotografía el usuario
+bool containsUrlFoto = true;
+    
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista para visualizar los resultados del buscador de "Perfiles" --------------------*@
+
+@if (Model != null)
+{
+    @* Carga de datos en variables para el posterior uso en la vista *@
+    if (Model.TypeProfile == ProfileType.Personal || Model.TypeProfile == ProfileType.Teacher)
+    {
+        tipoPerfil = "persona conImagenPerfil";
+        nombrePerfil = Model.NamePerson;
+        urlPerfil = Model.UrlPerson;
+
+        if (Model.UrlFoto != null)
+        {
+            urlFoto = Model.UrlFoto;
+        }
+        else
+        {
+            tipoPerfil = "persona";
+            urlFoto = Html.ObtenerFotoAnonimaDePerfil(Model.TypeProfile);
+            containsUrlFoto = false;
+        }
+    }
+    else if (Model.TypeProfile == ProfileType.ProfessionalPersonal)
+    {
+        tipoPerfil = "persona conImagenPerfil";
+        nombrePerfil = Model.NamePerson + " " + ConstantesDeSeparacion.SEPARACION_CONCATENADOR + " " + Model.NameOrganization;
+        urlPerfil = Model.UrlPerson;
+
+        if (Model.UrlFoto != null)
+        {
+            urlFoto = Model.UrlFoto;
+        }
+        else
+        {
+            tipoPerfil = "persona";
+            urlFoto = Html.ObtenerFotoAnonimaDePerfil(Model.TypeProfile);
+            containsUrlFoto = false;
+        }
+    }
+    else
+    {
+        tipoPerfil = "organizacion conImagenPerfil";
+        nombrePerfil = Model.NameOrganization;
+        urlPerfil = Model.UrlOrganization;
+
+        if (Model.UrlFoto != null)
+        {
+            urlFoto = Model.UrlFoto;
+        }
+        else
+        {
+            tipoPerfil = "organizacion";
+            urlFoto = Html.ObtenerFotoAnonimaDePerfil(Model.TypeProfile);
+            containsUrlFoto = false;
+        }
+    }
+	
+	
+	@* Comprobar si el usuaruio es diferente al usuario actual que está logueado *@    
+    if (!IdentidadActual.IsGuestUser && IdentidadActual.KeyPerson != Model.KeyPerson)
+    {        
+        @* Comprobar si se puede seguir/no seguir --> Si el perfil es Personal o Profesional*@
+        if (Model.TypeProfile == ProfileType.Personal || Model.TypeProfile == ProfileType.ProfessionalPersonal) {
+            permitirFollow = true;
+            nombreASeguir = Model.NamePerson;
+
+            @* Acción de No/Seguir a usuario*@
+            if (@Model.Actions.FollowingProfile){
+			    //funcion_seguir = "AccionPerfil_NoSeguir(this, '" + @Model.ListActions.UrlUnfollow + "')";
+                funcion_seguir = "AccionPerfil_Seguir(this, '" + @Model.ListActions.UrlUnfollow + "')";
+                icono_seguir = "person_remove_alt_1";
+                titulo_seguir = "Dejar de seguir";	
+	        }else{
+			    //funcion_seguir = "AccionPerfil_Seguir(this, '" + @Model.ListActions.UrlFollow + "')";
+                funcion_seguir = "AccionPerfil_Seguir(this, '" + @Model.ListActions.UrlFollow + "')";
+                icono_seguir = "person_add_alt_1";
+                titulo_seguir = "Seguir";
+	        }	   
+        }
+    }
+
+    @*Cada item encontrado de tipo Persona-Contacto*@
+       <article class="resource">
+           <div class="wrap profile">
+               @* Contenedor de la imagen en miniatura del usuario *@
+               <div class="user-miniatura">
+                   <div class="imagen-usuario-wrap">
+                       <div class="imagen @( (containsUrlFoto == false) ? "sinImagen" : null) ">
+                           @if (containsUrlFoto == false)
+                           {
+                               <span class="material-icons">person</span>
+                           }
+                           else
+                           {
+                               <span style="background-image: url(@Html.GetBaseUrlContent()@urlFoto);"></span>
+                           }
+
+                       </div>
+                   </div>
+                   @* Contenedor del nombre del usuario *@
+                   <div class="nombre-usuario-wrap">
+                       @if (!string.IsNullOrEmpty(urlPerfil))
+                       {
+                           <a href="@urlPerfil">
+                               <p class="nombre">@nombrePerfil</p>
+                                @if (Model.TypeProfile  == ProfileType.Organization) 
+                               { 
+                                    <p class="nombre-completo">@nombrePerfil @ConstantesDeSeparacion.SEPARACION_CONCATENADOR @Model.NameOrganization </p>
+                               }  
+                           </a>
+                       }
+                       else
+                       {
+                           <p class="nombre">@nombrePerfil</p>                           
+                            if (Model.TypeProfile  == ProfileType.Organization) 
+                               { 
+                                    <p class="nombre-completo">@nombrePerfil @ConstantesDeSeparacion.SEPARACION_CONCATENADOR @Model.NameOrganization </p>
+                               }  
+                       }
+
+                       @* Información adicional del usuario -> Sin diseño de dewenir 
+                       <div class="group content">
+                           @if (Model.ExtraInfo != null)
+                           {
+                               if (!string.IsNullOrEmpty(Model.ExtraInfo.ProvinceOrState) || !string.IsNullOrEmpty(Model.ExtraInfo.Country))
+                               {
+                                   <p>
+                                       @if (!string.IsNullOrEmpty(Model.ExtraInfo.ProvinceOrState))
+                                       {
+                                           string separador = "";
+                                           if (!string.IsNullOrEmpty(Model.ExtraInfo.Country))
+                                           {
+                                               separador = ",";
+                                           }
+                                           @Model.ExtraInfo.ProvinceOrState@separador
+                                       }
+                                       @if (!string.IsNullOrEmpty(Model.ExtraInfo.Country))
+                                       {
+                                           @Model.ExtraInfo.Country
+                                       }
+                                   </p>
+                               }
+                               if (Model.ExtraInfo.ExtraData != null && Model.ExtraInfo.ExtraData.Count > 0)
+                               {
+                                   foreach (string DatoExtra in Model.ExtraInfo.ExtraData.Keys)
+                                   {
+                                       <p><span class="clave">@DatoExtra:</span> <span class="valor">@Model.ExtraInfo.ExtraData[DatoExtra]</span></p>
+                                   }
+                               }
+
+                               if (Model.ExtraInfo.Puestos != null && Model.ExtraInfo.Puestos.Count > 0)
+                               {
+                                   foreach (string puesto in Model.ExtraInfo.Puestos)
+                                   {
+                                       <p>@puesto</p>
+                                   }
+                               }
+
+                               if (!string.IsNullOrEmpty(Model.ExtraInfo.Description))
+                               {
+                                   <div class="TextoTiny">
+                                       @Html.AcortarTexto(Model.ExtraInfo.Description, 300)
+                                   </div>
+                               }
+                           }
+                       </div> *@                     
+                   </div>
+
+                   @* Contenedor de las acciones a realizar al usuario *@
+                   <div class="acciones-usuario-wrap">                       
+                       @if (permitirFollow == true) { 
+                           <ul class="no-list-style">
+                               @* Botón / Opción de Seguir *@
+                               <li>
+                                   <a class="btn btn-outline-grey"
+                                      onclick="@funcion_seguir">
+                                       <span class="material-icons">@icono_seguir</span>
+                                       <span class="texto">@titulo_seguir</span>
+                                   </a>
+                               </li>
+                           </ul>
+                       }
+                       @* Contenedor de las acciones + Botón desplegar acciones: Mostrarlo sólo si el usuario dispone de permisos /  *@
+                       @if (IdentidadActual.IsProyectAdmin == true) { 
+                            <div class="acciones-recurso-listado">
+                               <div class="dropdown">
+                                   <a href="#"
+                                      class="dropdown-toggle"
+                                      role="button"
+                                      id="dropdownMasOpciones"
+                                      data-toggle="dropdown"
+                                      aria-haspopup="true"
+                                      aria-expanded="false">
+                                       <span class="material-icons">more_vert</span>
+                                   </a>
+                                   <div class="dropdown-menu basic-dropdown dropdown-icons dropdown-menu-right dropdown-sobre-toggle"
+                                        aria-labelledby="dropdownMasOpciones"
+                                        style="will-change: transform">
+                                       <p class="dropdown-title pl-3 ml-3">Acciones</p>
+                                       <span class="material-icons cerrar-dropdown">close</span>
+                                       @* Contenedor de las acciones a realizar al usuario (Bloquear, No enviar newsletter, Expulsar, Cambiar rol) *@
+                                       <div id="accionesListado_@Model.Key.ToString()_@Guid.NewGuid()_@ViewBag.ProyectoID.ToString()" class="group acciones noGridView">
+                                           @* Aquí irán las acciones para cada "Perfil". Muestro un pequeño loading que será sobreescrito *@
+                                           <div class="spinner-border spinner-border-sm texto-primario" role="status">
+                                               <span class="sr-only">Cargando ...</span>
+                                           </div>
+                                           <small class="ml-1">Cargando ...</small>
+                                       </div>
+                                   </div>
+                               </div>
+                           </div>
+                       }
+                   </div>
+               </div>
+           </div>
+    </article>
+}
+
+
+
+
+
+
+
+

@@ -1,0 +1,98 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista que muestra un pequeño formulario para solicitar el envío o no de newsletters. Actualmente, la gestión es realizada vía "Modal", en concreto en "_receive-newsletters".
+No obstante, se mantiene esta vista, para posibles accesos que se realicen desde Links de correo electrónico (newsletters)
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+// Valor que tendrá el input para enviar newsletters -> Se utilizará el control en JS
+string chkRecibirNewsletterOption = "rbRecibirNewsletter";
+// Valor que tendrá el input para NO enviar newsletters
+string chkNoRecibirNewsletterOption = "rbNoRecibirNewsletter";
+// Nombre que tendrá el input para las opciones para la gestion de newsletters
+string chkRecibirNewsletterName = "chkRecibirNewsletter";
+// Id del panel donde se mostrará posible errores o avisos de OK
+string chkRecibirNewsletterNameInfoPanel = "chkRecibirNewsletterNameInfoPanel";
+// Id del botón para realizar el envío de la petición
+string btnSubmitReceiveNewsletters = "btnSubmitReceiveNewsletters";
+// Estado actual de si el usuario está recibiendo (o no) newsletters de la comunidad
+bool isReceivingNewsletter = Html.GetIdentidadActual().ReceiveNewsletter;
+
+}
+@*
+    ----------------------------------------------------------------
+    -------------------- Vista para gestionar la recepción de Newsletters (Página) --------------------
+*@
+
+
+<div class="row">
+    @* Contenedor del formulario para la solicitud de cambio de contraseña*@
+    <div class="col">
+        <div class="form panel-centrado">
+            <h1>@Html.GetText("COMMON", "NEWSLETTERSINGULAR")</h1>
+            <div class="fieldset fieldset01">
+                <fieldset>
+                    <div class="fieldsetContent">
+                        @* Mensaje para abandonar una comunidad *@
+                        <div class="form-group">
+                            <label class="control-label">
+                                @Html.GetText("SUSCRIPCIONES", "DESEASRECIBIRNEWSLETTER")
+                            </label>
+                        </div>
+                        @* Contenido del modal -> Radio para seleccionar sí o no de recibir newsletters *@
+                        <div class="form-group">
+                            <div class="themed primary custom-control custom-radio custom-control-inline">
+                                <input type="radio"
+                                       id="@chkRecibirNewsletterOption"
+                                       name="@chkRecibirNewsletterName"
+                                       class="custom-control-input"
+                                       value="@chkRecibirNewsletterOption"
+                                       @(isReceivingNewsletter ? "checked=checked" : "") />
+                                <label class="custom-control-label" for="@chkRecibirNewsletterOption">@Html.GetText("COMMON", "SI")</label>
+                            </div>
+                            <div class="themed primary custom-control custom-radio custom-control-inline">
+                                <input type="radio"
+                                       id="@chkNoRecibirNewsletterOption"
+                                       name="@chkRecibirNewsletterName"
+                                       value="@chkNoRecibirNewsletterOption"
+                                       class="custom-control-input"
+                                       @(!isReceivingNewsletter ? "checked=checked" : "") />
+                                <label class="custom-control-label" for="@chkNoRecibirNewsletterOption">@Html.GetText("COMMON", "NO")</label>
+                            </div>
+                        </div>
+                        @* Panel de error o mensaje de OK *@
+                        <div id="@chkRecibirNewsletterNameInfoPanel" style="display: none;" class="alert alert-danger alert-success" role="alert">
+
+                        </div>
+                        @* Botón de acción*@
+                        <div class="form-actions">
+                            <!--<input type="submit" value="@Html.GetText("COMMON", "SI")" onclick="MostrarUpdateProgress();" />-->
+                            <input id="@btnSubmitReceiveNewsletters" type="submit" class="btn btn-primary" value="@Html.GetText("COMMON", "ACEPTAR")" />
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    (function ($) {
+        // Parámetros para operativaSolicitarRecibirNewsletter
+        const pParams = {
+            nameChkReceiveNewsletter: "@chkRecibirNewsletterName",
+            chkRecibirNewsletter: "@chkRecibirNewsletterOption",
+            chkNoRecibirNewsletter: "@chkNoRecibirNewsletterOption",
+            urlRequestReceiveNewsletters: "@Html.GetComunidad().Url/@Html.GetText("URLSEM", "RECIBIRNEWSLETTER")/save-changes",
+            chkRecibirNewsletterNameInfoPanel: "@chkRecibirNewsletterNameInfoPanel",
+            btnSubmitReceiveNewsletters: "@btnSubmitReceiveNewsletters",
+        };
+        // Gestión de operativa para recibir newsLettercontraseña
+        operativaSolicitarRecibirNewsletter.init(pParams);
+    })();
+
+</script>

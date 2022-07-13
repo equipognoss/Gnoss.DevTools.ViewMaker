@@ -1,0 +1,168 @@
+﻿@model LicenseEditorModel
+@*
+Descripción
+-----------------------------------------------
+Vista parcial que se utiliza para mostrar un pequeño editor de la licencia del recurso que se está creando o editando. Es en esta vista parcial donde se puede elegir propiedades del recurso referente a la licencia tales como:
+- Permitir usos comerciales de tu obra
+- Permitir modificaciones de tu obra
+La vista se usa directamente en la vista _ModificarRecurso
+
+Variables
+----------------------------------------------
+*@
+@{
+string checkedRadio0 = "";
+string checkedRadio1 = "";
+string checkedRadio2 = "";
+string checkedRadio3 = "";
+string checkedRadio4 = "";
+
+// Textos de tipo Tooltip de ayuda
+string titleTooltipText0 = Html.GetText("LICENCIASDOCUMENTOS", "INFOUSOCOMERCIAL");
+string titleTooltipText1 = Html.GetText("LICENCIASDOCUMENTOS", "INFOUSONOCOMERCIAL");
+string titleTooltipText2 = Html.GetText("LICENCIASDOCUMENTOS", "INFOPERMITIROBRAS");
+string titleTooltipText3 = Html.GetText("LICENCIASDOCUMENTOS", "INFOUSOCOMPARTIR");
+string titleTooltipText4 = Html.GetText("LICENCIASDOCUMENTOS", "INFOUSOSINDERIVADAS");
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista para seleccionar la licencia a un recurso creado o editado --------------------*@
+
+@{
+    string licenciaActual = "";
+
+    if (!string.IsNullOrEmpty(Model.DefaultLicense))
+    {
+        licenciaActual = Model.DefaultLicense;
+    }
+    else if (!string.IsNullOrEmpty(Model.License))
+    {
+        licenciaActual = Model.License;
+    }
+    else
+    {
+        licenciaActual = "12";
+    }
+}
+
+@*Panel para la gestión de la licencia del recurso *@
+<div id="editorLicenciaDoc" class="licenciaDoc">
+    @* Controlar si es o no editable el tipo de licencia*@
+    @if (Model.NotEditable || !string.IsNullOrEmpty(Model.DefaultLicense))
+    {
+        string htmlNoEdit = null;
+
+        if (Model.NotEditable)
+        {
+            htmlNoEdit = Html.GetText("CONTROLESDOCUMENTACION", "LICENCIANOEDITABLE");
+        }
+        else
+        {
+            htmlNoEdit = Model.MessageDefaultLicense;
+        }
+        <div class="top10"></div>
+    }
+    @* Mostrar opciones con liencia por defecto *@
+    @if (string.IsNullOrEmpty(Model.DefaultLicense))
+    {
+        // Controlar las opciones o tipos de licencias
+        if (licenciaActual[0] == '0')
+        {
+            checkedRadio0 = "checked=\"checked\"";
+        }
+        else
+        {
+            checkedRadio1 = "checked=\"checked\"";
+        }
+
+        if (licenciaActual[1] == '0')
+        {
+            checkedRadio2 = "checked=\"checked\"";
+        }
+        else if (licenciaActual[1] == '1')
+        {
+            checkedRadio3 = "checked=\"checked\"";
+        }
+        else
+        {
+            checkedRadio4 = "checked=\"checked\"";
+        }
+
+        string disablesRadios = "";
+
+        if (Model.NotEditable)
+        {
+            disablesRadios = "disabled=\"disabled\"";
+        }
+
+        @* Descripción de posibilidad de editar/añadir licencia a Recurso*@
+        if (!Model.NotEditable)
+        {
+            <div class="form-group mb-3">
+                <label class="control-label d-block">@Html.Raw(Html.GetText("LICENCIASDOCUMENTOS", "INFOLICENCIASEDICIONDOC", Model.EcosystemProjectName))</label>
+            </div>
+        }
+
+        @* Contenedor tipo de licencia - Permiso uso comercial *@
+        <div class="form-group mb-4 edit-permisos-usos">
+            <label class="control-label d-block mb-3">@Html.GetText("LICENCIASDOCUMENTOS", "INFO1NIVEL")</label>
+            @* Opción Sí *@
+            <div class="custom-control themed little custom-radio">
+                <input type="radio" id="radio1Nivel" class="custom-control-input" name="1Nivel" onclick="document.getElementById('txtHackValorSelecLicencia').value = '0' + document.getElementById('txtHackValorSelecLicencia').value.substring(1);" @Html.Raw(checkedRadio0) @Html.Raw(disablesRadios)>
+                <label class="custom-control-label" for="radio1Nivel">@Html.GetText("COMMON", "SI")</label>
+                @* Tooltip de ayuda *@
+                <span class="material-icons" style="cursor:pointer "data-toggle="tooltip" data-placement="top" title="@titleTooltipText0">
+                    info
+                </span>
+            </div>
+            @* Opción No *@
+            <div class="custom-control themed little custom-radio">
+                <input type="radio" id="radio1Nivel2" class="custom-control-input" name="1Nivel" onclick="document.getElementById('txtHackValorSelecLicencia').value = '1' + document.getElementById('txtHackValorSelecLicencia').value.substring(1);" @Html.Raw(checkedRadio1) @Html.Raw(disablesRadios)>
+                <label class="custom-control-label" for="radio1Nivel2">@Html.GetText("COMMON", "NO")</label>
+                @* Tooltip de ayuda *@
+                <span class="material-icons" style="cursor:pointer "data-toggle="tooltip" data-placement="top" title="@titleTooltipText1">
+                    info
+                </span>
+            </div>
+        </div>
+
+        @* Contenedor tipo de licencia - Permiso uso comercial *@
+        <div class="form-group mb-4 edit-permisos-modificacion">
+            <label class="control-label d-block mb-3">@Html.GetText("LICENCIASDOCUMENTOS", "INFO2NIVEL")</label>
+            @* Opción Sí *@
+            <div class="custom-control themed little custom-radio">
+                <input type="radio" id="radio2Nivel" class="custom-control-input" name="2Nivel" onclick="document.getElementById('txtHackValorSelecLicencia').value = document.getElementById('txtHackValorSelecLicencia').value.substring(0, 1) + '0';" @Html.Raw(checkedRadio2) @Html.Raw(disablesRadios)>
+                <label class="custom-control-label" for="radio2Nivel">@Html.GetText("COMMON", "SI")</label>
+                @* Tooltip de ayuda *@
+                <span class="material-icons" style="cursor:pointer "data-toggle="tooltip" data-placement="top" title="@titleTooltipText2">
+                    info
+                </span>           
+            </div>
+            @* Opción Sí mientras que ... *@
+            <div class="custom-control themed little custom-radio">
+                <input type="radio" id="radio2Nivel2" class="custom-control-input" name="2Nivel" onclick="document.getElementById('txtHackValorSelecLicencia').value = document.getElementById('txtHackValorSelecLicencia').value.substring(0, 1) + '1';" @Html.Raw(checkedRadio3) @Html.Raw(disablesRadios)>
+                <label class="custom-control-label" for="radio2Nivel2">@Html.GetText("LICENCIASDOCUMENTOS", "SIMIENTRASQUE")</label>
+                @* Tooltip de ayuda *@
+                <span class="material-icons" style="cursor:pointer "data-toggle="tooltip" data-placement="top" title="@titleTooltipText3">
+                    info
+                </span>            
+            </div>
+            @* Opción No*@
+            <div class="custom-control themed little custom-radio">
+                <input type="radio" id="radio2Nivel3" class="custom-control-input" name="2Nivel" onclick="document.getElementById('txtHackValorSelecLicencia').value = document.getElementById('txtHackValorSelecLicencia').value.substring(0, 1) + '2';" @Html.Raw(checkedRadio4) @Html.Raw(disablesRadios)>
+                <label class="custom-control-label" for="radio2Nivel3">@Html.GetText("COMMON", "NO")</label>
+                @* Tooltip de ayuda *@
+                <span class="material-icons" style="cursor:pointer "data-toggle="tooltip" data-placement="top" title="@titleTooltipText4">
+                    info
+                </span>             
+            </div>
+        </div>
+        @* Campo oculto donde se guardarán los valores seleccioandos *@
+        <input name="txtHackValorSelecLicencia" type="hidden" value="@licenciaActual" id="txtHackValorSelecLicencia">
+    }
+    <hr />
+</div>
+
+

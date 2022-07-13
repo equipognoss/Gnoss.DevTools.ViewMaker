@@ -1,0 +1,33 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista que se utiliza para mostrar/editar los datos profesionales de un usuario (Perfil Profesional)
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+EditProfileViewModel.ProfileProfesionalViewModel Perfil = Model.ProfileProfesional;
+
+@* Identificadores de elementos HTML para lógica JS *@
+@* ID del input del Email del perfil profesional *@     
+string idEmailProfesional = "ProfileProfesional_Email";
+string inputEmailProfesional = "ProfileProfesional.Email";
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Editar datos del perfil profesional del usuario (Email profesional) --------------------
+*@
+
+@* Correo electrónico - Email *@
+<div class="form-group mb-5 edit-correo">
+    <label class="control-label d-block" for="@idEmailProfesional">@Html.GetText("REGISTROUSUARIOORGANIZACION", "EMAIL")</label>
+    <input placeholder="Introduce tu correo electrónico"
+           type="text"
+           name="@inputEmailProfesional"
+           id="@idEmailProfesional"
+           value="@Perfil.Email"
+           class="form-control not-outline" />
+</div>

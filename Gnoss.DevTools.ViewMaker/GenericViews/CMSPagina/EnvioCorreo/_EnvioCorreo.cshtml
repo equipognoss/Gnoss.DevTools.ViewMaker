@@ -1,0 +1,85 @@
+﻿@using Es.Riam.Gnoss.Web.MVC.Models;
+@model CMSComponentMail
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra el componente Formulario o Envío de Correo.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+}
+@*
+----------------------------------------------------------------
+-------------------- Vista CMS del componente de Formulario o Envío de correo --------------------*@
+
+
+<div class="fieldset" id="@Model.Key.ToString()">
+    <fieldset class="labels">
+        <legend>@Model.Title</legend>
+        <div class="fieldsetContent">
+            @{
+                foreach (CMSComponentMail.CMSFormFiled campoFormulario in Model.FormFields)
+                {
+                    string nombrecampo = campoFormulario.Name;
+                    string idCampo = Model.Key.ToString() + "_" + campoFormulario.Order;
+                    if (campoFormulario.Required)
+                    {
+                        nombrecampo += " *";
+                    }
+                    <div class="fila">
+                        <label for="@idCampo">@nombrecampo</label>
+                        @switch (campoFormulario.FormFiledType)
+                        {
+                            case CMSComponentMail.CMSFormFiled.CMSFormFiledType.Short:
+                                <input id="@idCampo" class="text medium campoEnvioCorreo" type="text" />
+                                break;
+                            case CMSComponentMail.CMSFormFiled.CMSFormFiledType.Long:
+                                <textArea id="@idCampo" class="campoEnvioCorreo"></textArea>
+                                break;
+                        }
+                    </div>
+                }
+
+                <p class="button">
+                    @{
+                        string funcionEnviarCorreo = "EnviarCorreo('" + Model.Key.ToString() + "')";
+                    }
+                    <input class="submit" type="button" value="@Model.TextButton" onclick="@funcionEnviarCorreo" />
+                </p>
+                <div id="@Model.Key.ToString()_mensaje"></div>
+            }
+        </div>
+    </fieldset>
+</div>
+
+
+
+<script type="text/javascript">
+    function EnviarCorreo(idComponente) {
+        MostrarUpdateProgress();
+        var args = {};
+        args.ComponentKey = '@Model.Key';
+        $('#' + idComponente + ' .campoEnvioCorreo').each(function () {
+            args[$(this).attr("id")] = $(this).val();
+        });
+
+        const urlAction = '@Model.UrlSendForm';
+
+        GnossPeticionAjax(
+            urlAction,
+            args,
+            true
+        ).done(function (response) {
+            /* Mostrar mensaje informativo */
+            mostrarNotificacion('success', response);            
+        }).fail(function (response) {
+            /* Mostrar mensaje informativo */
+            mostrarNotificacion('error', response);
+        }).always(function () {
+            OcultarUpdateProgress();
+        });
+    }
+</script>

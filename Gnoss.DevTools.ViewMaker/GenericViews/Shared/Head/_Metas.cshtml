@@ -1,0 +1,60 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista que se utiliza para incluir todo el código Meta que puede necesitar una página
+    - Charset
+    - Código para responsive
+    - Meta description...
+Esta vista parcial es cargada directamente en el _Layout.cshtml
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista parcial de Metas del Layout --------------------
+*@
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+@if (Html.GetMetaDescriptionPestanya() != null)
+{
+    string metaDescription = Html.GetMetaDescriptionPestanya();
+    <meta name="description" content="@Html.GetMetaDescriptionPestanya()" />
+}
+
+@if (Html.GetListaMetas() != null)
+{
+    foreach (KeyValuePair<string, string> contentMeta in Html.GetListaMetas())
+    {
+        <meta name="@contentMeta.Key" content="@contentMeta.Value" />
+    }
+}
+
+@if (Html.GetListaMetasComplejas() != null)
+{
+    foreach (Dictionary<string, string> atributosMeta in Html.GetListaMetasComplejas())
+    {
+        System.Text.StringBuilder meta = new System.Text.StringBuilder("<meta");
+
+        foreach (string clave in atributosMeta.Keys)
+        {
+            meta.Append(" ");
+            meta.Append(clave);
+            meta.Append("=");
+            meta.Append("\"");
+            meta.Append(atributosMeta[clave]);
+            meta.Append("\"");
+        }
+
+        meta.Append(" />\r\n");
+        @Html.Raw(meta)
+    }
+}

@@ -1,0 +1,307 @@
+﻿@model ProfilePageViewModel
+@*
+Descripción
+-----------------------------------------------
+Vista parcial que muestra datos o información personal de un perfil de usuario. En esta vista, se visualiza información como:
+- Nombre completo
+- Imagen del usuario
+- Información de grupos sociales
+- Tags
+- Descripción del curriculum
+- Posición en la empresa
+- Provincia o estado del usuario
+- Información extra
+- Comunidades a las que pertenece el usuario
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+ProfileModel Perfil = Model.Profile;
+
+CommunityModel Comunidad = Html.GetComunidad();
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+
+string nombreCompleto = Html.ObtenerNombreCompletoDeFichaIdentidad(Perfil);
+// URL de perfil del usuario
+string urlFoto = "";
+// Controlar si dispone o no de fotografía el usuario
+bool containsUrlFoto = true;
+// Especificar el número máximo de etiquetas que se visualizarán por defecto (Si hay más, el resto aparecerán ocultas)
+int maxNumTagsToDisplay = 3;
+// Contador de acciones que puede realizar el usuario
+int actionsAllowedCounter = 0;
+// Controlar si puede o no enviar mensaje
+bool canSendMessage = false;
+// Url para poder editar el perfil (Si el usuario visualiza su propio perfil)
+string urlBase = Comunidad.Url;
+if (Comunidad.MetaProyect)
+{
+    urlBase = Html.GetPerfil().Url.Substring(0,Html.GetPerfil().Url.Length - 1);        
+}
+// Url para poder editar el perfil (Si el usuario visualiza su propio perfil)
+string urlEditarPerfil = $"{urlBase}/{Html.GetText("URLSEM", "EDITARPERFIL")}"; //Perfil.Url + Html.GetText("URLSEM", "EDITARPERFIL");
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista de información o datos del perfil del usuario --------------------
+*@
+
+@* Si el perfil está desconectado, mostrar foto de anonimo *@
+@if (!IdentidadActual.IsGuestIdentity && !string.IsNullOrEmpty(Perfil.UrlFoto))
+{
+    urlFoto = string.Format("{0}{1}", @Html.GetBaseUrlContent(), @Perfil.UrlFoto.Replace("_peque.png", "_grande.png"));
+}
+else
+{
+    urlFoto = string.Format("{0}/{1}/{2}/anonimo_grande.png", @Html.GetBaseUrlContent(), @Es.Riam.Util.UtilArchivos.ContentImagenes, @Es.Riam.Util.UtilArchivos.ContentImagenesPersonas);
+    containsUrlFoto = false;
+}
+
+@* Contenedor de datos de perfil del usuario *@
+<div class="perfil-cabecera">
+    @* Contenedor del usuario: Nombre, Miniatura Imagen del usuario y Acciones del usuario *@
+    <div class="user-miniatura">
+        <div class="imagen-usuario-wrap">
+            <div class="imagen @( (containsUrlFoto == false) ? "sinImagen" : null) ">
+                @if (containsUrlFoto)
+                {
+                    <span style=" background-image: url(@urlFoto);"></span>
+                }
+                else
+                {
+                    <span class="material-icons">person</span>
+                }
+            </div>
+        </div>
+        @* Contenedor para Nombre y puesto *@
+        <div class="nombre-usuario-wrap">
+            <p class="nombre">@Html.TruncateString(nombreCompleto, 30)</p>
+            @*<p class="nombre-completo">@Html.TruncateString(nombreCompleto, 30) @ConstantesDeSeparacion.SEPARACION_CONCATENADOR</p>*@
+        </div>
+
+        @* Contenedor para Acciones relacionadas del usuario (Enviar mensaje...) *@
+        <div class="acciones-usuario-wrap">
+            <ul class="no-list-style d-flex">
+                @* Acción de No/Seguir a usuario*@
+                @if (Perfil.Actions.Follow)
+                {
+                    <li>
+                        @* No Seguir *@
+                        @if (Perfil.Actions.FollowingProfile)
+                        {
+                            <a class="btn btn-primary btn-seguir"
+                               onclick="AccionPerfil_Seguir(this, '@Perfil.ListActions.UrlUnfollow')">
+                                <span class="seguir">
+                                    <span class="material-icons">person_remove_alt_1</span>
+                                    <span class="texto">@Html.GetText("COMMON", "NOSEGUIR")</span>
+                                </span>
+                            </a>
+                        }
+                        @* Seguir *@
+                        else
+                        {
+                            <a class="btn btn-primary btn-seguir"
+                               onclick="AccionPerfil_Seguir(this, '@Perfil.ListActions.UrlFollow')">
+                                <span class="seguir">
+                                    <span class="material-icons">person_add_alt_1</span>
+                                    <span class="texto">@Html.GetText("COMMON", "SEGUIR")</span>
+                                </span>
+                            </a>
+                        }
+                    </li>
+                }
+
+                @* Si el usuario visualiza su perfil, Mostrar botón para "Editarlo" *@
+                @if (Perfil.Key == IdentidadActual.KeyIdentity)
+                {
+                    <li>
+                        <a href="@urlEditarPerfil"
+                           class="btn btn-primary d-xl-flex">
+                            <span class="material-icons">edit</span>
+                            <span>@Html.GetText("MENU", "EDITARPERFIL")</span>
+                        </a>
+                    </li>
+                }
+
+                @* Acción de enviar mensaje *@
+                @if (Perfil.Actions.SendMessage)
+                {
+                    @* No permitirse mandar mensaje a uno mismo*@
+                    if (Perfil.Key != IdentidadActual.KeyIdentity)
+                    {
+                        <li>
+                            <a data-toggle="modal"
+                               data-target="#modal-container"
+                               onclick="javascript:AccionEnviarMensajeMVC('@Html.GetUrlPagina()', '@Perfil.Key','Enviar mensaje');"
+                               class="btn btn-outline-grey d-none d-xl-flex">
+                                <span class="material-icons">send</span>
+                                <span>Enviar mensaje</span>
+                            </a>
+                        </li>
+                    }
+                }
+                @* Más acciones a realizar (Menú Hamburguesa) *@
+                @if (Perfil.Actions != null)
+                {
+                    foreach (System.Reflection.PropertyInfo propiedad in Perfil.Actions.GetType().GetProperties())
+                    {
+                        // Comprobar que la propiedad sea de tipo ActionsModel
+                        var tipoAction = propiedad.DeclaringType.Name;
+                        var dataType = propiedad.PropertyType.Name;
+
+                        if (tipoAction == "ActionsModel" && dataType == "Boolean")
+                        {
+                            // Comprobar valor Booleano y sumar contador si es true
+
+                            Boolean allowAction = (Boolean)propiedad.GetValue(Perfil.Actions);
+                            if (allowAction == true)
+                            {
+                                // Comprobar si la acción es "SendMessage".
+                                if (propiedad.Name == "SendMessage")
+                                {
+                                    canSendMessage = true;
+                                    // Desactivar la opción de enviar mensaje para no ser mostrado en "mas opciones".
+                                    Perfil.Actions.SendMessage = false;
+                                }
+                                else if (propiedad.Name == "AddContact")
+                                {
+                                    Perfil.Actions.AddContact = false;
+                                }
+                                else if (propiedad.Name == "Follow") {
+                                    Perfil.Actions.Follow = false;
+                                }
+                                else
+                                {
+                                    actionsAllowedCounter += 1;
+                                }
+                            }
+                        }
+                    }
+
+                    /* Mostrar Más acciones si no solo puede enviar mensajes */
+                    if (actionsAllowedCounter > 0)
+                    {
+                        <li>
+                            <div class="acciones-recurso-listado">
+                                <div class="dropdown">
+                                    <a href="#"
+                                       class="dropdown-toggle btn btn-outline-grey no-flecha"
+                                       role="button"
+                                       id="dropdownMasOpciones"
+                                       data-toggle="dropdown"
+                                       aria-haspopup="true"
+                                       aria-expanded="false">
+                                        <span class="material-icons">more_vert</span>
+                                    </a>
+                                    <div class="dropdown-menu basic-dropdown dropdown-icons dropdown-menu-right"
+                                         aria-labelledby="dropdownMasOpciones">
+                                        @* Carga de acciones disponibles (Enviar Mensaje, Agregar contacto...*@
+                                        @Html.PartialView("ControlesMVC/_AccionesPerfil", Perfil)
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                }
+            </ul>
+        </div>
+
+    </div>
+
+    @* Contenedor de etiquetas del usuario *@
+    @if (Model.Curriculum != null && Model.Curriculum.ListTags != null && Model.Curriculum.ListTags.Count > 0)
+    {
+        @* Listado de etiquetas en las que está el usuario *@
+        <div class="listado-comunidades">
+            <ul class="no-list-style d-flex">
+                @{
+                    int contador = 0;
+                }
+
+                @for (contador = 0; contador < Model.Curriculum.ListTags.Count; contador++)
+                {
+                    if (contador > maxNumTagsToDisplay)
+                    {
+                        <li>
+                            <a class="btn ver-mas icono-flecha-abajo con-icono-after collapsed"
+                               data-toggle="collapse"
+                               data-target="#js-lista-comunidades-extra"
+                               aria-expanded="false"
+                               aria-controls="js-lista-comunidades-extra">
+                                Ver más
+                            </a>
+                        </li>
+                        break;
+                    }
+                    string tag = Model.Curriculum.ListTags[contador];
+                    <li>
+                        <a class="btn" href="@Comunidad.Url/@Html.GetText("URLSEM", "PERSONASYORGANIZACIONES")?sioc_t:Tag=@tag">@tag</a>
+                    </li>   
+
+                }
+            </ul>
+        </div>
+        @* Contenedor de comunidades ocultas *@
+        if (Model.Curriculum.ListTags.Count > 3)
+        {
+            <div class="collapse listado-comunidades listado-comunidades-extra" id="js-lista-comunidades-extra">
+                <ul class="no-list-style d-flex">
+                    @for (int contadorEtiquetasOcultas = contador; contadorEtiquetasOcultas < Model.Curriculum.ListTags.Count; contadorEtiquetasOcultas++)
+                    {
+                        string tag = Model.Curriculum.ListTags[contadorEtiquetasOcultas];
+                        <li>
+                            <a class="btn" href="@Comunidad.Url/@Html.GetText("URLSEM", "PERSONASYORGANIZACIONES")?sioc_t:Tag=@tag">@tag</a>
+                        </li>                                                
+                    }
+                </ul>
+            </div>
+        }
+    }
+
+    @* Controlar si el usuario está logueado *@
+    @if (IdentidadActual.IsGuestIdentity)
+    {
+        <div class="group content">
+            <p>
+                @if (IdentidadActual.IsGuestUser)
+                {
+                    @Html.GetText("BUSQUEDAAVANZADA", "INICIOPERESPECIFICA")
+                    <a href="@Comunidad.Url/@Html.GetText("URLSEM", "HAZTEMIEMBRO")">@Html.GetText("COMINICIOLOGIN", "REGISTRATEPARTICIPA")</a>
+                    @Html.GetText("COMADMINCATEGORIAS", "O")                        
+                    <a href="@Comunidad.Url/@Html.GetText("URLSEM", "LOGIN")/redirect/@(new Uri($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}").AbsoluteUri)">@Html.GetText("COMINICIOLOGIN", "INICIASESION")</a>
+                }
+                else
+                {
+                    @Html.GetText("BUSQUEDAAVANZADA", "INICIOPERESPECIFICA")
+                    <a href="@Comunidad.Url/@Html.GetText("URLSEM", "HAZTEMIEMBRO")">@Html.GetText("COMINICIOLOGIN", "HACERSEMIEMBRO")</a>
+                }
+            </p>
+        </div>
+    }
+    @* Perfil no encontrado*@
+    else if (Perfil.Key == Guid.Empty)
+    {
+        <div class="group content">
+            <p>No se ha encontrado el perfil que está buscando</p>
+        </div>
+    } 
+    
+    @* Información de Curriculum - Descripción del perfil *@
+    @if (Model.Curriculum != null && !string.IsNullOrEmpty(Model.Curriculum.Description))
+    {      
+        string description = Model.Curriculum.Description;
+        if (Model.Curriculum.Description.IndexOf("<p>") != 0)
+        {
+            <p>@Html.AcortarTexto(description, 400).Replace("\n", "<br />")</p>
+        }
+        else
+        {
+            <p>@Html.AcortarTexto(description, 400).Replace("\n", "<br />")</p>
+        }                
+    }
+    
+</div>

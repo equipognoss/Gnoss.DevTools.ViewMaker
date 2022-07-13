@@ -1,0 +1,252 @@
+﻿@using Es.Riam.Gnoss.Web.MVC.Models;
+@if (Html.GetComunidad() != null)
+{
+@*
+Descripción
+----------------------------------------------------------------
+Vista que contiene el botón para poder añadir (+) en una comunidad un recurso que puede ser de tipo:
+- Nota
+- Archivo
+- Link o URL
+- Pregunta
+- Encuesta
+- Debate
+
+Esta lógica ha sido obtenida del panel del front anterior "PanelQueHacer.cshtml" ya que era donde se encontraba esta acción.
+Este elemento se situa en el header, por lo que la vista es utilizada en el fichero "_header.cshtml"
+
+@*
+Variables
+----------------------------------------------------------------
+*@
+CommunityModel Comunidad = Html.GetComunidad();
+CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
+@*
+----------------------------------------------------------------
+
+-------------------- Botón (+) para añadir un recurso a la comunidad --------------------
+*@
+<li class="nuevo">
+    <a href="#"
+       class="btn mas btn-outline-primary btn-round dropdown-toggle no-flecha"
+       id="menuNuevoDropdown"
+       data-toggle="dropdown"
+       aria-haspopup="true"
+       aria-expanded="true">@Html.GetText("QUEPUEDOHACER", "CREARRECURSO")</a>
+    <div id="menuDropdownCrear"
+         class="dropdown-menu dropdown-menu-right basic-dropdown"
+         aria-labelledby="menuNuevoDropdown">
+        <ul class="menuCreacion no-list-style">
+            @* Comprobar si se puede crear una nota en comunidad *@
+            @if (permisosComunidad.DocumentPermissions.Contains(ResourceModel.DocumentType.Nota))
+            {
+                <li id="liNota">
+                    <a id="linkNota" class="item-dropdown">
+                        <span class="material-icons">note_add</span>
+                        <span class="texto">@Html.GetText("PERFILBASESUBIR", "NOTA")</span>
+                    </a>
+                </li>
+            }else if (Html.EsPaginaEspacioPersonal() || Html.EsPaginaContribuciones()) {
+                // Si el usuario está al menos en la página Mi espacio personal
+                <li id="liNota">
+                    <a id="linkNota" class="item-dropdown">
+                        <span class="material-icons">
+                            note_add
+                        </span>
+                        <span class="texto">
+                            @Html.GetText("PERFILBASESUBIR", "NOTA")
+                        </span>
+                    </a>
+                </li>
+            }
+
+            @* Comprobar si se puede crear un fichero en comunidad *@
+            @if (permisosComunidad.DocumentPermissions.Contains(ResourceModel.DocumentType.FicheroServidor))
+            {
+                <li id="liArchivo">
+                    <a class="item-dropdown" data-toggle="modal" data-target="#modal-add-resource-file">
+                        <span class="material-icons">
+                            description
+                        </span>
+                        <span class="texto">
+                            @Html.GetText("PERFILBASESUBIR", "NUEVOARCHIVO", "50")
+                        </span>
+                    </a>
+                </li>
+            }else if (Html.EsPaginaEspacioPersonal() || Html.EsPaginaContribuciones()) {
+                // Si el usuario está al menos en la página Mi espacio personal
+                <li id="liArchivo">
+                    <a class="item-dropdown" data-toggle="modal" data-target="#modal-add-resource-file">
+                        <span class="material-icons">
+                            description
+                        </span>
+                        <span class="texto">
+                            @Html.GetText("PERFILBASESUBIR", "NUEVOARCHIVO", "50")
+                        </span>
+                    </a>
+                </li>
+            }
+            @* Comprobar si se puede crear un URL en comunidad *@
+            @if (permisosComunidad.DocumentPermissions.Contains(ResourceModel.DocumentType.Hipervinculo))
+            {
+                <li id="liURL">
+                    <a class="item-dropdown" data-toggle="modal" data-target="#modal-add-resource-url">
+                        <span class="material-icons">
+                            link
+                        </span>
+                        <span class="texto">
+                            @Html.GetText("PERFILBASESUBIR", "DIRECCIONURL")
+                        </span>
+                    </a>
+                </li>
+            }else if (Html.EsPaginaEspacioPersonal() || Html.EsPaginaContribuciones()) {
+                // Si el usuario está al menos en la página Mi espacio personal
+                <li id="liURL">
+                    <a class="item-dropdown" data-toggle="modal" data-target="#modal-add-resource-url">
+                        <span class="material-icons">
+                            link
+                        </span>
+                        <span class="texto">
+                            @Html.GetText("PERFILBASESUBIR", "DIRECCIONURL")
+                        </span>
+                    </a>
+                </li>
+            }
+            @* Comprobar si se puede crear un URL WIKI en comunidad - (MYG-111)
+            @if (permisosComunidad.DocumentPermissions.Contains(ResourceModel.DocumentType.Wiki))
+            {
+                <li id="liWiki">
+                    <a class="item-dropdown" data-toggle="modal" data-target="#modal-add-resource-wiki">
+                        <span class="material-icons">
+                            link
+                        </span>
+                        @Html.GetText("PERFILBASESUBIR", "ARTICULOWIKI")
+                    </a>
+                </li>
+            }
+            *@
+
+            @* Comprobar si se puede crear una Referencia a Doc en comunidad *@
+            @if (permisosComunidad.DocumentPermissions.Contains(ResourceModel.DocumentType.ReferenciaADoc))
+            {
+                <li id="liReferenciaDoc">
+                    <a class="item-dropdown" data-toggle="modal" data-target="#modal-add-resource-reference">
+                        <span class="material-icons">
+                            bookmark_border
+                        </span>
+                        <span class="texto">
+                            @Html.GetText("PERFILBASESUBIR", "ARTICULOWIKI")
+                        </span>
+                    </a>
+                </li>
+            }
+
+            @* Separador de recursos a crear (Añadirlo sólo si hay opciones de añadir un tipo de recurso de los anteriores) *@
+            @if (permisosComunidad.CreateResource) 
+            {
+                <li class="dropdown-divider"></li>
+            }
+
+            @* Comprobar si se puede crear una Pregunta *@
+            @if (permisosComunidad.CreateQuestion)
+            {
+                <li class="addPregunta">
+                    <a class="item-dropdown" href="@Comunidad.Url/@Html.GetText("URLSEM", "SUBIRPREGUNTA")/@Guid.NewGuid()/15">
+                        <span class="material-icons">
+                            contact_support
+                        </span>
+                        <span class="texto">
+                            @Html.GetText("QUEPUEDOHACER", "CREAPREGUNTA")
+                        </span>
+                    </a>
+                </li>
+            }
+            @* Comprobar si se puede crear un Debate *@
+            @if (permisosComunidad.CreateDebate)
+            {
+                <li class="addDebate">
+                    <a class="item-dropdown" href="@Comunidad.Url/@Html.GetText("URLSEM", "SUBIRENCUESTA")/@Guid.NewGuid()/16">
+                        <span class="material-icons">
+                            question_answer
+                        </span>
+                        <span class="texto">
+                            @Html.GetText("QUEPUEDOHACER", "CREADEBATE")
+                        </span>
+                    </a>
+                </li>
+            }
+            @* Comprobar si se puede crear una encuesta *@
+            @if (permisosComunidad.CreatePoll)
+            {
+                <li class="addEncuesta">
+                    <a class="item-dropdown" href="@Comunidad.Url/@Html.GetText("URLSEM", "SUBIRDEBATE")/@Guid.NewGuid()/18">
+                        <span class="material-icons">
+                            how_to_vote
+                        </span>
+                        <span class="texto">
+                            @Html.GetText("QUEPUEDOHACER", "CREAENCUESTA")
+                        </span>
+                    </a>
+                </li>
+            }
+            @* Comprobar si se pueden crear recursos mediante plantillas *@
+            @if (permisosComunidad.DocumentPermissions.Contains(ResourceModel.DocumentType.Semantico) && permisosComunidad.OntologyPermissionsNameUrls != null)
+            {
+                <li class="dropdown-divider"></li>
+                foreach (string nombreOnto in permisosComunidad.OntologyPermissionsNameUrls.Keys)
+                {
+                    if (!string.IsNullOrEmpty(permisosComunidad.OntologyPermissionsNameUrls[nombreOnto].Value))
+                    {
+                        string textoNombreOnto = nombreOnto + ": ";
+                        <li>
+                            <a class="item-dropdown" href="@permisosComunidad.OntologyPermissionsNameUrls[nombreOnto].Key">
+                                <span class="material-icons">
+                                    integration_instructions
+                                </span>
+                                <span class="texto">
+                                    @Html.GetText("CREARDOCUMENTO", "SOLOUNO")
+                                </span>
+                            </a>
+                            |
+                            <a class="item-dropdown" href="@permisosComunidad.OntologyPermissionsNameUrls[nombreOnto].Value">
+                                <span class="material-icons">
+                                    integration_instructions
+                                </span>
+                                <span class="texto">
+                                    @Html.GetText("CREARDOCUMENTO", "VARIOSALAVEZ")
+                                </span>
+                            </a>
+
+                        </li>
+                    }
+                    else
+                    {
+                        <li>
+                            <a class="item-dropdown" href="@permisosComunidad.OntologyPermissionsNameUrls[nombreOnto].Key">
+                                <span class="material-icons">
+                                    integration_instructions
+                                </span>
+                                <span class="texto">
+                                    @nombreOnto
+                                </span>
+                            </a>
+                        </li>
+                    }
+                }
+            }
+        </ul>
+    </div>
+</li>
+
+<script>
+    /**
+     * Llamada a acción para inicializar la opción de crear el recurso de tipo Nota al pulsar sobre "Nueva Nota o artículo"
+     *
+     */
+    $(document).ready(function () {
+        InicializarSubirRecursoExt("@Comunidad.Url/@Html.GetText("URLSEM", "SUBIRRECURSO")");
+    });
+</script>
+}
+
+

@@ -1,0 +1,23 @@
+﻿@model ResultadoModel
+@if (Model != null)
+{
+    string claseResource = "resource-list listView";
+
+    <div>
+        <div class="@claseResource">
+            @{
+                if (Model.ListaResultados != null)
+                {
+                    foreach (ObjetoBuscadorModel resultado in Model.ListaResultados)
+                    {
+                        if (resultado is ResourceModel)
+                        {
+                                
+                            @Html.PartialView("_ResultadoRecursoGadget", (ResourceModel)resultado)
+                        }
+                    }
+                }
+            }
+        </div>
+    </div>
+}

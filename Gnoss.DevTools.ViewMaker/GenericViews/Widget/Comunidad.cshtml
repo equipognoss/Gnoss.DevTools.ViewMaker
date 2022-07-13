@@ -1,0 +1,267 @@
+﻿@model List<ResourceModel>
+
+@{
+    Layout = null;
+
+    CommunityModel Comunidad = Html.GetComunidad();
+}
+
+@functions {
+    private string ObtenerTextoPublicadoSegunFecha(DateTime pFecha, KeyValuePair<int, int> pDiferenciaFechas)
+    {
+        string textoPublicado = "";
+
+        if (pDiferenciaFechas.Key < 2 || (pDiferenciaFechas.Key == 2 && pDiferenciaFechas.Key > 1))
+        {
+            textoPublicado = Html.GetText("CONTROLESLIVE", "EL", pFecha.ToString("dd/MM/yy"));
+        }
+        else if (pDiferenciaFechas.Key == 2)
+        {
+            textoPublicado = Html.GetText("CONTROLESLIVE", "HACESEMANA");
+        }
+        else if (pDiferenciaFechas.Key == 3 && pDiferenciaFechas.Value > 1)
+        {
+            textoPublicado = Html.GetText("CONTROLESLIVE", "HACEDIAS", pDiferenciaFechas.Value.ToString());
+        }
+        else if (pDiferenciaFechas.Key == 3)
+        {
+            textoPublicado = Html.GetText("CONTROLESLIVE", "AYER");
+        }
+        else if (pDiferenciaFechas.Key == 4 && pDiferenciaFechas.Value > 1)
+        {
+            textoPublicado = Html.GetText("CONTROLESLIVE", "HACEHORAS", pDiferenciaFechas.Value.ToString());
+        }
+        else if (pDiferenciaFechas.Key == 4)
+        {
+            textoPublicado = Html.GetText("CONTROLESLIVE", "HACEHORA");
+        }
+        else if (pDiferenciaFechas.Key == 5 && pDiferenciaFechas.Value > 1)
+        {
+            textoPublicado = Html.GetText("CONTROLESLIVE", "HACEMINUTOS", pDiferenciaFechas.Value.ToString());
+        }
+        else
+        {
+            textoPublicado = Html.GetText("CONTROLESLIVE", "HACEMINUTO");
+        }
+
+        return textoPublicado;
+    } 
+}
+@{  
+    string bodyStyle = "";
+    string estilo = "";
+            
+    if (Context.Request.Headers.ContainsKey("scroll") && Context.Request.Headers["scroll"] == "true")
+    {
+        bodyStyle += "overflow:auto;";
+    }
+    else
+    {
+        bodyStyle += "overflow:hidden;";
+    }
+
+    if (Context.Request.Headers.ContainsKey("marco") && Context.Request.Headers["marco"] != "")
+    {
+        estilo += ".widget-usuario-gnoss{background: none repeat scroll 0 0 " + Context.Request.Headers["marco"] + ";}\n";
+    }
+
+    if (Context.Request.Headers.ContainsKey("fondo")&& Context.Request.Headers["fondo"] != "")
+    {
+        bodyStyle += "background: none repeat scroll 0 0 " + Context.Request.Headers["fondo"] + ";";
+    }
+
+    if (Context.Request.Headers.ContainsKey("enlaces") && Context.Request.Headers["enlaces"] != "")
+    {
+        estilo += ".widget-usuario-gnoss .widget-usuario-body-gnoss a {color: " + Context.Request.Headers["enlaces"] + ";}";
+    }
+
+    if (Context.Request.Headers.ContainsKey("logo") && Context.Request.Headers["logo"] != "")
+    {
+        estilo += ".widget-usuario-gnoss .widget-usuario-body-gnoss a {color: " + Context.Request.Headers["enlaces"] + ";}";
+    }
+}
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>
+        @Comunidad.Name
+    </title>
+    <meta name="robots" content="noindex, follow" />
+    <link id="CSSobjetoGnoss" rel="stylesheet" type="text/css" media="screen" href="@Html.GetBaseUrlStatic()/cssNuevo/ObjetoGnoss.css?v=@Html.GetVersion()" />
+    <link id="IMGfavicon" rel="shortcut icon" type="image/ico" href="@Html.GetBaseUrlStatic()/img/favicon.ico" />
+    <script src="@Html.GetBaseUrlStatic()/jsUnificar/jquery.min.js?v=@Html.GetVersion()" type="text/javascript"></script>
+    <script src="@Html.GetBaseUrlStatic()/lang/@Html.GetUtilIdiomas().LanguageCode/text.js?v=@Html.GetVersion()" type="text/javascript"></script>
+    <style type="text/css">
+        @estilo
+    </style>
+</head>
+<body class="bodyWidget-gnoss" >
+    <div class="widget-usuario-gnoss">
+        <div class="wrap-widget-usuario-gnoss">
+            <div class="widget-usuario-head-gnoss">
+                <h3>
+                    <a href="@Comunidad.Url" id="linkComunidadLogo" target="_blank" title="@Comunidad.Name">
+                        <img src="@Comunidad.Logo" id="imgLogoComunidad" alt="@Comunidad.Name" />
+                        @if (string.IsNullOrEmpty(Context.Request.Headers["logoCabecera"]))
+                        {
+                             @Comunidad.Name
+                        }
+                    </a>
+                </h3>
+            </div>
+            <div id="bodyWidget" class="widget-usuario-body-gnoss" style="@bodyStyle">
+                <div class="resource-list-gnoss">
+                    <span style="display: none;" id="hack"></span>
+                    @foreach(ResourceModel recurso in Model)
+                    {
+                        string urlRecurso = recurso.CompletCardLink;
+                        string titulo = recurso.Title;
+                        string urlAutor = Html.ObtenerUrlPerfil(recurso.Publisher);
+                        string nombreAutor = Html.ObtenerNombrePerfil(recurso.Publisher);
+                        string fotoAutor = recurso.Publisher.UrlFoto;
+                        
+                        <div id="elemento0" class="resource-gnoss">
+                            <div class="description-gnoss">
+                                <div class="title-gnoss">
+                                    <h4><a href="@urlRecurso" target="_blank" title="@titulo">@titulo</a></h4>
+                                    <p class="resourceType @recurso.RdfType"><span>tipo de documento</span><a href="@urlRecurso" target="_blank" title="@titulo">@titulo</a></p>
+                                </div>
+                                <div class="group-gnoss author-gnoss">
+                                    <p><a class="author-image-gnoss" href="@urlAutor">
+                                        @if (string.IsNullOrEmpty(fotoAutor))
+                                        { 
+                                        <img src="@Html.GetBaseUrlContent()/@Es.Riam.Util.UtilArchivos.ContentImagenes/@Es.Riam.Util.UtilArchivos.ContentImagenesPersonas/anonimo_peque.png" class="author-name-gnoss" alt="@nombreAutor"/>                                        
+                                        }
+                                        else
+                                        {
+                                        <img src="@Html.GetBaseUrlContent()@fotoAutor" class="author-name-gnoss" alt="@nombreAutor"/>
+                                        }
+                                       </a>
+                                       <span><a href="@urlAutor">@nombreAutor</a></span>
+                                    </p>
+
+                                    @{
+                                        KeyValuePair<int, int> diferenciaFechas = Es.Riam.Util.UtilDatos.ObtenerDiferenciaEntreFechas(DateTime.Now, recurso.PublishDate);
+
+                                        string fechaPublicado = ObtenerTextoPublicadoSegunFecha(recurso.PublishDate, diferenciaFechas).ToString().ToLower();
+                                    }
+                                    <p class="publicacion-gnoss">@fechaPublicado</p>
+                                    <span class="fechaOriginal-gnoss" style="display: none">@recurso.PublishDate.ToString("yyyy/MM/dd hh:mm")</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div id="panPie" class="widget-usuario-foot-gnoss @(string.IsNullOrEmpty(Context.Request.Headers["logo"])?"":"default" + Context.Request.Headers["logo"])">
+            <p>
+                <a title='GNOSS' target='_blank' href='http://www.gnoss.com'>Powered by <span>GNOSS</span></a>
+            </p>
+        </div>
+    </div>
+
+    @{
+        int alto = 400;
+        if (!string.IsNullOrEmpty(Context.Request.Headers["alto"]))
+        {
+            int.TryParse(Context.Request.Headers["alto"], out alto);
+        }  
+    }
+
+    <script type="text/javascript">
+        var retardoTxt;
+        var listado = $(".resource-list-gnoss");
+
+        $('#imgLogoComunidad').load(function () {
+            RecalcularAltura();
+        });
+
+        function DifFechasEvento(fecha, idContenedor) {
+            var factual = new Date();
+
+            var finicio = new Date(fecha);
+            var difD = parseInt((factual.getTime() / (1000 * 60 * 60 * 24)) - (finicio.getTime() / (1000 * 60 * 60 * 24)));
+            var difH = parseInt((factual.getTime() / (1000 * 60 * 60)) - (finicio.getTime() / (1000 * 60 * 60)));
+            var difM = parseInt((factual.getTime() / (1000 * 60)) - (finicio.getTime() / (1000 * 60)));
+            //Montamos la frase para el tiempo pasado
+            var tiempoPasado = '';
+            if (difD < 7) {
+                if (difD == 0) {
+                    if (difH == 0) {
+                        if (difM <= 1) {
+                            tiempoPasado = tiempo.haceMinus + ' 1 ' + tiempo.minuto;
+                        }
+                        else {
+                            tiempoPasado = tiempo.haceMinus + ' ' + difM + ' ' + tiempo.minutos;
+                        }
+                    }
+                    else if (difH == 1) {
+                        tiempoPasado = tiempo.haceMinus + ' 1 ' + tiempo.hora;
+                    }
+                    else {
+                        tiempoPasado = tiempo.haceMinus + ' ' + difH + ' ' + tiempo.horas;
+                    }
+                }
+                else if (difD == 1) {
+                    tiempoPasado = tiempo.ayerMinus;
+                }
+                else {
+                    tiempoPasado = tiempo.haceMinus + ' ' + difD + ' ' + tiempo.dias;
+                }
+            }
+            else {
+                var dia = finicio.getDate();
+                if (dia < 10) { dia = '0' + dia; }
+                var mes = finicio.getMonth() + 1;
+                if (mes < 10) { mes = '0' + mes; }
+
+                var fecha = dia + '/' + mes + '/' + finicio.getFullYear();
+                tiempoPasado = tiempo.elMinus + ' ' + tiempo.dia + ' ' + fecha;
+            }
+            $('#' + idContenedor).html(tiempoPasado);
+        }
+
+        function actualizarWidget() {
+            if ($(".widget-usuario-body-gnoss").css("overflow") == "auto") {
+                clearTimeout(retardoTxt);
+                retardoTxt = setInterval("actualizarWidget()", 6000);
+            }
+            else {
+                var altura = $(".resource-gnoss").first().height();
+                $(".resource-gnoss").first().animate({ opacity: 0, "margin-top": "-=" + altura + "px" }, "slow", function () {
+                    $(".resource-gnoss").first().hide();
+                    $(".resource-gnoss").first().css("margin-top", "0");
+                    //DifFechasEvento($(".resource-gnoss").first().find(".fechaOriginal-gnoss").html(), $(".resource-gnoss").first().find(".fecha_elemento").attr("id"));
+                    $(".resource-gnoss").first().appendTo(listado);
+                    $(".resource-gnoss").last().show();
+                    $(".resource-gnoss").last().animate({ opacity: 1 });
+
+                    clearTimeout(retardoTxt);
+                    retardoTxt = setInterval("actualizarWidget()", 6000);
+                });
+            }
+        }
+
+        function RecalcularAltura() {
+            $('#bodyWidget').css({
+                'height': (@alto -$('.widget-usuario-foot-gnoss')[0].clientHeight - $('.widget-usuario-head-gnoss')[0].clientHeight - 30) + 'px'
+            });
+        }
+
+        function IniciarScrollAutomatico() {
+            //Tiempo que espera antes de empezar a mover el widget
+            clearTimeout(retardoTxt);
+            retardoTxt = setTimeout('actualizarWidget()', 6000);
+        }
+
+        $(document).ready(function () {
+            IniciarScrollAutomatico();
+            RecalcularAltura();
+        });
+    </script>
+</body>
+</html>
+

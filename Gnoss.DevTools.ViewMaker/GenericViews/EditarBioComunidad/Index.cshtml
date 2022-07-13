@@ -1,0 +1,47 @@
+﻿@model EditCvCommunityModel
+
+@{
+    Html.SetBodyClass("layout03 comGnoss");
+    CommunityModel Comunidad = Html.GetComunidad();
+}
+
+
+<div id="content">
+    <div id="col02">
+        <h2>@Html.GetText("EDITORBIOCOM", "TITULO", Comunidad.Name)</h2>
+        <p>@Html.GetText("EDITORBIOCOM", "INTROMINI2")</p>
+        <div class="box">
+            <fieldset>
+                <form method="post">
+                    <p>
+                        @Html.GetText("EDITORBIOCOM", "SINTESIS")
+                    </p>
+                    <ul class="radioList">
+
+                        @foreach (Guid cv in Model.CvList.Keys)
+                        { 
+                            <li>
+                                <input type="radio" value="@cv" name="CvSelected" id="rb_@cv" @(Model.CvSelected == cv?"checked=checked":"") />
+                                <label for="rb_@cv">@Model.CvList[cv]</label>
+                            </li>
+                        }
+                    </ul>
+                    <p>
+                        <input type="submit" class="submit principal" value="@Html.GetText("EDITORBIOPRO", "COMPARTIR")" />
+                    </p>
+                </form>
+                <div style="display: block;" id="menssages">
+                </div>
+                <div class="box">
+                    <p>
+                        @Html.GetText("EDITORBIOCOM", "CREARBIO")
+                    </p>
+                    <br />
+                    <p>
+                        <a class="submit principal" href="@Html.GetBaseUrlIdioma().Replace("https://", "http://")/@Html.GetText("URLSEM", "EDITARBIOSINTRO")">@Html.GetText("EDITORBIOCOM", "NUEVABIO")</a>
+                    </p>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>

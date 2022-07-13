@@ -1,0 +1,21 @@
+﻿@model SemanticPropertyModel
+
+@if (string.IsNullOrEmpty(Model.LiteralInfo.LiteralLink))
+{
+    @Html.Raw(Model.LiteralInfo.LiteralName);
+}
+else
+{
+    string target = "";
+
+    if (Model.Element.TargetLink == null)
+    {
+        target = "target=\"_blank\"";
+    }
+    else if (Model.Element.TargetLink != "")
+    {
+        target = "target=\"" + Model.Element.TargetLink + "\"";
+    }
+    
+    <a href="@Model.LiteralInfo.LiteralLink" @Html.Raw(target)>@Model.LiteralInfo.LiteralName</a>
+}

@@ -1,0 +1,31 @@
+﻿@model CMSComponentResourceList
+@if (Model != null && Model.ResourceList.Count>0)
+{
+    <div class="group tabsGroup">
+        <div class="roup acciones tabspresentation">
+            <ul>
+            @{
+                int i=0;
+                foreach (ResourceModel fichaModel in Model.ResourceList)
+                {
+                    string activo = null;
+                    if (i == 0)
+                    {
+                        activo = "active";
+                    }
+                    i++;
+                    <li class="@activo"><a href="#"> @fichaModel.Title </a></li>
+                }
+            }
+            </ul>
+        </div>
+        <div class="horizontal">
+        @foreach (ResourceModel fichaModel in Model.ResourceList)
+        {
+            <div class="block">
+            @Html.PartialView(Model.ViewNameResources, fichaModel)
+            </div>
+        }
+        </div>
+    </div>
+}

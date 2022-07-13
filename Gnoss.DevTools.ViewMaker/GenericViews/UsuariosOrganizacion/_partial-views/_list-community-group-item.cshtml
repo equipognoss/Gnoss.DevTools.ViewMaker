@@ -1,0 +1,42 @@
+﻿@model GroupCardModel
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra cada item de tipo Grupo  para ser mostrado en la sección de "Administrar Comunidades".
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+GroupCardModel grupo = Model;
+}
+
+<article class="resource" id="@grupo.Clave">
+    <div class="wrap">       
+        <div class="user-miniatura">
+            <div class="imagen-usuario-wrap">
+                <div class="imagen sinImagen">
+                    <span class="material-icons">groups</span>
+                </div>
+            </div>
+
+            <div class="nombre-usuario-wrap">
+                <a href="@grupo.UrlGroup">
+                    <p class="nombre">@grupo.Name</p>
+                </a>
+            </div>
+            @* Acción de Editar Grupo*@
+            <div class="acciones-usuario-wrap">
+                <ul class="no-list-style">
+                    <li>
+                        <a class="btn btn-outline-grey" href="@grupo.UrlGroup/@Html.GetText("URLSEM", "EDITARGRUPO")">
+                            <span class="material-icons">edit</span>
+                            <span>@Html.GetText("COMMON", "EDITAR")</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</article>

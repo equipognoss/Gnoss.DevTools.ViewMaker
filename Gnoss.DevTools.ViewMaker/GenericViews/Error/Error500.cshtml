@@ -1,0 +1,34 @@
+﻿@model Error500ViewModel
+<div class="info columms" id="info">
+    <p class="title-panel-info">@Html.GetText("500", "TITULO")</p>
+    <div id="col03">
+        @try
+        {
+            if (Model.ShowError)
+            {
+                <div>
+                    <p>ERROR:</p>
+                    <p>@Model.Error</p>
+                    <p>TRAZA:</p>
+                    <p>@Model.ErrorTrace</p>
+                </div>
+            }
+            else
+            {
+                <div class="box">
+                    <fieldset>
+                        <legend>@Html.Raw(Html.GetText("500", "ERRORGENERICO"))</legend>
+                    </fieldset>
+                </div>
+            }
+        }
+        catch
+        {
+            <div class="box">
+                <fieldset>
+                    <legend>@Html.Raw(Html.GetText("500", "ERRORGENERICO"))</legend>
+                </fieldset>
+            </div>
+        }
+    </div>
+</div>

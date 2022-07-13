@@ -1,0 +1,33 @@
+﻿@model VotesModel
+
+<div id="panelVotantes" class="componente cp0401">
+    <div class="titulo">
+        <h2>Usuarios que han votado el recurso</h2>
+    </div>
+    <div class="contenido">
+        <div class="resource-list">
+            <div id="wrapresources_votos" class="wrapresources">
+                @foreach (VotesModel.VoterModel votante in Model.Voters)
+                {
+                    string voto = "votoPositivo";
+                    if (votante.Vote == -1)
+                    {
+                        voto = "VotoNegativo";
+                    }
+                    <div class="resource @voto">
+                        <div class="box description">
+                            <div class="group title">
+                                <h4><a href="@votante.Url">@votante.Name</a></h4>
+                                <div class="logoComunidad">
+                                    <a href="@votante.Url">
+                                        <img src="@votante.Image" />
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

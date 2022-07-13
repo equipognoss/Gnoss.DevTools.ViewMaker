@@ -1,0 +1,315 @@
+﻿@model CommentModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista que hace de contenedor de comentarios. Muestra todos los comentarios asociados a un determinado recurso. Contendrá:
+- Vista parcial para añadir un comentario
+- Vista parcial que contendrá todos los comentarios existentes de un recurso.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+// Nombre del publicador del comentario
+string nombrePublicador = Html.ObtenerNombrePerfil(Model.PublisherCard);
+// URL del publicador del comentario
+string urlPublicador = Html.ObtenerUrlPerfil(Model.PublisherCard);
+// Clase del publicador para mostrar o no fotografía
+string urlFoto = "";
+// Comprobar si el comentario actual tiene respuestas
+bool hasReplies = false;
+
+// Acción responder
+string funcionComentario_ResponderComentario = "";
+
+// Acción eliminar
+string funcionComentario_EliminarComentario = "";
+
+// Acción editar
+string funcionComentario_EditarComentario = "";
+string funcionComentario_EditarComentarioJIRA = "";
+string funcionComentario_CancelarEditarComentario = "";
+string funcionComentario_GuardarComentario = "";
+
+// Controlar si dispone o no de fotografía el usuario
+bool containsUrlFoto = true;
+
+    @* Asignación de acciones de comentarios *@
+    if (Model != null && Model.Actions != null) { 
+        // Acción responder comentario
+        if (Model.Actions.Reply){
+            funcionComentario_ResponderComentario = "Comentario_ResponderComentario('" + Model.Actions.UrlReply + "', '" + Model.Key + "');";
+        }
+        // Acción editar comentario
+        if (Model.Actions.Edit) { 
+            funcionComentario_EditarComentario = "Comentario_EditarComentario('" + Model.Actions.UrlEdit + "', '" + Model.Key + "');";
+            funcionComentario_EditarComentarioJIRA = "Comentario_Editar_JIRA('" + Model.Actions.UrlEdit + "', '" + Model.Key + "');";
+            funcionComentario_CancelarEditarComentario = "Comentario_Cancelar_JIRA('" + Model.Key + "');";
+            funcionComentario_GuardarComentario = "Comentario_EnviarEditarComentario_JIRA('" + Model.Actions.UrlEdit + "', '" + Model.Key + "');";         
+        }
+        // Acción eliminar comentario
+        if (Model.Actions.Delete) {                                 
+            funcionComentario_EliminarComentario = "Comentario_EliminarComentario('" + Model.Actions.UrlDelete + "', '" + Model.Key + "');";             
+        }
+    }     
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Comentario asociado a un recurso --------------------
+*@
+
+@* Cargar la foto del publicador o anónima *@
+@if (Model.PublisherCard.UrlFoto == null)
+{
+    containsUrlFoto = false;
+    urlFoto = Html.ObtenerFotoAnonimaDePerfil(Model.PublisherCard.TypeProfile);
+}
+else {
+    urlFoto = Model.PublisherCard.UrlFoto;
+}
+
+
+@* Comrpboar si hay respuestas asociadas al comentario *@
+@if (Model.Replies.Count > 0)
+{
+    hasReplies = true;
+}
+
+<div class="comentario"
+     rel="sioc:has_discussion"
+     id="@Model.Key"
+     resource="@Html.GetUrlPagina()/comentario/@Model.Key"
+     typeof="sioc_t:Comment"
+     about="@Html.GetUrlPagina()/comentario/@Model.Key">
+    <div class="bloque-comentario">                                
+        <div class="col-comentario">
+            <div class="comentario-header mb-2">
+                @* Nombre/Datos del usuario *@
+                <div class="user-miniatura">
+                    <div class="nombre-usuario-wrap">
+                        <a typeof="foaf:Person"
+                           href="@urlPublicador">
+                            <span class="nombre" property="foaf:name">@nombrePublicador</span>
+                        </a>
+                    </div>
+                </div>
+
+                @* Fecha de la publicación *@
+                <div class="fecha-publicacion">
+                    <span content="@Es.Riam.Gnoss.ExportarImportar.UtilImportarExportar.PasarFechaEnFormatoEstandar(Model.PublishDate)" property="dcterms:created">@Model.PublishDate.ToString("yyyy/MM/dd HH:mm")</span>
+                </div>
+            </div>
+            @* Comentario o Cuerpo del comentario *@
+            <div class="comentario-body">
+                <div property="sioc:content" class="comentario-contenido">
+                    @Html.Raw(Model.Title)
+                </div>
+            </div>
+            @* Acciones del usuario sobre el comentario *@
+            @if (Model.Actions != null)
+            {
+                <div class="comentario-acciones">
+                    <div class="wrap">
+                        @* Acción Editar Comentario *@
+                        @if (Model.Actions.Edit)
+                        {
+                            @* Editar comentario vía Modal - Hacerlo en sin modal 
+                            <div>
+                                <span class="btn btn-outline-grey"
+                                    data-target="#modal-container"
+                                    data-toggle="modal"
+                                    onclick="@funcionComentario_EditarComentario">
+                                    <span class="material-icons">edit</span>
+                                        @Html.GetText("CONTROLESDOCUMENTACION", "EDITAR")
+                                </span>
+                            </div>
+                            *@
+
+                            <div>
+                                <span class="btn btn-outline-grey"
+                                      id="edit-comment-@Model.Key"
+                                      onclick="@funcionComentario_EditarComentarioJIRA">
+                                    <span class="material-icons">edit</span>
+                                    <span class="texto">@Html.GetText("CONTROLESDOCUMENTACION", "EDITAR")</span>                                    
+                                </span>
+                            </div>
+
+                            <div class="d-none">
+                                <span class="btn btn-outline-grey"
+                                      id="save-comment-@Model.Key"
+                                      onclick="@funcionComentario_GuardarComentario">
+                                    <span class="material-icons">save</span>
+                                    <span class="texto">@Html.GetText("COMMON", "GUARDAR")</span>                                    
+                                </span>
+                            </div>
+
+                            <div class="d-none">
+                                <span class="btn btn-outline-grey"
+                                      id="cancel-comment-@Model.Key"
+                                      onclick="@funcionComentario_CancelarEditarComentario">
+                                    <span class="material-icons">close</span>
+                                    <span class="texto">@Html.GetText("COMMON", "CANCELAR")</span>                                    
+                                </span>
+                            </div>
+
+                         }
+                        @* Acción Eliminar Comentario *@                                     
+                        @if (Model.Actions.Delete)
+                        {
+                            <div>
+                                <span class="btn btn-outline-grey"
+                                    onclick="@funcionComentario_EliminarComentario">
+                                    <span class="material-icons">delete</span>
+                                    <span class="texto">@Html.GetText("CONTROLESDOCUMENTACION", "ELIMINAR")</span>                                    
+                                </span>
+                            </div>
+                        }
+
+                        @* Acción Responder Comentario *@
+                        @if (Model.Actions.Reply)
+                        {
+                            <div class="responder">
+                                <span class="btn btn-outline-grey"
+                                      data-target="#modal-container"
+                                      data-toggle="modal"
+                                      onclick="@funcionComentario_ResponderComentario">
+                                    <span class="material-icons">reply</span>
+                                    <span class="texto">@Html.GetText("CONTROLESDOCUMENTACION", "RESPONDER")</span>                                    
+                                </span>
+                            </div>
+                        }
+                    </div>
+
+                    @* Acciones para dispositivos móviles: Comprobar si hay alguna acción disponible *@
+                    @if (Model.Actions.Edit || Model.Actions.Delete || Model.Actions.Reply)
+                    {
+                        <div class="wrap-movil">
+                            <div class="dropdown">
+                                <a href="#"
+                                   class="dropdown-toggle no-flecha"
+                                   role="button"
+                                   data-toggle="dropdown"
+                                   aria-haspopup="true"
+                                   aria-expanded="false">
+                                    <span class="material-icons">more_vert</span>
+                                </a>
+                                <div class="dropdown-menu basic-dropdown dropdown-icons dropdown-menu-right">
+                                    <p class="dropdown-title">Acciones</p>
+                                    <span class="material-icons cerrar-dropdown">close</span>
+                                    <ul class="no-list-style">
+                                        @* Acción Editar Comentario (Móvil) *@
+                                        @if (Model.Actions.Edit) {
+
+                                            @* Editar comentario 'sin modal'
+                                            <li>
+                                                <span class="item-dropdown"
+                                                    data-target="#modal-container"
+                                                    data-toggle="modal"
+                                                    onclick="@funcionComentario_EditarComentario">
+                                                    <span class="material-icons">edit</span>
+                                                    <span class="texto">@Html.GetText("CONTROLESDOCUMENTACION", "EDITAR")</span>                                                    
+                                                </span>                                      
+                                            </li>*@
+
+                                            <li>
+                                                <span class="item-dropdown"
+                                                    id="edit-comment-mobile-@Model.Key"
+                                                    onclick="@funcionComentario_EditarComentario">
+                                                    <span class="material-icons">edit</span>
+                                                    <span class="texto">@Html.GetText("CONTROLESDOCUMENTACION", "EDITAR")</span>                                                    
+                                                </span>                                                 
+                                            </li>
+
+                                            <li class="d-none">
+                                                <span class="item-dropdown"                                                    
+                                                    id="save-comment-mobile-@Model.Key"
+                                                    onclick="@funcionComentario_GuardarComentario">
+                                                    <span class="material-icons">save</span>
+                                                    <span class="texto">@Html.GetText("COMMON", "GUARDAR")</span>                                                    
+                                                </span>                                                 
+                                            </li>
+
+                                            <li class="d-none">
+                                                <span class="item-dropdown"
+                                                      id="cancel-comment-mobile-@Model.Key"
+                                                      onclick="@funcionComentario_CancelarEditarComentario">
+                                                    <span class="material-icons">close</span>
+                                                    <span class="texto">@Html.GetText("COMMON", "CANCELAR")</span>                                                    
+                                                </span>
+                                            </li>
+                                        }
+                                        @* Acción Eliminar Comentario (Móvil) *@
+                                        @if (Model.Actions.Delete) { 
+                                            <li>
+                                                <span class="item-dropdown"
+                                                    onclick="@funcionComentario_ResponderComentario">
+                                                    <span class="material-icons">delete</span>
+                                                    <span class="texto">@Html.GetText("CONTROLESDOCUMENTACION", "ELIMINAR")</span>
+                                                </span>
+                                            </li>
+                                        }
+                                        @* Acción Responder (Móvil)*@
+                                        @if (Model.Actions.Reply)
+                                        {
+                                            <li>
+                                                <span class="item-dropdown"
+                                                      data-target="#modal-container"
+                                                      data-toggle="modal"
+                                                      onclick="@funcionComentario_ResponderComentario">
+                                                    <span class="material-icons">reply</span>
+                                                    <span class="texto">@Html.GetText("CONTROLESDOCUMENTACION", "RESPONDER")</span>
+                                                </span>                                        
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+        @* Foto del usuario *@
+        <div class="col-usuario">
+            <div class="user-miniatura">
+                <div class="imagen-usuario-wrap">
+                    <a href="@urlPublicador">
+                        <div class="imagen @( (containsUrlFoto == false) ? "sinImagen" : null) ">
+                            @if (containsUrlFoto == false)
+                            {
+                            <span class="material-icons">person</span>
+                            }
+                            else {
+                                <span style="background-image: url(@Html.GetBaseUrlContent()@urlFoto)"></span>
+                            }                            
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Respuestas al comentario *@
+    @if (hasReplies)
+    {
+        <div>
+            @foreach (CommentModel comentarioHijo in Model.Replies)
+            {                                
+                @Html.PartialView("_partial-views/_comment-reply", comentarioHijo)               
+            }
+        </div>
+    }
+</div>
+
+
+<script lang="javascript" type="text/javascript">
+    $(document).ready(function () {
+        let fechamoment = "@Model.PublishDate.ToString("yyyy-MM-dd")" + "T" + "@Model.PublishDate.ToString("HH:mm:ss")" + "Z";
+        var fechaServer = moment(fechamoment);
+        var fechaMsj = fechaServer.tz(Intl.DateTimeFormat().resolvedOptions().timeZone).format('YYYY/MM/DD HH:mm');
+        $("#@Model.Key .fecha-publicacion span").text(fechaMsj);
+    });
+</script>

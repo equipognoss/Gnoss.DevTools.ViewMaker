@@ -1,0 +1,69 @@
+﻿@*
+Descripción
+----------------------------------------------------------------
+Vista parcial donde se gestiona los mensajes que se mostrarán dependiendo del estado de la comunidad.
+
+Variables
+----------------------------------------------------------------
+*@
+@{ 
+CommunityModel Comunidad = Html.GetComunidad();
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+}
+@*
+----------------------------------------------------------------
+
+-------------------- Gestión de mensajes acerca del estado de la comunidad --------------------*@
+
+
+@if (Comunidad != null && string.IsNullOrEmpty(Context.Request.Query["new-community-wizard"]) && (IdentidadActual.IsExpelled || Comunidad.ProjectState == CommunityModel.StateProject.Close || Comunidad.ProjectState == CommunityModel.StateProject.CloseTemporaly || Comunidad.ProjectState == CommunityModel.StateProject.Definition))
+{
+    <div id="info" 
+         role="alert" 
+         class="alert alert-warning mt-2">
+        <div class="d-flex header">
+            <span class="material-icons mr-2">info</span>           
+            <p class="aviso font-weight-bold">Aviso</p>
+        </div>
+        
+        @if (IdentidadActual.IsExpelled)
+        {
+            @*Usuario expulsado*@
+            <p>@Html.Raw(Html.GetText("COMINICIOLOGIN", "ADVERTENCIAEXPULSADO1"))</p>
+            <p>@Html.GetText("COMMON", "MUCHASGRACIAS")</p>
+        }
+        else if (Comunidad.ProjectState == CommunityModel.StateProject.Close) {
+            <p>@Html.GetText("COMADMIN", "EXPLICACIONCERRADA", Html.GetNombreProyectoEcosistema())</p>
+        }else if (Comunidad.ProjectState == CommunityModel.StateProject.CloseTemporaly){ 
+            <p>@Html.GetText("COMADMIN", "EXPLICACIONCERRADATMP")</p>
+        }else if (Comunidad.ProjectState == CommunityModel.StateProject.Definition) {
+            if (IdentidadActual.IsProyectAdmin)
+            {
+                string urlAdmin = @Html.GetGeneradorURLs().ObtenerURLAdministracionComunidad(Html.GetUtilIdiomas(), Html.GetBaseUrlIdioma(), Comunidad.ShortName, "ADMINISTRARCOMUNIDADGENERAL");
+                //Sacamos el mensaje al administrador:
+                switch (Comunidad.AccessType)
+                {
+                    case CommunityModel.TypeAccessProject.Public:
+                        @Html.Raw(Html.GetText("COMINICIOLOGIN", "NOACCESODEFINICIONADMINPUBLICA", urlAdmin))
+                        break;
+                    case CommunityModel.TypeAccessProject.Private:
+                        @Html.Raw(Html.GetText("COMINICIOLOGIN", "NOACCESODEFINICIONADMINPRIVADA", urlAdmin))
+                        break;
+                    case CommunityModel.TypeAccessProject.Reserved:
+                        @Html.Raw(Html.GetText("COMINICIOLOGIN", "NOACCESODEFINICIONADMINRESERVADA", urlAdmin))
+                        break;
+                    case CommunityModel.TypeAccessProject.Restricted:
+                        @Html.Raw(Html.GetText("COMINICIOLOGIN", "NOACCESODEFINICIONADMINRESTRINGIDA", urlAdmin))
+                        break;
+                }
+            } else{
+                <p>@Html.GetText("COMINICIOLOGIN", "COMUNIDADDEFINICION")</p>
+                <p>@Html.GetText("COMINICIOLOGIN", "NOACCESODEFINICION")</p>
+                foreach (ProfileModel admin in Comunidad.Administrators)
+                {
+                    <p>@Html.ObtenerNombrePerfil(admin)</p>
+                }
+            }
+        }
+    </div>
+}

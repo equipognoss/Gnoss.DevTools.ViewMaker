@@ -1,0 +1,79 @@
+﻿@model ResourceViewModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista modal que servirá para añadir el recurso a una de las carpetas personales del  usuario. Es para guardar el recurso en su espacio personal.
+Para ahorrar código, esta vista modal se cargará en un modal "padre" que es el "__resourece-modal-container"
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+ResourceModel fichaRecurso = Model.Resource;
+// Función para aceptar la acción de guardado
+string funcionAccionRecurso_AgregarABR_Aceptar = "AccionRecurso_AgregarABR_Aceptar('" + fichaRecurso.ListActions.UrlAddToPersonalSpace + "', '" + fichaRecurso.CompletCardLink + "', '" + fichaRecurso.Key + "')";
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista Modal para opción de Categorizar un Recurso --------------------
+*@
+
+@* Título de la acción *@
+<div class="modal-header">
+    <p class="modal-title">
+        <span class="material-icons">create_new_folder</span>@Model.PersonalSpace
+    </p>
+    <span class="material-icons cerrar" data-dismiss="modal" aria-label="Close">close</span>
+</div>
+@* Contenido/cuerpo de la acción *@
+<div class="modal-body">
+    <div class="formulario-edicion" id='despAccionRec_@fichaRecurso.Key'>
+
+        @* Pequeño título/Encabezado de la acción*@
+        <div class="form-group">
+            <label class="control-label">@Html.GetText("PERFILBASERECURSOSFICHA", "AGREGARABRPERSONAL")@Model.PersonalSpace</label>
+        </div>
+
+        @* Panel con las opciones disponibles para listar las carpetas personales del usuario *@
+        <div id="panDesplegableSelCat">
+            @* Quitar la lista ya que solo hay una opción 
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                @* Opción Ver listado en Arbol 
+                <li class="nav-item">
+                    <a class="nav-link active"
+                       id="ver-arbol-tab"
+                       data-toggle="tab"
+                       href="#ver-arbol"
+                       role="tab"
+                       aria-controls="ver-arbol"
+                       aria-selected="true">@Html.GetText("TESAURO", "VERARBOL")</a>
+                </li>
+            </ul>*@
+            @*<div class="tab-content">*@
+                @* Listado en "ARBOL" *@
+                @Html.PartialView("../FichaRecurso/_FichaCategoriaTesauroArbol", Model)
+            @*</div>*@
+        </div>
+
+        @* Input guardar guardar las selecciones *@
+        <input type="hidden"
+               id="txtSeleccionados" />
+
+        @* Mensaje informativo del proceso*@
+        <div>
+            <div id="menssages">
+                <div class="ok"></div>
+                <div class="ko"></div>
+            </div>
+        </div>
+        
+        @* Acciones del Modal - Guardar *@
+        <div class="form-actions">
+            <a onclick="@funcionAccionRecurso_AgregarABR_Aceptar" class="btn btn-primary pmd-ripple-effect">@Html.GetText("PERFILBASERECURSOSFICHA", "AGREGARABRPERSONAL")@Model.PersonalSpace</a>
+
+        </div>
+    </div>
+</div>

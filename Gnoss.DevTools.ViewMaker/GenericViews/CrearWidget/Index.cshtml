@@ -1,0 +1,295 @@
+﻿@{
+    CommunityModel Comunidad = Html.GetComunidad();
+    
+    const int ANCHOMIN = 150;
+    const int ANCHOMAX = 650;
+    const int ANCHOPORDEFECTO = 300;
+
+    const int ALTOMIN = 400;
+    const int ALTOMAX = 1000;
+
+    Html.GetListaCSS().Add(Html.GetBaseUrlStatic() + "/js/farbtastic/farbtastic.css?v=" + Html.GetVersion());
+    Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/js/farbtastic/farbtastic.js?v=" + Html.GetVersion());
+
+    Html.SetBodyClass("layout02 comGnoss");
+}
+<script defer="defer" type="text/javascript">
+
+    function seleccionarCode(obj) {
+        if (obj.nodeName.toLowerCase() == 'textarea' || (obj.nodeName.toLowerCase() == 'input' && obj.type == 'text')) {
+            obj.select();
+            return;
+        }
+        if (window.getSelection) {
+            var sel = window.getSelection();
+            var range = document.createRange();
+            range.selectNodeContents(obj);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
+        else if (document.selection) {
+            document.selection.empty();
+            var range = document.body.createTextRange();
+            range.moveToElementText(obj);
+            range.select();
+        }
+    } 
+
+    function cancelarEnvio(event) {
+        if(event.which || event.keyCode){
+            if ((event.which == 13) || (event.keyCode == 13)) {
+                return false;
+            }
+        }
+    }
+
+    function crearWidget() {
+        var anchoWidget = $('#tbAncho').val();
+        var altoWidget = $('#tbAlto').val();
+        var numRecursosWidget = $('#ddlNumRecursos').val();
+        var scrollWidget = !$('#cAutoRotacion').is(':checked');
+        var colorMarcoWidget = $('#cColorExterior').val().replace('#', '%23');
+        var colorFondoWidget = $('#cColorInterior').val().replace('#', '%23');
+        var colorEnlaceWidget = $('#cColorEnlaces').val().replace('#', '%23');
+        var logoCabeceraWidget = $('#cLogoGrande').is(':checked') ? "1" : "";
+        var logoPieWidget = $('#cFooter01').is(':checked') ? "0" : $('#cFooter02').is(':checked') ? "1" : "2";
+
+
+        var urlWidget = "@Comunidad.Url/ObjetoGnossComunidad?numRecursos=" + numRecursosWidget + "&ancho=" + anchoWidget + "&alto=" + altoWidget + "&scroll=" + scrollWidget + "&marco=" + colorMarcoWidget + "&fondo=" + colorFondoWidget + "&enlaces=" + colorEnlaceWidget + "&logo=" + logoPieWidget;
+
+        if (logoCabeceraWidget != "") {
+            urlWidget += "&logoCabecera=" + logoCabeceraWidget;
+        }
+
+        var codigoWidget = '<iframe marginheight="0" marginwidth="0" scrolling="no" frameborder="0" width="' + anchoWidget + '" height="' + altoWidget + '" src="' + urlWidget + '"></iframe>';
+
+        $('#txtCodigoWidget').text(codigoWidget);
+
+        $('#panContenedorWidget').html(codigoWidget);
+
+        if (typeof $.farbtastic != 'undefined') {
+            var f = $.farbtastic('#colorpicker');
+            var p = $('#colorpicker').css('opacity', 0.25);
+            var selected;
+            $('.aparienciaWidget input')
+          .each(function () { f.linkTo(this); $(this).css('opacity', 0.75); })
+          .focus(function () {
+              if (selected) {
+                  $(selected).css('opacity', 0.75).removeClass('colorwell-selected');
+              }
+              f.linkTo(this);
+              p.css('opacity', 1);
+              $(selected = this).css('opacity', 1).addClass('colorwell-selected');
+          });
+        }
+    }
+
+    $(document).ready(function () {
+
+        crearWidget();
+
+        $('#tbAncho').keydown(function (event) { cancelarEnvio(event) });
+        $('#tbAlto').keydown(function (event) { cancelarEnvio(event) });
+        $('#cColorExterior').keydown(function (event) { cancelarEnvio(event) });
+        $('#cColorInterior').keydown(function (event) { cancelarEnvio(event) });
+        $('#cColorEnlaces').keydown(function (event) { cancelarEnvio(event) });
+            
+        $('#btGenerar').click(function () { $('#widget-codigo-gnoss').show(); $('#btGenerar').hide(); });
+        $('#btProbar').click(function () { crearWidget(); return false; })
+
+        $('#txtCodigoWidget').focus(function () { seleccionarCode(this); });
+        $('#txtCodigoWidget').click(function () { seleccionarCode(this); });
+        $('#txtCodigoWidget').keydown(function () { return false; });
+    });
+</script>
+<div id="col01">
+    <div class="cofigWidget">
+        <div class="content">
+            <h2>@Html.GetText("COMMON", "CREARWIDGETCOMUNIDAD")</h2>
+            <div class="box formulario widgetConfig">
+                <h3>@Html.GetText("OBJETOGNOSS", "PERSONALIZAWIDGET")</h3>
+                <div class="fieldset">
+                    <fieldset class="largeLabels">
+                        <legend>@Html.GetText("OBJETOGNOSS", "ESTILOCABECERA")</legend>
+                        <div class="fieldsetContent">
+                            <div class="cLogo">
+                                <ul class="radioList">
+                                    <li>
+                                        <span class="cLogoGrande">
+                                            <input type="radio" value="logoGrande" name="cTipoLogo" id="cLogoGrande" checked="checked" />
+                                            <label for="cLogoGrande">@Html.GetText("OBJETOGNOSS", "LOGOGRANDE")</label>
+                                        </span>
+                                    </li>
+                                    <li>
+                                        <span class="cLogoYTexto">
+                                            <input type="radio" value="logoYTexto" name="cTipoLogo" id="cLogoYTexto" />
+                                            <label for="cLogoYTexto">@Html.GetText("OBJETOGNOSS", "IMAGENMASTEXTO")</label>
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="fieldset">
+                    <fieldset class="largeLabels">
+                        <legend>@Html.GetText("OBJETOGNOSS", "PREFERENCIASYDIMENSIONES")</legend>
+                        <div class="fieldsetContent">
+                            <p>
+                                <label>@Html.GetText("OBJETOGNOSS", "NUMRECURSOS")</label>
+                                <select class="cNumeroRecursos" id="ddlNumRecursos">
+                                    <option value="10" selected="selected">10</option>
+                                    <option value="20">20</option>
+                                    <option value="30">30</option>
+                                    <option value="40">40</option>
+                                    <option value="50">50</option>
+                                    <option value="60">60</option>
+                                    <option value="70">70</option>
+                                    <option value="80">80</option>
+                                    <option value="90">90</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </p>
+                            <p>
+                                <label for="tbAncho">@Html.GetText("OBJETOGNOSS", "ANCHO")</label>
+                                <input type="text" class="cAncho text medium numeral" id="tbAncho" value="@ANCHOPORDEFECTO.ToString()" />
+                                <em class="help">@Html.Raw(Html.GetText("OBJETOGNOSS", "ANCHOEXP", ANCHOMIN.ToString(), ANCHOMAX.ToString()))</em>
+                            </p>
+                            <p>
+                                <label for="tbAlto">@Html.GetText("OBJETOGNOSS", "ALTO")</label>
+                                <input type="text" class="cAlto text medium numeral" id="tbAlto" value="@ALTOMIN.ToString()" />
+                                <em class="help">@Html.Raw(Html.GetText("OBJETOGNOSS", "ALTOEXP", ALTOMIN.ToString(), ALTOMAX.ToString()))</em>
+                            </p>
+                            <div class="cMovimiento">
+                                <ul class="radioList">
+                                    <li>
+                                        <span class="cAutoRotacion text">
+                                            <input type="radio" value="auto" name="cIncluir" id="cAutoRotacion" checked="checked" />
+                                            <label for="cAutoRotacion">@Html.GetText("OBJETOGNOSS", "AUTOROTACION")</label>
+                                        </span>
+                                    </li>
+                                    <li>
+                                        <span class="cIncluirScroll text">
+                                            <input type="radio" value="scroll" name="cIncluir" id="cIncluirScroll" />
+                                            <label for="cIncluirScroll">@Html.GetText("OBJETOGNOSS", "INCLUIRSCROLL")</label>
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="fieldset">
+                    <fieldset class="aparienciaWidget largeLabels">
+                        <legend>@Html.GetText("OBJETOGNOSS", "APARIENCIA")</legend>
+                        <div class="fieldsetContent">
+                            <ul class="radioList">
+                                <li><span class="cColorExterior">
+                                    <label>@Html.GetText("OBJETOGNOSS", "COLOREXTERIOR")</label>
+                                    <input type="text" class="text big numeral colorwell-selected" id="cColorExterior" value="#D9DBF7" name="cColorExterior" style="background-color: rgb(217, 219, 247); color: rgb(0, 0, 0); opacity: 0.75;" />
+                                </span></li>
+                                <li><span class="cColorInterior">
+                                    <label>@Html.GetText("OBJETOGNOSS", "COLORINTERIOR")</label>
+                                    <input type="text" class="text big numeral colorwell-selected" id="cColorInterior" value="#FFFFFF" name="cColorInterior" style="background-color: rgb(255, 255, 255); color: rgb(0, 0, 0); opacity: 0.75;" />
+                                </span></li>
+                                <li><span class="cColorEnlaces">
+                                    <label>@Html.GetText("OBJETOGNOSS", "COLORENLACES")</label>
+                                    <input type="text" class="text big numeral colorwell-selected" id="cColorEnlaces" value="#8186BD" name="cColorEnlaces" style="background-color: rgb(129, 134, 189); color: rgb(0, 0, 0); opacity: 0.75;" />
+                                </span></li>
+                            </ul>
+                        </div>
+                        <div id="colorpicker" style="opacity: 0.25;">
+                            <div class="farbtastic">
+                                <div class="color" style="background-color: rgb(0, 21, 255);"></div>
+                                <div class="wheel"></div>
+                                <div class="overlay"></div>
+                                <div class="h-marker marker" style="left: 28px; top: 145px;"></div>
+                                <div class="sl-marker marker" style="left: 116px; top: 85px;"></div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <fieldset class="footerWidgetGNOSS">
+                    <legend>@Html.GetText("OBJETOGNOSS", "LOGOPIE")</legend>
+                    <ul class="radioList">
+                        <li>
+                            <span class="cFooter01">
+                                <input type="radio" checked="checked" value="0" name="footerWidgetGNOSS" id="cFooter01" style="border: 0px none; padding: 0px; margin-top: 0px;" />
+                                <label for="cFooter01">@Html.GetText("OBJETOGNOSS", "COLORPORDEFECTO")</label>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="cFooter02">
+                                <input type="radio" value="1" name="footerWidgetGNOSS" id="cFooter02" style="border: 0px none; padding: 0px; margin-top: 0px;" />
+                                <label for="cFooter02">@Html.GetText("OBJETOGNOSS", "BLANCO")</label>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="cFooter03">
+                                <input type="radio" value="2" name="footerWidgetGNOSS" id="cFooter03" style="border: 0px none; padding: 0px; margin-top: 0px;" />
+                                <label for="cFooter03">@Html.GetText("OBJETOGNOSS", "GRIS")</label>
+                            </span>
+                        </li>
+                    </ul>
+                </fieldset>
+
+                <fieldset>
+                    <ul class="actionButtons">
+                        <li><a class="btProbar" id="btProbar" href="#">Probar ajustes</a></li>
+                    </ul>
+                    <input type="hidden" value="@Comunidad.Url/ObjetoGnossComunidad" class="urlWidget" id="urlWidget" />
+                </fieldset>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="col02">
+    <div class="acciones tabspresentation tabsWidget">
+        <ul>
+            <li>
+                <a href="@Comunidad.Url/@Html.GetText("URLSEM", "OBJETOGNOSSBUSCADOR")" id="hlWidgetBuscador">Widget Buscador</a></li>
+            <li class="active">
+                <a href="@Comunidad.Url/@Html.GetText("URLSEM", "OBJETOGNOSS")" id="hlWidgetComunidad">Widget Contenidos</a></li>
+        </ul>
+    </div>
+    <div class="componente widthTabs">
+        <div class="box widget">
+            <div class="widgetExplain">
+                <p>
+                    @Html.GetText("OBJETOGNOSS", "INFOCREAROBJETOGNOSSCOM", Comunidad.Name)
+                    @*<a target="_blank" href="@Html.GetText("AYUDASCONTEXTUALES", "LINKGNOSSWIDGET")" id="linkInfoCrearObjeto">@Html.GetText("AYUDASCONTEXTUALES", "COMOFUNCIONA")</a>*@
+                </p>
+            </div>
+            <fieldset class="largeLabels">
+                <legend>@Html.GetText("OBJETOGNOSS", "VISTAPREVIAWIDGET")</legend>
+            </fieldset>
+
+            
+            <div id="panContenedorWidget" class="widget-usuario-gnoss">                    
+                <div id="panWidget"></div>
+            </div>
+
+            <div class="widget-activador-gnoss">
+                <ul class="actionButtons">
+                    <li><a id="btGenerar" class="btGenerar">@Html.GetText("OBJETOGNOSS", "LLEVARWIDGET")</a></li>
+                </ul>
+            </div>
+
+            <div style="display: none;" class="widget-codigo-gnoss" id="widget-codigo-gnoss" >
+                <div class="fieldset">
+                    <fieldset class="aparienciaWidget largeLabels">
+                        <legend>@Html.GetText("OBJETOGNOSS", "CODIGODELWIDGET")</legend>
+                        <div class="fieldsetContent">
+                            <p class="textarea">
+                                <label for="txtCodigoWidget">@Html.GetText("OBJETOGNOSS", "COPIAYPEGA")</label>
+                                <textarea id="txtCodigoWidget" rows="5" cols="20"></textarea>
+                            </p>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,81 @@
+﻿@model RegisterDataViewModel
+
+
+@*
+Descripción
+-----------------------------------------------
+Vista que se utiliza para mostrar el paso de "Conéctate" con los usuarios de la comunidad que permite seguir a usuarios de la propia comunidad.
+Correspondería con el último paso de registro (Paso 4).
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista de Seguir a personas durante el proceso de Registro --------------------
+*@
+@* Contenedor de usuarios a seguir *@
+<div class="grupo-personas mb-5">
+    <div class="resource-list usuarios con-borde">
+        @* Cada uno de los usuarios disponibles a seguir*@
+        @foreach (ProfileModel perfil in Model.ListProfiles){
+            <article class="resource resource-grupo">
+                <div class="user-miniatura">
+                    @* Contenedor de la imagen del usuario (si dispone) *@                                        
+                    <div class="imagen-usuario-wrap">                      
+                        <div class="imagen @( string.IsNullOrEmpty(perfil.UrlFoto) ? "sinImagen" : null) ">
+                            @if (!string.IsNullOrEmpty(perfil.UrlFoto))
+                            {
+                                <span style="background-image: url(@Html.GetBaseUrlContent()/@perfil.UrlFoto);"></span>
+                            }
+                            else
+                            {
+                                <span class="material-icons">person</span>
+                            }
+                        </div>                      
+                    </div>
+                    
+                    @* Nombre del usuario a seguir *@
+                    <div class="nombre-usuario-wrap">                    
+                        <p id="nombre-@perfil.NamePerson" rel="sioc:has_creator" class="nombre">@perfil.NamePerson</p>
+                        @*<p class="nombre-completo">@perfil.NamePerson</p>*@
+                    </div>
+
+                    @* Acción de Seguir al usuario *@
+                    <div class="acciones-usuario-wrap">
+                        <ul class="no-list-style">
+                        <li>
+                            <a class="btn btn-outline-grey"
+                            id="btn-seguir-usuario-@perfil.NamePerson"
+                            onclick="AccionPerfil_Seguir(this, '@perfil.ListActions.UrlFollow')">                              
+                                <span class="material-icons">person_add_alt_1</span>
+                                <span>Seguir</span>
+                            </a>
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </article>
+        }    
+    </div>
+</div>
+
+@* Formulario de envío de datos (Continuar) *@
+<form method="post" id="formConectateRegistro">
+    <div class="actionButtons">
+        <div class="mb-3">
+            <input type="hidden" name="paginaOriginal" value="@Model.ReferrerPage" />
+            <input type="hidden" name="paginaConectate" value="true" />
+            <input type="hidden" name="tienePaginaDatosRegistro" value="@Model.TabData.ToString().ToLower()" />
+            <input id="submit"
+                   type="submit"
+                   value="Continuar"
+                   class="btn btn-primary principal submit uppercase btn-registrate" />
+        </div>
+    </div>
+</form>
+

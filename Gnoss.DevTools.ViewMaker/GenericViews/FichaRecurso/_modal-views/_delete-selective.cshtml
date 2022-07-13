@@ -1,0 +1,75 @@
+﻿@model ResourceViewModel
+@*
+Descripción
+-----------------------------------------------
+Vista modal que servirá para eliminar un recurso. Se mostrará cuando en la ficha del recurso, se pulse sobre "Eliminar".
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+ResourceModel fichaRecurso = Model.Resource;
+CommunityModel Comunidad = Html.GetComunidad();
+
+// Función para proceder a Eliminar de forma selectiva
+string funcionEliminarSelectivoAceptar = "AccionRecurso_EliminarSelectivo_Aceptar('" + fichaRecurso.ListActions.UrlDeleteSelective + "', '" + fichaRecurso.Key + "')";
+
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Vista Modal para Eliminar un recurso --------------------
+*@
+
+<div class="modal-header">
+    <p class="modal-title">
+        @* Título del Modal *@
+        <span class="material-icons">delete_sweep</span>@Html.GetText("PERFILBASE", "INFORMACIONELIMINARRECURSO")
+    </p>
+    <span class="material-icons cerrar"
+          data-dismiss="modal"
+          aria-label="Close">close</span>
+</div>
+@* Contenido del Modal *@
+<div class="modal-body" id="despAccionRec_@fichaRecurso.Key">
+    <div class="formulario-edicion">
+
+        @* Mensaje para Eliminar o no el recurso *@
+        <div class="form-group">
+            <label class="control-label">@Html.GetText("PERFILBASE", "INFORMACIONELIMINARRECURSO")</label>
+        </div>
+
+        @* Recorrer cada uno de los lugares donde está compartido el recurso*@
+        @foreach (ResourceModel.SharedBRModel baseRecursos in fichaRecurso.Shareds)
+        {
+          
+            string disabled = "";
+                if (baseRecursos.ProyectKey == Comunidad.Key)
+                {
+                    disabled = "checked=\"checked\"";
+                }                        
+            @* Label e Input de la comunidad donde está compartido el recurso*@                            
+            <div class="custom-control custom-checkbox mb-2">
+                <input type="checkbox" class="custom-control-input" name="@baseRecursos.Key" id="@baseRecursos.Key" @disabled />
+                <label class="custom-control-label" for="@baseRecursos.Key">@baseRecursos.Name</label>  
+             </div>              
+            
+        }
+
+        @* Mensaje informativo del proceso*@
+        <div id="despAccionRec_@fichaRecurso.Key">
+            <div>
+                <div id="menssages">
+                    <div class="ok"></div>
+                    <div class="ko"></div>
+                </div>
+            </div>
+        </div>
+
+        @* Botones de borrado selectivo. Acción a ejecutar *@
+        <div class="form-actions" id="eliminarSelectivo_@fichaRecurso.Key">                                       
+            <button onclick="@funcionEliminarSelectivoAceptar" class="btn btn-primary">@Html.GetText("PERFILBASERECURSOSFICHA", "ELIMINAR")</button>
+        </div>
+
+    </div>
+</div>

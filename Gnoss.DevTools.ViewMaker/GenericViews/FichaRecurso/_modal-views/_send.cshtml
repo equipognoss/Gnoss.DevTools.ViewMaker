@@ -1,0 +1,297 @@
+﻿@model SendLinkViewModel
+@*
+Descripción
+-----------------------------------------------
+Vista modal que servirá para enviar un determinado link de un recurso a un usuario. Se mostrará cuando en la ficha del recurso, se pulse sobre "Enviar".
+El código es relativamente nuevo aunque es adaptado de la anterior vista localizada en "\EnviarEnlace\Index.cshtml"
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+CommunityModel Comunidad = Html.GetComunidad();
+HeaderModel Cabecera = Html.GetCabecera();
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+
+
+// Identificadores para lógica JS
+
+//Id del input para buscar contactos
+string idTxtFiltro = "txtFiltro";
+// Id del input para escribir el email de los usuarios a los que enviar la invitación
+string idTxtCorreoAInvitar = "txtCorreoAInvitar";
+// Id del botón para añadir un email a destinatarios de la invitación
+string idButtonLitAniadirCorreo = "litAniadirCorreo";
+
+//Id del input vacío donde se añadirán los invitados para enviar el email.
+string idTxtHackInvitados = "txtHackInvitados";
+
+// Id de Contenedor general de destinatarios
+string idPanContenedorInvitados = "panContenedorInvitados";
+// Id de Contenedor donde irán los items seleccionados
+string idListaDestinatarios = "lista-destinatarios";
+// Id de Contenedor informativo de "No destinatarios"
+string idNoDestinatarios = "no-destinatarios";
+// Id del idioma en el que irá el email
+string idDlIdioma = "ddlIdioma";
+// Id del input de notas para el email
+string idTxtNotas = "txtNotas";
+
+// Id del botón para enviar las invitaciones
+string idBtnEnviarInvitaciones = "btnEnviarInvitaciones";
+
+// Panel donde se mostrarán los mensajes de error o OK
+string idPanelInfo = "panelInfo";
+// Etiqueta que indica si hay o no destinatarios seleccionados para enviar la invitación
+string idLblInfoCorreo = "lblInfoCorreo";
+
+// Parametros para servicio autocompletar
+string idInpt_urlServicioAutocompletar = "inpt_urlServicioAutocompletar";
+// Identidad de la Organización
+string identidadOrg = "";
+// Comunidad privada o no para autocomplete
+string boolPrivada = "true";
+// Método que se utilizará para el envío en autocomplete
+string metodoEnvio = "AutoCompletarEnvioEnlaceComunidad";
+// Controlar si es EcosistemasinMetaProyecto
+string isEcosistemaSinMetaProyecto = "false";
+
+// Construir la url a la que habrá que mandar la petición para enviar el link
+string urlSend = Html.GetUrlPagina();
+int position = urlSend.IndexOf("load-action");
+string newUrlSend = $"{urlSend.Substring(0,position)}enviar-enlace/save-changes";
+
+// Mensaje informativo instrucciones para enviar a contactos
+string instrucciones = "";    
+}
+@*
+----------------------------------------------------------------
+-------------------- Vista Modal para opción de Enviar (Link) de Recurso --------------------
+*@
+
+@* Control de la identidad para el servicio autocompletar*@
+@if (IdentidadActual.KeyOrganization.HasValue)
+{
+    identidadOrg = IdentidadActual.KeyOrganization.Value.ToString();
+}
+@* Control de si la comunidad es privada o no *@
+@if (Comunidad.AccessType == CommunityModel.TypeAccessProject.Public || Comunidad.AccessType == CommunityModel.TypeAccessProject.Restricted)
+{
+    boolPrivada = "false";
+}
+
+@* Control de si es EcosistemasinMetaProyecto *@
+@if (!Html.GetEsEcosistemaSinMetaProyecto()){
+    isEcosistemaSinMetaProyecto = "true";
+    metodoEnvio = "AutoCompletarEnvioEnlace";
+}
+
+
+@{
+@* Controlar mensaje informativo en panel *@
+    if (Comunidad.AccessType == CommunityModel.TypeAccessProject.Public || Comunidad.AccessType == CommunityModel.TypeAccessProject.Restricted)
+    {
+        instrucciones = Html.GetText("ENVIOENLACE", "ENVIARATODOS");
+    }
+    else
+    {
+        instrucciones = Html.GetText("ENVIOENLACE", "ENVIARAMIEMBROS");
+    }
+}
+
+@* Incluir referencia a CKEditor*@
+@{
+    //Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/ckeditor.js?v=" + Html.GetVersion());
+    //Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/adapters/jquery.js?v=" + Html.GetVersion());
+}
+
+      <div class="modal-header">
+        <p class="modal-title">
+          <span class="material-icons">send</span>@Html.GetText("COMMON","ENVIAR")
+        </p>
+        <span
+          class="material-icons cerrar"
+          data-dismiss="modal"
+          aria-label="Close"
+          >close</span
+        >
+      </div>
+      <div class="modal-body">
+        <div class="formulario-edicion formulario-enviar">
+
+            <div class="form-group mb-1">
+                <label class="control-label">@instrucciones</label>
+                    <div id="panDesplegableDestinatarios">
+                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active"
+                                   id="botonContactos"
+                                   data-toggle="tab"
+                                   href="#miembros"
+                                   role="tab"
+                                   aria-controls="miembros"
+                                   aria-selected="true">@Html.GetText("CONTACTOS", "GRUPOMIEMBROSORGANIZACION", Comunidad.Name)</a>
+                            </li>
+                            @* Mostrar Tabs de "Destinatarios" dependiendo del tipo de comunidad  *@
+                            @if (Comunidad.AccessType == CommunityModel.TypeAccessProject.Public || Comunidad.AccessType == CommunityModel.TypeAccessProject.Restricted)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link"
+                                       id="botonCorreos"
+                                       data-toggle="tab"
+                                       href="#cuentas-correo"
+                                       role="tab"
+                                       aria-controls="cuentas-correo"
+                                       aria-selected="false">@Html.GetText("INVITACIONES", "INVITARAEXTERNOS")</a>
+                                </li>
+                            }
+                            </ul>
+
+                        <div class="tab-content">
+                            @* Panel para introducir correos DE MIS CONTACTOS *@
+                            <div class="tab-pane fade active show"
+                                 id="miembros"
+                                 role="tabpanel"
+                                 aria-labelledby="miembros-tab">
+                                <div class="filtroRapido">
+                                    <input type="text"
+                                           placeholder="@instrucciones"
+                                           onkeydown="if(event.which || event.keyCode){if ((event.which == 13) || (event.keyCode == 13)) {return false;}}"
+                                           id="@idTxtFiltro"
+                                           class="form-control ac_input"
+                                           autocomplete="off" />
+                                    <span class="icon material-icons">search</span>
+                                </div>
+                            </div>
+                            @* Panel para introducir correos a enviar el recurso *@
+                            <div class="tab-pane fade"
+                                 id="cuentas-correo"
+                                 role="tabpanel"
+                                 aria-labelledby="cuentas-correo-tab">
+                                <div class="autocompletar autocompletar-tags form-group">
+                                    <div class="input-wrap form-sticky-button">
+                                        <input type="text"
+                                               placeholder="Introduce los correos separados por comas y haz clic en añadir"
+                                               id="@idTxtCorreoAInvitar"
+                                               class="form-control"
+                                               autocomplete="off" />
+                                        <a id="@idButtonLitAniadirCorreo"
+                                           class="btn btn-primary uppercase">Añadir</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @* Controlar el tipo de comunidad y mostrar diseño: Sin diseño de dewenir
+                    @if (Comunidad.AccessType == CommunityModel.TypeAccessProject.Public || Comunidad.AccessType == CommunityModel.TypeAccessProject.Restricted)
+                    {
+                        <fieldset class="oculto" id="divCorreos">
+                            <p>
+                                <label>@Html.GetText("INVITACIONES", "CORREOAINVITAR")</label></p>
+                            <p class="textarea">
+                                <textarea id="txtCorreoAInvitar" cols="20" rows="2"></textarea>
+                                <em class="help">@Html.GetText("INVITACIONES", "SEPARADASCOMAS")</em>
+                            </p>
+
+                            <input type="button" value="añadir" onclick="javascript:agregarCorreo();" id="litAñadirCorreo" />
+                            <div class="ko">
+                                <p>
+                                    <label id="lblInfoCorreo"></label>
+                                </p>
+                            </div>
+                        </fieldset>
+                    }*@
+
+                    </div>
+                
+            </div>
+           
+          @* Panel informativo de Destinatarios/No Destinatarios *@
+            <div id="@idPanContenedorInvitados" class="mb-4 @idPanContenedorInvitados">
+                @* Panel No Destinatarios *@
+                <span id="@idNoDestinatarios" class="@idNoDestinatarios texto-gris-claro mb-3"
+                  >Ningún destinatario añadido...</span
+                >
+                @* Panel con Destinatarios ELEGIDOS PARA ENVIAR *@
+                <span class="tag-list @idListaDestinatarios" id="@idListaDestinatarios">
+                </span>
+          </div>
+          @* Panel de idioma en el que se enviará el email *@
+          <div class="form-group mb-4">
+            <label class="control-label d-block">@Html.GetText("INVITACIONES", "IDIOMAMENSAJE")</label>
+            <select id="@idDlIdioma" class="js-select2 form-control pmd-select2">
+                @foreach (KeyValuePair<string, string> idioma in Cabecera.Languajes)
+                {
+                <option value="@idioma.Key" @if (Html.GetUtilIdiomas().LanguageCode == idioma.Key){<text>selected="selected"</text>}>@idioma.Value</option>
+                }
+            </select>
+          </div>
+          @* Panel de cuerpo del mensaje a enviar en el email *@
+          <div class="form-group mb-4">
+            <label class="control-label d-block">@Html.GetText("ENVIOENLACE", "AGREGARNOTA")</label>
+            <textarea cols="20" rows="2" name="txtNotas" id="txtNotas" class="cke mensajes"></textarea>
+          </div>
+
+          @* Panel informando el título del recurso que se enviará *@
+          <div class="form-group mb-4">
+            <label class="control-label">Enlace a</label>
+            <div class="recurso-enviar-wrap">
+              <div class="header-resource">
+                <div class="title-wrap">
+                  <p class="title">
+                      @Model.LinkName
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        @* Mensaje de error de detección de emails a enviar*@
+        <div style="display: none" id="@idPanelInfo">
+            <p>
+                <label id="@idLblInfoCorreo"></label>
+            </p>
+        </div>
+          
+          @* Input que guardará los correos/contactos seleccionados*@
+          <input type="hidden" id="@idTxtHackInvitados" />
+
+          @* Panel para aceptar/enviar email *@
+          <div class="form-actions">
+              <a id="@idBtnEnviarInvitaciones" class="btn btn-primary">@Html.GetText("COMMON", "ENVIARENLACE")</a>
+          </div>
+        </div>
+      </div>
+
+<script type="text/javascript">
+   
+    (function ($) {
+        const pParamsSendLinkResource = {
+            idTxtFiltro: "@idTxtFiltro",
+            idTxtCorreoAInvitar: "@idTxtCorreoAInvitar",
+            idButtonLitAniadirCorreo: "@idButtonLitAniadirCorreo",
+            idTxtHackInvitados: "@idTxtHackInvitados",
+            idPanContenedorInvitados: "@idPanContenedorInvitados",
+            idListaDestinatarios: "@idListaDestinatarios",
+            idNoDestinatarios: "@idNoDestinatarios",
+            idBtnEnviarInvitaciones: "@idBtnEnviarInvitaciones",
+            idPanelInfoInvitationSent: "@idPanelInfo",
+            idLblInfoCorreo: "@idLblInfoCorreo",
+            idTxtNotas: "@idTxtNotas",
+            idDlIdioma: "@idDlIdioma",
+            urlSend: "@newUrlSend",
+            autocompleteParams: {
+                identidad: "@IdentidadActual.KeyIdentity",
+                identidadMyGnoss: "@IdentidadActual.KeyMetaProyectIdentity",
+                identidadOrg: "@identidadOrg",
+                proyecto: "@Comunidad.Key",
+                idInpt_urlServicioAutocompletar: "@idInpt_urlServicioAutocompletar",
+                metodo: "@metodoEnvio",
+                isEcosistemasinMetaProyecto: @isEcosistemaSinMetaProyecto,
+                esPrivada: @boolPrivada,
+            }
+        };
+        // Gestión de operativa 
+        operativaEnviarResource_Link_Community_Invitation.init(pParamsSendLinkResource);
+        
+    })();
+</script>

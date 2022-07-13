@@ -1,0 +1,312 @@
+﻿@model SemanticPropertyModel
+
+@{
+    Es.Riam.Semantica.OWL.Propiedad mPropiedad = Model.Element.Propiedad;
+}
+
+@if (mPropiedad.EspecifPropiedad.SelectorEntidad.TipoSeleccion == "UrlRecurso")
+{
+    string clasePag = "";
+
+    if (Model.OntologyPropInfo.EntitySelector.NumEntitiesForPage > 0)
+    {
+        clasePag = "class=\"pagSelEnt\"";
+    }
+
+    <div @Html.Raw(clasePag)>
+        @foreach (SemanticPropertyModel.ResourceLinkedToEntitySelector recLink in Model.OntologyPropInfo.EntitySelector.LinkedResources)
+        {
+            if (!string.IsNullOrEmpty(recLink.Title))
+            {
+                @AddLinkedResourceProperty(recLink, 0)
+            }
+
+            if (!string.IsNullOrEmpty(recLink.ImageUrl))
+            {
+                @AddLinkedResourceProperty(recLink, 1)
+            }
+
+            if (!string.IsNullOrEmpty(recLink.Description))
+            {
+                @AddLinkedResourceProperty(recLink, 2)
+            }
+
+            if (recLink.Authors != null && recLink.Authors.Count > 0)
+            {
+                @AddLinkedResourceProperty(recLink, 3)
+            }
+        }
+    </div>
+}
+else if (mPropiedad.EspecifPropiedad.SelectorEntidad.TipoSeleccion == "PersonaGnoss" || mPropiedad.EspecifPropiedad.SelectorEntidad.TipoSeleccion == "GruposGnoss")
+{
+    string clasePag = "";
+
+    if (Model.OntologyPropInfo.EntitySelector.NumEntitiesForPage > 0)
+    {
+        clasePag = "class=\"pagSelEnt\"";
+    }
+
+    <div @Html.Raw(clasePag)>
+        <span class="values">
+            @foreach (SemanticPropertyModel.ResourceLinkedToEntitySelector recLink in Model.OntologyPropInfo.EntitySelector.LinkedResources)
+            {
+                <span class="value">@recLink.Title</span>
+            }
+        </span>
+    </div>
+}
+else
+{
+    if (mPropiedad.EspecifPropiedad.SelectorEntidad.TipoSeleccion == "Tesauro")
+    {
+        if (mPropiedad.EspecifPropiedad.SelectorEntidad.TipoPresentacion == "Arbol")
+        {
+            if (Model.OntologyPropInfo.PropertyValues.Count > 0)
+            {
+                <div class="ArbolTesSem">
+                    <ul>
+                        @AddThesaurusSemanticTreeChildren(Model.OntologyPropInfo.PropertyValues)
+                    </ul>
+                </div>
+            }
+        }
+        else
+        {
+            string classDiv = "tesSem contSelEnt contSelEnt_" + mPropiedad.NombreGeneracionClases;
+            bool pintarComa = false;
+            <div class="@classDiv">
+                @foreach (SemanticPropertyModel.PropertyValue propertyValue in Model.OntologyPropInfo.PropertyValues)
+                {
+                    if (pintarComa)
+                    {
+                        @Html.Raw(" > ");
+                    }
+
+                    pintarComa = true;
+
+                    <span>@propertyValue.Value</span>
+                }
+            </div>
+        }
+    }
+    else
+    {
+        if (Model.OntologyPropInfo.EntitySelector.NumEntitiesForPage > 0)
+        {
+            <div class="pagSelEnt">
+                @AddNormalSelEnt()
+            </div>
+        }
+        else
+        {
+            @AddNormalSelEnt()
+        }
+
+    }
+}
+
+@if (Model.OntologyPropInfo.EntitySelector.NumEntitiesForPage > 0)
+{
+    string srcImagenEspera = Html.GetBaseUrlStatic() + "/images/espera.gif";
+    string onclick = "PaginarSelectorEnt(this, '" + Model.EntityParent.SemanticResourceModel.MvcActionsUrl + "/load-more-entities-selector', '" + Model.EntityParent.Key + "', '" + Model.Element.Propiedad.Nombre + "', " + Model.OntologyPropInfo.EntitySelector.NumEntitiesForPage + ", " + Model.OntologyPropInfo.EntitySelector.TotalEntitiesPagination + ");";
+
+    <div class="loadpagSelectEnt" style="display:none;">
+        <img ID="imgEsperaArchivo" src="@srcImagenEspera" alt="Espere..." />
+    </div>
+    <div class="pagSelectEnt">
+        <a class="antPagSelectEnt" onclick="@onclick">@Html.GetText("COMMON", "ANTERIOR")</a>
+        <a class="sigPagSelectEnt" onclick="@onclick">@Html.GetText("COMMON", "SIGUIENTE")</a>
+    </div>
+}
+
+@functions{
+
+    string AddNormalSelEnt()
+    {
+        string classDiv = "contSelEnt contSelEnt_" + Model.Element.Propiedad.NombreGeneracionClases;
+
+        foreach (SemanticPropertyModel.PropertyValue propertyValue in Model.OntologyPropInfo.PropertyValues)
+        {
+            <div class="@classDiv">
+                @foreach (SemanticPropertyModel semPropModel in propertyValue.RelatedEntity.Properties)
+                {
+                    if (Model.EntityParent.Entity.Ontologia.ConfiguracionPlantilla.HtmlNuevo > 1 && semPropModel.Element != null && semPropModel.Element.Propiedad != null)
+                    {
+                        string claseProp = "propSelEnt propSelEnt_" + semPropModel.Element.Propiedad.NombreGeneracionClases;
+
+                        <div class="@claseProp">
+                            @Html.PartialView("SemCms/_Propiedad", semPropModel)
+                        </div>
+                    }
+                    else
+                    {
+                        @Html.PartialView("SemCms/_Propiedad", semPropModel)
+                    }
+                }
+            </div>
+        }
+        return string.Empty;
+    }
+
+    string AddThesaurusSemanticTreeChildren(List<SemanticPropertyModel.PropertyValue> pValores)
+    {
+        foreach (SemanticPropertyModel.PropertyValue propertyValue in pValores)
+        {
+            string idHijo = null;
+
+            if (propertyValue.ThesaurusSemanticTreeChildren != null && propertyValue.ThesaurusSemanticTreeChildren.Count > 0)
+            {
+                idHijo = "hijo_" + Guid.NewGuid().ToString();
+            }
+
+            <li>
+                @if (idHijo != null)
+                {
+                    string srcImg = Html.GetBaseUrlStatic() + "/img/verMenos.gif";
+                    <a onclick="DesplegarImgMas(this, '@idHijo')"><img class="imgMas" alt="-" src="@srcImg" /></a>
+                }
+                @if (!string.IsNullOrEmpty(propertyValue.UrlAuxiliaryLinkControl))
+                {
+                    <a href="@propertyValue.UrlAuxiliaryLinkControl">@propertyValue.Value</a>
+                }
+                else
+                {
+                    <span>@propertyValue.Value</span>
+                }
+            </li>
+
+            if (idHijo != null)
+            {
+                <li id="@idHijo">
+                    <ul>
+                        @AddThesaurusSemanticTreeChildren(propertyValue.ThesaurusSemanticTreeChildren)
+                    </ul>
+                </li>
+            }
+        }
+        return string.Empty;
+    }
+
+    string AddLinkedResourceProperty(SemanticPropertyModel.ResourceLinkedToEntitySelector pRecLink, short pTipoCampo)
+    {
+        Es.Riam.Semantica.OWL.Propiedad mPropiedad = Model.Element.Propiedad;
+        string classCont = "edit edit_" + mPropiedad.NombreGeneracionClases;
+
+        if (pTipoCampo == 0)
+        {
+            classCont += "_TituloDoc";
+        }
+        else if (pTipoCampo == 1)
+        {
+            classCont += "_ImagenDoc";
+        }
+        else if (pTipoCampo == 2)
+        {
+            classCont += "_DescripcionDoc";
+        }
+        else if (pTipoCampo == 3)
+        {
+            classCont += "_AutoresDoc";
+        }
+
+        if (pTipoCampo == 2)
+        {
+            @AddLinkedResourcePropertyInt(pRecLink, pTipoCampo)
+        }
+        else if (Model.EntityParent.Entity.Ontologia.ConfiguracionPlantilla.HtmlNuevo > 0)
+        {
+            <div class="@classCont">
+                @AddLinkedResourcePropertyInt(pRecLink, pTipoCampo)
+            </div>
+        }
+        else
+        {
+            <p class="@classCont">
+                @AddLinkedResourcePropertyInt(pRecLink, pTipoCampo)
+            </p>
+        }
+        return string.Empty;
+    }
+
+    string AddLinkedResourcePropertyInt(SemanticPropertyModel.ResourceLinkedToEntitySelector pRecLink, short pTipoCampo)
+    {
+        Es.Riam.Semantica.OWL.Propiedad mPropiedad = Model.Element.Propiedad;
+        string titulo = null;
+        string classTitle = "lb lb_" + mPropiedad.NombreGeneracionClases;
+
+        if (pTipoCampo == 0 && !string.IsNullOrEmpty(pRecLink.TitleLabel))
+        {
+            titulo = pRecLink.TitleLabel;
+            classTitle += "_TituloDoc";
+        }
+        else if (pTipoCampo == 1 && !string.IsNullOrEmpty(pRecLink.ImageUrlLabel))
+        {
+            titulo = pRecLink.ImageUrlLabel;
+            classTitle += "_ImagenDoc";
+        }
+        else if (pTipoCampo == 2 && !string.IsNullOrEmpty(pRecLink.DescriptionLabel))
+        {
+            titulo = pRecLink.DescriptionLabel;
+            classTitle += "_DescripcionDoc";
+        }
+        else if (pTipoCampo == 3 && !string.IsNullOrEmpty(pRecLink.AuthorsLabel))
+        {
+            titulo = pRecLink.AuthorsLabel;
+            classTitle += "_AutoresDoc";
+        }
+
+        if (!string.IsNullOrEmpty(titulo))
+        {
+            <strong class="@classTitle">@titulo</strong>
+        }
+
+        string href = "";
+        string target = "";
+
+        if (!Model.EntityParent.SemanticResourceModel.HideInfoIsNotMember)
+        {
+            href = pRecLink.Link;
+
+            if (mPropiedad.EspecifPropiedad.SelectorEntidad.NuevaPestanya)
+            {
+                target = "target=\"_blank\"";
+            }
+        }
+
+        <span class="values">
+            @if (pTipoCampo == 0)
+            {
+                <a class="value" href="@href" @Html.Raw(target)>@pRecLink.Title</a>
+            }
+            else if (pTipoCampo == 1)
+            {
+                <a class="value" href="@href" @Html.Raw(target)>
+                    <img class="value" src="@pRecLink.ImageUrl" alt="@pRecLink.Title" />
+                </a>
+            }
+            else if (pTipoCampo == 2)
+            {
+                <div>@Html.Raw(pRecLink.Description)</div>
+            }
+            else if (pTipoCampo == 3)
+            {
+                bool agregarComa = false;
+                <span class="value">
+                    @foreach (string autor in pRecLink.Authors.Keys)
+                    {
+                        if (agregarComa)
+                        {
+                            @Html.Raw(",")
+                        }
+
+                        <a href="@pRecLink.Authors[autor]" @Html.Raw(target)>@autor</a>
+
+                        agregarComa = true;
+                    }
+                </span>
+            }
+        </span>
+        return string.Empty;
+    }
+}

@@ -1,0 +1,265 @@
+﻿@model SearchViewModel
+@*
+Descripción
+-----------------------------------------------
+Nueva vista que muestra las acciones disponibles a realizar para el buscador. Estas se muestran en la cabecera del listado, correspondiente con el fichero "_list-header". Estas acciones serán:
+- ComboBox para "Descargar"
+- ComboBox para "Ordenar"
+- ComboBox para "Visualizar"
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+//Opciones para filtrar los resultados del buscador
+Dictionary<string, string> listaFiltrosOrden = Model.FilterOrderList;
+// Filtro por defecto para obtener los resultados de los recursos
+string FiltroOrdenSeleccionado = Model.FilterOrderSelected;
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Cabecera-Header de lista de recursos dentro de una comunidad --------------------
+*@
+
+@* Listado de acciones para hacer con resultados *@
+<div class="acciones-listado">
+    <div class="wrap">
+
+        @* Opciones - Acciones (Descargar búsquedas, Ordenar resultados...) *@
+
+        @* Botón de descargar el listado *@
+        @if (Model.ListExportation != null && Model.ListExportation.Count == 1 && Model.ListExportation[0].ExportationFormats.Count == 1)
+        {
+            string nombreExportacion = Model.ListExportation[0].ExportationName;
+            Guid exportacionID = Model.ListExportation[0].Key;
+            string formatoExportacion = Model.ListExportation[0].ExportationFormats[0];
+            string id = "liDescarga" + formatoExportacion.ToUpper();
+
+            @* Botón de descarga *@
+            <div id="@id" class="descargar dropdown">
+                <form method="post" id="FormExportarBusqueda">
+                    <a id="@nombreExportacion @formatoExportacion"
+                       class="dropdown-toggle"
+                       data-toggle="dropdown"
+                       aria-expanded="false"
+                       onclick="ExportarBusqueda('@exportacionID','@nombreExportacion', '@formatoExportacion');">
+                        <span class="material-icons">download</span>
+                        <span class="texto">@nombreExportacion @formatoExportacion.ToUpper()</span>
+                    </a>
+                    <input class="activo" type="hidden" id="ParametrosExportacion" name="ParametrosExportacion" />
+                </form>
+            </div>
+        }
+        @* Descarga de múltiples tipos de recursos *@
+        else if (Model.ListExportation != null && Model.ListExportation.Count > 0)
+        {
+            <div class="descargar dropdown">
+                <form method="post" id="FormExportarBusqueda">
+                    <a class="dropdown-toggle"
+                       data-toggle="dropdown"
+                       aria-expanded="false">
+                        <span class="material-icons">download</span>
+                        <span class="texto">Descargar</span>
+                    </a>
+                    <input class="activo" type="hidden" id="ParametrosExportacion" name="ParametrosExportacion" />
+                    @* Lista de opciones para descargar/exportar *@
+                    <div id="listaExportaciones"
+                         class="dropdown-menu basic-dropdown dropdown-menu-right"
+                         style="will-change: transform">
+                        @foreach (SearchViewModel.ExportationModel fila in Model.ListExportation)
+                        {
+                            foreach (string formato in fila.ExportationFormats)
+                            {
+                                <a id="@fila.ExportationName @formato"
+                                   class="item-dropdown"
+                                   onclick="ExportarBusqueda('@fila.Key','@fila.ExportationName','@formato');">@fila.ExportationName @formato.ToUpper()</a>
+                            }
+                        }
+                    </div>
+                </form>
+            </div>
+        }
+
+        @* Botón de filtrar resultados *@
+        @if (listaFiltrosOrden != null && listaFiltrosOrden.Count > 0)
+        {
+            @* Opciones de Ordenar los resultados obtenidos *@
+            <div id="panel-orderBy" class="ordenar dropdown dropdown-select">
+                @* La ordenación debe estar "activa". Por defecto se ordena por fecha
+                <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <span class="material-icons">swap_vert</span>
+                    <span class="texto">@Html.GetText("BANDEJAENTRADA", "ORDENADOPOR")</span>
+                </a>
+                *@
+                @* Coger por defecto la primera opción*@
+                <a class="dropdown-toggle active" data-toggle="dropdown" aria-expanded="false">
+                    <span class="material-icons">swap_vert</span>                                        
+                    <span class="texto">@FiltroOrdenSeleccionado @Html.GetText("COMMON", "DESCENDENTE").ToLower()</span>                                                                                                                                
+                </a>
+
+                <div class="dropdown-menu basic-dropdown dropdown-menu-right" style="will-change: transform;">
+                    @foreach (string filtro in listaFiltrosOrden.Keys)
+                    {
+                        string activo = (@FiltroOrdenSeleccionado == filtro ? "activeView" : "");
+                        // Ascendente
+                        <a class="item-dropdown @activo" data-orderBy="@listaFiltrosOrden[filtro]" data-order="orden|desc">
+                            <span class="material-icons">swap_vert</span>
+                            <span class="texto">@filtro @Html.GetText("COMMON", "DESCENDENTE").ToLower()</span> 
+                        </a>
+                        // Descendente
+                        <a class="item-dropdown" data-orderBy="@listaFiltrosOrden[filtro]" data-order="orden|asc">
+                            <span class="material-icons">swap_vert</span>
+                            <span class="texto">@filtro @Html.GetText("COMMON", "ASCENDENTE").ToLower()</span> 
+                        </a>
+                    }
+                </div>
+            </div>
+
+            @* Opciones de Ordenar los resultados obtenidos 
+            <div id="panel-orderAscDesc" class="ordenar dropdown dropdown-select">
+                @* Coger por defecto la primera opción
+                <a class="dropdown-toggle active" data-toggle="dropdown" aria-expanded="false" data-order="orden|asc">
+                    <span class="material-icons">swap_vert</span>
+                    <span class="texto">@Html.GetText("COMMON","ASCENDENTE")</span>
+                </a>
+                
+                <div class="dropdown-menu basic-dropdown dropdown-menu-right" style="will-change: transform;">
+                    <a class="item-dropdown activeView" data-order="orden|asc">
+                        <span class="material-icons">swap_vert</span>
+                        <span class="texto">@Html.GetText("COMMON", "ASCENDENTE")</span>
+                    </a>
+                    <a class="item-dropdown" data-order="orden|desc">
+                        <span class="material-icons">swap_vert</span>
+                        <span class="texto">@Html.GetText("COMMON","DESCENDENTE")</span>
+                    </a>
+                </div>
+            </div>*@
+        }
+
+        @* Opciones de visualización los resultados - Tener en cuenta opciones de visualización según la configuración *@
+        @if (Model.ViewList.Count >= 1) {            
+            @* Detectar la vista activa*@
+            SearchViewModel.ViewTypeModel.ViewTypeSearch tipoVistaActiva = SearchViewModel.ViewTypeModel.ViewTypeSearch.List;
+
+            <div id="panel-viewBy" class="visualizacion dropdown dropdown-select">
+
+                @* Dejar activa la vista activa en el select *@
+                @foreach (SearchViewModel.ViewTypeModel tipoVista in Model.ViewList) {
+                    // Conocer la vista activa para establecerla visualmente en el "Buscador" por defecto
+                        string activo = "";
+                        if (tipoVista.Active)
+                        {
+                            activo = "activeView";
+                            tipoVistaActiva = tipoVista.ViewType;
+                        }                
+                }
+
+                @* Visualizar por defecto los resultados *@
+
+                @switch (tipoVistaActiva)
+                {
+                    case SearchViewModel.ViewTypeModel.ViewTypeSearch.List:
+                        <a id="buscador" class="dropdown-toggle active" data-toggle="dropdown">
+                            <span class="material-icons">view_agenda</span>
+                            <span class="texto">@Html.GetText("COMBUSQUEDAAVANZADA", "LISTADO")</span>
+                        </a>
+                        break;
+                    case SearchViewModel.ViewTypeModel.ViewTypeSearch.Grid:
+                        <a id="buscador" class="dropdown-toggle active" data-toggle="dropdown">
+                            <span class="material-icons">reorder</span>
+                            <span class="texto">@Html.GetText("COMBUSQUEDAAVANZADA", "MOSAICO")</span>
+                        </a>
+                        break;
+                    case SearchViewModel.ViewTypeModel.ViewTypeSearch.Map:
+                        <a id="buscador" class="dropdown-toggle active" data-toggle="dropdown">
+                            <span class="material-icons">location_on</span>
+                            <span class="texto">@Html.GetText("COMBUSQUEDAAVANZADA", "MAPA")</span>
+                        </a>
+                        break;                    
+                    default:
+                        <a id="buscador" class="dropdown-toggle active" data-toggle="dropdown">
+                            <span class="material-icons">view_agenda</span>
+                            <span class="texto">Visualizar</span>
+                        </a>
+                        break;
+                }              
+                @* Opciones disponibles para visualizar los resultados *@
+                <div class="dropdown-menu basic-dropdown dropdown-icons dropdown-menu-right">
+                    @* Detectar el los tipos de visualización disponibles *@
+                    @foreach (SearchViewModel.ViewTypeModel tipoVista in Model.ViewList) {
+                        // Conocer si la vista está o no activa
+                        string activo = "";
+                        if (tipoVista.Active)
+                        {
+                            activo = "activeView";
+                            tipoVistaActiva = tipoVista.ViewType;
+                        }
+                        @* Mostrar o no el tipo de vista para visualizar resultados *@
+                        switch (tipoVista.ViewType) {
+                            
+                            @* Visualización LISTA *@
+                            case SearchViewModel.ViewTypeModel.ViewTypeSearch.List:
+                                <a class="item-dropdown aListView @activo" data-class-resource-list="listView">
+                                    <span class="material-icons">view_agenda</span>
+                                    <span class="texto">@Html.GetText("COMBUSQUEDAAVANZADA", "LISTADO")</span>
+                                </a>
+
+                                @* Añadir la vista compactada para recursos si está Lista activada *@
+                                <a class="item-dropdown aCompacView @activo" data-class-resource-list="compacView">
+                                    <span class="material-icons">reorder</span>
+                                    <span class="texto">@Html.GetText("CORREO", "COMPACTADA")</span>
+                                </a>
+
+                                break;
+                            @* Visualización GRID - MOSAICO*@
+                            case SearchViewModel.ViewTypeModel.ViewTypeSearch.Grid:
+                                <a class="item-dropdown aMosaicView @activo" data-class-resource-list="mosaicView">
+                                    <span class="material-icons">view_comfy</span>
+                                    <span class="texto">@Html.GetText("COMBUSQUEDAAVANZADA", "MOSAICO")</span>
+                                </a>                                                        
+                                break;
+                            @* Visualización MAPA *@
+                            case SearchViewModel.ViewTypeModel.ViewTypeSearch.Map:                           
+                                <a class="item-dropdown aMapView @activo" data-class-resource-list="mapView">
+                                    <span class="material-icons">location_on</span>
+                                    <span class="texto">@Html.GetText("COMBUSQUEDAAVANZADA", "MAPA")</span>
+                                </a>
+                                break;
+                            @* Visualización GRÁFICO -> Con subopciones*@
+                            case SearchViewModel.ViewTypeModel.ViewTypeSearch.Chart:
+                                @* Pintar las subopciones de Gráfico si los hay 
+                                <a class="item-dropdown aGraphView @activo" data-class-resource-list="graphView">
+                                    <span class="material-icons">leaderboard</span>
+                                    <span class="texto">@Html.GetText("COMBUSQUEDAAVANZADA", "GRAFICOS")</span>
+                                </a>
+                                *@
+                                @* Subopciones de gráficos *@
+                                foreach (SearchViewModel.ChartViewModel grafico in Model.ChartList)
+                                {
+                                    <a id="liOpcChart_@grafico.Key" class="item-dropdown aGraphView" data-class-resource-list="graphView">
+                                        <span class="material-icons">leaderboard</span>
+                                        <span class="texto" onclick="SeleccionarChart('@grafico.Key', '@grafico.JS');">@grafico.Name</span>
+                                    </a>                                
+                                }                                
+                                break;
+                        }
+                    }                    
+                    @* OPCIONES DE VISUALIZACIÓN DE MOMENTO NO CONTEMPLADAS                        
+                    <a class="item-dropdown aCompacView" data-class-resource-list="compacView">
+                        <span class="material-icons">reorder</span>
+                        <span class="texto">Compacto</span>
+                    </a>
+                    
+                    <a class="item-dropdown aGrafoView" data-class-resource-list="grafoView">
+                        <span class="material-icons">share</span>
+                        <span class="texto">Grafo</span>
+                    </a>
+                    *@
+                </div>
+            </div>
+        }
+        
+    </div>
+</div>

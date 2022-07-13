@@ -1,0 +1,55 @@
+﻿@model AdministrarUsuariosOrganizacionViewModel
+@*
+Descripción
+-----------------------------------------------
+Nueva vista que muestra las acciones disponibles a realizar para el buscador. Estas se muestran en la cabecera del listado, correspondiente con el fichero "_list-header". Estas acciones serán:
+- ComboBox para "Descargar"
+- ComboBox para "Ordenar"
+- ComboBox para "Visualizar"
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Cabecera-Header de lista de recursos dentro de una comunidad --------------------
+*@
+
+@* Listado de acciones para hacer con resultados *@
+<div class="acciones-listado">
+    <div class="wrap">
+        @* Opciones - Acciones (Ordenar resultados) *@        
+               
+        @* Opciones de visualización los resultados - No tener en cuenta opciones de visualización según la configuración *@                   
+            <div id="panel-viewBy" class="visualizacion dropdown dropdown-select">
+                @* Visualizar por defecto los resultados *@
+                <a id="buscador" class="dropdown-toggle active" data-toggle="dropdown">
+                    <span class="material-icons">view_agenda</span>
+                    <span class="texto">@Html.GetText("COMBUSQUEDAAVANZADA", "LISTADO")</span>
+                </a>
+                                                                             
+                              
+                @* Opciones disponibles para visualizar los resultados *@
+                <div class="dropdown-menu basic-dropdown dropdown-icons dropdown-menu-right">
+                    @* Mostrar o no el tipo de vista para visualizar resultados *@                                                
+                    @* Visualización LISTA *@                    
+                    <a class="item-dropdown aListView activeView" data-class-resource-list="listView">
+                        <span class="material-icons">view_agenda</span>
+                        <span class="texto">@Html.GetText("COMBUSQUEDAAVANZADA", "LISTADO")</span>
+                    </a>
+                    
+                    @* Visualización GRID - MOSAICO*@                    
+                    <a class="item-dropdown aCompacView" data-class-resource-list="mosaicView">
+                        <span class="material-icons">view_comfy</span>
+                        <span class="texto">@Html.GetText("COMBUSQUEDAAVANZADA", "MOSAICO")</span>
+                    </a>                                                           
+                </div>
+            </div>                
+    </div>
+</div>

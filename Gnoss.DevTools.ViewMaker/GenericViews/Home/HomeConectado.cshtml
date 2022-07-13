@@ -1,0 +1,168 @@
+﻿@model HomeConectedViewModel
+@*
+Descripción
+-----------------------------------------------
+Vista que contiene los elementos principales para cargar el html cuando el usuario está en la home estando conectado o logueado. Esta vista "Home" será la home principal (no la Home de una comunidad) 
+La Home está formada por:
+ - Un buscador de elementos
+- Un panel izquierdo/centrado donde apareceran las secciones principales (Actividad Reciente)
+- Un panel derecho donde se mostrarán los widgets o información relevante (Lo más interesante, Widgets...)
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+UserProfileModel perfil = Html.GetPerfil();
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+// Utilizado para las rutas de "Migas de Pan"
+CommunityModel Comunidad = Html.GetComunidad();
+//Nombre o título de la pestaña para ponerlo en el Breadcrumb
+string nombrePestanya = Html.GetNombrePestanya();
+//Url de la pestaña para mostrarla en el Breadcrumb
+string urlPestanya = Comunidad.Url + "/" + Html.GetNombreUrlPestanya();
+Html.SetBodyClass(" layout01 myGnoss homeMyGnoss "); 
+//Nº Máximo de comunidades que se mostrarán en el área derecha de la Home
+int numCommunitiesToShow = 5;
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista de la Home cuando el usuario está logeado (Home sin estar en ninguna comunidad) --------------------
+*@
+
+@* Row principal *@
+<div class="row">
+    @*Breadcrumb / Migas de pan en la home*@
+    <div class="col col-12 col-breadcrumb" id="breadcrumb">
+        <ul>
+            <li><a href="@Comunidad.Url"><strong>@Html.GetText("COMMON", "HOME")</strong></a></li>
+        </ul>
+    </div>
+    @* Contenedor del buscador principal - No debe haber Buscador en Home *@
+    @*
+    <div class="col col-12 col-buscador">
+        @* Buscador de elementos en la home - Vista parcial
+        @Html.PartialView("_partial-views/_searcher")
+    </div>
+    *@
+
+    @* Contenedor izquierda/central del Home *@
+    <div class="col col-12 col-xl-8 col-contenido izquierda">
+        <div class="wrapCol">
+            @* Título de la home: Actividad Reciente *@
+            <div class="header-contenido">
+                <div class="h1-container">
+                    <h1>@Html.GetText("CONTROLESLIVE", "TITULOCONTROLEVENTOS")</h1>
+                </div>
+            </div>
+
+            @* Contenedor para listado de actividad *@
+            @if (Model.RecentActivity.RecentActivityItems.Count > 0)
+            {
+                @* Listado de sección Actividad Reciente *@
+                <div class="resource-list listView resource-list-personas">
+                    <div class="resource-list-wrap">
+                        @* Item de cada comunidad *@
+                        @if (Model.RecentActivity.RecentActivityItems.Count > 0)
+                        {
+                            @Html.PartialView("ControlesMVC/_ActividadReciente", Model.RecentActivity)
+                        }
+                    </div>
+                </div>
+            }
+            else if (!IdentidadActual.IsExpelled && Comunidad.ProjectState != CommunityModel.StateProject.Close && Comunidad.ProjectState != CommunityModel.StateProject.CloseTemporaly && Comunidad.ProjectState != CommunityModel.StateProject.Definition || IdentidadActual.IsProyectAdmin || IdentidadActual.IsProyectSupervisor)
+            {
+                <div>
+                    <div class="group content">
+                        <p>
+                            @Html.Raw(Html.GetText("CONTROLESLIVE", "ACTIVIDADRECIENTEVACIOCOM", (string)Comunidad.Url + "/" + Html.GetText("URLSEM", "SUBIRRECURSO")))
+                        </p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    @* Contenedor derecho (Nº de Recursos, Nº Personas, Administradores, Lo más interesante, Últimos usuarios Regitrados...) *@
+    <div class="col col-12 col-xl-4 col-contexto col-lateral derecha">
+
+        @* Contenedor de grupo de comunidades para la Meta Home*@
+        <div class="wrapCol grupo-comunidades">
+            <h2 class="section-title">@Html.GetText("COMMON", "COMUNIDADES")</h2>
+            <div class="resource-list con-borde">
+                @{
+                    int contadorComunidadesPerfil = 0;
+                    foreach (UserProfileModel.ProfileCommunitiesModel comunidadPerfil in (perfil.Communities).OrderByDescending(comunidadPerfil => comunidadPerfil.NumberOfConnections))
+                    {
+                        if (contadorComunidadesPerfil == numCommunitiesToShow) {
+                            if (perfil.Communities.Count > numCommunitiesToShow) {
+                                <a href="@perfil.Url@Html.GetText("URLSEM", "MISCOMUNIDADES")">@Html.GetText("INICIO", "VERTODOS")</a>
+                            }
+                            break;
+                        }
+                        string clase = "Abierta";
+                        if (comunidadPerfil.Type == 1 || comunidadPerfil.Type == 3) { clase = "Cerrada"; }
+
+                        @* Item de la comunidad *@
+                        <article class="resource resource-grupo">
+                            <div class="wrap @clase">
+                                <h3 class="title icono-mundo con-icono-before">
+                                    <a href="@comunidadPerfil.Url" title="@comunidadPerfil.Name">@comunidadPerfil.Name</a>                                    
+                                </h3>
+                                @* No mostrar información adicional *@
+                                @*<p class="autor">@clase</p>*@
+                            </div>
+                        </article>                        
+                        contadorComunidadesPerfil++;
+                    }
+                }
+            </div>
+        </div>
+
+        @* Contenedor para paneles Home (Mi Espacio personal, Registro Organización para empresa, asociación y Gestión de clases para profesores Clases. (Presente en el viejo Front en el lazo izquierdo a modo de "Widget" *@
+        <div class="wrapCol">
+            @* Solicitar creación de Comunidad *@
+            @if (Comunidad.MetaProyect) { 
+            
+                <h2 class="section-title">Crear comunidad</h2>
+                <div class="resource-list mgOrganizaciones">
+                    <article class="resource">
+                        <p>                            
+                            <a href="@perfil.Url@Html.GetText("URLSEM", "SOLICITARCOMUNIDAD")">Crea una comunidad, una red social donde podrás compartir información e invitar a personas que desees</a>
+                        </p>
+                    </article>
+                </div>                                      
+            }        
+
+
+            <h2 class="section-title">@Html.GetNombreEspacioPersonal()</h2>
+            <div class="resource-list mgOrganizaciones">
+                <article class="resource ">
+                    <p>
+                        <a href="@perfil.Url@Html.GetText("URLSEM", "MISRECURSOS")">@Html.GetText("HOMEUSU", "TEXTOESPACIOPERSONAL", Html.GetNombreProyectoEcosistema())</a>
+                    </p>
+                </article>
+            </div>
+
+            @* Crea tu red para tu empresa, asociación o colectivo (Presente en el viejo Front en el lazo izquierdo a modo de "Widget" *@
+            <h2 class="section-title">@Html.GetText("HOMEUSU", "MENUORGANIZACIONES")</h2>
+            <div class="resource-list mgEspacioPersonal">
+                <article class="resource">
+                    <p>
+                        <a href="@perfil.Url@Html.GetText("URLSEM", "REGISTROORGANIZACION")">Crea tu red para tu empresa, asociación o colectivo</a>
+                    </p>
+                </article>
+            </div>
+            @* Opciones en caso de ser Profesor -> Administrar clases (Presente en el viejo Front en el lazo izquierdo a modo de "Widget" --> Ocultado (MYG-82) 
+            <h2 class="section-title">@Html.GetText("HOMEUSU", "MENUCLASES")</h2>
+            <div class="resource-list mgClases">
+                <article class="resource">
+                    <p><a href="@perfil.Url@Html.GetText("URLSEM", "REGISTROCLASE")">@Html.GetText("ADMINISTRARCLASES", "TEXTOCREARCLASE")</a></p>
+                </article>
+            </div> *@
+        </div>
+    </div>
+
+</div>

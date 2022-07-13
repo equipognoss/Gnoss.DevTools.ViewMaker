@@ -1,0 +1,40 @@
+﻿@model ResourceModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra las categoría de un determinado recurso.
+Esta vista se muestra directamente en la vista _FichaAutoresEditoresLectores para mantener el diseño.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista de las Categorías de un recurso --------------------
+*@
+
+@if (Model.Categories != null && Model.Categories.Count > 0)
+{
+    <div class="group categorias" xmlns:skos="http://www.w3.org/2004/02/skos/core#">
+        <p class="group-title">
+            @Html.GetText("COMMON", "CATEGORIAS"):
+        </p>
+        <ul class="listCat">
+            @foreach (CategoryModel categoria in Model.Categories)
+            {
+            <li rel="sioc:topic">
+                <a typeof="sioc_t:Tag" href="@Model.UrlSearch/@Html.GetText("URLSEM","CATEGORIA")/@Html.EliminarCaracteresUrlSem(Html.ObtenerTextoDeIdioma(categoria.LanguageName))/@categoria.Key/"><span property="skos:prefLabel">@Html.ObtenerTextoDeIdioma(categoria.LanguageName)</span></a>@if (!categoria.Key.Equals(Model.Categories.Last().Key))
+                {
+                   @* @(",") *@
+                }
+            </li>
+            }
+        </ul>
+    </div>
+}

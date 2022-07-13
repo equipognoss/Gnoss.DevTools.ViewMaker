@@ -1,0 +1,184 @@
+﻿@model ContactModel
+
+@if (Model != null)
+{
+    string id = "contact_" + Model.Key;
+    
+    <div class="resource" id="@id">
+        <div class="box description">
+            <div class="group title">
+                <h3>
+                    @if (!string.IsNullOrEmpty(Model.Url))
+                    {
+                        <a href="@Model.Url">@Model.Name</a>
+                    }
+                    else
+                    {
+                        @Model.Name
+                    }
+                </h3>
+                @{
+                    string classImagen = " persona";
+                    if (Model.Type == ContactModel.ContactType.Group)
+                    { classImagen = " grupo"; }
+                    else if (Model.Type == ContactModel.ContactType.Organization)
+                    { classImagen = " organizacion "; }
+                    if (!string.IsNullOrEmpty(Model.Foto))
+                    {
+                        classImagen += " conImagenPerfil";
+                    }
+                }
+                <p class="resourceType @classImagen">
+                    <a href="@Model.Url">
+                        @if (!string.IsNullOrEmpty(Model.Foto))
+                        {
+                            <img src="@ViewBag.BaseUrlContent/@Es.Riam.Util.UtilArchivos.ContentImagenes@Model.Foto" alt="@Model.Name" />
+                        }
+                    </a>
+                </p>
+            </div>
+            <div class="group content">
+                <p></p>
+            </div>
+            @if (Model.Type == ContactModel.ContactType.Person || Model.Type == ContactModel.ContactType.Organization)
+            {
+                <div class="filterSpace" id="divGroups_@Model.Key">
+                    @if (Model.ListGroups != null && Model.ListGroups.Count > 0)
+                    {
+                        <div>
+                            <p>Añadido a: </p>
+                            <ul class="tags">
+                                @foreach (string grupoID in Model.ListGroups.Keys)
+                                {
+                                    <li id="@(Model.Key + "_" + grupoID)">@Model.ListGroups[grupoID]
+                                        <a class="remove" onclick="EliminarGrupoDeContacto('@Model.Key','@grupoID')">Eliminar</a>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+            }
+            @if (Model.Type == ContactModel.ContactType.Group)
+            {
+                <div class="filterSpace" id="divMembers_@Model.Key">
+                    @if (Model.ListMembers != null && Model.ListMembers.Count > 0)
+                    {
+                        <div>
+                            <p>Personas: </p>
+                            <ul class="tags">
+                                @foreach (string memberID in Model.ListMembers.Keys)
+                                {
+                                    <li id="@(Model.Key + "_" + memberID)">@Model.ListMembers[memberID]
+                                        <a class="remove" onclick="EliminarContactoDeGrupo('@Model.Key','@memberID')">Eliminar</a>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+            }
+            <div class="group acciones">
+                <ul id="listaAcciones_@Model.Key">
+                    @if (Model.Type == ContactModel.ContactType.Group)
+                    {
+                        <li><a onclick="javascript:MostrarPanelAccionDesp('desplegable_@Model.Key', null);AccionEditarNombreGrupoMVC('Editar nombre','@Model.Key',' Introduce el nuevo nombre del grupo Grupo @Model.Name');$('div.messageKo').hide(); $('div.messageOk').hide();">Editar nombre</a></li>
+                        <li><a onclick="EliminarGrupo('@Model.Key')">Eliminar grupo</a></li>
+                    }
+                    <li><a onclick="javascript:AccionEnviarMensajeContacto('@Model.Key', '@((Model.Type == ContactModel.ContactType.Group).ToString())');">Enviar mensaje</a></li>
+                    @if (Model.Type != ContactModel.ContactType.Group)
+                    {
+                        <li><a onclick="AgregarGruposContacto('@Model.Key');">Añadir a grupo</a></li>
+                        <li><a onclick="EliminarContacto('@Model.Key')">Eliminar de mis contactos</a></li>
+                    }
+                    else
+                    {
+                        <li><a onclick="AgregarContactosGrupo('@Model.Key');" >Agregar miembros al grupo</a></li>
+                    }
+                </ul>
+            </div>
+            <div style="display: none;" id="desplegable_@Model.Key">
+                <div style="display: none;" class="stateShowForm" id="panels">
+                    <div class="loading" id="loading">
+                        <p>Cargando formulario, un momento por favor</p>
+                    </div>
+                    <div id="menssages">
+                        <div class="ok"></div>
+                        <div class="ko"></div>
+                    </div>
+                    <div class="box form activeForm" id="action">
+                        <div id="@Model.Key"></div>
+                    </div>
+                    <div class="box form activeForm" id="aux_@Model.Key">
+                        @if (Model.Type == ContactModel.ContactType.Group)
+                        {
+                            <fieldset class="finderUtils" id="divContactos_@Model.Key">
+                                <p>Añade tus contactos</p>
+                                <fieldset id="divAutocompletar_@Model.Key">
+                                    <p>
+                                        <input type="text" class="finderSectionText autocompletar ac_input" id="input_@Model.Key" autocomplete="off" />
+                                        @{
+                            string members = "";
+                            if (Model.ListMembers != null)
+                            {
+                                foreach (string memberID in Model.ListMembers.Keys)
+                                {
+                                    members += memberID + ",";
+                                }
+                            }
+                                        }
+                                        <input type="text" value="@members" style="display: none" id="input_@(Model.Key)_hack" />
+                                        @{
+                            string accionAceptar = "AgregarTodosContactosAGrupos('" + Model.Key + "')";
+                                        }
+                                        <input type="button" value="Aceptar" onclick="@accionAceptar" id="botonAceptar_@Model.Key" />
+                                    </p>
+                                    <div class="filterSpace" id="divResultados_@Model.Key"></div>
+                                    <p></p>
+                                </fieldset>
+                            </fieldset>
+                        }
+                        else
+                        {
+                            <fieldset class="finderUtils" id="divContactos_@Model.Key">
+                                <p>Añade tus grupos</p>
+                                <fieldset id="divAutocompletar_@Model.Key">
+                                    <p>
+                                        <input type="text" class="finderSectionText autocompletar ac_input" id="input_@Model.Key" autocomplete="off" />
+                                         @{
+                            string groups = "";
+                            if (Model.ListGroups != null)
+                            {
+                                foreach (string groupsID in Model.ListGroups.Keys)
+                                {
+                                    groups += groupsID + ",";
+                                }
+                            }
+                                        }
+                                        <input type="text" value="@groups" style="display: none" id="input_@(Model.Key)_hack" /> 
+                                        @{
+                            string accionAceptar = "AgregarTodosGruposAContactos('" + Model.Key + "')";
+                                        }
+                                        <input type="button" value="Aceptar" onclick="@accionAceptar" id="botonAceptar_@Model.Key" />
+                                    </p>
+                                    <div class="filterSpace" id="divResultados_@Model.Key"></div>
+                                    <p></p>
+                                </fieldset>
+                            </fieldset>
+                            
+                        }
+                    </div>
+                    <p class="cerrar"><a onclick="CerrarPanelAccion('desplegable_@Model.Key')" title="cerrar formulario">cerrar x</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+
+
+
+
+

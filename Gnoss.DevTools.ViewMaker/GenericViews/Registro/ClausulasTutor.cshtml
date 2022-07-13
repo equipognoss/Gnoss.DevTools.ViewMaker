@@ -1,0 +1,74 @@
+﻿
+@{
+
+    CommunityModel Comunidad = Html.GetComunidad();
+    HeaderModel Cabecera = Html.GetCabecera();
+    UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+    Html.SetOcultarMenusComunidad(true);
+}
+
+<div id="col01">
+    <h3>Activación de cuenta de alumno</h3>
+    <p>Los alumnos menores de 14 años necesitan que su padre, madre o tutor legal activen su cuenta para acceder a las clases de Didactalia creadas por sus profesores.</p>
+</div>
+
+<div class="fieldset fieldset02">
+    <fieldset>
+        <div class="fieldsetContent">
+            <input type="hidden" id="clausulasSelecc" name="clausulasSelecc" />
+            <ul class="radioList" id="condicionesUso">
+                <li>
+                    <input type="checkbox" class="" id="clausula-menores" />
+                    <span class="clauAdicional">  He leído y acepto las <a onclick="MostrarPanelExtra();$('#condicionesUsoGenericas').parent().children().each(function(){var div = $(this);div.hide();});$('#condicionesUsoGenericas').show();return false;">condiciones de acceso y uso</a> y la <a onclick="MostrarPanelExtra();$('#clausulasTextoGenericas').parent().children().each(function(){var div = $(this);div.hide();});$('#clausulasTextoGenericas').show();return false;">política de privacidad</a> de Didactalia  </span>
+                </li>
+                @*{
+                        foreach (Guid clausula in Model.Clauses.Keys)
+                        {
+                            string classCheck = "";
+                            if (Model.Clauses[clausula].Value)
+                            {
+                                classCheck = "optional";
+                            }
+                            <li>
+                                <input type="checkbox" class="@classCheck" id="@clausula" />
+                                <span class="clauAdicional">@Html.Raw(Model.Clauses[clausula].Key)</span>
+                            </li>
+                        }
+                    }*@
+            </ul>
+        </div>
+        <div id="divKoCondicionesUso" class="contenedorError">
+            <div class="ko">
+            </div>
+        </div>
+    </fieldset>
+</div>
+
+<input type="submit" value="Activar cuenta" class="" id="btnCrearCuenta" onclick="AceptarClausulas()" />
+
+<script>
+
+    function AceptarClausulas()
+    {
+        if (ValidarPantallaTutorClausulas())
+        {
+            document.location = "@Model?clausulas=true";
+        }
+    }
+
+    function ValidarPantallaTutorClausulas()
+    {
+        var errorCondiciones = ComprobarClausulas();
+
+        if (errorCondiciones.length > 0) {
+            crearError(errorCondiciones, '#divKoCondicionesUso', false);
+            return false;
+        }
+        else {
+            $('#divKoCondicionesUso').html('');
+        }
+        return true;
+    }
+</script>
+
+

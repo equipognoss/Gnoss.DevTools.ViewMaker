@@ -1,0 +1,75 @@
+﻿@model SearchViewModel
+@*
+Descripción
+-----------------------------------------------
+Nueva vista que muestra todos los items en modo Lista después de haber realizado una búsqueda (o sin búsqueda activa). Los recursos se mostrarán en la parte central-derecha. Es donde se muestran los recursos los cuales podrán visualizarse en:
+- Vista Compacta
+- Vista Lista
+- Vista Mosaico
+- Vista Gráfica
+- Vista Mapa
+- Vista Grafo
+
+Los datos son cargados mediante el servicio "CargadorResultados".
+
+En esta vista se cargarán las subvistas de los items devueltos del buscador. Estas subvistas pertenecen al servicio "ServicioResultados".
+Para las acciones disponibles de cada uno de los items (Recursos) devueltos por el buscador, se cargarán en el modal container.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+// Resultados obtenidos 
+string htmlResultados = Model.HTMLResourceList;
+string tipoPagina = Model.PageName;
+//string claseCss = "";
+
+// Páginas que no tendrían espaciado en los list-items
+/*string[] tipoPaginasSinEspaciado = new string[] { 
+    Html.GetText("COMMON", "BASERECURSOS"),
+    Html.GetText("COMMON", "ENCUESTAS"),
+    Html.GetText("COMMON", "PREGUNTAS"), 
+    Html.GetText("COMMON", "DEBATES"),
+    Html.GetText("COMMON", "MISCONTRIBUCIONES"),
+};
+
+if (!tipoPaginasSinEspaciado.Contains(tipoPagina) && tipoPagina != null) {
+    claseCss = "usuarios";
+}*/
+
+}
+
+
+@*
+----------------------------------------------------------------
+-------------------- Lista donde se mostrarán los los items o recursos del buscador --------------------
+*@
+
+@* Contenedor de items (recursos) de resultados *@
+<div id="panResultados" class="resource-list listView">
+
+    @* Mostrado de resultados *@
+    @if (string.IsNullOrEmpty(htmlResultados) && Model.JSONResourceList != null)
+    {
+    <div class="resource-list-wrap">
+        @Html.PartialView("../CargadorResultados/CargarResultados", Model.JSONResourceList);
+    </div>
+    }
+    else
+    {
+
+    @* Envoltorio de los items devueltos por el buscador *@
+    <div class="resource-list-wrap">
+        @* Cargar los resultados obtenidos del servicio "Cargador Resultados" *@
+        @Html.Raw(htmlResultados)
+    </div>
+    }
+</div> @* Cargando más datos *@
+                <div class="loading-more-results d-none">
+                    <div class="d-flex flex-column align-items-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">@Html.GetText("COMMON", "CARGANDO")</span>
+                        </div>
+                        <p class="text-muted mt-2">@Html.GetText("COMMON", "CARGANDO")</p>
+                    </div>
+                </div>

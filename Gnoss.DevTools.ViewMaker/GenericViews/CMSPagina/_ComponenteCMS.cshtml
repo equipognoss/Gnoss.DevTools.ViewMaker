@@ -1,0 +1,15 @@
+﻿@model CMSComponent
+@if (Model != null)
+{
+    string estilos = Model.Styles;
+    if (Model is CMSComponentGroupComponents)
+    {
+    @Html.PartialView(Model.ViewName, Model)
+    }
+    else
+    {       
+    <div class="block @estilos" id="@Model.Key.ToString()">
+        @Html.PartialView(Model.ViewName, Model)  
+    </div>
+    }
+}

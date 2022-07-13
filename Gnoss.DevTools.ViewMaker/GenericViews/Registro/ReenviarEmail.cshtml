@@ -1,0 +1,122 @@
+﻿@model AutenticationModel
+
+@{
+
+    CommunityModel Comunidad = Html.GetComunidad();
+    HeaderModel Cabecera = Html.GetCabecera();
+    UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+    Html.SetOcultarMenusComunidad(true);
+    string NombreProyectoEcosistema = Html.GetNombreProyectoEcosistema();
+}
+
+<div id="col01">
+    <p>Si desea recibir otra vez el Email de activación pulse el siguiente botón</p>
+    <button onclick="postGnoss()" id="reenviar-correo">EnviarCorreo</button>
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+
+    @if (Model.Reenviar)
+    {
+        <p>Si desea cambiar el correo electronico con el cual se dio de alta por favor introduzcalo y pulse Enviar Correo</p>
+        <form id="formulario">
+            <input type="text" id="txtEmail" name="txtEmail" placeholder="Correo electrónico *">
+
+            <input type="button" onclick="postGnossCambioCorreo()" value="Enviar Correo" />
+        </form>
+    }
+
+    <div id="divKodatosUsuario">
+        <div class="ko">
+            <label id="lblMailRepetido" style="display: none;">
+            </label>
+        </div>
+    </div>
+
+</div>
+
+
+<script>
+
+    function postGnoss() {
+        MostrarUpdateProgress();
+        GnossPeticionAjax(
+        document.URL + '/enviar',
+        "",
+        true
+        ).always(function () {
+            OcultarUpdateProgress();
+        });
+    }
+
+    function postGnossCambioCorreo() {
+        Options = {};
+        MostrarUpdateProgress();
+        if (CoomprobarCampo() == true) {
+            Options['Url'] = $("#txtEmail").val();
+            GnossPeticionAjax(
+            document.URL + '/correo',
+            Options,
+            true
+            ).fail(function (data) {
+                that.mostrarErrorGuardado(data);
+            }).always(function () {
+                OcultarUpdateProgress();
+            });
+        }
+        else {
+            var error = 'El correo no debe estar vacio y debe ser un correo valido';
+            mostrarErrorMailVacio(error);
+            OcultarUpdateProgress();
+        }
+    }
+
+    function CoomprobarCampo() {
+        var todoOk = false;
+        if ($('#lblMailRepetido').css('display') == 'none') {
+            todoOk = true;
+        }
+        if (todoOk == true && ($('#txtEmail').val() != null)) {
+            todoOk = true;
+        }
+        return todoOk;
+    }
+
+    function mostrarErrorGuardado(data) {
+        if (data)
+        {
+            $('#formulario').after('<div class="error general">'+data+'</div>');
+        } else
+        {
+            $('#formulario').after('<div class="error general">Ha habido errores en el guardado</div>');
+        }
+    }
+
+    function mostrarErrorMailVacio(error) {
+        var mensaje = '<p>' + error + '</p>';
+        crearError(mensaje, '#lblMailRepetido');
+        $('#lblMailRepetido').show();
+    }
+
+
+
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#txtEmail').blur(function () { 
+            ComprobarEmailUsuario('@Html.GetUrlPagina()');
+            var error = ValidarEmailIntroducido('txtEmail', 'lblEmail');
+            if (error != '') {
+                mostrarErrorMailVacio(error);
+            } else {
+                $('#lblMailRepetido').html();
+                $('#lblMailRepetido').hide();
+            }
+        });
+        $('#txtEmail').keydown(function (event) {
+            if (event.which || event.keyCode) { if ((event.which == 13) || (event.keyCode == 13)) { return false; } }
+        });
+    });
+</script>

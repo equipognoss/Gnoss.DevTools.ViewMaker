@@ -1,0 +1,155 @@
+﻿@using Es.Riam.Gnoss.Web.MVC.Models;
+@if (Html.GetComunidad() != null)
+{
+@*
+Descripción
+----------------------------------------------------------------
+Menú de navegación para la comunidad. Corresponde con el menú que aparecerá debajo del nombre y tipo de la comunidad en la que se encuentra el ususario.
+Este menú será visible si el usuario está logeado, aunque no hará falta controlarlo ya que aparecería en el header de la comunidad
+- Home
+- Índice
+- Recursos
+- Debates
+- Preguntas
+- Encuestas 
+- Personas y organizaciones
+- Acerca de...
+@*
+Variables
+----------------------------------------------------------------
+*@
+CommunityModel Comunidad = Html.GetComunidad();
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+string claseOcultarCommunityRow= "";
+@*
+----------------------------------------------------------------
+-------------------- Menú Navegación de la Comunidad --------------------
+*@
+
+
+@* Mostrar "Menú Administración" si se disponen de permisos. ¿Dónde colorcarlo? De momento lo coloco aquí. *@
+if (ViewBag.PermisosPaginas != null)
+{
+    @Html.PartialView("../Shared/_MenuAdministracion")
+}
+
+@functions{
+    string PintarPestanya(CommunityModel.TabModel pPestanya, bool pPintarEnlaces)
+    {
+        if (pPestanya.Visible)
+        {
+            string clasePest = "nivel01";
+            if (pPestanya.Active)
+            {
+                clasePest += " active";
+            }
+            if (pPestanya.Name == "Home")
+            {
+                clasePest += " navHomeCom";
+            }
+
+            <li class="@clasePest @pPestanya">
+                <a @Html.Raw(pPintarEnlaces ? "href=\"" + pPestanya.Url + "\"" : " disabled=\"disabled\"") @Html.Raw(pPestanya.OpenInNewWindow ? "target=\"_blank\"" : "")>@pPestanya.Name</a>
+                @if (pPestanya.SubTab != null && pPestanya.SubTab.Count > 0)
+                {
+                    <ul>
+                        @foreach (CommunityModel.TabModel pPestanyaInt in pPestanya.SubTab)
+                        {
+                            @PintarPestanya(pPestanyaInt, pPintarEnlaces);
+                        }
+                    </ul>
+                }
+            </li>
+        }
+        return string.Empty;
+    }
+}
+@* Ocultar o no la fila de comunidades para móvil si la comunidad principal es la misma que la metaComunidad *@
+@if (Comunidad.NameMetaComunidad.ToLower().Equals(Comunidad.Name.ToLower())) {
+    claseOcultarCommunityRow = "d-none";
+}
+
+
+@* Mostrar "Mostrar Menú de Navegación de la Comunidad - Desktop y Móvil"*@
+<div class="row community-row @claseOcultarCommunityRow">
+    <div class="community-menu-wrapper">
+        @* Mostrar el menú trigger de la MetaComunidad si la MetaComunidad es diferente al nombre de la comunidad *@
+        @if (!Comunidad.NameMetaComunidad.ToLower().Equals(Comunidad.Name.ToLower())) { 
+            <a href="javascript: void(0);"
+                id="menuLateralComunidadTrigger"
+                data-target="menuLateralComunidad"
+                class="texto-blanco">
+                <span class="material-icons">menu</span>
+            </a>
+        }
+        
+        <div class="page-name-wrapper">
+            <span class="page-name">@Comunidad.Name</span>
+            
+        </div>
+        <div id="community-menu" class="">
+            <ul>
+                @{
+                    bool pintarEnlaces = true;
+                    if (IdentidadActual.IsGuestIdentity && (Comunidad.ProjectState == CommunityModel.StateProject.Definition || Comunidad.ProjectState == CommunityModel.StateProject.Close || Comunidad.ProjectState == CommunityModel.StateProject.CloseTemporaly))
+                    {
+                        pintarEnlaces = false;
+                    }
+                    foreach (CommunityModel.TabModel pPestanya in Comunidad.Tabs)
+                    {
+                        @PintarPestanya(pPestanya, pintarEnlaces);
+                    }
+                }
+            </ul>
+        </div>
+    </div>
+
+    @* Menú Lateral de navegación de Comunidad para móviles *@
+    <aside id="menuLateralComunidad"
+           class="menuLateral comunidad"
+           role="navigation">
+        <div class="header">
+            <div class="wrap-header">
+                <div class="menu-logo-wrapper">
+                    <div class="menu-toggle">
+                        <a href="javascript: void(0);"
+                           class="cerrar texto-blanco">
+                            <span class="material-icons">menu</span>
+                        </a>
+                    </div>
+                    <div class="logo-wrapper">
+                        <a href="@Comunidad.Url" class="texto-blanco">
+                            @Comunidad.Name
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <span class="material-icons cerrar">close</span>
+        </div>
+
+        <div class="body custom-css-scroll">
+            <div id="community-menu-movil">
+                <p class="title">Navegación</p>
+                <ul class="nav pmd-sidebar-nav">
+                    @{
+                        bool pintarEnlacesMovil = true;
+                        if (IdentidadActual.IsGuestIdentity && (Comunidad.ProjectState == CommunityModel.StateProject.Definition || Comunidad.ProjectState == CommunityModel.StateProject.Close || Comunidad.ProjectState == CommunityModel.StateProject.CloseTemporaly))
+                        {
+                            pintarEnlacesMovil = false;
+                        }
+                        foreach (CommunityModel.TabModel pPestanya in Comunidad.Tabs)
+                        {
+                            @PintarPestanya(pPestanya, pintarEnlacesMovil);
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+    </aside>
+    <!-- <div class="pmd-sidebar-overlay" data-rel="menuLateralComunidad"></div> -->
+</div>
+
+
+
+}
+

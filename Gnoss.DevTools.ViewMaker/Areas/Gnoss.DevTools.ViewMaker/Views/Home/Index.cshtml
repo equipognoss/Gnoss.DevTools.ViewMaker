@@ -1,0 +1,110 @@
+﻿
+@using Microsoft.AspNetCore.Http;
+
+@{
+    ViewBag.Title = "AskURL";
+    Layout = "~/Areas/Gnoss.DevTools.ViewMaker/Views/_LayoutAskUrl.cshtml";
+
+    string ErrorAskURL = "";
+
+    HttpContext httpContext = @ViewBag.Session;
+
+    
+
+    if (httpContext.Session.GetString("ErrorAskURL") != null)
+    {
+        ErrorAskURL = httpContext.Session.GetString("ErrorAskURL");
+    }
+    httpContext.Response.Headers.Add("Cache-Control", "no-cache, no-store");
+    /*
+     if (Session["ErrorAskURL"] != null)
+     {
+         ErrorAskURL = (string)Session["ErrorAskURL"];
+     }}
+
+     Response.Headers.Add("Cache-Control", "no-cache, no-store");*/
+}
+
+<h2>Compilador de vistas</h2>
+<hr />
+
+<form class="form" autocomplete="off">
+    <div class="form-horizontal">
+        <h3>Url y sesión</h3>
+        <div class="form-group url row">
+            <label for="URL" class="control-label col-md-3">Url: </label>
+            <div class="col-md-9">
+                <div class="textbox">
+                    @Html.TextBox("URL", "", new { @list = "lastURLs" })
+                    @if (ViewBag.LastURLs.Count > 0)
+                    {
+                        <datalist id="lastURLs">
+                            @foreach (string url in ViewBag.LastURLs)
+                            {
+                                <option>@url</option>
+                            }
+                        </datalist>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="form-group session row">
+            <label for="SessionID" class="control-label col-md-3">SessionID: </label>
+            <div class="col-md-9">
+                <div class="textbox">
+                    @Html.TextBox("SessionID", "", new { @list = "lastSessionID" })
+                    @if (ViewBag.LastSessionID.Count > 0)
+                    {
+                        <datalist id="lastSessionID">
+                            @foreach (string sessionID in ViewBag.LastSessionID)
+                            {
+                                <option>@sessionID</option>
+                            }
+                        </datalist>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="form-group estilosPersonalizados row">
+            <label for="contentLocal" class="control-label col-md-3">Usar estilos personalizados Local <i>Html.GetBaseUrlPersonalizacion()</i></label>
+            <div class="col-md-9">
+                <div class="textbox">
+                    <span class="fa fa-edit" title="Usar estilos personalizados Local 'Html.GetBaseUrlPersonalizacion()'"></span>
+                    @Html.CheckBox("contentLocal", false)
+                </div>
+            </div>
+        </div>
+        <div class="form-group autentication">
+            <hr />
+            <h3>
+                <a class="dropdown-toggle authBasic" href="#authBasic" title="Autenticación Básica">Autenticación Básica<span class="fa fa-lock" ></span></a>
+            </h3>
+            <div class="panel-collapse collapse" id="authBasic">
+                <div class="form-group row">
+                    <label for="User" class="control-label col-md-3">Usuario: </label>
+                    <div class="col-md-3">
+                        <div class="textbox">
+                            @Html.TextBox("User")
+                        </div>
+                    </div>
+                </div>
+                <p></p>
+                <div class="form-group row">
+                    <label for="Password" class="control-label col-md-3">Password: </label>
+                    <div class="col-md-3">
+                        <div class="textbox">
+                            @Html.Password("Password")
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group botones row">
+            <div class="col-md-offset-3 col-md-9">
+                <input name="submit" id="cargar" type="button" value="Cargar" class="btn btn-default">
+                <input name="submit" id="reCargar" type="button" value="Recargar" class="btn btn-default">
+            </div>
+        </div>
+    </div>
+</form>
+

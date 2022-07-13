@@ -1,0 +1,38 @@
+﻿@model ResourceModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra las etiquetas de un determinado recurso.
+Esta vista se muestra directamente en la vista _FichaAutoresEditoresLectores para mantener el diseño.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista de las Etiquetas de un recurso --------------------
+*@
+
+@if (Model.Tags != null && Model.Tags.Count > 0)
+{
+    <div class="group etiquetas">
+        <p class="group-title">
+            @Html.GetText("COMMON", "ETIQUETAS"):
+        </p>
+        <ul class="listTags">
+            @foreach (string etiqueta in Model.Tags)
+            {
+                <li rel="sioc:topic">
+                    <a typeof="sioc_t:Tag" href="@Model.UrlSearch/@Html.GetText("URLSEM","TAG")/@etiqueta"><span property="dcterms:name">@etiqueta</span></a>@if (!etiqueta.Equals(Model.Tags.Last()))
+                    {@* @(",") *@}
+                </li>
+            }
+        </ul>
+    </div>
+}

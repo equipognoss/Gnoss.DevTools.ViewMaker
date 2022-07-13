@@ -1,0 +1,108 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista que contiene el formulario para realizar la solicitud de Cambiar contraseña de un usuario dentro de una comunidad.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+CommunityModel Comunidad = Html.GetComunidad();
+}
+@*
+----------------------------------------------------------------
+-------------------- Vista para Cambiar Password de un usuario --------------------
+*@
+
+@* Establecer clase al body**@
+@{
+    Html.SetBodyClass("layout03 password-page no-min-height-content");
+}
+
+
+<div class="row">
+    @* Contenedor del formulario para la solicitud de cambio de contraseña*@
+    <div class="col">
+        <div class="form panel-centrado">
+            <h1>@Html.GetText("NUEVOPASSWORD", "TITULO")</h1>
+            <div class="fieldset fieldset01">
+                <fieldset>
+                    <div class="fieldsetContent">
+                        <div class="form-group">
+                            @* Label + Input para password anterior *@
+                            <label for="txtOldPassword" class="control-label">@Html.GetText("CAMBIARPASSWORD", "PASSWORDANTERIOR")</label>
+                            <input type="password"
+                                   placeholder="Introduce tu contraseña actual"
+                                   id="txtOldPassword"
+                                   class="form-control" />
+
+                        </div>
+                        <div class="form-group">
+                            @* Label + Input para la contraseña nueva *@
+                            <label for="txtNewPassword" class="control-label">@Html.GetText("CAMBIARPASSWORD", "PASSWORDNUEVA")</label>
+                            <input type="password"
+                                   placeholder="Introduce tu nueva contraseña"
+                                   id="txtNewPassword"
+                                   class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            @* Label + Input para confirmar la contraseña nueva*@
+                            <label for="txtConfirmedPassword" class="control-label">@Html.GetText("CAMBIARPASSWORD", "PASSWORDNUEVACONFIRMAR")</label>
+                            <input type="password"
+                                   placeholder="Confirma la nueva contraseña"
+                                   id="txtConfirmedPassword"
+                                   class="form-control" />
+                        </div>
+
+                        @* Panel de error o aviso de Mayúsculas activadas *@
+                        <div id="passwordEmptyPanel" style="display: none;" class="alert alert-warning" role="alert">
+                            Es necesario que introduzcas la contraseña anterior y la nueva para solicar el cambio.
+                        </div>
+
+                        @* Panel de error o aviso de Mayúsculas activadas *@
+                        <div id="warning" style="display: none;" class="alert alert-warning" role="alert">
+                            Bloq Mayús activado
+                        </div>
+
+                        @* Panel de error o mensaje de OK *@
+                        <div id="passwordRequestInfoPanel" style="display: none;" class="alert alert-danger alert-success" role="alert">
+
+                        </div>
+
+                        @* Panel de error o aviso si ha expirado la solicitud para solicitar cambio de contraseña*@
+                        @{
+                            if (Context.Request.Query.ContainsKey("expired") && Context.Request.Query["expired"].Equals("true"))
+                            {
+                                <div id="expiredPanel" class="alert alert-danger" role="alert">
+                                    @Html.Raw(Html.GetText("CAMBIARPASSWORD", "PASSWORDCADUCADA"))
+                                </div>
+                            }
+                        }
+                    </div>
+                </fieldset>
+            </div>
+
+            <div class="fieldset actionButtons fieldset03 actionButtons">
+                <fieldset>
+                    <div class="fieldsetContent">
+                        <input class="principal submit btn btn-primary"
+                               type="button"
+                               id="btnCambiarPassword"
+                               value="@Html.GetText("CAMBIARPASSWORD", "ACEPTAR")" />
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    // Parámetros para operativaSolicitarContrasenia
+    (function ($) {
+        const pParamsSolicitarContrasenia = {
+            urlPasswordRequest: "@Html.GetUrlPagina()/change",
+        };
+        // Gestión de operativa para cambio de contraseña
+        operativaSolicitarCambiarContrasenia.init(pParamsSolicitarContrasenia);
+     })();
+</script>

@@ -1,0 +1,24 @@
+﻿@model SemanticPropertyModel
+
+@{
+    int count = 0;
+}
+    
+<div class="viewGroups">
+    <ul>
+        @foreach (string idOpcion in Model.Element.OpcionesSelectorGrupo.Keys)
+        {
+            string clase = "";
+                
+            if (count == 0)
+            {
+                clase = "class=\"activo\"";
+            }
+                
+            <li @Html.Raw(clase)><a onclick="SeleccOpcionTab(this, '@idOpcion');">@Model.Element.OpcionesSelectorGrupo[idOpcion]</a></li>
+                
+            count++;
+        }
+    </ul>
+</div>
+

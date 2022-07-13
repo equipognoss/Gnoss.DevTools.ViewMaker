@@ -1,0 +1,29 @@
+﻿@using Es.Riam.Gnoss.Web.MVC.Models;
+@model CMSComponentThesaurus
+@if(Model != null)
+{   
+    <div class="componente cp0102">
+        <div class="contenido">
+            @{
+    string imagen = "";
+    if (Model.Image)
+    {
+        imagen = " mosaico";
+    }
+            }
+            <div class="wrap @imagen">
+                <h4>@Model.CategoryName</h4>
+                <ul>
+                    @foreach (CategoryModel categoria in Model.Categories)
+                    {                        
+                        <li><a href="@Model.UrlBaseCategories/@Html.EliminarCaracteresUrlSem(categoria.Name)/@categoria.Key/">@categoria.Name</a></li>
+                    }
+                </ul>
+                <p class="verTodas">
+                    <a href="@Model.UrlIndex">@Html.GetText("COMMON", "VERTODOSSINPUNTOS")</a>
+                </p>
+            </div>
+        </div>
+    </div>
+}
+      

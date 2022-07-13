@@ -1,0 +1,44 @@
+﻿@model CMSBlock
+@if(Model != null)
+{   
+    string rowcol = "row";
+    if (Model.ParentKey.HasValue)
+    {
+        rowcol = "col";
+    }
+
+    string atributos = "";
+    foreach (string clave in Model.Attributes.Keys)
+    {
+        if (clave == "class")
+        {
+            rowcol += " " + Model.Attributes[clave];
+        }
+        else
+        {
+            atributos += clave + "=" + Model.Attributes[clave] + " ";
+        }
+    }    
+
+    <div class="@rowcol" @Html.Raw(atributos) id="@Model.Key.ToString()"> 
+    @{    
+        if (Model.ComponentList != null)
+        {
+            foreach (CMSComponent componente in Model.ComponentList)
+            {
+                @Html.PartialView("_ComponenteCMS", componente);  
+            }
+        }
+
+        if (Model.BlockList != null)
+        {
+            foreach (CMSBlock bloque in Model.BlockList)
+            {
+                @Html.PartialView("_BloqueCMS", bloque)
+            }
+        }
+    }    
+   
+    </div>
+}
+      

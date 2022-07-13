@@ -1,0 +1,56 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista modal que se utiliza para crear una Referencia a doc a modo de recurso en una comunidad. Se llama, cuando el usuario pulsa en (+).
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista Modal para Añadir un Referencia a doc a modo de recurso en una comunidad --------------------
+*@
+
+<div class="modal modal-top fade show"
+     tabindex="-1"
+     role="dialog"
+     id="modal-add-resource-reference">
+
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            @* Título del modal *@
+            <div class="modal-header">
+                <p class="modal-title">
+                    <span class="material-icons">bookmark_border</span>@Html.GetText("PERFILBASESUBIR", "REFERENCIAADOC")
+                </p>
+                <span class="material-icons cerrar"
+                      data-dismiss="modal"
+                      aria-label="Close">close</span>
+            </div>
+            @* Cuerpo del modal *@
+            <div class="modal-body">
+                <div class="formulario-edicion">
+                    <div id="lblSelecionaUnDoc" class="form-group">
+                        <label class="control-label">@Html.GetText("PERFILBASESUBIR", "REFERENCIAADOC")</label>
+                    </div>
+                    @* Input para introducir la URL a modo recurso *@
+                    <div id="divURL" class="form-group">
+                        <label id="lblDescribaUbic">@Html.GetText("PERFILBASESUBIR", "REFERENCIAADOC_T")</label>
+                        <input id="txtUbicacionDoc" type="text" class="form-control" aria-describedby="txtUbicacionDocHelp" onkeydown="if(event.which || event.keyCode){if ((event.which == 13) || (event.keyCode == 13)) {return false;}}" />
+                        <small id="txtUbicacionDocHelp" class="form-text text-muted"></small>
+                    </div>
+                    
+                    @* Botón de acción de subir Referencia a Doc *@
+                    <div class="form-actions">                        
+                        <input id="lbSiguienteReferencia" class="btn btn-primary" type="submit" value="@Html.GetText("PERFILBASESUBIR", "SIGUIENTE")" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

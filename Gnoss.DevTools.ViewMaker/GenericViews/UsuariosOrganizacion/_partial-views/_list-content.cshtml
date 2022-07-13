@@ -1,0 +1,78 @@
+﻿@model AdministrarUsuariosOrganizacionViewModel
+@*
+Descripción
+-----------------------------------------------
+Nueva vista que muestra todos los items en modo Lista después de haber realizado una búsqueda (o sin búsqueda activa). Los recursos se mostrarán en la parte central-derecha. Es donde se muestran los recursos los cuales podrán visualizarse en:
+- Vista Compacta
+- Vista Lista
+- Vista Mosaico
+- Vista Gráfica
+- Vista Mapa
+- Vista Grafo
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+// Obtengo el tipo de item que se desea mostrar en _list-content (Comunidades, Grupos) pasado desde la vista "Comunidades" y "Grupos"
+var listItemType = (String)ViewData["UsuariosOrganizacionListItemType"];
+// Url para acciones
+string urlBaseAcciones = Model.UrlFilter;
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Lista donde se mostrarán los los items o recursos del buscador --------------------
+*@
+
+@* Cargar posibles acciones para ser utilizadas en _list-community-item *@
+@{
+    string urlBaseAccionesUsuariosOrganizacion = (ViewData["BaseAccionesUsuariosOrganizacion"] ?? string.Empty) as string;
+    if (!string.IsNullOrEmpty(urlBaseAccionesUsuariosOrganizacion))
+    {
+        ViewData.Add("BaseAccionesUsuariosOrganizacion", urlBaseAcciones);
+    }
+    else
+    {
+        // Actualizar el el tipo de dato que se desea mostrar en _list-content
+        ViewData["BaseAccionesUsuariosOrganizacion"] = urlBaseAcciones;
+    }
+}   
+
+@* Contenedor de items *@
+<div id="panResultados" class="resource-list @listItemType.ToLower() listView">
+    @* Inner del contenido de los items *@
+    <div class="resource-list-wrap">
+        @switch (listItemType)
+        {
+            case "Comunidades":
+                foreach (CommunityModel comunidad in Model.Proyectos)
+                {
+                    @Html.PartialView("../UsuariosOrganizacion/_partial-views/_list-community-item", comunidad)
+                }
+                break;
+
+            case "Grupos":
+                foreach (GroupCardModel grupo in Model.Grupos)
+                {
+                    @Html.PartialView("../UsuariosOrganizacion/_partial-views/_list-community-group-item", grupo)
+                }
+                break;
+
+            case "Usuarios":
+                foreach (AdministrarUsuariosOrganizacionViewModel.UserOrganizationModel usuario in Model.Usuarios)
+                {
+                    @Html.PartialView("../UsuariosOrganizacion/_partial-views/_list-community-user-item", usuario)
+                }
+                break;
+
+            default:
+                <h2>No hay datos para ser mostrados</h2>
+                break;
+        }
+    </div>    
+</div>
+
+@* Paginador de resultados *@
+@Html.PartialView("../UsuariosOrganizacion/_Paginador", Model)

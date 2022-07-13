@@ -1,0 +1,57 @@
+﻿@model AdministrarUsuariosOrganizacionViewModel
+
+@{
+    string urlBaseAcciones = Model.UrlFilter;
+}
+
+@*
+Descripción
+-----------------------------------------------
+Vista que se encarga de lista los diferentes grupos de usuarios existentes dentro de la comunidad.
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+CommunityModel Comunidad = Html.GetComunidad();
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+string urlAdministracion = Html.GetPerfil().Url + Html.GetText("URLSEM", "ADMINISTRACION") + "/";
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista índice para adminstrar organización: Grupos --------------------
+*@
+
+
+@* Indicarle a _list-content el tipo de items que se desean mostrar *@
+@{
+    string listItemType = (ViewData["UsuariosOrganizacionListItemType"] ?? string.Empty) as string;
+    if (!string.IsNullOrEmpty(listItemType))
+    {
+        ViewData.Add("UsuariosOrganizacionListItemType", "Grupos");
+    }
+    else
+    {
+        // Actualizar el el tipo de dato que se desea mostrar en _list-content
+        ViewData["UsuariosOrganizacionListItemType"] = "Grupos";
+    }
+}        
+
+@* Header de la página de listado de Grupos *@
+@Html.PartialView("../UsuariosOrganizacion/_partial-views/_list-header", Model)
+
+@* Panel derecho-central donde estará el contenido del "buscador"*@
+<div class="col col-12 col-xl-12">
+    @* Div que envuelve todo el contenido central-derecho*@
+    <div class="wrapCol">
+        @* Buscador *@
+        @Html.PartialView("../UsuariosOrganizacion/_partial-views/_searcher", Model)
+
+        @* Contenido / Listado de resultados de Grupos *@
+        @Html.PartialView("../UsuariosOrganizacion/_partial-views/_list-content", Model)
+    </div>
+
+</div>

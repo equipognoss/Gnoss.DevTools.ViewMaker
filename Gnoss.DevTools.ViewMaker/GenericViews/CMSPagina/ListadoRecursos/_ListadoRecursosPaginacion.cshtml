@@ -1,0 +1,24 @@
+﻿@model CMSComponentResourceList
+@if (Model != null && Model.ResourceList.Count > 0)
+{
+    <div class="componentePaginado">
+        <p class="tituloComponente">@Model.Title</p>    
+        @foreach (ResourceModel fichaModel in Model.ResourceList)
+        {
+            <div class=" componente ">
+            @Html.PartialView(Model.ViewNameResources, fichaModel)
+            </div>
+        }
+        @if(Model.ResourceList.Count > 1){
+        <ul class="paginador">
+            <li class="paginadorAnterior"><a href="/">&lt;</a></li>
+            <li class="paginadorSiguiente"><a href="/">&gt;</a></li>
+            <li class="paginadorContador"><span class="actual">1</span> de <span class="total">@Model.ResourceList.Count</span></li>
+        </ul>
+        }
+        @if (!string.IsNullOrEmpty(Model.URLSeeMore))
+        { 
+            <p class="listadoNoticiasCompleto"><a href="@Model.URLSeeMore">@Html.GetText("COMMON", "VERTODOSSINPUNTOS")</a></p>
+        }
+    </div>
+}

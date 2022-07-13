@@ -1,0 +1,28 @@
+﻿@model GroupPageViewModel
+@*
+Descripción
+-----------------------------------------------
+Nueva vista que muestra el header de la lista de items-usuarios que forman parte del grupo y que aparecerá en la zona central-derecha de la página web. Contendría:
+
+
+Variables
+----------------------------------------------------------------*@
+@{ 
+GroupCardModel grupo = Model.Group;
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Cabecera-Header de lista de recursos dentro de una comunidad --------------------
+*@
+
+@* Contenedor de la cabecera de resultados con recursos de la Comunidad *@
+<div class="col col-12 header-listado">
+    @* Título de Búsquedas *@
+    <div class="h1-container">              
+        <h1>@grupo.Name <span id="panNumResultados" class="numResultados">@Model.NumMembers</span></h1>                   
+    </div>
+
+    @* ComboBox disponibles para filtrado de resultados (Descargar, Ordenar, Visualizar) *@
+    @Html.PartialView("../FichaGrupoComunidad/_partial-views/_list-header-actions", Model)
+</div>

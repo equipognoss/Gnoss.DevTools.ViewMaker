@@ -1,0 +1,21 @@
+﻿@model  Dictionary<string,KeyValuePair<bool, string>>
+
+
+<div class="info columms cookies" id="info">
+	<p class="title-panel-info"><span>Panel </span>@Html.GetText("COMMON", "INFORMACION")</p>
+	<div class="col-4">
+		<p>@Html.GetText("COMMON", "CONTENIDOOTROSIDIOMAS")</p>
+        <ul>
+        @foreach (string idioma in Model.Keys)
+        {
+            if (@Model[idioma].Key)
+            {
+                <li><a href="@Model[idioma].Value">@Html.GetText("COMMON", "IDIOMA"+idioma)</a></li>    
+            }
+        }
+        </ul>
+	</div>			
+</div>
+
+
+

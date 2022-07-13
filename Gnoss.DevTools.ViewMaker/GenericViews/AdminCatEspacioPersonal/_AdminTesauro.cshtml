@@ -1,0 +1,87 @@
+﻿@model AdminCatEspacioPersonalModel
+
+@*Descripción
+-----------------------------------------------
+Vista parcial que contiene el Tesauro y las opciones donde se muestran las categorías para poder gestionarlas (Editarlas, Crearlas, Borrarlas…).
+Esta vista es devuelta por el servidor con todos los datos creados/gestionados pendientes de de ser guardados en BD.
+
+Variables
+----------------------------------------------------------------
+*@
+
+@*
+----------------------------------------------------------------
+-------------------- Vista parcial que contendrá la gestión del Tesauro para Edición de Categorías --------------------
+*@
+
+@* Panel de acciones a realizar con Categorías*@
+<div class="acciones-listado tipo-2 acciones-listado-categorias">
+    <div class="wrap">
+        <div class="checkAllWrapper" id="checkAllCategoriesWrapper">
+            <div class="custom-control custom-checkbox">
+                <input type="checkbox" class="custom-control-input" id="checkAllCategories">
+                <label class="custom-control-label" for="checkAllCategories">
+                </label>
+            </div>
+            <div class="check-actions-wrap">
+                <a href="javascript: void(0);" class="dropdown-toggle check-actions-toggle" data-toggle="dropdown">
+                    <span class="material-icons">
+                        arrow_drop_down
+                    </span>
+                </a>
+                <div class="dropdown-menu basic-dropdown check-actions" id="checkActions">
+                    <a href="javascript: void(0)" class="item-dropdown checkall">Todo</a>
+                    <a href="javascript: void(0)" class="item-dropdown decheckall">Nada</a>
+                </div>
+            </div>
+        </div>
+        <a class="btn btn-outline-grey" id="nueva-categoria">
+            <span class="material-icons-outlined">create_new_folder</span>
+            <span class="pl-2">@Html.GetText("COMADMINCATEGORIAS", "CREARNUEVA")</span>
+        </a>
+        <a class="btn btn-outline-grey disabled" id="renombrar-categoria">
+            <span class="material-icons-outlined">drive_file_rename_outline</span>
+            <span class="pl-2">@Html.GetText("COMADMINCATEGORIAS", "CAMBIARNOMBRE")</span>
+        </a>
+        @if (Model.CategoryNamesToMove != null && Model.CategoryNamesToMove.Count > 0)
+        {
+            <a class="btn btn-outline-grey disabled" id="mover-categoria">
+                <span class="material-icons-outlined">import_export</span>
+                <span class="pl-2">@Html.GetText("COMADMINCATEGORIAS", "MOVER")</span>
+            </a>
+        }
+        @if (Model.CategoryNamesToOrder != null && Model.CategoryNamesToOrder.Count > 0)
+        {
+            <a class="btn btn-outline-grey disabled" id="ordenar-categoria">
+                <span class="material-icons-outlined">sort</span>
+                <span class="pl-2">@Html.GetText("COMADMINCATEGORIAS", "ORDENAR")</span>
+            </a>
+        }
+
+        <a class="btn btn-outline-grey disabled" id="eliminar-categoria">
+            <span class="material-icons">delete</span>
+            <span class="pl-2">@Html.GetText("COMADMINCATEGORIAS", "ELIMINAR")</span>
+        </a>
+    </div>
+</div>
+
+@* Vista parcial Mostrar categorías para selección *@
+@Html.PartialView("_partial-views/_action-show-categories", Model)
+
+@* Vista parcial Crear nueva Categoría *@
+@Html.PartialView("_partial-views/_action-add-category", Model)
+
+@* Vista parcial Renombar Categoría *@
+@Html.PartialView("_partial-views/_action-rename-category", Model)
+
+@* Vista parcial Mover Categoría  *@
+@if (Model.CategoryNamesToMove != null && Model.CategoryNamesToMove.Count > 0)
+{
+    @Html.PartialView("_partial-views/_action-move-category", Model)
+}
+
+@* Vista parcial Ordenar Categoría *@
+@if (Model.CategoryNamesToOrder != null && Model.CategoryNamesToOrder.Count > 0)
+{
+    @Html.PartialView("_partial-views/_action-sort-category", Model)
+}

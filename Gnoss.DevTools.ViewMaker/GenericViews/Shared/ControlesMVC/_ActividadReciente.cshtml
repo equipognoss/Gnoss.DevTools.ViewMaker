@@ -1,0 +1,82 @@
+﻿@model RecentActivity
+@*Descripción
+    -----------------------------------------------
+Vista que se utiliza como item de cada una de las actividades recientes
+que se mostrarán a modo de listado tanto en la Home (sin estar en comunidad) como en la home de una comunidad así como en la página de perfil del usuario (Actividad reciente del usuario)
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Item de Actividad reciente (Mostrado en la Home y en la Home de una Comunidad) --------------------
+*@
+
+@foreach (RecentActivityItem actividad in Model.RecentActivityItems)
+{
+    string actividadInfo = (ViewData["actividad"] ?? string.Empty) as string;
+    if (!string.IsNullOrEmpty(actividadInfo))
+    {
+        ViewData.Add("actividad", actividad);
+    }
+    else {
+        // Actualizar el dato
+        ViewData["actividad"] = actividad;
+    }
+
+    @* Tipo de Actividad Reciente: Recurso *@
+    if (actividad is RecentActivityResourceItem)
+    {        
+        @Html.PartialView("../Shared/ControlesMVC/_partial-views/_recent-activity-resource", Model)        
+    }
+    @* Tipo de Actividad Reciente: Miembro de Comunidad *@
+    else if (actividad is RecentActivityMemberItem)
+    {        
+        @Html.PartialView("../Shared/ControlesMVC/_partial-views/_recent-activity-member", Model)                
+    }
+}
+
+@if (Model.RecentActivityItems.Count == Model.NumItemsPage)
+{
+    Guid guidControl = Guid.NewGuid();
+    <div id="actividadReciente_@guidControl" class="col">
+        <a class="btn btn-primary" onclick="ActividadReciente_MostrarMas('@Model.UrlLoadMoreActivity', '@Html.GetUrlLoadResourceActions()', '@Model.TypeActivity', '@(Model.NumPage + 1)', '@guidControl', '@Model.ComponentKey', '@Model.ProfileKey')">@Html.GetText("HOMEUSU", "MASACTIVIDAD")</a>
+    </div>
+
+}
+else if (Model.RecentActivityItems.Count == 0 && Model.NumPage == 1)
+{
+    switch (Model.TypeActivity)
+    {
+        case (int)TipoActividadReciente.HomeUsuario:
+            break;
+        case (int)TipoActividadReciente.HomeProyecto:
+            break;
+        case (int)TipoActividadReciente.PerfilProyecto:
+            <div class="resource actividad">
+                <div class="group">
+                    <p>@Html.GetText("PERFIL", "USUARIOSINACTIVIDAD")</p>
+                </div>
+            </div>
+            break;
+        case (int)TipoActividadReciente.SuscripcionProyecto:
+            break;
+        case (int)TipoActividadReciente.Suscripcion:
+            break;
+        case (int)TipoActividadReciente.SuscripcionSiNoHomeProyecto:
+            break;
+    }
+}
+<script type="text/javascript">
+        $(document).ready(function () {
+            limpiarActividadRecienteHome.init();
+            MontarFechas();
+            CompletadaCargaActividadReciente();
+            ObtenerAccionesListadoMVC('@Html.GetUrlLoadResourceActions()');
+        });
+</script>

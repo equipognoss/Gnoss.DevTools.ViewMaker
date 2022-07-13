@@ -1,0 +1,85 @@
+﻿@*
+Descripción
+----------------------------------------------------------------
+Vista que simplemente controlará si diferentes vistas modales han de cargarse o no en pantalla dependiendo de permisos del usuario, comunidad.
+Estas vistas modales se lanzan desde el menú lateral del usuario.
+
+@*
+Variables
+----------------------------------------------------------------
+*@
+@{
+CommunityModel Comunidad = Html.GetComunidad();
+// Permisos disponibles en la comunidad
+CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+
+}
+@*
+----------------------------------------------------------------
+
+-------------------- Control de aparición de los modales relativos a opciones de la Cabecera/Header --------------------
+*@
+
+@{
+    @* 1 - Crear Recurso -> Subir fichero (Llamada desde _resource-add-resource) *@
+    @*if (!Comunidad.MetaProyect && !Html.EsPaginaEdicionRecurso() && permisosComunidad.DocumentPermissions.Contains(ResourceModel.DocumentType.FicheroServidor))*@
+    if (!Html.EsPaginaEdicionRecurso() && permisosComunidad.DocumentPermissions.Contains(ResourceModel.DocumentType.FicheroServidor))
+    {        
+        @Html.PartialView("../Shared/_cabecera/_modal-views/_add-resource-file");
+    }
+
+    @* 2 - Crear Recurso -> Subir URL (Llamada desde _resource-add-resource) *@    
+    @*if (!Comunidad.MetaProyect && !Html.EsPaginaEdicionRecurso() && permisosComunidad.DocumentPermissions.Contains(ResourceModel.DocumentType.Hipervinculo))*@
+    if (!Html.EsPaginaEdicionRecurso() && permisosComunidad.DocumentPermissions.Contains(ResourceModel.DocumentType.Hipervinculo))
+    {
+        @Html.PartialView("../Shared/_cabecera/_modal-views/_add-resource-url");        
+    }
+
+    @* 3 - Crear Recurso -> Subir Wiki (Llamada desde _resource-add-resource) *@    
+    @*if (!Comunidad.MetaProyect && !Html.EsPaginaEdicionRecurso() && permisosComunidad.DocumentPermissions.Contains(ResourceModel.DocumentType.Wiki))*@
+    if (!Html.EsPaginaEdicionRecurso() && permisosComunidad.DocumentPermissions.Contains(ResourceModel.DocumentType.Wiki))
+    {        
+        @Html.PartialView("../Shared/_cabecera/_modal-views/_add-resource-wiki");
+    }
+
+    @* 4 - Crear Recurso -> Subir Referencia a Doc (Llamada desde _resource-add-resource) *@    
+    @*if (!Comunidad.MetaProyect && !Html.EsPaginaEdicionRecurso() && permisosComunidad.DocumentPermissions.Contains(ResourceModel.DocumentType.ReferenciaADoc))*@
+    if (!Html.EsPaginaEdicionRecurso() && permisosComunidad.DocumentPermissions.Contains(ResourceModel.DocumentType.ReferenciaADoc))
+    {
+        @Html.PartialView("../Shared/_cabecera/_modal-views/_add-resource-reference");
+    }
+
+    @* 5 - Posibilidad de salir de una comunidad *@
+    if (permisosComunidad.LeaveCommunity)
+    {
+        @Html.PartialView("../Shared/_cabecera/_modal-views/_leave-community");        
+    }
+
+    @* 6 - Gestionar la aparición del modal Recibir Newsletter - Controlar la página actual -> No el modal de RecibirNewsletters si el usuario accede a la página directamente (no al modal) *@
+    bool isRecibirNewsletterPage = false;
+    if (Html.GetUrlPagina() == $"{Html.GetComunidad().Url}/{@Html.GetText("URLSEM", "RECIBIRNEWSLETTER")}")
+    {
+        isRecibirNewsletterPage = true;
+    }
+    else
+    {
+        isRecibirNewsletterPage = false;
+    }
+    if (!Comunidad.MetaProyect && !IdentidadActual.IsGuestIdentity && !isRecibirNewsletterPage)
+    {        
+        @Html.PartialView("../Shared/_cabecera/_modal-views/_receive-newsletters");
+    }
+
+    @* 7 - Gestionar la aparición del modal de Invitar a Comunidad *@
+    if (Comunidad.ProjectState != CommunityModel.StateProject.Closing && (Comunidad.ProjectState != CommunityModel.StateProject.Definition || IdentidadActual.IsProyectAdmin || IdentidadActual.IsProyectSupervisor))
+    {
+        if (permisosComunidad.Invite)
+        {            
+            @Html.PartialView("../Shared/_cabecera/_modal-views/_invite-community");
+        }
+    }
+
+    @* 8 - Inserción del contenedor de modales dinámicos para que esté disponible en la plataforma *@    
+    @Html.PartialView("../Shared/_cabecera/_modal-views/_modal-container");
+}

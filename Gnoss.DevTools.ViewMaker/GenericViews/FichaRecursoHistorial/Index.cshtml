@@ -1,0 +1,179 @@
+﻿@model List<ResourceModel>
+
+@{
+    ResourceModel DocActual = Model.OrderByDescending(recurso => recurso.Version).First();
+
+    Html.SetBodyClass("layout04 full fichaRecurso ");
+}
+
+<div id="col01">
+    <h3>@Html.GetText("COMPARARVERSIONES", "HISTORIALDE") @DocActual.Title</h3>
+    <div id="panContenedorFichaRecurso">
+        <div class="resource" id="divResource">
+            <div class="box description" id="divResourceInt">
+                <div class="wrapDescription">
+                    <div class="group title">
+                        <h3><a href="@DocActual.CompletCardLink">@DocActual.Title</a></h3>
+                        <p class="resourceType @DocActual.RdfType">
+                            <span>tipo de documento</span>
+                            <a href="@DocActual.CompletCardLink">@DocActual.RdfTypeName</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="box historial" id="historialArticulo">
+                <table cellspacing="0" cellpadding="0" id="panHistorial_table">
+                    <thead>
+                        <tr>
+                            <th>@Html.GetText("HISTORIALVERSIONES", "SELECTOR")</th>
+                            <th scope="col">@Html.GetText("HISTORIALVERSIONES", "VERSION")</th>
+                            <th scope="col">@Html.GetText("HISTORIALVERSIONES", "HORA")</th>
+                            <th scope="col">@Html.GetText("HISTORIALVERSIONES", "FECHA")</th>
+                            <th scope="col">@Html.GetText("HISTORIALVERSIONES", "EDITOR")</th>
+                            <th scope="col">@Html.GetText("HISTORIALVERSIONES", "RESTAURAR")</th>
+                            @if(DocActual.TypeDocument == ResourceModel.DocumentType.FicheroServidor)
+                            {
+                            <th scope="col">@Html.GetText("HISTORIALVERSIONES", "DESCARGAR")</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int cont = 0;
+                        }
+                        @foreach(ResourceModel doc in Model.OrderByDescending(recurso => recurso.Version))
+                        {
+                        <tr @(cont%2 == 0 ? "class=\"par\"" : "")>
+                            <td>
+                                <input type="checkbox" onclick="ComprobarChecks(this);" id="@doc.Key"></td>
+                            <td><a href="@doc.CompletCardLink">@doc.Version</a></td>
+                            <td>@doc.PublishDate.ToString("HH:mm")</td>
+                            <td>@doc.PublishDate.ToString("dd/MM/yyyy")</td>
+                            <td>@doc.Publisher.NamePerson</td>
+                            @if (doc.Key == DocActual.Key)
+                            { 
+                                <td>@Html.GetText("HISTORIALVERSIONES", "VERSIONACTUAL")</td>
+                            }
+                            else
+                            {
+                                <td><a onclick="DesplegarRestaurar(this, '@doc.ListActions.UrlLoadActionRestoreVersion', '@doc.Key.ToString()')">@Html.GetText("HISTORIALVERSIONES", "RESTAURAR")</a></td>
+                            }
+                            
+                            @if(DocActual.TypeDocument == ResourceModel.DocumentType.FicheroServidor)
+                            {
+                            <td><a href="@doc.UrlPreview">@Html.GetText("HISTORIALVERSIONES", "DESCARGAR")</a></td>
+                            }
+                        </tr>
+                            cont++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="confirmRestaurar">
+                <div style="display: none;" class="stateShowForm" id="panels">
+                    <div class="loading" id="loading" style="display: none;">
+                        <p>Cargando formulario, un momento por favor</p>
+                    </div>
+                    <div class="box form activeForm" id="action" style="display: block;">
+                        <div id="panAccionDoc">
+                        </div>
+                    </div>
+                    <p class="cerrar" style="display: block;"><a id="cerrarConfirmRestaurar" title="cerrar formulario">cerrar x</a></p>
+                </div>
+            </div>
+            
+            <fieldset>
+                <p><input type="button" onclick="DesplegarComparar()" value="@Html.GetText("HISTORIALVERSIONES", "COMPARAR")"></p>
+            </fieldset>
+
+            <div style="display:none" id="despleCompVer">
+                <div style="display: block;" class="stateShowForm" id="panels">
+                    <div class="box form activeForm" id="action" style="display: block;">
+                        <div id="panDiffDoc"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <input type="text" class="oculto" id="txtHackCheckSeleccionados" />
+    <script type="text/ecmascript">
+        function DesplegarRestaurar(boton, url, id)
+        {
+            var panelID = 'despAccionRec_' + id;
+
+            $('.confirmRestaurar').attr('id', panelID);
+            $('#cerrarConfirmRestaurar').attr('onclick', 'CerrarPanelAccion(\'' + panelID + '\')');
+
+            DesplegarAccionMVC(url, boton, panelID, '');
+        }
+
+        /*function DescargarVersion(boton, url, id)
+        {
+            MostrarUpdateProgress();
+            var dataPost = {
+                documentoID: id;
+            }
+
+            GnossPeticionAjax('@Html.GetUrlPagina()/download', dataPost, true).done(function (data) {
+                         
+                OcultarUpdateProgress();
+            });
+        }*/
+
+        function DesplegarComparar()
+        {
+            MostrarUpdateProgress()
+            $('#despleCompVer').hide();
+            $('#despleCompVer .activeForm #panDiffDoc').html('');
+
+            var dataPost = {
+                documentosComparar: $('#txtHackCheckSeleccionados').val()
+            }
+
+            GnossPeticionAjax('@Html.GetUrlPagina()/compare', dataPost, true).done(function (data) {
+                $('#despleCompVer').show();
+                $('#despleCompVer .activeForm #panDiffDoc').html(data);
+                
+                OcultarUpdateProgress();
+            });
+        }
+
+        var numChecksActivos = 0;
+        VaciarChecks();
+
+        function ComprobarChecks(check) {
+            var textBoxHack = $('#txtHackCheckSeleccionados');
+            var input = $('#panHistorial_table input');
+            numChecksActivos = 0;
+            for (var i = 0; i < input.length; i++) {
+                if (input[i].checked == true) {
+                    numChecksActivos++;
+                }
+            }
+            if ($(check).is(':checked')) {
+                textBoxHack.val(textBoxHack.val() + '&' + $(check).attr('id'));
+                if (numChecksActivos > 2) {
+                    $(check).prop('checked', false);
+                    textBoxHack.val(textBoxHack.val().replace('&' + $(check).attr('id'), ''));
+                    return false;
+                }
+            }
+            else {
+                textBoxHack.val(textBoxHack.val().replace('&' + $(check).attr('id'), ''));
+            }
+            return false;
+        }
+
+        function VaciarChecks()
+        {
+            $('#txtHackCheckSeleccionados').val('');
+            var input = $('#panHistorial_table input');
+
+            for (var i = 0; i < input.length; i++) {
+                $(input[i]).prop('checked', false);
+            }
+        }
+    </script>
+</div>

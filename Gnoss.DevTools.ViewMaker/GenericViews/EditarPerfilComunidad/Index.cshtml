@@ -1,0 +1,366 @@
+﻿@model EditProfileViewModel
+
+
+@*
+Descripción
+-----------------------------------------------
+Vista principal que sirve para englobar subvistas para poder editar el perfil de un usuario de la comunidad. En la página de perfil, el usuario podrá editar la siguiente información:
+- Información básica: Nombre, Apellidos, País de Residencia, Idioma, Provincia, Sexo, Código Postal, Localidad, Fecha de Nacimiento, Correo electrónico.
+- Preséntate a la comunidad: Pocas palabras ¿Quién eres?, etiquetas
+- Perfil en la web: Webs en los que participa el usuario en otros sitios en la web.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+UserProfileModel Perfil = Html.GetPerfil();
+CommunityModel Comunidad = Html.GetComunidad();
+
+// Url para redirigir/cancelar simplemente la edición del perfil del usuario
+string urlCancelar = "";
+// Nombre de clase del body para editar perfil del usuario
+string bodyClass = "edicionRecurso edicionPerfil usuarioConectado comunidad page-modal no-clonarMenuUsuario";
+// Url donde se cargará la foto/imagen del usuario
+string urlFoto = "";
+
+@* Identificadores de elementos HTML para lógica JS *@
+@* PERFIL PERSONAL *@ 
+@* ID para el borrado de imagen de perfil *@
+string idDeleteProfileImage = "btn_delete_profile_image";
+@* ID del input Nombre *@    
+string idName = "ProfilePersonal_Name";
+string inputName = "ProfilePersonal.Name";
+@* ID del input Apellido *@    
+string idLastName = "ProfilePersonal_LastName";
+string inputLastName = "ProfilePersonal.Name";
+@* ID del input Email *@    
+string idEmail = "ProfilePersonal_Email";
+string inputEmail = "ProfilePersonal.Email";
+@* ID del input FechaNacimiento *@     
+string idBornDate = "ProfilePersonal_BornDate";
+string inputBornDate = "ProfilePersonal.BornDate";
+@* ID del input Pais *@     
+string idCountry= "ProfilePersonal_Country";
+string inputCountry = "ProfilePersonal.Country";
+@* ID del input Provincia *@     
+string idRegion= "ProfilePersonal_Region";
+@* ID del input Localidad *@     
+string idLocation = "ProfilePersonal_Location";
+string inputLocation = "ProfilePersonal.Location";
+@* ID del input CodigoPostal *@     
+string idPostalCode = "ProfilePersonal_PostalCode";
+string inputPostalCode = "ProfilePersonal.PostalCode";
+@* ID del input Lenguaje *@    
+string idLang = "ProfilePersonal_Lang";
+string inputLang = "ProfilePersonal.Lang";
+@* ID del input Sexo *@     
+string idSex = "ProfilePersonal_Sex";
+string inputSex= "ProfilePersonal.Sex";
+
+@* ID del input del Email del tutor *@     
+string idEmailTutor = "ProfilePersonal_EmailTutor";
+string inputEmailTutor = "ProfilePersonal.EmailTutor";
+@* Id del input para privacidad isSearched *@     
+string idIsSearched = "ProfilePersonal_IsSearched";
+string inputIsSearched = "ProfilePersonal.IsSearched";
+@* Id del input para privacidad isExternalSearched *@     
+string idIsExternalSearched = "ProfilePersonal_IsExternalSearched";
+string inputIsExternalSearched = "ProfilePersonal.IsExternalSearched";
+
+@* PERFIL PROFESIONAL *@
+@* ID del input del Email del perfil profesional (Vista PerfilProfesional) *@     
+string idEmailProfesional= "ProfileProfesional_Email";
+string inputEmailProfesional = "ProfileProfesional.Email";
+
+@* PERFIL ORGANIZACION *@
+string idNameOrganization = "ProfileOrganization_NameOrganization";
+string inputNameOrganization = "ProfileOrganization.NameOrganization";
+@* ID del input país *@
+string idCountryOrganization = "ProfileOrganization_Country";
+string inputCountryOrganization = "ProfileOrganization.Country";
+@* ID del input de código Postal de Organización *@
+string idPostalCodeOrganization = "ProfileOrganization_PostalCode";
+string inputPostalCodeOrganization = "ProfileOrganization.PostalCode";
+@* ID del input de código Localidad de Organización *@
+string idLocationOrganization = "ProfileOrganization_Location";
+string inputLocationOrganization = "ProfileOrganization.Location";
+@* ID del alias/nombre corto de Organización *@
+string idAliasOrganization = "ProfileOrganization_Alias";
+string inputAliasOrganization = "ProfileOrganization.Alias";
+@* ID de la web de la Organización *@
+string idWebsiteOrganization = "ProfileOrganization_WebSite";
+string inputWebOrganization = "ProfileOrganization.WebSite";
+@* ID de la dirección de la Organización *@
+string idAddressOrganization = "ProfileOrganization_Address";
+string inputAddressOrganization = "ProfileOrganization.Address";
+
+@*ID de inputs de Redes sociales (Twitter, Facebook y Linkedin) *@
+string idTwitterSocial = "twitterSocialUrl";
+string idLinkedinSocial = "linkedinSocialUrl";
+string idFacebookSocial = "facebookSocialUrl";
+
+@* ID del input Descripción CV *@    
+string idDescription = "Curriculum_Description";
+string inputDescription = "Curriculum.Description";
+@* ID del input Tags del usuario *@     
+string idTags = "Curriculum_Tags";
+string inputTags= "Curriculum.Tags";
+
+@* ID del panel de errores/ok *@
+string idDivPanelInfo = "divPanelInfo";
+@* ID del botón para guardar los datos *@
+string idSaveButton = "submitEditarPerfil";
+// URL para guardado de datos Personales
+string urlPersonalProfileSaveProfile = $"{@Html.GetUrlPagina()}/save-profile";
+// URL para guardado de datos BIO (CV)
+string urlPersonalProfileSaveBio = $"{@Html.GetUrlPagina()}/save-bio";
+// URL para guardado de redes sociales
+string urlPersonalProfileSaveSocialWebs = @Html.GetUrlPagina();
+
+// Id input para escribir una determinada URL
+string idUrlUsuario = "UrlUsuario";
+// Id Tabla donde estarán los enlaces URL del usuario
+string idTblRedesSociales = "tblRedesSociales";
+// Id Botón para añadir una URL en el perfil del usuario
+string idBtnRedSocial = "btnRedSocial";
+// Id Botón para eliminar una determinada URL en el perfil del usuario
+string idBtnBorrarUrl = "btnBorrarUrl";
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Editar perfil usuario en comunidad --------------------
+*@
+
+@{
+    Html.SetBodyClass(bodyClass);
+
+    @* Añadir CKEditor *@
+    //Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/ckeditor.js?v=" + Html.GetVersion());
+    //Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/adapters/jquery.js?v=" + Html.GetVersion());
+
+    @* Configuración de URL en caso de cancelar y salir del editor del perfil *@
+    if (!string.IsNullOrEmpty(Context.Request?.Headers["Referer"].ToString())) {
+        urlCancelar = Context.Request.Headers["Referer"].ToString();               
+    }
+    else if ( !string.IsNullOrEmpty(Comunidad.ShortName)){
+        urlCancelar = $"{Html.GetUrlComunidadPrincipal()}/comunidad/{Comunidad.ShortName}";
+    }
+    else {
+        urlCancelar = Html.GetUrlComunidadPrincipal();
+    }
+
+    @* Comprobar la foto de perfil del usuario y mostrar anónimo si no dispone de foto actual.*@    
+    if (string.IsNullOrEmpty(Perfil.Foto))
+    {
+        //urlFoto = Html.ObtenerFotoAnonimaDePerfil(Perfil.TypeProfile);
+        urlFoto = Html.GetBaseUrlStatic() + "/img/iconos/Personas/anonimo_grande.png";
+    }
+    else
+    {        
+        // Cogemos la foto grande para que se visualice mejor
+        urlFoto = Perfil.Foto.Replace("_peque.png","_grande.png");
+        urlFoto = @Html.GetBaseUrlContent() + urlFoto;
+    }
+}
+
+<div class="row">
+    @* Cabecera principal estilo modal para Editar perfil del usuario *@
+    <div class="col col-12 header-tipo-modal texto-blanco">
+        <div class="container">
+            <div class="modal-header">
+                <p class="modal-title">
+                    <span class="material-icons">mode_edit</span>Editar perfil
+                </p>
+                <a href="@urlCancelar" class="cerrar texto-blanco">
+                    <span class="material-icons">close</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    @* Sección de edición del perfil del usuario *@
+    <div class="col col-12 col-edicion"> 
+        <div class="wrapCol container">        
+            <div class="formulario-edicion background-blanco">
+                @* Menú de Tabs Editar perfil: Datos personales, Preséntante a la comunidad, Redes Sociales*@
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active"
+                        id="datos-personales-tab"
+                        data-toggle="tab"
+                        href="#ver-datos-personales"
+                        role="tab"
+                        aria-controls="ver-datos-personales"
+                        aria-selected="true">@Html.GetText("PERFIL", "DATOSPERSONALES")</a>
+                    </li>
+                    @if (Model.ProfileOrganization == null) {
+                        <li class="nav-item">
+                            <a class="nav-link"
+                            id="presentate-tab"
+                            data-toggle="tab"
+                            href="#ver-presentate"
+                            role="tab"
+                            aria-controls="ver-presentate"
+                            aria-selected="false">@Html.GetText("BIORAPIDA", "CURRICULUM")</a>
+                        </li>
+                    }               
+                    <li class="nav-item">
+                        <a class="nav-link"
+                        id="redes-sociales-tab"
+                        data-toggle="tab"
+                        href="#ver-redes-sociales"
+                        role="tab"
+                        aria-controls="ver-redes-sociales"
+                        aria-selected="false">@Html.GetText("PERFIL", "PERFILENWEB")</a>
+                    </li>
+                </ul>
+                @* Contenido de las Tabs*@
+                <div class="tab-content">
+                    @* Tab - Ver Datos Personales *@
+                    <div class="tab-pane fade active show" id="ver-datos-personales" role="tabpanel" aria-labelledby="ver-datos-personales-tab">
+                        @* Contenedor de imagen del usuario *@
+                        <div class="form-group mb-5">
+                            <label for="" class="control-label d-block">@Html.GetText("PERFIL", "FOTOPERFIL")</label>
+                            <div class="image-uploader js-image-uploader">
+                                <div class="image-uploader__drop-area">
+                                    <div class="image-uploader__preview" style="display: block; border:1px solid #ccc; position: relative">
+                                        @* Image Preview - Por defecto mostrar "Anónimo"*@
+                                        <img class="image-uploader__img d-block" alt="Imagen Usuario" src="@urlFoto" />
+                                        @* Botón eliminar foto de perfil *@
+                                        <div class="image-uploader-delete @( string.IsNullOrEmpty(Model.UrlFoto) ? "d-none" : null)">
+                                            <a id="@idDeleteProfileImage" class="btn btn-outline-grey w-100">
+                                                <span class="material-icons">delete</span>
+                                                <span class="texto">@Html.GetText("PERFIL", "ELIMINARFOTO")</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    @*Descripción de la acción*@
+                                    <div class="image-uploader__instructions">
+                                        <div class="image-uploader__icon">
+                                            <span class="material-icons">backup</span>
+                                        </div>
+                                        <div class="image-uploader__info">
+                                            <p>
+                                                <strong>
+                                                    @Html.GetText("COMMON", "ARRASTRA_Y_SUELTA")
+                                                </strong>
+                                            </p>
+                                            <p>@Html.GetText("COMMON", "IMAGENES_FORMATO_JPG_PNG")</p>
+                                            <p>@Html.GetText("COMMON", "PESO_MAXIMO_250KB")</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="image-uploader__error">
+                                    <p class="ko"></p>
+                                </div>
+                            </div>
+                            <input type="file" class="image-uploader__input" accept="image/*" />
+                        </div>
+
+                        <form id="formularioEdicionPerfilPersonal" action="@Model.UrlActionSaveProfile">
+                            @* Datos de Edición perfil (Personal, Organización...) *@
+                            @* Datos Perfil: Personal *@
+                            @if (Model.ProfilePersonal != null)
+                            {
+                                @Html.PartialView("_PerfilPersonal", Model)
+                            }
+                            @* Datos Perfil: Organización *@
+                            else if (Model.ProfileOrganization != null)
+                            {
+                                @Html.PartialView("_PerfilOrganizacion", Model)
+                            }
+                            @* Datos Perfil: Profesional *@
+                            else if (Model.ProfileProfesional != null)
+                            {
+                                @Html.PartialView("_PerfilProfesional", Model)
+                            }
+                            @* Datos Perfil: Profesor *@
+                            else if (Model.ProfileTeacher != null)
+                            {
+                                @Html.PartialView("_PerfilProfesor", Model)
+                            }
+                        </form>
+                    </div>
+
+                    @* Tab - Presentate a la comunidad *@
+                    @if (Model.ProfileOrganization == null) { 
+                    <div class="tab-pane fade" id="ver-presentate" role="tabpanel" aria-labelledby="ver-presentate-tab">                                      
+                        @* Información adicional CV: Organización *@
+                        @Html.PartialView("_CVRapido", Model)
+                    </div>
+                    }
+                    @* Tab - Redes sociales, Links del usuario *@
+                    <div class="tab-pane fade" id="ver-redes-sociales" role="tabpanel" aria-labelledby="ver-redes-sociales-tab">
+                        @* Perfil en la Web: Redes Sociales *@
+                        @Html.PartialView("_RedesSociales", Model)
+                    </div>
+                </div>
+
+                @* Mensajes OK/Error en el guardado *@
+                <div id="@idDivPanelInfo" style="display: none" class="alert alert-danger alert-success mb-5" role="alert"></div>
+
+                @* Botones para acción de guardado/cancelar *@
+                <a id="@idSaveButton" class="btn btn-primary uppercase">@Html.GetText("PERFIL", "GUARDAR")</a>
+                <a class="btn btn-link uppercase" href="@urlCancelar">@Html.GetText("COMMON", "CANCELAR")</a>            
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    // Parámetros para operativaEditarPerfilUsuario
+    (function ($) {
+        const pParamsEditarPerfil = {
+            perfilPersonal: {
+                idDeleteProfileImage: "@idDeleteProfileImage",
+                idName: "@idName",
+                idLastName: "@idLastName",
+                idEmail: "@idEmail",
+                idEmailProfesional: "@idEmailProfesional",
+                idBornDate: "@idBornDate",
+                idCountry: "@idCountry",
+                idRegion: "@idRegion",
+                idLocation: "@idLocation",
+                idPostalCode: "@idPostalCode",
+                idLang: "@idLang",
+                idSex: "@idSex",
+                idEmailTutor: "@idEmailTutor",
+                idIsSearched: "@idIsSearched",
+                idIsExternalSearched: "@idIsExternalSearched",
+                idNameOrganization: "@idNameOrganization",
+                idCountryOrganization: "@idCountryOrganization",
+                idPostalCodeOrganization: "@idPostalCodeOrganization",
+                idLocationOrganization: "@idLocationOrganization",
+                idAliasOrganization: "@idAliasOrganization",
+                idWebsiteOrganization: "@idWebsiteOrganization",
+                idAddressOrganization: "@idAddressOrganization",
+            },
+            curriculum: {
+                idDescription: "@idDescription",
+                idTags: "@idTags",
+            },
+            redesSociales: {
+                idUrlUsuario: "@idUrlUsuario",
+                idTblRedesSociales: "@idTblRedesSociales",
+                idBtnRedSocial: "@idBtnRedSocial",
+                idBtnBorrarUrl: "@idBtnBorrarUrl",
+                idTwitterSocial: "@idTwitterSocial",
+                idFacebookSocial: "@idFacebookSocial",
+                idLinkedinSocial: "@idLinkedinSocial",
+            },
+            others: {
+                idDivPanelInfo: "@idDivPanelInfo",
+                idSaveButton: "@idSaveButton",
+                urlPersonalProfileSaveProfile: "@urlPersonalProfileSaveProfile",
+                urlPersonalProfileSaveBio: "@urlPersonalProfileSaveBio",
+                urlPersonalProfileSaveSocialWebs: "@urlPersonalProfileSaveSocialWebs",
+                urlImagenAnonima: `@Html.GetBaseUrlStatic()/img/iconos/Personas/anonimo_grande.png`
+
+            }
+    };
+        // Gestión de operativa para funcionamiento de EditarPerfilUsuario
+        operativaEditarPerfilUsuario.init(pParamsEditarPerfil);
+    })();
+</script>

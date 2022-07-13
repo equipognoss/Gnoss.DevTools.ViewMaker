@@ -1,0 +1,67 @@
+﻿@model AdminCatEspacioPersonalModel
+@*
+Descripción
+-----------------------------------------------
+Vista parcial de "Ordenar categoría" que se carga dentro del modal de "Editar categorias" del perfil del usuario
+
+Variables
+----------------------------------------------------------------
+*@
+
+
+@*
+----------------------------------------------------------------
+-------------------- Vista parcial dentro del modal del Espacio Personal --------------------
+*@
+
+<div id="seccion-ordenar" class="seccion">
+    <div class="titulo-seccion mb-4">
+        <span class="material-icons-outlined">sort</span>
+        <span class="pl-2">@Html.GetText("COMADMINCATEGORIAS", "ORDENAR")</span>
+    </div>
+    <div class="form">
+        <div class="form-group mb-5">
+            <label class="control-label d-block">
+                @if (Model.CategoryNamesToOrder != null && Model.CategoryNamesToOrder.Count > 0)
+                {
+                    @Html.GetText("COMADMINCATEGORIAS", "ORDENARCATTEXT")
+                }
+                else
+                {
+                    @Html.GetText("COMADMINCATEGORIAS", "ORDENARCATSTEXT")
+                }
+
+                <strong>
+                    @{
+                        string sep = "";
+
+                        foreach (string nombreCatOrdenar in Model.CategoryNamesToOrder)
+                        {
+                            @Html.Raw(sep + nombreCatOrdenar);
+                            sep = ", ";
+                        }
+                    }
+                </strong>
+
+                @if (Model.CategoryNamesToOrder.Count == 1)
+                {
+                    @Html.GetText("COMADMINCATEGORIAS", "AORDENAR")
+                }
+                else
+                {
+                    @Html.GetText("COMADMINCATEGORIAS", "AORDENARLAS")
+                }
+            </label>
+            <select id="cmbCategoriasOrdenar" style="width: 100%" class="js-select2" data-placeholder="Seleccionar categoría" data-select-search="true">
+                @foreach (Guid categoriaID in Model.ParentCategoriesForOrderCategories.Keys)
+                {                    
+                    <option value="@categoriaID.ToString()">@Model.ParentCategoriesForOrderCategories[categoriaID]</option>
+                }                
+            </select>          
+        </div>
+    </div>
+    <div class="acciones">
+        <a id="guardar-ordenar" class="btn btn-primary text-uppercase guardar">@Html.GetText("COMADMINCATEGORIAS", "ORDENAR")</a>
+        <a class="btn btn-link text-uppercase volver pl-3">@Html.GetText("COMMON", "CANCELAR")</a>
+    </div>
+</div>

@@ -1,0 +1,27 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista que contiene la Home cuando el usuario no está conectado en la Home de la metaComunidad. Simplemente se visualizará la opción del formulario para que haga "Login"
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Vista de la Home cuando el usuario no está conectado (Home sin estar en ninguna comunidad) --------------------
+*@
+
+<div class="row">
+    <div id="col01" class="col">
+        <div class="form formtheme01 formularioRegistroUsuarios panel-centrado">                                   
+            <h1>Inicia sesión en <strong>myGNOSS</strong></h1>                        
+            <div>                
+                @Html.PartialView("../Registro/_FormularioLogin")
+            </div>
+        </div>
+    </div>
+</div>

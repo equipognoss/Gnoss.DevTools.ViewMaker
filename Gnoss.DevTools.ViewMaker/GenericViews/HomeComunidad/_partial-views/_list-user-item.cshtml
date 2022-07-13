@@ -1,0 +1,58 @@
+﻿@model ProfileModel
+@*
+Descripción
+-----------------------------------------------
+Vista que se utiliza para mostrar información de un usuario con su nombre y fotografía. Este tipo de vista se utiliza para mostrar un usuario en los Widgets laterales de la home de una comunidad.
+Es usado o llamado desde la vista Index de la carpeta "HomeComunidad".
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+ProfileModel usuario = Model;
+// Url de foto para cada usuario (Recién registrados, Admin...) para cargar su foto correctamente
+string urlFoto = Model.UrlFoto;
+// Controlar si dispone o no de fotografía el usuario
+bool containsUrlFoto = true;
+
+}
+
+
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Vista del usuario con su foto y nombre que se mostrará en un Widget lateral (Últimos usuarios registrados...) --------------------
+*@
+
+@* Cargar fotografía del usuario / o Asignarle una de tipo Personal - Anónima *@
+@if (string.IsNullOrEmpty(urlFoto)){    
+    urlFoto = Html.ObtenerFotoAnonimaDePerfil(ProfileType.Personal);
+    containsUrlFoto = false;
+}
+
+
+@* Contenedor con la información del usuario *@
+<article class="resource resource-grupo">
+    <div class="user-miniatura">
+        <div class="imagen-usuario-wrap">
+            <a href="@usuario.UrlPerson">
+                <div class="imagen @( (containsUrlFoto == false) ? "sinImagen" : null) ">
+                    @if (containsUrlFoto == false)
+                    {
+                        <span class="material-icons">person</span>
+                    }
+                    else { 
+                        <span style="background-image: url(@Html.GetBaseUrlContent()@urlFoto);"></span>
+                    }                
+                </div>
+            </a>
+        </div>
+        <div class="nombre-usuario-wrap">
+            <a href="@usuario.UrlPerson">
+                <p class="nombre">@usuario.NamePerson</p>
+                @* Quitar el subtitulo de información del usuario *@
+                @*<p class="nombre-completo">@usuario.NamePerson</p>*@
+            </a>
+        </div>
+    </div>
+</article>

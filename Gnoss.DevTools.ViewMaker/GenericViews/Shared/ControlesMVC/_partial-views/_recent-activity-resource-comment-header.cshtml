@@ -1,0 +1,89 @@
+﻿@model List<ResourceEventModel>
+@*
+Descripción
+-----------------------------------------------
+Vista utilizada para usarse como Header o título informativo que indica las personas que han realizado comentarios en el recurso.
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+@* Lista de los autores de los comentarios *@
+List<string> authorComments = new List<string> { };
+string haComentado = Html.GetText("COMMON", "X_HA_COMENTADO_EN");
+string hanComentado = Html.GetText("COMMON", "X_HAN_COMENTADO_EN");
+
+
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Vista de header informativo de autores del comentarios de un recurso --------------------
+*@
+
+@* Puede haber múltiples autores de un recurso, mostrar los nombres así: "Juan, David han comentado en " *@
+@foreach (ResourceEventCommentModel eventoComentario in Model.Where(evento => evento.Type == ResourceEventModel.EventType.Commented))
+{
+    @* Obtención de cada comentario *@
+CommentModel comment = eventoComentario.Comment;
+string namePerson = Html.TruncateString(Html.ObtenerNombrePerfil(comment.PublisherCard), 22);
+
+var matchingvalues = authorComments
+                    .Where(stringToCheck => stringToCheck.Contains(namePerson));
+
+var authorFound = authorComments
+            .FirstOrDefault(stringToCheck => stringToCheck.Contains(namePerson));
+
+    @*Si no hay usuario, añadirlo*@
+    if (authorFound == null)
+    {
+        authorComments.Add(namePerson);
+    }
+}
+
+
+@* Contenedor/Información de que se ha comentado el recurso*@
+<div class="top-wrap actividad-wrap">
+
+    @* Contenedor de Información de Evento -> El recurso ha gustado *@
+    @if (Model.Find(evento => evento.Type == ResourceEventModel.EventType.Voted) != null)
+    {                            
+        @* Información de a quién le ha comentado el recurso *@
+        <div class="actividad recomienda">
+            <span class="icon"></span>
+            <span class="usuario">
+                @Html.GetText("CONTROLESLIVE", "A1PERSONA")
+            </span>
+            <span class="texto">@Html.GetText("CONTROLESLIVE", "LEHAGUSTADO")</span>
+        </div>
+    }
+
+   
+    @* Contenedor de Información de Evento -> ¿Recurso certificado? *@
+    @if (Model.Find(evento => evento.Type == ResourceEventModel.EventType.Certified) != null)
+    {
+        ResourceEventCertifyModel eventoCertificacion = (ResourceEventCertifyModel)Model.Find(evento => evento.Type == ResourceEventModel.EventType.Certified);        
+        <div class="actividad certifica">
+            <span class="icon"></span>
+            <span class="usuario">
+                @Html.GetText("CONTROLESLIVE", "RECCERTIFICADO",@eventoCertificacion.Description)
+            </span>
+            <span class="texto"> </span>
+        </div>      
+    }
+    
+    @if (Model.Find(evento => evento.Type == ResourceEventModel.EventType.Commented) != null) { 
+        @* Información de quién ha comentado el recurso *@
+        <div class="actividad comenta">
+            <span class="icon"></span>
+            <span class="usuario">
+                <span>
+                    @String.Join(", ", authorComments)
+                </span>
+            </span>
+            <span class="texto"> @( (authorComments.Count > 1 ) ? hanComentado : haComentado) </span>
+        </div>
+    }
+
+</div>

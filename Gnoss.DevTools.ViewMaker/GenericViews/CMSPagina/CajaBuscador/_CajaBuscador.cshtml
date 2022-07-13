@@ -1,0 +1,26 @@
+﻿@using Es.Riam.Gnoss.Web.MVC.Models;
+@model CMSComponentSearchBox
+@if (Model != null)
+{   
+    <div class="cp0103">
+        @if (!string.IsNullOrEmpty(Model.Title))
+        {
+            <div class="titulo">
+                <h4>
+                    @Model.Title                    
+                </h4>
+            </div>
+        }        
+        <div class="contenido">
+            <div class="buscador-theme-01">
+                <fieldset style="display: block;">
+                    <legend class="nota">buscador</legend>
+                    <div class="fieldsetGroup searchGroup">
+                        <input type="text" id="criterio" class="text defaultText autocompletar" origen="@Model.AutocompleteID" placeholder="@Model.DefaultText"/>
+                        <input type="button" id="btEncontrar" class="encontrar" />
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+}

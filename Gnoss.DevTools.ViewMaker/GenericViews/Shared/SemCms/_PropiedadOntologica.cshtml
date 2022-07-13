@@ -1,0 +1,216 @@
+﻿@model SemanticPropertyModel
+
+@{
+    Es.Riam.Semantica.OWL.Propiedad propiedad = Model.Element.Propiedad;
+}
+
+@if (Model.ReadMode && Model.EntityParent.SpecificationEntity.EsMapaGoogle && Model.EntityParent.SpecificationEntity.NoSustituirEntidadEnMapaGoogle && (Model.EntityParent.SpecificationEntity.PropiedadesDatosMapa.Key == propiedad.Nombre || Model.EntityParent.SpecificationEntity.PropiedadesDatosMapa.Value == propiedad.Nombre || Model.EntityParent.SpecificationEntity.PropiedadesDatosMapaRuta.Key == propiedad.Nombre))
+{
+    string idMap = "mapGoogle_" + Model.EntityParent.Entity.TipoEntidadGeneracionClases;
+    
+    <div id="@idMap" class="mapGoogle"></div>
+}
+else if (propiedad.Tipo == Es.Riam.Semantica.OWL.TipoPropiedad.DatatypeProperty)
+{
+    bool unicoValor = (propiedad.FunctionalProperty || propiedad.CardinalidadMenorOIgualUno || propiedad.EspecifPropiedad.ValoresSepComas || Model.Element.SoloPrimerValor);
+    string claseProOntoData = "";
+
+    if (propiedad.EspecifPropiedad.ClaseCssPanel != null)
+    {
+        claseProOntoData = propiedad.EspecifPropiedad.ClaseCssPanel;
+    }
+    else
+    {
+        claseProOntoData = "mb-5 cont_" + propiedad.NombreGeneracionClases;
+
+        if (unicoValor)
+        {
+            claseProOntoData = "form-group " + claseProOntoData;
+        }
+    }
+
+    if (!Model.ReadMode)
+    {
+        if (Model.EntityParent.Entity.Ontologia.ConfiguracionPlantilla.HtmlNuevo > 0 || !unicoValor)
+        {
+            <div class="@claseProOntoData">
+                @Html.PartialView("SemCms/_PropiedadOntoData", Model)
+            </div>
+        }
+        else
+        {
+            <p class="@claseProOntoData">
+                @Html.PartialView("SemCms/_PropiedadOntoData", Model)
+            </p>
+        }
+    }
+    else if (Model.Element.ElementoPadre != null && Model.Element.ElementoPadre.EsGrupo && Model.Element.ElementoPadre.TipoGrupo != null && Model.Element.ElementoPadre.TipoGrupo.ToLower() == "ul")
+    {
+        <li>
+            <div>
+                @Html.PartialView("SemCms/_PropiedadOntoData", Model)
+            </div>
+        </li>
+    }
+    else if (unicoValor || (Model.Element.ElementoPadre != null && Model.Element.ElementoPadre.EsGrupo && Model.Element.ElementoPadre.TipoGrupo != null && (Model.Element.ElementoPadre.TipoGrupo.ToLower() == "li" || Model.Element.ElementoPadre.TipoGrupo.ToLower() == "titulo" || Model.Element.ElementoPadre.TipoGrupo.ToLower() == "subtitulo" || Model.Element.ElementoPadre.TipoGrupo.ToLower().StartsWith("h"))))
+    {
+        @Html.PartialView("SemCms/_PropiedadOntoData", Model)
+    }
+    else
+    {
+        if (Model.EntityParent.Entity.Ontologia.ConfiguracionPlantilla.HtmlNuevo > 0)
+        {
+            <div class="@claseProOntoData">
+                @Html.PartialView("SemCms/_PropiedadOntoData", Model)
+            </div>
+        }
+        else
+        {
+            <p class="@claseProOntoData">
+                @Html.PartialView("SemCms/_PropiedadOntoData", Model)
+            </p>
+        }
+    }
+}
+else
+{
+    string aboutRDFa = "";
+    string relRDFa = "";
+    string microDatos = "";
+    string microFormatos = "";
+    string extraClassMicroFormatos = "";
+
+    if (Model.EntityParent.SemanticResourceModel.ReadMode)
+    {
+        aboutRDFa = "about=\"" + Model.OntologyPropInfo.AboutRDFA + "\"";
+        relRDFa = "rel=\"" + Model.OntologyPropInfo.PropertyRDFA + "\"";
+
+        if (Model.Element.Propiedad.EspecifPropiedad.Microdatos != null)
+        {
+            microDatos = "itemprop=\"" + Model.Element.Propiedad.EspecifPropiedad.Microdatos + "\"";
+        }
+
+        foreach (string microKey in Model.Element.Propiedad.EspecifPropiedad.Microformatos.Keys)
+        {
+            if (microKey != "class")
+            {
+                microFormatos += microKey + "=\"" + Model.Element.Propiedad.EspecifPropiedad.Microformatos[microKey] + "\" ";
+            }
+            else
+            {
+                extraClassMicroFormatos += " " + Model.Element.Propiedad.EspecifPropiedad.Microformatos[microKey];
+            }
+        }
+    }
+
+    if (propiedad.EspecifPropiedad.SelectorEntidad == null || (!Model.ReadMode && propiedad.EspecifPropiedad.SelectorEntidad.TipoSeleccion == "Edicion"))
+    {
+        <div class="group">
+            @if (Model.OntologyPropInfo.UniqueValue || Model.ReadMode)
+            {
+                string entityNameAux = Model.OntologyPropInfo.PropertyValues[0].RelatedEntity.EntityNameForTitle;
+            
+                if (!Model.OntologyPropInfo.UniqueValue)
+                {
+                    Model.OntologyPropInfo.PropertyValues[0].RelatedEntity.EntityNameForTitle = Model.Element.Propiedad.EspecifPropiedad.NombreLectura;
+                }
+            
+                @Html.PartialView("SemCms/_TituloEntidad", Model.OntologyPropInfo.PropertyValues[0].RelatedEntity)
+
+                Model.OntologyPropInfo.PropertyValues[0].RelatedEntity.EntityNameForTitle = entityNameAux;
+            }
+            else
+            {
+                @Html.PartialView("SemCms/_TituloPropiedad", Model)
+            }
+            <div class="contentgroup">
+                @if (Model.OntologyPropInfo.UniqueValue)
+                {
+                    <div @Html.Raw(relRDFa) @Html.Raw(aboutRDFa) @Html.Raw(microDatos) @Html.Raw(microFormatos)>
+                        @Html.PartialView("SemCms/_Entidad", Model.OntologyPropInfo.PropertyValues[0].RelatedEntity)
+                    </div>
+                }
+                else
+                {
+                    string classGrupoEntidades = null;
+
+                    if (propiedad.EspecifPropiedad.ClaseCssPanel != null)
+                    {
+                        classGrupoEntidades = propiedad.EspecifPropiedad.ClaseCssPanel;
+                    }
+                    else
+                    {
+                        classGrupoEntidades = "cont cont_" + propiedad.NombreGeneracionClases;
+                    }
+
+                    classGrupoEntidades += extraClassMicroFormatos;
+                
+                    <div class="@classGrupoEntidades" @Html.Raw(relRDFa) @Html.Raw(aboutRDFa) @Html.Raw(microDatos) @Html.Raw(microFormatos)>
+                        @Html.PartialView("SemCms/_PropiedadOntoObject", Model)
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        string classGrupoEntidades = null;
+
+        if (propiedad.EspecifPropiedad.ClaseCssPanel != null)
+        {
+            classGrupoEntidades = propiedad.EspecifPropiedad.ClaseCssPanel;
+        }
+        else
+        {
+            classGrupoEntidades = "cont cont_" + propiedad.NombreGeneracionClases;
+        }
+
+        classGrupoEntidades += extraClassMicroFormatos;
+    
+        if (!Model.ReadMode)
+        {
+            <div class="form-group mb-5 campomultievaluado">
+                <div class="@classGrupoEntidades">
+                    @Html.PartialView("SemCms/_PropiedadOntoSelectorEntidad", Model)
+                </div>
+            </div>
+        }
+        else
+        {
+            if (propiedad.EspecifPropiedad.SelectorEntidad.TipoPresentacion != null && propiedad.EspecifPropiedad.SelectorEntidad.TipoPresentacion == "Sustituir")
+            {
+                @Html.PartialView("SemCms/_PropiedadOntoSelectorEntidad", Model)
+            }
+            else if (Model.Element.TipoPresentacion != null && Model.Element.TipoPresentacion == "GrupoContenido")
+            {
+                string entityNameAux = Model.OntologyPropInfo.PropertyValues[0].RelatedEntity.EntityNameForTitle;
+                Model.OntologyPropInfo.PropertyValues[0].RelatedEntity.EntityNameForTitle = Model.Element.Propiedad.EspecifPropiedad.NombreLectura;
+            
+                <div class="group">
+                    @Html.PartialView("SemCms/_TituloEntidad", Model.OntologyPropInfo.PropertyValues[0].RelatedEntity)
+                    <div class="contentgroup">
+                        <div class="@classGrupoEntidades" @Html.Raw(relRDFa) @Html.Raw(aboutRDFa) @Html.Raw(microDatos) @Html.Raw(microFormatos)>
+                            @Html.PartialView("SemCms/_PropiedadOntoSelectorEntidad", Model)
+                        </div>
+                    </div>
+                </div>
+    
+                Model.OntologyPropInfo.PropertyValues[0].RelatedEntity.EntityNameForTitle = entityNameAux;
+            }
+            else if (Model.EntityParent.Entity.Ontologia.ConfiguracionPlantilla.HtmlNuevo > 1)
+            {
+                <div class="@classGrupoEntidades" @Html.Raw(relRDFa) @Html.Raw(aboutRDFa) @Html.Raw(microDatos) @Html.Raw(microFormatos)>
+                    @Html.PartialView("SemCms/_TituloPropiedad", Model)
+                    @Html.PartialView("SemCms/_PropiedadOntoSelectorEntidad", Model)
+                </div>
+            }
+            else
+            {
+                @Html.PartialView("SemCms/_TituloPropiedad", Model)
+                <div class="@classGrupoEntidades" @Html.Raw(relRDFa) @Html.Raw(aboutRDFa) @Html.Raw(microDatos) @Html.Raw(microFormatos)>
+                    @Html.PartialView("SemCms/_PropiedadOntoSelectorEntidad", Model)
+                </div>
+            }
+        }
+    }
+}

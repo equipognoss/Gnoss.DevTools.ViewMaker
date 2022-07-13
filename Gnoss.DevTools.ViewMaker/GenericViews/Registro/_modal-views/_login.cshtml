@@ -1,0 +1,164 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista modal que contiene el login de un usuario que se hará visible cuando un usuario desee realizar una acción y no tenga permisos. 
+Esta vista se hará visible ya que el método jquery 'operativaLoginEmergente' disparará la visualización de esta vista modal.
+Esta vista modal estará presente siempre y cuando el usuario sea de tipo "IsGuestUser" Aunque está guardada en "Views Registro" lo ideal es que se muestre en el Layout principal, por lo que se carga en "_Cabecera".
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+// Página actual para poder saber si estamos la página "Login"
+string currentPage = Html.GetUrlPagina();
+// Cargar el loginModal -> Por defecto SÍ (No se mostrará si el usuario está registrado o está en la página login)
+bool showModalLogin = true;
+}
+@*
+----------------------------------------------------------------
+-------------------- Vista modal del Formulario de Registro que aparecerá cuando se dispare el jquery 'operativaLoginEmergente' --------------------
+*@
+
+@* Comprobación de si es necesario cargar el Login Modal ( Si el usuario es invitado pero no está en la página de Login) *@
+@{
+    string[] currentPageSectionString = currentPage.Split('/');
+    foreach (string currentPageString in currentPageSectionString)
+    {
+        if (currentPageString.Equals(Html.GetText("URLSEM", "LOGIN")) || currentPageString.Equals(Html.GetText("URLSEM", "HOME")) || currentPageString.Equals(Html.GetText("URLSEM", "HAZTEMIEMBRO")))
+        {
+            showModalLogin = false;
+            break;
+        }
+    }
+} 
+
+@* Controlar y mostrar el modal login *@
+@if (IdentidadActual.IsGuestUser)
+{
+    // Cargar vista modal Login emergente si el usuario es invitado pero no está en la página de Login ni de registro
+    if (showModalLogin)
+    {
+        @* Contenedor de vista modal para el formulario Login emergente *@
+        <div id="modal-login"
+             class="modal fade"
+             tabindex="-1"
+             role="dialog">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                @* HAY QUE CARGAR EL MODAL-CONTENT de los demás modales en el #modal-dinamic-content *@
+                <div class="modal-content">                            
+                    @* Cargar aquí el contenido de los paneles modales *@
+                    <div id="content">
+                        @* Header del Modal *@
+                        <div class="modal-header">
+                            <p class="modal-title">                        
+                                Inicia sesión o regístrate
+                            </p>
+                            <span class="material-icons cerrar" data-dismiss="modal" aria-label="Close">close</span>
+                        </div>
+                        @* Contenido del formulario de Login *@
+                        <div class="modal-body">
+                            <form method="post"
+                                  id="formPaginaLogin"
+                                  action="@Html.GetUrlActionLogin()">
+                                <div class="fieldset fieldset01">
+                                    <fieldset>
+                                        <div class="fieldsetContent">
+                                            <div class="form-group">
+                                                <label for="usuario_Login" class="control-label">@Html.GetText("LOGIN", "NOMBREUSUARIOOCORREO")</label>
+                                                <input placeholder="Introduce tu correo electrónico"
+                                                       type="text"
+                                                       name="usuario"
+                                                       id="usuario_Login"
+                                                       class="form-control" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="password_login" class="control-label">@Html.GetText("LOGIN", "CONTRASEÑA")</label>
+                                                <input placeholder="Introduce tu contraseña"
+                                                       type="password"
+                                                       name="password"
+                                                       id="password_login"
+                                                       class="form-control" />
+                                            </div>
+                                            @{                                        
+                                                if (IdentidadActual.IsGuestUser && !string.IsNullOrEmpty(@Html.GetTokenLoginUsuario()) && IdentidadActual.NumberOfLoginAttemptsIP >= 2)
+                                                {
+                                                    string srcCaptcha = @Html.GetUrlServicioLogin() + "/LoginCaptcha.aspx?token=" + System.Net.WebUtility.UrlEncode(@Html.GetTokenLoginUsuario());
+                                                    <p id="panCaptcha">
+                                                        <label>
+                                                            @Html.GetText("LOGIN", "TEXTOCAPTCHA")
+                                                            <img id="imgCaptcha" src="@srcCaptcha" />
+                                                        </label>
+                                                        <input name="captcha" type="captcha" id="captcha" class="text medium" onkeydown="if(event.which || event.keyCode){if ((event.which == 13) || (event.keyCode == 13)) {Entrar(); return false;}}" />
+                                                    </p>
+                                                }
+                                            }
+                                            <div id="loginError" class="error-wrap">
+                                                <div class="ko">
+                                                    <p id="mensajeError">@Html.GetText("LOGIN", "CLAVEERRONEA")</p>
+                                                </div>
+                                            </div>
+                                            <div id="loginErrorAutenticacionExterna" class="error-wrap">
+                                                <div class="ko">
+                                                    <p>@Html.GetText("LOGIN", "AUTENTICACIONEXTERNA")</p>
+                                                </div>
+                                            </div>
+                                            <div id="logintwice" class="error-wrap">
+                                                <div class="ko">
+                                                    <p id="mensajeErrorLoginTwice">@Html.GetText("LOGIN", "LOGINTWICE", @Html.GetSessionTimeout())</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                                @* Contenedor de botón "Iniciar Sesión" / No puedes iniciar sesión *@
+                                <div class="fieldset actionButtons fieldset03 actionButtons">
+                                    <fieldset>
+                                        <div class="fieldsetContent d-flex flex-column align-items-end">
+                                            <p>
+                                                @{
+                                                    string funcion = "if(validarCampos()){MostrarUpdateProgress();}else{ $('#loginError .ko').show();return false;}";
+
+                                                    CommunityModel Comunidad = Html.GetComunidad();
+                                                }
+                                            </p>
+                                            @* Link para recuperar contraseña olvidada *@
+                                            <a class="olvidaste-password mb-2" href="@Comunidad.Url/@Html.GetText("URLSEM", "OLVIDEPASSWORD")">@Html.GetText("INICIO", "OLVIDOPASSWORD")</a>
+
+                                            <input class="principal submit btn btn-primary"
+                                                   id="btnSubmit"                                                                                    
+                                                   title="@Html.GetText("COMMON", "INICIARSESION")"
+                                                   value="@Html.GetText("COMMON", "INICIARSESION")" />
+                                        </div>
+
+                                        @* Opción de Crease una cuenta si lo permite la comunidad*@
+                                        @if (!Comunidad.MetaProyect && ((Comunidad.ProyectType != CommunityModel.TypeProyect.CatalogoNoSocial) || (Comunidad.AccessType == CommunityModel.TypeAccessProject.Public)))
+                                        {
+                                            <p class="actionRegister">
+                                                @* Permitir registrase o solicitar registro dependiendo del tipo de Comunidad *@
+                                                @if (Comunidad.ProyectType != CommunityModel.TypeProyect.CatalogoNoSocial)
+                                                {
+
+                                                    if (Comunidad.AccessType == CommunityModel.TypeAccessProject.Restricted && (!Comunidad.MetaProyect))
+                                                    {
+                                                        <span>Si todavía no tienes cuenta</span>
+                                                        <a class="olvidaste-password" href="@Comunidad.Url/@Html.GetText("URLSEM", "SOLICITARACCESO")">@Html.GetText("COMINICIOLOGIN", "SOLICITARACCESO")</a>
+                                                    }
+                                                    else if (Comunidad.AccessType == CommunityModel.TypeAccessProject.Public && (!Comunidad.MetaProyect))
+                                                    {
+                                                        <span>Si todavía no tienes cuenta</span>
+                                                        <a class="olvidaste-password" href="@Comunidad.Url/@Html.GetText("URLSEM", "HAZTEMIEMBRO")">@Html.GetText("COMINICIOLOGIN", "HACERSEMIEMBRO")</a>
+                                                    }
+                                                }
+                                            </p>
+                                        }
+                                    </fieldset>
+                                </div>
+                            </form>
+                        </div>           
+                    </div>            
+                </div>
+            </div>
+        </div>
+    }
+}

@@ -1,0 +1,147 @@
+﻿@model RegisterDataViewModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista índice o principal donde se cargarán los diferentes formularios o vistas para el proceso de registro correspondiente al paso 2, 3 y 4 (si hiciera falta).
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+// Clase no-clonarMenuUsuario para no mostrar el panel del usuario izquierdo durante el proceso de registro.
+Html.SetBodyClass("layout04 full operativaRegistro registroPaso0 " + Model.TabActive + " comGnoss" + " registro " + "no-clonarMenuUsuario");
+CommunityModel Comunidad = Html.GetComunidad();
+
+UserProfileModel Perfil = Html.GetPerfil();
+
+}
+@*
+    ----------------------------------------------------------------
+    -------------------- Vista indice del proceso de registro para los pasos 2, 3 y 4 --------------------
+*@
+
+<div class="row">    
+    <div id="col01" class="col">
+        <div class="form formularioRegistroUsuarios panel-centrado">
+            <h1>Hola <strong>@Perfil.Name</strong>, gracias por unirte a <strong>@Comunidad.Name</strong></h1>
+            <div class="box box01">
+                @* Paso actual de registro en el que se encuentra el usuario *@
+                <div class="step-progress-wrap mb-5">
+                    <ul class="step-progress">
+                        @* Comprobar el paso en el que se encuentra el usuario*@                                                
+                        @* Paso0-1: Registro inicial: Paso realizado (registro inicial realizado)  *@
+                        <li class="step-progress__circle done active">
+                            <span class="step-progress__text">Datos básicos</span>
+                        </li>
+
+                        @* Paso2: Crear tu perfil - Datos (Nombre, datos, foto) *@
+                        @if (Model.TabData)
+                        {
+                            <li class="step-progress__bar @(Model.TabActive == 2 || Model.TabActive == 1 || Model.TabActive == 3 ?"active":"")"></li>
+                            <li class="step-progress__circle @(Model.TabActive == 1 || Model.TabActive == 2 || Model.TabActive == 3 ?"active":"") @(Model.TabActive == 1 || Model.TabActive == 2 || Model.TabActive == 3 ?"done":"") ">
+                                <span class="step-progress__text @(Model.TabActive == 2?"current":"")">@Html.GetText("REGISTRO", "CREAPERFIL")</span>
+                            </li>
+                        }
+
+                        @* Paso3 : Preferencias  *@
+                        @if (Model.TabPreferences)
+                        {
+                            <li class="step-progress__bar @(Model.TabActive == 1 || Model.TabActive == 3 ?"active":"")"></li>
+                            <li class="step-progress__circle @(Model.TabActive == 1 || Model.TabActive == 3?"active":"") @(Model.TabActive == 1 || Model.TabActive == 3 ?"done":"")">
+                                <span class="step-progress__text @(Model.TabActive == 1?"current":"")">@Html.GetText("REGISTRO", "PREFERENCIAS")</span>
+                            </li>
+                        }
+
+                        @* Paso4 : Conectar con usuarios  *@
+                        @if (Model.TabConect)
+                        {
+                            <li class="step-progress__bar @(Model.TabActive == 3?"active":"")"></li>
+                            <li class="step-progress__circle @(Model.TabActive == 3?"active":"")">
+                                <span class="step-progress__text @(Model.TabActive == 3?"current":"")">@Html.GetText("REGISTRO", "CONECTATE")</span>
+                            </li>
+                        }                        
+                    </ul>
+                </div>
+
+                @* Formularios o vistas a mostrar dependiendo del estado actual del TAB *@
+                @* Panel de Preferencias*@
+                @if (Model.TabPreferences && Model.TabActive == 1)
+                {
+                    @Html.PartialView("_Preferencias")
+                }
+                @* Panel de Preferencias*@
+                @if (Model.TabData && Model.TabActive == 2)
+                {
+                    @Html.PartialView("_Datos")
+                }
+                @* Panel de Conectate con gente a quien poder seguir*@
+                @if (Model.TabConect && Model.TabActive == 3)
+                {
+                    @Html.PartialView("_Conectate")
+                }
+
+                @* Inicio del formulario de registro paso 2
+                    <div class="form-group mb-3">
+                        <label class="control-label d-block">Nombre</label>
+                        <input placeholder="Introduce tu nombre" type="text" value="Ramón" name="" id="" class="form-control not-outline">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="control-label d-block">Apellidos</label>
+                        <input placeholder="Introduce tus apellidos" type="text" value="Martínez García" name="" id="" class="form-control not-outline">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="control-label d-block">Localidad</label>
+                        <input placeholder="Introduce tu localidad" type="text" name="" id="" class="form-control not-outline">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="control-label d-block">Pais</label>
+                        <select id="ddlPais" name="ddlPais" class="js-select2" data-select-search="true">
+                            <option value="00000000-0000-0000-0000-000000000000">Sin especificar</option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-5">
+                        <label class="control-label d-block">Foto de perfil</label>
+                        <div class="image-uploader js-image-uploader">
+                            <div class="image-uploader__preview">
+                                <img class="image-uploader__img" alt="Imagen Usuario" src="">
+                            </div>
+                            <div class="image-uploader__drop-area">
+                                <div class="image-uploader__icon">
+                                    <span class="material-icons">backup</span>
+                                </div>
+                                <div class="image-uploader__info">
+                                    <p><strong>Arrastra y suelta en la zona punteada una foto para tu perfil</strong></p>
+                                    <p>Imágenes en formato .PNG o .JPG</p>
+                                    <p>Peso máximo de las imágenes 250 kb</p>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="file" class="image-uploader__input" accept="image/*" />
+                    </div>
+                    <div class="form-group mb-5">
+                        <label class="control-label d-block">NextWeb pertenece al ecosistema myGNOSS. ¿Dónde quieres mostrar tu perfil?</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="nombre-falso-cambiar" id="id-falso-1-cambiar" value="option1" checked>
+                            <label class="form-check-label" for="id-falso-1-cambiar">Sólo en la comunidad <strong>NextWeb</strong></label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="nombre-falso-cambiar" id="id-falso-2-cambiar" value="option2">
+                            <label class="form-check-label" for="id-falso-2-cambiar">En todas las comunidades del Ecosistema myGNOSS</label>
+                        </div>
+                    </div>
+                    <div class="actionButtons">
+                        <div class="mb-3">
+                            <input type="submit" value="GUARDAR Y SIGUIENTE" class="btn btn-primary principal submit uppercase" onclick="if (ComprobarDatos()) { return false; }">
+                        </div>
+                        <div>
+                            <span>¿Ya eres usuario de GNOSS?</span>
+                            <a class="link" href="" onclick="CargarFormLoginRegistro('http://pruebas.gnoss.net/comunidad/gnoss-developers-community/hazte-miembro')">Iniciar seción</a>
+                        </div>
+                    </div>*@
+                @* FIN  del formulario de registro paso 2*@
+            </div>
+        </div>
+    </div>
+</div>

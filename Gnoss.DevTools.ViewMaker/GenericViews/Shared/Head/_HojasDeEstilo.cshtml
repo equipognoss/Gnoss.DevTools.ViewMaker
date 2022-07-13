@@ -1,0 +1,97 @@
+﻿@{
+    CommunityModel Comunidad = Html.GetComunidad();
+}
+
+
+    @* Ficheros CSS Cargados *@
+
+    <!-- MATERIAL ICONS -->
+    <link type="text/css"
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined"
+          media="all" />
+
+    <!-- FONT AWESOME -->
+    <link href="https://use.fontawesome.com/releases/v5.0.8/css/all.css"
+          rel="stylesheet" />
+
+    <!-- JQUERY UI (Datepicker) -->
+    <link type="text/css"
+          rel="stylesheet"
+          href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/jqueryUI/jquery-ui.min.css?v=@Html.GetVersion()" />        
+
+    <!-- BOOTSTRAP 4 + PROPELLER -->
+    <link rel="stylesheet"
+          href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/bootstrap/bootstrap.min.css?v=@Html.GetVersion()"
+          type="text/css" />
+    <link rel="stylesheet"
+          href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/propeller/css/propeller.min.css?v=@Html.GetVersion()"
+          type="text/css" />
+
+    <!-- LIGHTGALLERY -->
+    <link type="text/css"
+          rel="stylesheet"
+          href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/lightgallery/css/lightgallery.min.css?v=@Html.GetVersion()" />
+
+    <!-- JQUERY CUSTOM SCROLL BAR Version: 3.1.13 -->
+    <link type="text/css"
+          rel="stylesheet"
+          href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/customscroller/css/jquery.mCustomScrollbar.min.css?v=@Html.GetVersion()" />
+
+    <!-- PRELOADER MATERIALIZE -->
+    <link type="text/css"
+          rel="stylesheet"
+          href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/spinner-material/spinner-material.css?v=@Html.GetVersion()" />
+
+    <!-- DATATABLES -->    
+    <link rel="stylesheet" 
+          type="text/css"
+          href="https://cdn.datatables.net/v/bs4/dt-1.11.3/b-2.1.1/b-html5-2.1.1/fc-4.0.1/fh-3.2.1/r-2.2.9/sc-2.0.5/sl-1.3.4/datatables.min.css">
+
+    <!-- SELECT2 -->
+    <link type="text/css"
+          rel="stylesheet"
+          href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/select2/css/select2.min.css?v=@Html.GetVersion()" />
+
+    <!-- Toastr -->
+    <link type="text/css"
+          rel="stylesheet"
+          href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/toastr/toastr.min.css?v=@Html.GetVersion()" />
+
+    <!-- Simple Donut -->
+    <link type="text/css"
+          rel="stylesheet"
+          href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/simple-donut/simple-donut.css?v=@Html.GetVersion()" />
+
+    <!-- Owl Carousel -->
+    <link type="text/css"
+          rel="stylesheet"
+          href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/owl-carousel/css/owl.carousel.min.css?v=@Html.GetVersion()" />
+      
+    <!-- PERSONALIZACION TEMA -->
+    <link type="text/css"
+          rel="stylesheet"
+          href="@Html.GetBaseUrlStatic()/responsive/theme/theme.css?v=@Html.GetVersion()" />
+
+          <!-- DatePicker -->
+    <link type="text/css"
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" />
+      
+
+@if (Html.GetListaCSS() != null)
+{
+    foreach (string css in Html.GetListaCSS())
+    {
+        <link media="screen" type="text/css" rel="stylesheet" href="@css" />
+    }
+}
+
+@*Estilo para mygnoss*@
+@if (Comunidad != null && Comunidad.Key == ProyectoAD.MetaProyecto)
+{
+    //<link media="screen" type="text/css" rel="stylesheet" href="@Html.GetBaseUrlStatic()/cssNuevo/mygnoss.css?v=@Html.GetVersion()" />
+}
+
+@*Estilo sólo para comunidad*@
+@Html.PartialView("../Shared/Head/_HojasDeEstiloPersonalizado")

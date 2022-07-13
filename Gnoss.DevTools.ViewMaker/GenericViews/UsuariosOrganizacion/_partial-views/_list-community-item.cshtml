@@ -1,0 +1,300 @@
+﻿@model CommunityModel
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra cada una de las comunidades para poder realizar las acciones necesarias para su administración.
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+@* Controlar si se dispone de Logo de la comunidad *@
+bool containsUrlFoto = true;
+CommunityModel comunidad = Model;
+@* Tipo de comunidad *@
+string communityType = "";
+
+// Obtengo el las acciones posibles (urlfilter) obtenidas de la vista "_list-content"
+var urlBaseAccionesUsuariosOrganizacion = (String)ViewData["BaseAccionesUsuariosOrganizacion"];
+
+}
+
+@* Controlar si la comunidad dispone de logo *@
+@if (String.IsNullOrEmpty(comunidad.Logo))
+{
+    containsUrlFoto = false;
+}
+
+@* Controlar el tipo de Comunidad (Pública, Privada...)*@
+@switch ((CommunityModel.TypeAccessProject)comunidad.AccessType)
+{
+    case CommunityModel.TypeAccessProject.Private:
+        communityType = Html.GetText("COMUNIDADES", "COMUNIDADPRIVADA"); //@Html.Raw Acordarse al escribir poner RAW
+        break;
+    case CommunityModel.TypeAccessProject.Public:
+        communityType = Html.GetText("COMUNIDADES", "COMUNIDADPUBLICA");
+        break;
+    case CommunityModel.TypeAccessProject.Reserved:
+        communityType = Html.GetText("COMUNIDADES", "COMUNIDADRESERVADA");
+        break;
+    case CommunityModel.TypeAccessProject.Restricted:
+        communityType = Html.GetText("COMUNIDADES", "COMUNIDADRESTRINGIDA");
+        break;
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista de la Comunidad para ser Administrada por el administrador --------------------
+*@
+
+@* Item de tipo Community para ser Administrador  *@
+
+<article class="resource" id="@comunidad.Key">
+    <div class="wrap">
+        <div class="user-miniatura">
+            <div class="imagen-usuario-wrap">
+                <a href="@comunidad.Url">
+                    @* Imagen de la comunidad*@
+                    <div class="imagen @( (containsUrlFoto == false) ? "sinImagen" : null) ">
+                        @if (containsUrlFoto == false)
+                        {
+                            <span class="material-icons">groups</span>
+                        }
+                        else
+                        {
+                            <span style="background-image: url(@comunidad.Logo)"></span>
+                        }
+                    </div>
+                </a>
+            </div>
+            <div class="nombre-usuario-wrap">
+                <a href="@comunidad.Url">
+                    @* Nombre de la comunidad *@
+                    <p class="nombre">@comunidad.Name</p>
+                </a>
+            </div>
+            <div class="acciones-usuario-wrap">
+                <ul class="no-list-style">
+                    <li>
+                        @* Acción para Añadir Uusarios el perfil *@
+                        <a class="btn btn-outline-grey"
+                           data-toggle="modal"
+                           data-target="#modal-container"
+                           data-communitykey="@comunidad.Key"
+                           onclick="DeployActionInModalPanel('@urlBaseAccionesUsuariosOrganizacion/load-asign-users/@comunidad.Key', this, 'modal-dinamic-content', '');"
+                           >
+                            @* Acción / Opción para Añadir usuarios a la comunidad *@
+                            <span class="material-icons">person_add_alt_1</span>
+                            <span>Asignar usuarios a comunidad</span>
+                        </a>
+                    </li>
+                </ul>
+                <div class="acciones-recurso-listado">
+                    @* Más opciones de acciones sobre esa comunidad *@
+                    <div class="dropdown">
+                        <a href="#"
+                           class="dropdown-toggle"
+                           role="button"
+                           id="dropdownMasOpciones"
+                           data-toggle="dropdown"
+                           aria-haspopup="true"
+                           aria-expanded="false">
+                            <span class="material-icons">more_vert</span>
+                        </a>
+                        <div class="dropdown-menu basic-dropdown dropdown-icons dropdown-menu-right dropdown-sobre-toggle"
+                             aria-labelledby="dropdownMasOpciones">
+                            <p class="dropdown-title pl-3 ml-3">Acciones</p>
+                            <span class="material-icons cerrar-dropdown">close</span>
+                            <ul class="no-list-style">
+                                @* Activación o no de registro automático *@
+                                @if (comunidad.RegistroAutomatico)
+                                {
+                                    <li>
+                                        <a class="item-dropdown"
+                                           data-toggle="modal"
+                                           data-target="#modalActivarRegAuto_@comunidad.Key">
+                                            <span class="material-icons">group_remove</span>
+                                            <span class="texto">Desactivar registro automático</span>
+                                        </a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li>
+                                        <a class="item-dropdown"
+                                           data-toggle="modal"
+                                           data-target="#modalActivarRegAuto_@comunidad.Key">
+                                            <span class="material-icons">group_add</span>
+                                            <span class="texto">Activar registro automático</span>
+                                        </a>
+                                    </li>
+                                }
+                                @* Abandonar Comunidad*@
+                                <li>
+                                    <a class="item-dropdown"
+                                       data-toggle="modal"
+                                       data-target="#modalAbandonarCommunity_@comunidad.Key">
+                                        <span class="material-icons">exit_to_app</span>
+                                        <span class="texto">Abandonar comunidad</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @* Información relativa a la comunidad (Tipo de comunidad, Nº de Personas, ) *@
+        <div class="info-comunidad d-flex flex-wrap align-items-center">
+            @* Tipo de Comunidad*@
+            <div class="tipo-wrap">
+                <span class="material-icons">public</span>
+                <span class="texto">@Html.Raw(communityType)</span>
+            </div>
+            @* Categorías de la comunidad *@
+            @*
+            <div class="categorias-wrap">
+                <ul class="no-list-style d-flex flex-wrap">
+                    <li>
+                        <a href="@comunidad.Url/@Html.GetText("URLSEM", "PERSONASYORGANIZACIONES")/@Html.GetText("URLSEM", "PERSONAS")">@Html.GetText("COMMON", "PERSONAS") <span class="numResultados">(@comunidad.NumberOfPerson)</span></a>
+                    </li>
+                    <li>
+                        <a href="@comunidad.Url/@Html.GetText("URLSEM", "PERSONASYORGANIZACIONES")/@Html.GetText("URLSEM", "ORGANIZACIONES")">@Html.GetText("COMMON", "ORGANIZACIONES") <span class="numResultados">(@comunidad.NumberOfOrganizations)</span></a>
+                    </li>
+                    <li>
+                        <a href="@comunidad.Url/@Html.GetText("URLSEM", "RECURSOS")">@Html.GetText("COMMON", "RECURSOS") <span class="numResultados">(@comunidad.NumberOfResources)</span></a>
+                    </li>
+                </ul>
+            </div>
+            *@
+        </div>
+
+        @* Categorías de la comunidad *@
+        @if (comunidad.Categories != null && comunidad.Categories.Count > 0)
+        {
+            <div class="etiquetas-wrap">
+                <ul class="no-list-style d-flex flex-wrap">
+                    @foreach (CategoryModel categoria in comunidad.Categories)
+                    {
+                        <li>
+                            <a class="tag" href="@comunidad.UrlSearch/@Html.GetText("URLSEM", "CATEGORIA")/@categoria.Name/@categoria.Key">
+                                <span class="material-icons">category</span>
+                                <span class="">@categoria.Name</span>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+
+        @* Etiquetas de la comunidad *@
+        @if (comunidad.Tags != null && comunidad.Tags.Count > 0)
+        {
+            <div class="etiquetas-wrap">
+                <ul class="no-list-style d-flex flex-wrap">
+                    @foreach (string tag in comunidad.Tags)
+                    {
+                        <li>
+                            <a class="tag" href="@comunidad.UrlSearch/@Html.GetText("URLSEM", "TAG")/@tag">
+                                <span class="material-icons">label</span>
+                                <span class="texto">@tag</span>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+</article>
+
+
+@* Modales para acciones de la comunidad en concreto *@
+
+@* Activación Registro automático*@
+<div id="modalActivarRegAuto_@comunidad.Key"
+     class="modal modal-top fade show modalActivarRegAuto"
+     tabindex="-1"
+     role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            @* Header del Modal *@
+            <div class="modal-header">
+                <p class="modal-title">
+                    <span class="material-icons">@(comunidad.RegistroAutomatico ? "group_remove" : "group_add") </span>
+                    @if (comunidad.RegistroAutomatico)
+                    {
+                        <span>Desactivar registro automático</span>
+                    }
+                    else
+                    {
+                        <span>Activar registro automático</span>
+                    }
+                </p>
+                <span class="material-icons cerrar" data-dismiss="modal" aria-label="Close">close</span>
+            </div>
+            @* Contenido donde se mostrará el contenido del Modal cargado *@
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="control-label">
+                        @if (comunidad.RegistroAutomatico)
+                        {
+                            <span>Si continúas, desactivarás el registro automático para esta comunidad.</span>
+                        }
+                        else
+                        {
+                            <span>Si continúas, activarás el registro automático y todos los usuarios de la organización formarán parte de esta comunidad.</span>
+                        }
+                    </label>
+                </div>
+
+                @* Botón de acciones *@
+                <div class="form-actions">
+                    <button data-dismiss="modal" class="btn btn-primary">No</button>
+                    <button class="btn btn-outline-primary ml-1 @( comunidad.RegistroAutomatico ? "btnAceptarDesactivarRegAuto" : "btnAceptarActivarRegAuto")"
+                            data-communitykey="@comunidad.Key"
+                            >
+                        Sí
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@* Abandonar Comunidad *@
+<div id="modalAbandonarCommunity_@comunidad.Key"
+     class="modal modal-top fade show modalAbandonarCommunity"     
+     tabindex="-1"
+     role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            @* Header del Modal *@
+            <div class="modal-header">
+                <p class="modal-title">
+                    <span class="material-icons">exit_to_app</span>                                        
+                        Abandonar comunidad
+                </p>
+                <span class="material-icons cerrar" data-dismiss="modal" aria-label="Close">close</span>
+            </div>
+            @* Contenido donde se mostrará el contenido del Modal cargado *@
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="control-label">                                                
+                        <span>Si continúas, la organización abandonará la comunidad.</span>                        
+                    </label>
+                </div>
+
+                @* Botón de acciones *@
+                <div class="form-actions">
+                    <button data-dismiss="modal" class="btn btn-primary">@Html.GetText("COMMON", "NO")</button>
+                    <button class="btn btn-outline-primary ml-1 btnAceptarAbandonarCommunity"
+                            data-communitykey="@comunidad.Key">
+                        @Html.GetText("COMMON", "SI")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,45 @@
+﻿@model Es.Riam.Gnoss.Web.MVC.Models.BlogModel
+@if (Model != null)
+{   
+    <div class="resource ">
+        <div class="box description">
+            <div class="group title">
+                <h3>
+                    <a href="@Model.Url">@Model.Name</a>
+                </h3>
+                <p class="resourceType persona conImagenPerfil">
+                    <a href="@Model.Url">
+                        @if(!string.IsNullOrEmpty(Model.Publisher.UrlFoto))
+                        {
+                        <img style="Width: 54px" alt="" class="icono" src="@ViewBag.BaseUrlContent@Model.Publisher.UrlFoto" />
+                        }
+                        else
+                        {
+                        <img style="Width: 54px" alt="" class="icono" src="@ViewBag.BaseUrlContent/@Es.Riam.Util.UtilArchivos.ContentImagenesPersonas/anonimo_peque.png" />
+                        }
+                    </a>
+                </p>
+            </div>
+            <div class="group content">
+                <span class="descripcionResumida">
+                    <p style="display: block;">@Model.Description</p>
+                </span>
+            </div>
+            <!-- Etiquetas y categorías del proyecto -->
+            <div class="group utils-2">
+                <p>El Blog de
+                    <br />
+                    <a href="@Model.Publisher.UrlPerson">@Model.Publisher.NamePerson</a>
+                </p>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+
+
+
+
+

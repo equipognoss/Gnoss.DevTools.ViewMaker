@@ -1,0 +1,20 @@
+﻿
+@{
+
+    CommunityModel Comunidad = Html.GetComunidad();
+    HeaderModel Cabecera = Html.GetCabecera();
+    UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+    Html.SetOcultarMenusComunidad(true);
+}
+
+<div id="col01">
+    @if (!Model)
+    {
+        <p>Sólo queda un último paso, ve a tu bandeja de entrada (revisa tu bandeja de spam por si llegase allí) y confirma tu dirección de email.</p>
+    }
+    else
+    {
+        <p>Sólo queda un último paso, avisa a tu tutor para que vaya a su bandeja de entrada (revisa tu bandeja de spam por si llegase allí) y confirme su dirección de email.</p>
+    }
+</div>
+

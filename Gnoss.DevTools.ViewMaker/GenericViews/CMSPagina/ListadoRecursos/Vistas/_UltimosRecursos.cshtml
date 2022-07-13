@@ -1,0 +1,113 @@
+﻿@using Es.Riam.Util;
+@model ResourceModel
+@if (Model != null)
+{
+    string conImagenAsociada = "";
+    if (!string.IsNullOrEmpty(Model.UrlPreview))
+    {
+         conImagenAsociada="";
+    }
+    <div class="resource @conImagenAsociada" >
+        <div class="box description">
+            <div class="wrapDescription">                
+	            <div class="group title">
+	                <h2><a href="@Model.CompletCardLink">@Model.Title</a></h2>
+
+                    <p class="resourceType @(Model.TypeDocument == ResourceModel.DocumentType.Semantico?"semantico " + Model.RdfType:Model.NameImage)"><span>tipo de documento</span><a href="@Model.CompletCardLink">@Model.NameImage</a></p>
+			    </div>	      
+                @{
+    string descripcionCorta = UtilCadenas.EliminarHtmlDeTexto(Model.Description.Replace("<p>", "<p> ").Replace("</n>", "</n> "));
+                    if (descripcionCorta.Length > 150)
+                    {
+                        descripcionCorta = descripcionCorta.Substring(0, 150) + "...";
+                    }
+                    if (!string.IsNullOrEmpty(descripcionCorta))
+                    {
+                        descripcionCorta = "<p>" + descripcionCorta + "</p>";
+                    }
+                }                
+                <div class="group content">
+		            <div class="descripcionResumida">
+                        @if (!string.IsNullOrEmpty(Model.UrlPreview)){
+                            <p class="miniatura"><a href="@Model.CompletCardLink"><img src="@Model.UrlPreview" alt="@Model.Title" title="@Model.Title" /></a></p>
+                        }
+                        @Html.Raw(descripcionCorta)</div>
+                    <div class="verMasRecurso">
+                        <p>
+                            <a href="@Model.CompletCardLink">...</a>
+                        </p>
+                    </div>
+		        </div>
+                <div class="group utils-2" >
+				    <p>
+                        @if (Model.TypePublication == ResourceModel.PublicationType.Published)
+                        {
+                            @Html.GetText("BASERECURSOS", "PUBLICADOPORCUANDO", Model.PublishDate.Day.ToString(), Model.PublishDate.Month.ToString(), Model.PublishDate.Year.ToString())
+                        }else
+                        {
+                            @Html.GetText("BASERECURSOS", "COMPARTIDOPORCUANDO", Model.PublishDate.Day.ToString(), Model.PublishDate.Month.ToString(), Model.PublishDate.Year.ToString())
+                        }
+                        
+                        @if (Model.Publisher.TypeProfile == ProfileType.Personal || Model.Publisher.TypeProfile == ProfileType.Teacher)
+                        {
+                            <span><a property="foaf:name" typeof="foaf:Person" href="@Model.Publisher.UrlPerson">@Model.Publisher.NamePerson</a></span>
+                        }
+                        else if (Model.Publisher.TypeProfile == ProfileType.ProfessionalPersonal)
+                        {
+                            <span><a property="foaf:name" typeof="foaf:Group" href="@Model.Publisher.UrlPerson">@Model.Publisher.NamePerson @ConstantesDeSeparacion.SEPARACION_CONCATENADOR @Model.Publisher.NameOrganization</a></span>
+                        }
+                        else if (Model.Publisher.TypeProfile == ProfileType.ProfessionalCorporate && !string.IsNullOrEmpty(Model.Publisher.NamePerson))
+                        {
+                            string idTemp = Guid.NewGuid().ToString();
+                            <span><a property="foaf:name" typeof="foaf:Group" href="@Model.Publisher.UrlOrganization">@Model.Publisher.NameOrganization</a><span class="userAuthor"><span style="display:none;" id="@idTemp"> (@Model.Publisher.NamePerson) </span><a onclick="javascript:DesplegarImgMas(this, '@idTemp');" style="cursor:pointer;"><img src="@Html.GetBaseUrlStatic()/img/verMas.gif" alt="+" /></a></span></span>
+                        }else
+                        {
+                            <span><a property="foaf:name" typeof="foaf:Group" href="@Model.Publisher.UrlOrganization">@Model.Publisher.NameOrganization</a></span>
+                        }
+				    </p>
+			    </div>	
+		        @if (Model.Categories.Count() > 0)
+                {                    
+                    <div class="group categorias">
+				        <p>
+                            @Html.GetText("COMMON", "CATEGORIAS"):  
+				        </p>
+				        <ul id="listCat">
+                            @{
+                                int cont = 0;
+                                foreach (CategoryModel categoria in Model.Categories)
+                                {
+                                    string separador = "";
+                                    if (cont > 0) { separador = ", "; }
+                                    <li>@separador<a href="@Model.UrlSearch/@Html.GetText("URLSEM","CATEGORIA")/@Html.EliminarCaracteresUrlSem(categoria.Name)/@categoria.Key/"><span>@categoria.Name</span></a></li>
+                                    cont++;
+                                }
+                            }
+				        </ul>
+			        </div>  
+                }
+                @if (Model.Tags.Count() > 0)
+                {             
+                    <div class="group etiquetas">
+                        <p>
+                            @Html.GetText("COMMON", "ETIQUETAS"):
+                        </p>
+                        <ul class="listTags">
+                            @{
+                                int cont = 0;
+                                foreach (string tag in Model.Tags)
+                                {
+                                    string separador = "";
+                                    if (cont > 0) { separador = ", "; }
+                                    
+                                    <li>@separador<a resource="@Model.UrlSearch/@Html.GetText("URLSEM","TAG")/@tag" rel="sioc:topic" href="@Model.UrlSearch/@Html.GetText("URLSEM","TAG")/@tag"><span about="@Model.UrlSearch/@Html.GetText("URLSEM","TAG")/@tag" property="dcterms:name" typeof="sioc_t:Tag">@tag</span></a></li>
+                                    cont ++;
+                                }
+                            }
+                        </ul>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>	
+}

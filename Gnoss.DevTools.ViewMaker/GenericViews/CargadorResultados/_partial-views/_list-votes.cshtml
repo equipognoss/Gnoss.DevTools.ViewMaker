@@ -1,0 +1,70 @@
+﻿@model ResourceModel
+
+
+@*
+Descripción
+-----------------------------------------------
+Vista para poder gestionar la acción en cada recurso del listado para permitir o no votar de forma positiva o negativa un recurso. 
+
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+bool isVotedPositive = false;
+bool isOwnedAuthor = false;
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Opciones para Votar un recurso que aparezca en el listado "Buscador" --------------------
+*@
+
+@* Controlar si es posible votar un recurso *@
+@if (Model.AllowVotes)
+{
+    if (Model.Votes != null)
+    {
+        isVotedPositive = Model.Votes.IsVotedPositive;        
+        isOwnedAuthor = Model.Votes.IsOwnedAuthor || (Model.Publisher.KeyPerson == Html.GetIdentidadActual().KeyPerson);
+    }
+
+    <div class="interacciones-recurso">
+        @* Gestión de Votos positivos *@
+        <div class="likes @( (isVotedPositive) ? "activo" : null)">
+            @if (!isOwnedAuthor)
+            {
+                if (isVotedPositive)
+                {
+                    if (Model.Votes.AllowNegativeVotes)
+                    {
+                        <span onclick="AccionRecurso_VotarEliminar(this, '@Model.Votes.UrlDeleteVote', '@Model.Votes.UrlVotePositive')" class="material-icons eleccionUsuario iconizer">thumb_up_alt</span>
+                    }
+                    else
+                    {
+                        <span onclick="AccionRecurso_VotarEliminar(this, '@Model.Votes.UrlDeleteVote', '@Model.Votes.UrlVotePositive')" class="material-icons eleccionUsuario iconizer">thumb_up_alt</span>
+                    }
+                }
+                else
+                {
+                    if (Model.Votes != null)
+                    {
+                        <span onclick="AccionRecurso_VotarPositivo(this, '@Model.Votes.UrlVotePositive', '@Model.Votes.UrlDeleteVote')" class="material-icons iconizer">thumb_up_alt</span>
+                    }
+                    else
+                    {
+                        <span onclick="AccionRecurso_VotarPositivo(this, '', '')" class="material-icons iconizer">thumb_up_alt</span>
+                    }
+                }
+            }
+            else
+            {
+                @*Es el propietario del recurso -> No puede votar *@
+                <span id="op_Like" title="El propietario del recurso no puede votar" style="color: #ccc;" class="material-icons eleccionUsuario iconizer">thumb_up_alt</span>
+            }
+            <span class="number">@Model.NumVotes</span>
+        </div>
+    </div>
+}

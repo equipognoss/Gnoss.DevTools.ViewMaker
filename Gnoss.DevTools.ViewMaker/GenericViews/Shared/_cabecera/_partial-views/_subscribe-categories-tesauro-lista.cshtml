@@ -1,0 +1,64 @@
+﻿@model EditSuscriptionViewModel
+@*
+Descripción
+----------------------------------------------------------------
+Vista que mostrará las categorías de una comunidad a las que un usuario podrá suscribirse. Estas categorías son mostradas en "Lista"
+
+@*
+Variables
+----------------------------------------------------------------
+*@
+@{ 
+    
+}
+@*
+----------------------------------------------------------------
+
+@* Listado de Categorías en formato "Lista" *@
+<div class="tab-pane fade"
+     id="ver-lista"
+     role="tabpanel"
+     aria-labelledby="ver-lista-tab">
+    <div class="divTesLista divCategorias clearfix">
+        @* Buscador-Filtrador de Categorías*@
+        <div class="buscador-categorias">
+            <div class="form-group">
+                <input class="filtroRapido form-control not-outline"
+                       placeholder="Busca una categoría"
+                       type="text"
+                       onkeydown="javascript:if(event.which || event.keyCode){if ((event.which == 13) || (event.keyCode == 13)) {return false;}}"
+                       onkeyup="javascript:MVCFiltrarListaSelCat(this, 'ver-lista');" />                
+            </div>
+        </div>
+        <div id="divSelCatLista">
+        @* Cada Item de Categoría *@
+            @foreach (CategoryModel categoria in Model.Categories.OrderBy(cat => cat.Name)) 
+            { 
+                @* Contenedor de la categoria en formato Lista *@
+                <div class="categoria-wrap">
+                    <div class="categoria @categoria.Key">
+                    @{                        
+                        string accionClick = "MVCMarcarElementoSelCat(this, 'selectorCategoriasSusc', 'txtHackCatTesSel');";
+                        string cadenaChecked = "";
+
+                        if (categoria.Selected)
+                        {
+                            cadenaChecked = "checked=\"checked\"";
+                        }
+                    }
+                        @* Mostrar o pintar el input y el título de la categoría correspondiente*@
+                        <div class="custom-control custom-checkbox themed little primary">
+                            <input type="checkbox"
+                                   id="list_@categoria.Key"
+                                   onclick="@accionClick" @cadenaChecked
+                                   data-item="@categoria.Key"
+                                   class="custom-control-input" />
+                            <label class="custom-control-label"
+                                   for="list_@categoria.Key">@categoria.Name</label>
+                        </div>
+                    </div> 
+                </div>
+            } 
+         </div>
+    </div>
+</div>

@@ -1,0 +1,50 @@
+﻿@model List<HtlmExtraElements>
+
+
+@*
+Descripción
+----------------------------------------------------------------
+Vista que se utiliza para mostrar elemlentos HTML adicionales a la comunidad del usuario. Muestra datos relacionados con BeginBody y EndBody
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+CommunityModel Comunidad = Html.GetComunidad();
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+string avisoCookies = Html.GetCookiesWarning();
+}
+@*
+----------------------------------------------------------------
+
+-------------------- Vista para mostrar elementos HTML adicionales --------------------*@
+
+@if (Model.Count > 0)
+{
+    // Agregar condiciones pintado HTML
+    foreach(HtlmExtraElements element in Model)
+    {
+        // O se puede pintar independientemente de las cookies O ya se han aceptado las cookies
+        bool condicionesOmniture = (element.CookiesControl || string.IsNullOrEmpty(avisoCookies));
+        
+        // Comunidad publica Y O hay elementos privados O el elemento está disponible para el usuario
+        bool comPublicaYHayElementosPrivadosOIdentidadEnGrupo = (Comunidad.AccessType != CommunityModel.TypeAccessProject.Private && (!element.HasPrivateElementsInCommunity || element.ElementIDUserList.Contains(element.HeadElementID)));
+
+        // Comunidad privada Y Pertenece al proyecto Y O hay elementos privados O el elemento está disponible para el usuario
+        bool comPrivadaYIdentidadPerteneceProyYHayElementosPrivadosOIdentidadEnGrupo = (Comunidad.AccessType == CommunityModel.TypeAccessProject.Private && !IdentidadActual.IsGuestIdentity && (!element.HasPrivateElementsInCommunity || element.ElementIDUserList.Contains(element.HeadElementID)));
+        
+        if (condicionesOmniture && (comPublicaYHayElementosPrivadosOIdentidadEnGrupo || comPrivadaYIdentidadPerteneceProyYHayElementosPrivadosOIdentidadEnGrupo))
+        {
+            System.Text.StringBuilder extraHTML = new System.Text.StringBuilder("<" + element.TagName);
+            foreach(string clave in element.Attributes.Keys)
+            {
+                extraHTML.Append(" " + clave + "='" + element.Attributes[clave] + "'");
+            }
+            extraHTML.Append(">");
+            extraHTML.Append(element.Content);
+            extraHTML.Append("</" + element.TagName + ">");
+            
+            @Html.Raw(extraHTML.ToString());
+        }
+    }
+}

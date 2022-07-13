@@ -1,0 +1,22 @@
+﻿@model SemanticPropertyModel
+
+@if (Model.Element.EsGrupo)
+{
+    @Html.PartialView("SemCms/_PropiedadGrupo", Model)
+}
+else if (Model.Element.EsLiteral)
+{
+    @Html.PartialView("SemCms/_PropiedadLiteral", Model)
+}
+else if (Model.Element.EsSelectorGrupo)
+{
+    @Html.PartialView("SemCms/_PropiedadSelectorGrupo", Model)
+}
+else if (Model.EntityParent.SemanticResourceModel.ReadMode && Model.Element.EsEspecial)
+{
+    @Html.PartialView("SemCms/_PropiedadDatoEspecial", Model)
+}
+else if (Model.Element.Propiedad != null)
+{
+    @Html.PartialView("SemCms/_PropiedadOntologica", Model)
+}

@@ -1,0 +1,50 @@
+﻿@model EditSuscriptionViewModel
+
+@functions{
+    string PintarCategoria(CategoryModel pCategoria)
+    {
+        <div>
+            @{
+                bool tieneHijos = Model.Categories.Count(cat => cat.ParentCategoryKey == pCategoria.Key) > 0;
+            }
+
+            @if (tieneHijos)
+            {
+                <img style="border-width:0px;margin-right:5px;cursor:pointer;" src="@Html.GetBaseUrlStatic()/img/verMas.gif" onclick="javascript:MVCDesplegarTreeView(this);" />
+            }
+            else
+            {
+                <img style="border-width:0px;" src="@Html.GetBaseUrlStatic()/img/miniWhiteSpace.gif" />
+            }
+            <span class="@pCategoria.Key">
+                @{
+                    string accionClick = "MVCMarcarElementoSelCat(this, 'selectorCategoriasSusc');";
+                    string cadenaChecked = "";
+                    if (pCategoria.Selected)
+                    {
+                        cadenaChecked = "checked=\"checked\"";
+                    }
+                }
+
+                <input type="checkbox" id="chk_arbol_@pCategoria.Key" onclick="@accionClick" @cadenaChecked />
+                <label for="chk_arbol_@pCategoria.Key">@pCategoria.Name</label>
+            </span>
+            @if (tieneHijos)
+            {
+                <div style="display:none; margin-left:15px;" class="panHijos">
+                    @foreach (CategoryModel categoria in Model.Categories.Where(cat => cat.ParentCategoryKey == pCategoria.Key).OrderBy(cat => cat.Order))
+                    {
+                        @PintarCategoria(categoria);
+                    }
+                </div>
+            }
+        </div>
+        return string.Empty;
+    }
+}
+
+
+@foreach (CategoryModel categoria in Model.Categories.Where(cat => cat.ParentCategoryKey == Guid.Empty).OrderBy(cat => cat.Order))
+{
+    @PintarCategoria(categoria);
+}

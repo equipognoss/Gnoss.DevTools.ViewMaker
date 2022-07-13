@@ -1,0 +1,47 @@
+﻿@using Es.Riam.Util;
+@model ResourceModel
+
+@if (Model != null)
+{    
+    <div class="resource" >
+        @if (!string.IsNullOrEmpty(Model.UrlPreview))
+        {
+            <div class="group image">
+                <img src="@Model.UrlPreview">
+            </div>
+        }
+        <div class="group title">
+            <h4>
+                <a href="@Model.CompletCardLink">@Model.Title</a>
+            </h4>
+        </div>
+        <div class="group date">
+            <p class="publicationDate">@Model.PublishDate.Day.ToString().@Model.PublishDate.Month.ToString().@Model.PublishDate.Year.ToString()</p>
+        </div>
+         @{
+            string descripcionCorta = UtilCadenas.EliminarHtmlDeTexto(Model.Description.Replace("<p>", "<p> ").Replace("</n>", "</n> "));
+            if (descripcionCorta.Length > 150)
+            {
+                descripcionCorta = descripcionCorta.Substring(0, 150) + "...";
+            }
+            if (!string.IsNullOrEmpty(descripcionCorta))
+            {
+                descripcionCorta = "<p>" + descripcionCorta + "</p>";
+            }
+
+        }
+        @if(!string.IsNullOrEmpty(descripcionCorta))
+        {
+            <div class="group resume">
+                @Html.Raw(descripcionCorta)
+            </div>
+        }
+        
+    </div>    
+    
+    
+        
+    
+    
+    
+}

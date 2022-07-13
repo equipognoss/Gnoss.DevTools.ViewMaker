@@ -1,0 +1,46 @@
+﻿@model GroupPageViewModel
+
+@*
+Descripción
+-----------------------------------------------
+Nueva vista que sirve para buscar elementos-recursos dentro de una comunidad. Suele estar en la parte superior de la comunidad.
+
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+// Opciones para filtrar los resultados del buscador
+//Dictionary<string, string> listaFiltrosOrden = Model.FilterOrderList;
+// Filtro por defecto para obtener los resultados de los recursos
+//string FiltroOrdenSeleccionado = Model.FilterOrderSelected;
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Buscador de elementos usado dentro de UsusariosOrganizacion / Administrar Organización --------------------
+*@
+
+<div class="col-buscador">
+    @* Formulario buscador *@
+    <form>
+        <fieldset style="display: block">
+            <div class="finderUtils" id="divCajaBusqueda">
+                <div class="group finderSection txtFiltrarMiembros">
+                    <label for="finderSection">Encontrar</label>
+                    <input type="text" id="txtFiltrarMiembros" 
+                           name="txtFiltrarMiembros" 
+                           value="" 
+                           aux=""
+                           class="not-outline finderSectionText ac_input" 
+                           autocomplete="off"
+                           placeholder="@Html.GetText("METABUSCADOR", "ENCONTRAR")" />
+                    <input title="@Html.GetText("METABUSCADOR", "ENCONTRAR")" type="button" class="encontrar findAction" id="inputLupaMiembros" />                                     
+                </div>               
+            </div>
+        </fieldset>
+    </form>
+</div>
+

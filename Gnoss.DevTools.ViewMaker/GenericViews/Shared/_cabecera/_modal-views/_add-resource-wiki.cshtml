@@ -1,0 +1,55 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista modal que se utiliza para cargar un artículo Wiki a modo de recurso en una comunidad. Se llama, cuando el usuario pulsa en (+).
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista Modal para Añadir un artículo Wiki a modo de recurso en una comunidad --------------------
+*@
+
+<div class="modal modal-top fade show"
+     tabindex="-1"
+     role="dialog"
+     id="modal-add-resource-wiki">
+
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            @* Título del modal *@
+            <div class="modal-header">
+                <p class="modal-title">
+                    <span class="material-icons">link</span>@Html.GetText("PERFILBASESUBIR", "ARTICULOWIKI")
+                </p>
+                <span class="material-icons cerrar"
+                      data-dismiss="modal"
+                      aria-label="Close">close</span>
+            </div>
+            @* Cuerpo del modal *@
+            <div class="modal-body">
+                <div class="formulario-edicion">
+                    <div id="lblSelecionaUnDoc" class="form-group">
+                        <label class="control-label">@Html.GetText("PERFILBASESUBIR", "ARTICULOWIKI")</label>
+                    </div>
+                    @* Input para introducir la URL Wiki a modo recurso *@
+                    <div id="divURL" class="form-group">
+                        <label id="">@Html.GetText("PERFILBASESUBIR", "WIKI_T")</label>
+                        <input id="txtArticuloWiki" placeholder="" type="text" class="form-control" aria-describedby="txtArticuloWikiHelp" onkeydown="if(event.which || event.keyCode){if ((event.which == 13) || (event.keyCode == 13)) {return false;}}" />
+                        <small id="txtArticuloWikiHelp" class="form-text text-muted"></small>
+                    </div>
+                    
+                    @* Botón de acción de subir URL WIKI *@
+                    <div class="form-actions">                        
+                        <input id="lbSiguienteWiki" class="btn btn-primary" type="submit" value="@Html.GetText("PERFILBASESUBIR", "SIGUIENTE")" />	
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

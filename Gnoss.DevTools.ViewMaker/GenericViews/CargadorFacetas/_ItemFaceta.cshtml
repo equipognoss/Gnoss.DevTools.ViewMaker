@@ -1,0 +1,79 @@
+﻿@model FacetItemModel
+@*
+Descripción
+-----------------------------------------------
+Vista que contiene cada item o elemento en modo lista para que se haga un filtrado deseado. Si hay subitems, se mostrará un (+) para ver más items por los que realizar la búsqueda o filtrado.
+Esta vista se carga o es utilizada a su vez en la vista _Faceta.cshtml
+
+
+
+Plantillas - Archivos de dewenir
+----------------------------------------------------------------
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+// Nombre a otorgarle a uno de los items
+string clase = "";
+string bandejaActiva = "";
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Uno de los items (li) de la lista de tags para realizar una búsqueda por recurso --------------------
+*@
+
+@* Nombre a añadir a modo de clase dependiendo del tipo de faceta *@
+    @{
+    if (Model.Name != "")
+    {
+        clase = "faceta";
+    }
+    if (Model.Selected)
+    {
+        clase += " applied";
+        bandejaActiva = "applied";
+    }
+}
+
+@if (Model != null)
+{
+    <li class="@bandejaActiva">
+        @* Controlar si hay más facetas hijas para desplegar o no*@
+        @if (Model.FacetItemlist != null && Model.FacetItemlist.Count > 0)
+        {
+            @* Nombre de la clase para poder desplegar subFacetas*@
+            clase += " con-subfaceta ocultarSubFaceta";
+        }
+
+        <a rel="nofollow" href="@Model.Filter" class="@clase" name="@Model.Name" title="@Model.Tittle">
+            @* Controlar si tiene o no más subitems*@
+            @if (Model.FacetItemlist != null && Model.FacetItemlist.Count > 0)
+            {
+                <span class="textoFaceta">@Model.Tittle</span>
+                <span class="num-resultados"> (@Model.Number)</span>
+                @* Desplegar/No desplegar*@
+                <span class="desplegarSubFaceta">
+                    <span class="material-icons">expand_more</span>
+                </span>
+            }
+            else
+            {
+                @* Nombre de la Faceta sin nº de hijos *@
+                <span class="textoFaceta">@Model.Tittle <span class="num-resultados">@(Model.Number >= 0?"(" + Model.Number + ")":"")</span></span>
+            }
+        </a>
+
+            @* Pintar las subfacetas hijas para que puedan ser mostradas si se pulsa en (+) *@
+        @if (Model.FacetItemlist != null && Model.FacetItemlist.Count > 0)
+        {
+            <ul id="cat_@Model.Tittle">
+                @foreach (FacetItemModel item in Model.FacetItemlist)
+                {
+                    @Html.PartialView("_ItemFaceta", item)
+                }
+            </ul>
+        }
+    </li>
+}

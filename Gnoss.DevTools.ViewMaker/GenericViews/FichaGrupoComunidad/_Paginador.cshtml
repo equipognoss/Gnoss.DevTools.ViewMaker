@@ -1,0 +1,206 @@
+﻿@model GroupPageViewModel
+@*
+Descripción
+-----------------------------------------------
+Vista que que muestra un paginador de resultados para los items listados en usuarios de un grupo de una comunidad
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+int NUM_PAG_INICIO = 3;
+int NUM_PAG_PROX_CENTRO = 2;
+int NUM_PAG_FIN = 3;
+
+int numTotal = Model.NumMembers;
+int numResultadosPagina = 10;
+int PaginaActual = Model.NumPage;
+
+int numPaginas = (int)Math.Ceiling((double)numTotal / (double)numResultadosPagina);
+
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Paginador de resultados --------------------
+*@
+
+@{
+    @* Nº de página actual para Pagiador de resultados JS*@
+    <input type="hidden" value="1" id="numPagina" />
+
+    @* Contenedor de Paginador *@
+    if (numPaginas > 1)
+    {
+        <nav id="navegadorPaginador" aria-label="Paginador de resultados">
+            <ul id="NavegadorPaginas_Pag" class="pagination paginadorResultados d-flex justify-content-end">
+                @* Controlar navegador "<" *@
+                @if (PaginaActual == 1)
+                {
+                    @* La página actual es la 1ª -> Inhabilitar la fecha < *@
+                    <li class="page-item disabled">
+                        <a class="page-link material-icons-outlined" style="font-size: 1rem;">
+                            arrow_back_ios
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    @* La página actual es la es otra diferente a la primera -> Habilitar la fecha < *@
+                    <li class="page-item">
+                        <a aux="@Html.Raw((PaginaActual - 1).ToString())" name="pagina|@Html.Raw((PaginaActual - 1).ToString())" class="page-link indiceNavegacion filtro primeraPagina material-icons-outlined" style="font-size: 1rem;">
+                            arrow_back_ios
+                        </a>
+                    </li>
+                }
+
+                @{
+                    //INICIO
+                    for (int i = 1; i <= NUM_PAG_INICIO; i++)
+                    {
+                        if (i > numPaginas) //Hemos excedio el número máximo de páginas, así que dejamos de pintar.
+                        {
+                            break;
+                        }
+                        @* Pintar la página activa si se encuentra en ella *@
+                        if (i == PaginaActual)
+                        {
+                            <li class="page-item active">
+                                <a class="page-link actual indiceNavegacion">@i</a>
+                            </li>
+                        }
+                        @* Pintar la página y establecer su URL para navegación *@
+                        else
+                        {
+                            <li class="page-item">
+                                <a aux="@i" name="pagina|@i" class="page-link indiceNavegacion filtro">@i</a>
+                            </li>
+                        }
+                    }
+
+                    if (numPaginas > NUM_PAG_INICIO) //Continuamos si ha más páginas que las que ya hemos pintado
+                    {
+                        int inicioRango = PaginaActual - NUM_PAG_PROX_CENTRO;
+                        int finRango = PaginaActual + NUM_PAG_PROX_CENTRO;
+
+                        if (PaginaActual < (NUM_PAG_INICIO + NUM_PAG_PROX_CENTRO + 1))
+                        {
+                            inicioRango = NUM_PAG_INICIO + 1;
+                            if (PaginaActual <= NUM_PAG_INICIO) //En el rango de las primeras
+                            {
+                                finRango = PaginaActual + NUM_PAG_INICIO + NUM_PAG_PROX_CENTRO - 1;
+                            }
+                            else
+                            {
+                                finRango = NUM_PAG_INICIO + (2 * NUM_PAG_PROX_CENTRO) + 1; //Ultimo número de la serie.
+                            }
+                        }
+                        else if (PaginaActual > (numPaginas - NUM_PAG_FIN - NUM_PAG_PROX_CENTRO))
+                        {
+                            finRango = numPaginas - NUM_PAG_FIN;
+                            if (PaginaActual > numPaginas - NUM_PAG_FIN) //En el rango de las últimas
+                            {
+                                inicioRango = PaginaActual - NUM_PAG_FIN - NUM_PAG_PROX_CENTRO + 1;//finRango - (pNumPaginas - PaginaActual + 1);
+                            }
+                            else
+                            {
+                                inicioRango = numPaginas - (NUM_PAG_FIN + (2 * NUM_PAG_PROX_CENTRO)); //Ultimo número de la serie empezando atrás.
+                            }
+
+                            //Avanzamos el inicio de la zona final para que no agrege páginas ya pintadas
+                            while (inicioRango <= NUM_PAG_INICIO)
+                            {
+                                inicioRango++;
+                            }
+                        }
+
+                        if (inicioRango > (NUM_PAG_INICIO + 1))
+                        {
+                            <li class="page-item separador">...</li>
+                        }
+
+                        for (int i = inicioRango; i <= finRango; i++)
+                        {
+                            if (i > numPaginas) //Hemos excedio el número máximo de páginas, así que dejamos de pintar.
+                            {
+                                break;
+                            }
+
+                            if (i == PaginaActual)
+                            {
+                                <li class="page-item active">
+                                    <a class="page-link indiceNavegacion filtro">@i</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item">
+                                    <a aux="@i" name="pagina|@i" class="page-link indiceNavegacion filtro">@i</a>
+                                </li>
+                            }
+                        }
+
+                        if (finRango < numPaginas)
+                        {
+                            //Continuamos si ha más páginas que las que ya hemos pintado
+                            inicioRango = numPaginas - NUM_PAG_FIN + 1;
+
+                            if ((inicioRango - 1) > finRango)
+                            {
+                                <li class="page-item separador">...</li>
+                            }
+
+                            //Avanzamos el inicio de la zona final para que no agrege páginas ya pintadas
+                            while (inicioRango <= finRango)
+                            {
+                                inicioRango++;
+                            }
+
+                            finRango = numPaginas;
+
+                            for (int i = inicioRango; i <= finRango; i++)
+                            {
+                                if (i > numPaginas) //Hemos excedio el número máximo de páginas, así que dejamos de pintar.
+                                {
+                                    break;
+                                }
+
+                                if (i == PaginaActual)
+                                {
+                                    <li class="page-item active">
+                                        <a class="page-link actual indiceNavegacion">@i</a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="page-item">
+                                        <a aux="@i" name="pagina|@i" class="page-link actual indiceNavegacion filtro">@i</a>
+                                    </li>
+                                }
+                            }
+                        }
+                    }
+                    /* Gestionar la flecha > si estamos en la última página */
+                    if (PaginaActual == numPaginas)
+                    {
+                        <li class="page-item disabled">
+                            <a class="page-link deshabilitado ultimaPagina material-icons-outlined" style="font-size: 1rem;">
+                                arrow_forward_ios
+                            </a>
+                        </li>
+                    }
+                    /* Gestionar la flecha > si NO estamos en la última página */
+                    else
+                    {
+                        <li class="page-item">
+                            <a aux="@Html.Raw((PaginaActual + 1).ToString())" name="pagina|@Html.Raw((PaginaActual).ToString())" class="page-link indiceNavegacion filtro ultimaPagina material-icons-outlined" style="font-size: 1rem;">
+                                arrow_forward_ios
+                            </a>
+                        </li>
+
+                    }
+                }
+            </ul>
+        </nav>
+    }
+}

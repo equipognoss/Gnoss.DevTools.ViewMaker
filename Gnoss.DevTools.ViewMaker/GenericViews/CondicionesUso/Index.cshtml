@@ -1,0 +1,42 @@
+﻿@model string
+
+@*Descripción
+    -----------------------------------------------
+Vista que muestra las condiciones de uso. Esta página se visualiza en una página "sola" aunque existe también un modal
+la cual se muestra haciendo click desde el footer/pie.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+string titulo = "";
+string descripcion = "";
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Página de Condiciones de uso --------------------
+*@
+
+@{
+    @* Controlar el título de la página y el contenido *@
+    if (string.IsNullOrEmpty(Model))
+    {
+        titulo = Html.GetText("CONDICIONESUSO", "TITULO");
+        descripcion = Html.GetText("CONDICIONESUSO", "INFO");
+    }
+    else
+    {
+        titulo = Html.GetText("CONDICIONESUSO", "TITULOCOM", Html.GetComunidad().Name);
+        descripcion = Model;
+    }
+}
+
+<div class="row">
+    <div class="col mt-5">
+        <h1>@titulo</h1>
+        <div class="box">
+            @Html.Raw(descripcion)
+        </div>
+    </div>
+</div>

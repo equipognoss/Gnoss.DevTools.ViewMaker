@@ -1,0 +1,212 @@
+﻿@model UploadResourceReplayPanelModel
+@*
+    Descripción
+    -----------------------------------------------
+    Vista parcial que se utiliza para mostrar un aviso al usuario cuando se crea un recurso cuyo título ya existe en la comunidad.
+
+
+    Variables
+    ----------------------------------------------
+*@
+@{
+    string tituloMen = null;
+    string argMostrar = null;
+    string argSi = null;
+    string textoBtnSi = Html.GetText("COMMON", "SI");
+    string textoBtnNo = Html.GetText("COMMON", "NO");
+    CommunityModel Comunidad = Html.GetComunidad();
+
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Aviso al usuario de recurso duplicado --------------------*@
+
+
+@* Controlar mensajes a mostrar en el aviso *@
+@{
+
+    @* Controlar el título del mensaje *@
+    if (Model.AddToGnossPage)
+    {
+        tituloMen = Html.GetText("PERFILBASESUBIRRECURSO", "EXISTE_DOC_REPE_ADDTOGNOSS");
+    }
+    else if (Comunidad.Key != ProyectoAD.MetaProyecto)
+    {
+        tituloMen = Html.GetText("PERFILBASESUBIRRECURSO", "EXISTE_DOC_REPE");
+    }
+    else
+    {
+        tituloMen = Html.GetText("PERFILBASESUBIRRECURSO", "EXISTE_DOC_REPE_MYGNOSS");
+    }
+
+    if (!Model.CanRepeatResource)
+    {        
+        <div id="panEnlRep">
+            <div class="card">
+                <div class="card-body">
+                    @* Título del mensaje *@
+                    <h6 class="card-subtitle mb-2 text-muted">@tituloMen 
+                        <a href="@Model.RepeatedResourceUrl">@Model.RepeatedResourceName</a>
+                    </h6>
+                    <p>@Html.Raw(Html.GetText("PERFILBASESUBIRRECURSO", "COMENTAR_DOC_REPE_ENLACE", Model.RepeatedResourceUrl))</p>
+                </div>
+            </div>
+        </div>
+
+    }
+    else
+    {
+        if (Model.RepeatedResourceType == 0)
+        {
+            argMostrar = "mostrarPanSubirRecurso('Referencia');";
+            argSi = "validarDocFisico(true);";            
+
+            <div id="panEnlRep">
+                <div class="card">
+                    <div class="card-body">
+                        @* Título del mensaje *@
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            @tituloMen @Html.GetText("PERFILBASESUBIRRECURSO", "UBICACION_DOC_REPE") @Model.RepetitionLink
+                        </h6>                        
+                    </div>
+                </div>
+            </div>
+
+        }
+        else if (Model.RepeatedResourceType == 1)
+        {
+            argMostrar = "mostrarPanSubirRecurso('URL');";
+            argSi = "validarUrl(true);";
+            
+            <div id="panEnlRep">
+                <div class="card">
+                    <div class="card-body">
+                        @* Título del mensaje *@
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            @tituloMen @Html.GetText("PERFILBASESUBIRRECURSO", "URL_DOC_REPE") @Model.RepetitionLink
+                        </h6>                        
+                    </div>
+                </div>
+            </div>
+        }
+        else if (Model.RepeatedResourceType == 2)
+        {
+            argMostrar = "mostrarPanSubirRecurso('Archivo');";
+            argSi = "validarDocAdjuntar(true, '" + Model.ExtraFile + "');";            
+            <div id="panEnlRep">
+                <div class="card">
+                    <div class="card-body">
+                        @* Título del mensaje *@
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            @tituloMen @Html.GetText("PERFILBASESUBIRRECURSO", "ARCHIVO_DOC_REPE") @Model.RepetitionLink
+                        </h6>                        
+                    </div>
+                </div>
+            </div>
+
+        }
+        else if (Model.RepeatedResourceType == 3)
+        {
+            argMostrar = "$('#panEnlRep').remove();$('#divContPanelBotonera').css('display', '');";
+            argSi = "EnviarDatosServidor('" + Model.ExtraFile + "');";
+
+            <div id="panEnlRep">
+                <div class="card">
+                    <div class="card-body">
+                        @* Título del mensaje *@
+                        @Html.Raw(Html.GetText("PERFILBASESUBIRRECURSO", "EXISTE_NOMBRE_DOC_REPE", Model.RepeatedResourceUrl, Model.RepeatedResourceName))
+
+
+                    </div>
+                </div>
+            </div>            
+        }
+        else if (Model.RepeatedResourceType == 4)
+        {
+            argMostrar = "$('#panEnlRep').remove();$('#divContPanelBotonera').css('display', '');";
+            argSi = "EnviarDatosServidor('" + Model.ExtraFile + "');";
+
+            <div id="panEnlRep">
+                <div class="card">
+                    <div class="card-body">
+                        @* Título del mensaje *@
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            @Html.GetText("PERFILBASERECURSOEDITAR", "CAMBIODOCPRIVEDITORES") @Html.GetText("PERFILBASERECURSOEDITAR", "DESEACONTINUAR")
+                        </h6>                        
+                    </div>
+                </div>
+            </div>  
+        }
+        else if (Model.RepeatedResourceType == 5)
+        {
+            argMostrar = "$('#panEnlRep').remove();$('#divContPanelBotonera').css('display', '');";
+            argSi = "EnviarDatosServidor('" + Model.ExtraFile + "');";            
+
+            <div id="panEnlRep">
+                <div class="card">
+                    <div class="card-body">
+                        @* Título del mensaje *@
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            @Html.GetText("PERFILBASERECURSOEDITAR", "CAMBIODEBATEPRIVEDITORES") @Html.GetText("PERFILBASERECURSOEDITAR", "DESEACONTINUAR")
+                        </h6>                        
+                    </div>
+                </div>
+            </div>
+
+        }
+        else if (Model.RepeatedResourceType == 6)
+        {
+            if (Model.CreateVersionIfConcurrency)
+            {
+                textoBtnSi = Html.GetText("CREARDOCUMENTO", "CREARVERSION");
+                argSi = "EnviarDatosServidor('Concurrencia|CrearVersion');";
+            }
+            else
+            {
+                textoBtnSi = Html.GetText("PERFILBASE", "SOBRESCRIBIR");
+                argSi = "EnviarDatosServidor('Concurrencia|Sobreescribir');";
+            }
+
+            textoBtnNo = Html.GetText("PERFILBASE", "CANCELAR");
+            argMostrar = "$('#panEnlRep').remove();$('#divContPanelBotonera').css('display', '');";
+
+            <p>@Html.Raw(Html.GetText("PERFILBASE", "SOBRESCRIBIRCAMBIOS", Model.ProfileConcurrencyName))</p>
+        }
+
+        if (Model.RepeatedResourceType < 3)
+        {
+            <p>@Html.GetText("PERFILBASESUBIRRECURSO", "PREGUNTA_DOC_REPE")</p>
+            @*if (Model.CanRepeatResource)
+            {
+                <a class="card-link" style="cursor:pointer" onclick="@argSi">@textoBtnSi</a>
+                <a class="card-link" style="cursor:pointer" onclick="@argMostrar">@textoBtnNo</a>
+            }*@
+        }
+    }
+      
+    if (Model.CanRepeatResource)
+    {
+        <div class="mt-2" id="panelRepBotonera">
+            <a class="btn btn-outline-primary" style="cursor:pointer" onclick="@argMostrar">@textoBtnNo</a>
+            <a class="btn btn-primary" style="cursor:pointer" onclick="@argSi">@textoBtnSi</a>            
+        </div>
+    }
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

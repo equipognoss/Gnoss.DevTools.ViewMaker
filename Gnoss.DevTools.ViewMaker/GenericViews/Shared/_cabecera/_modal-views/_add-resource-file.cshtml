@@ -1,0 +1,71 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista modal que se utiliza para cargar un fichero a modo de recurso en una comunidad. Se llama, cuando el usuario pulsa en (+).
+
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista Modal para Añadir un fichero a modo de recurso en una comunidad --------------------
+*@
+
+    <div class="modal modal-top fade show"
+         tabindex="-1" 
+         role="dialog"
+         id="modal-add-resource-file">
+         
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                @* Título del modal *@
+                <div class="modal-header">
+                    <p class="modal-title">
+                      <span class="material-icons">description</span>@Html.GetText("PERFILBASESUBIR", "NUEVOARCHIVO_T")
+                    </p>
+                    <span
+                      class="material-icons cerrar"
+                      data-dismiss="modal"
+                      aria-label="Close"
+                      >close</span
+                    >
+                </div>
+               @* Cuerpo del modal *@
+                <div class="modal-body">
+                    <div class="formulario-edicion">
+                        <div id="lblSelecionaUnDoc" class="form-group">
+                            <label class="control-label">@Html.GetText("PERFILBASESUBIR", "NUEVOARCHIVO_T")</label>
+                        </div>
+                        @* Input para seleccionar el fichero a subir
+        <div id="divArchivo" class="input-group mb-3">
+            <div class="custom-file">
+                <input type="file" id="fuExaminar" name="fuExaminar" />
+            </div>
+        </div>*@
+
+                        @* Contenedor para el input y botón de subida de fichero adjunto*@
+                        <div id="divArchivo" class="input-group mb-3">
+                            <input type="file" id="fuExaminar" class="custom-file-input" />
+                            <label class="custom-file-label" for="fuExaminar" data-browse="Explorar">@Html.GetText("PERFILBASESUBIR", "NUEVOARCHIVO_T")</label>
+                        </div>
+
+                        @* Caja para mensajes de posibles errores (Ej: El documento ya existe) *@
+                        <div id="modal-add-resource-file-messages-wrapper">
+                            <div class="ko"></div>
+                        </div>
+
+                        @* Botón de acción de subir fichero *@
+                        <div class="form-actions">
+                            <input id="lbSiguienteArchivo" class="btn btn-primary" type="submit" value="@Html.GetText("PERFILBASESUBIR", "SIGUIENTE")" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

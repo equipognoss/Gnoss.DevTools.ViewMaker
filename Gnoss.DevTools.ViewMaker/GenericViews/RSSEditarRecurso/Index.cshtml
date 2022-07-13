@@ -1,0 +1,146 @@
+﻿@model RSSEditarRecursoViewModel
+@{
+    Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/ckeditor.js?v=" + Html.GetVersion());
+    Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/adapters/jquery.js?v=" + Html.GetVersion());
+    Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/jsUnificar/MVC.EditarRecurso.js?v=" + Html.GetVersion());
+    Html.SetBodyClass("layout03  comGnoss");
+}
+
+<div id="col02">
+    <form autocomplete="off">
+        <div class="box" id="SubirRecurso">
+            <fieldset class="labels">
+                <legend>
+                    @Html.GetText("PERFILBASE", "EDITARECURSOTITULO") 
+                </legend>
+                <div>
+                    <p>
+                        <label id="lblTitulo" for="txtTitulo">@Html.GetText("PERFILBASESUBIRRECURSO", "Título")</label>
+                        <input type="text" onblur="EtiquetadoAutomaticoDeRecursos(this.value, $('#txtDescripcion').val(), $('#txtHackTagsTitulo'),true)" class="text big" id="txtTitulo" value="@Model.Titulo" name="txtTitulo">
+                        @{
+                            string tagsTitulo = "";
+                            foreach (string tag in Model.TagsTitulo)
+                            {
+                                tagsTitulo += "[&]" + tag + "[&]";
+                            }
+                        }
+                        <input type="hidden" id="txtHackTagsTitulo" value="@tagsTitulo" name="txtHackTagsTitulo">
+                    </p>
+                    <p>
+                        <label for="txtEnlace">@Html.GetText("PERFILBASESUBIRRECURSO", "ENLACE")<a target="_blank" href="@Model.Enlace" id="hlEnlace"> (@Html.GetText("COMMON", "VER"))</a></label>
+                        <input type="text" class="text big" disabled="disabled" id="txtEnlace" value="@Model.Enlace" name="txtEnlace">
+                    </p>
+                    <p>
+                        <label id="lblDescipcion" for="txtDescripcion">@Html.GetText("PERFILBASESUBIRRECURSO", "DESCRIPCION")</label>
+                        <textarea class="cke recursos" id="txtDescripcion" name="txtDescripcion">@Model.Descripcion</textarea>
+                    </p>
+                    <p>
+                        <label id="lblEtiquetas" for="txtTags">@Html.GetText("EDITORBIOCOM", "ETIQUETAS")</label>
+                    </p>
+                    <div class="autocompletar">
+                        <span class="contenedor"></span>
+                        @{
+                            string tags = "";
+                            foreach (string tag in Model.Tags)
+                            {
+                                tags += tag + ",";
+                            }
+                        }
+                        <input type="text" class="txtAutocomplete" id="txtEtiquetasFijas" value="@tags" />
+                        <input type="hidden" id="txtEtiquetasFijas_Hack" />
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>@Html.GetText("PERFILBASERECURSOSFICHA", "AGREGARCATEGORIA")</legend>
+                <div id="panDesplegableSelCat">
+                    @Html.PartialView("EditorTesauro/_EditorTesauro", Model.Tesauro)
+                </div>
+            </fieldset>
+        </div>
+        <div id="divPrivacidadYSeguridad">
+            <h3>@Html.GetText("PERFILBASERECURSOEDITAR", "PRIVACIDADYSEGURIDAD")</h3>
+            <fieldset>
+                <ul class="radioList">
+                    <li id="liPanCompartir">
+                        <input type="checkbox" name="chkCompartir" id="chkCompartir" @Html.Raw(Model.Compartir ? "checked=\"checked\"" : "")/>
+                        <strong><span id="lblChkCompartir">@Html.GetText("PERFILBASERECURSOSFICHA", "COMPARTIR")</span></strong><span id="lblChkCompartir2">@Html.GetText("PERFILBASESUBIRRECURSO", "MEN_COMPARTIR2")</span>
+                    </li>
+                </ul>
+            </fieldset>
+        </div>
+        <div class="autoriaRec" id="panAutoria">
+            <h3>@Html.GetText("PERFILBASESUBIRRECURSO", "TITPROPIEDADINTELECTUAL")</h3>
+            <div>
+                <div id="panAutorPropio">
+                    <fieldset class="labels" id="fielAutores">
+                        <p>
+                            <label id="lblTiuloAgregarAutores">@Html.GetText("PERFILBASESUBIRRECURSO", "AUTOR")</label>
+                            <input type="text" class="text big" id="txtAutores" value="@Model.Autores" name="txtAutores" autocomplete="off">
+                        </p>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+        <div class="error general" style="display: none;"></div>
+        <div class="ok general" style="display: none;"></div>
+        <div>
+            <fieldset id="panelBotonera">
+                <p>
+                    <input type="button" value="Guardar " id="lbGuardar" class="submit">
+                    <input type="button" value="Publicar" id="lbPublicar" class="submit principal">
+                </p>
+            </fieldset>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        ActivarAutocompletarRec('txtEtiquetasFijas', 'sioc_t:Tag');
+        $('#lbGuardar').click(function () {
+            Guardar(false)
+        });
+        $('#lbPublicar').click(function () {
+            Guardar(true)
+        });
+    });
+
+    function Guardar(publicar) {
+        $('.ok.general').html('').hide();
+        $('.error.general').html('').hide();
+
+        MostrarUpdateProgress();
+
+        var dataPost = {};
+
+        dataPost["Documento.Titulo"] = $('#txtTitulo').val();
+        dataPost["Documento.Descripcion"] = encodeURIComponent($('#txtDescripcion').val());
+
+        dataPost["Documento.Tags"] = $('#txtEtiquetasFijas_Hack').val();
+
+        var arrayCategorias = $('#txtHackCatTesSel').val().split(',');
+        $.each(arrayCategorias, function (indice, categoria) {
+            if (categoria.trim() != '') {
+                dataPost["Documento.CategoriasSeleccionadas[" + indice + "]"] = categoria.trim();
+            }
+        });
+
+        dataPost["Documento.Compartir"] = $('#chkCompartir').is(":checked");
+        dataPost["Documento.Autores"] = $('#txtAutores').val();
+
+        dataPost["Publicar"] = publicar;
+
+        GnossPeticionAjax(
+            document.location.href + "/save",
+            dataPost,
+            true
+        ).done(function (response) {
+            $('.ok.general').html(response).show();
+        }).fail(function (response) {
+            $('.error.general').html(response).show();
+        }).always(function (response) {
+            OcultarUpdateProgress();
+        });
+    }
+</script>

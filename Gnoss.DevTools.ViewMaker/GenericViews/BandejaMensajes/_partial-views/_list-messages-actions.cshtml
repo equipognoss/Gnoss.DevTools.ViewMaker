@@ -1,0 +1,64 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista que se utiliza para mostrar las acciones que se pueden realizar con mensajería:
+- Marcar como leído, no leído, todo, nada
+- Actualizar mensajes
+- Select para mostrar opciones adicionales
+
+Variables
+----------------------------------------------------------------
+*@
+@{ 
+// Botones de acciones: Pertenecen a _list-messages-actions
+string idMessageActionSelectAll = "messageActionSelectAll";
+string idMessageActionSelectNone = "messageActionSelectNone";
+string idMessageActionSelectRead = "messageActionSelectRead";
+string idMessageActionSelectNotRead = "messageActionSelectNotRead";
+}
+
+@*
+----------------------------------------------------------------
+ -------------------- Acciones de mensajes (Marcar, actualizar, select..) --------------------
+*@
+
+@* Listado de acciones para hacer con resultados *@
+
+<div class="acciones-listado tipo-2 acciones-listado-mensajes">
+    <div class="wrap">
+        <div class="checkAllWrapper" id="checkAllMesagesWrapper">
+            @* Contenedor de botones en listado de mensajes *@
+            <div class="custom-control custom-checkbox">
+                @* Selección múltiple de mensajes *@
+                <input type="checkbox"
+                       class="custom-control-input"
+                       id="checkAllMesages" />
+                <label class="custom-control-label" for="checkAllMesages"> </label>
+            </div>
+            <div class="check-actions-wrap">
+                <a href="javascript: void(0);"
+                   class="dropdown-toggle check-actions-toggle"
+                   data-toggle="dropdown"
+                   aria-expanded="false">
+                    <span class="material-icons"> arrow_drop_down </span>
+                </a>
+                <div class="dropdown-menu basic-dropdown check-actions"
+                     id="checkActions"
+                     style="will-change: transform">
+                    <a id="@idMessageActionSelectAll" class="item-dropdown">@Html.GetText("CORREO", "TODOS")</a>
+                    <a id="@idMessageActionSelectNone" class="item-dropdown">@Html.GetText("CORREO", "NINGUNO")</a>
+                    <a id="@idMessageActionSelectRead" class="item-dropdown">@Html.GetText("CORREO", "LEIDOS")</a>
+                    <a id="@idMessageActionSelectNotRead" class="item-dropdown">@Html.GetText("CORREO", "NOLEIDOS")</a>
+                </div>
+            </div>
+        </div>
+        @* Botón para actualizar mensajes *@
+        <div class="btn btn-outline-grey" id="reloadMensajes">
+            <span class="material-icons">cached</span>
+        </div>
+        @* Botón para borrado múltiple de mensajes *@
+        <div class="btn btn-outline-grey" id="deleteMultiplesMensajes">
+            <span class="material-icons">delete</span>
+        </div>
+    </div>
+</div>

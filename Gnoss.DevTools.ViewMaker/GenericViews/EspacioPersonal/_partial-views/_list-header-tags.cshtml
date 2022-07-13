@@ -1,0 +1,34 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista que muestra las TAGS que se han utilizado o relacionadas con la búsqueda de Recursos en el espacio personal de un usuario. Estará localizada debajo de las acciones.
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Tags usados para buscar recursos realizados por el "buscador" de recursos en el espacio personal --------------------
+*@
+
+@* Panel con TAGS usados en las búsquedas *@
+@* Panel con TAGS usados en las búsquedas *@
+<div class="etiquetas" id="panFiltros" style="display: none;">
+    <div class="group filterSpace">        
+            
+            @* Borrado de filtros lo muestro mejor en "CargarFacetas.cshtml" del servicio "ServicioCargarFacetas". Será una flecha que da la sensación que elimina todos los filtros *@
+            @*<p>
+                <span>@Html.GetText("COMBUSQUEDAAVANZADA", "FILTROS"): </span>
+                <a style="margin-left: 5px;" href="@Html.GetUrlPagina()" class="limpiarfiltros">@Html.GetText("COMBUSQUEDAAVANZADA", "LIMPIARFILTROS")</a>
+            </p>*@
+            <ul class="facetedSearch tags" id="panListadoFiltros"><li style="display: none;"></li></ul>
+        
+        <input type="submit" style="display: none;" id="enviarFormCajaBusqueda" value="enviar" title="enviar" />
+    </div>
+</div>

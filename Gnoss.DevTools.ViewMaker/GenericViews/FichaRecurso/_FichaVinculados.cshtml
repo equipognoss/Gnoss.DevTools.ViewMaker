@@ -1,0 +1,46 @@
+﻿@model ResourceModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista que se utiliza para mostrar en el panel derecho de la ficha de producto, información relacionada con el recurso que se está visualizando.
+El título suele ser "Relacionados / Vinculados".
+Se trata de una vista parcial que se muestra directamente en la vista del recurso (_FichaRecurso).
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+// Nº de elementos vinculados máximo a mostrar en la lista
+int numElementsToDisplay = 5;
+// Contador que se utilizará para llevar el nº de elementos que se están mostrando y poder compararlo con numElementsToDisplay
+int countElementsToDisplay = 0;
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Panel de Vinculados de un recurso --------------------
+*@
+
+@* Mostrar recursos vinculados si existen relacionados*@
+@if (Model.RelatedResources.Count > 0)
+{
+    @*Panel de recursos vinculados*@
+    <div class="wrapCol">
+        <h2 class="section-title">@Html.GetText("VINCULACIONDOCUMENTACION", "RECVINCOMUNIDAD")</h2>
+        <div class="resource-list">
+            @foreach (ResourceModel fichaVinculado in Model.RelatedResources)
+            {
+                @Html.PartialView("ControlesMVC/_FichaRecursoMini", fichaVinculado)
+                countElementsToDisplay++;
+                if (countElementsToDisplay >= numElementsToDisplay)
+                {
+                    <!-- No existe el "Ver más". Lo dejo donde debería de estar de existir la posibilidad. 
+                        <a href="./listadoGrupos.php" class="ver-mas ver-mas-icono con-icono-after">Ver más</a>-->
+                    break;
+                }
+            }
+        </div>
+    </div>
+}

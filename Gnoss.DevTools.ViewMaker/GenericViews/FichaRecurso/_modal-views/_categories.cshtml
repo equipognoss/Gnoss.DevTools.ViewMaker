@@ -1,0 +1,107 @@
+﻿@model ResourceViewModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista modal que servirá para categorizar un recurso. Se mostrará cuando en la ficha del recurso, se pulse sobre "Categorizar".
+Para ahorrar código, esta vista modal se cargará en un modal "padre" que es el "__resourece-modal-container"
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+ResourceModel fichaRecurso = Model.Resource;
+// Guardar las categorías que se hayan seleccionado
+string categoriasSeleccionadas = "";
+// Llamada a la función para Agregar Categorías cuando se pulse en Guardar
+string funcionAgregarCategoriasAceptar = "AccionRecurso_AgregarCategorias_Aceptar('" + fichaRecurso.ListActions.UrlAddCategories + "', '" + fichaRecurso.Key + "', $('#despAccionRec_" + fichaRecurso.Key + "').find('#txtSeleccionados').val(), " + Model.AllowEditCategories.ToString().ToLower() + ", '" + fichaRecurso.UrlSearch + "/" + Html.GetText("URLSEM", "CATEGORIA") + "')";
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista Modal para opción de Categorizar un Recurso --------------------
+*@
+
+@{
+@* Carga inicial de las categorías que hay seleccionadas*@
+    if (fichaRecurso.Categories != null)
+    {
+        foreach (CategoryModel categoria in fichaRecurso.Categories)
+        {
+            categoriasSeleccionadas += categoria.Key + ",";
+        }
+    }
+}
+
+
+<div class="modal-header">
+    <p class="modal-title">
+        <span class="material-icons">labels</span>@Html.GetText("PERFILBASERECURSOSFICHA", "AGREGARCATEGORIA")
+    </p>
+    <span class="material-icons cerrar" data-dismiss="modal" aria-label="Close">close</span>
+</div>
+<div class="modal-body">
+    <div class="formulario-edicion" id='despAccionRec_@fichaRecurso.Key'>
+        <div class="form-group">
+            <label class="control-label">@Html.GetText("CONTROLESSELCATEGORIASBUSQUEDDAS", "SELCATEGORIAS"): </label>
+        </div>
+        <div id="panDesplegableSelCat">
+            @* Quitar la lista ya que solo hay una opción 
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                @* Opción Ver listado en Arbol
+                <li class="nav-item">
+                    <a class="nav-link active"
+                       id="ver-arbol-tab"
+                       data-toggle="tab"
+                       href="#ver-arbol"
+                       role="tab"
+                       aria-controls="ver-arbol"
+                       aria-selected="true">@Html.GetText("TESAURO", "VERARBOL")</a>
+                </li>
+                @* Opción Ver listado en Lista*@
+                @* Quitado de momento _FichaCategoriaTesauroLista 
+                <li class="nav-item">
+                    <a class="nav-link"
+                       id="ver-list-tab"
+                       data-toggle="tab"
+                       href="#ver-lista"
+                       role="tab"
+                       aria-controls="ver-lista"
+                       aria-selected="false">@Html.GetText("TESAURO", "VERLISTA")</a>
+                </li>                
+            </ul>
+            *@
+            @*
+            <div class="tab-content">*@
+                @* Listado en "ARBOL" *@
+                @Html.PartialView("../FichaRecurso/_FichaCategoriaTesauroArbol", Model)
+
+                @* Listado en "LISTA"*@
+                @* Quitado de momento _FichaCategoriaTesauroLista *@
+                @* @Html.PartialView("../FichaRecurso/_FichaCategoriaTesauroLista", Model) *@
+            @*</div>*@
+        </div>
+
+        @* Mensaje de aviso en la acción realizada *@
+        <div>
+            <div id="menssages">
+                <div class="ok"></div>
+                <div class="ko"></div>
+            </div>
+        </div>
+
+        @* Acciones del Modal - Guardar *@
+        <div class="form-actions">
+            <button onclick="@funcionAgregarCategoriasAceptar" class="btn btn-primary pmd-ripple-effect">@Html.GetText("COMMON", "ACEPTAR")</button>
+            
+        </div>
+
+        @* Input guardar guardar las selecciones *@
+        <input type="hidden"
+               id="txtSeleccionados"
+               class="hackCatTesSel"
+               value="@categoriasSeleccionadas" />
+
+    </div>
+</div>

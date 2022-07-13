@@ -1,0 +1,125 @@
+﻿@model ResultadoModel
+
+
+@*Descripción
+-----------------------------------------------
+Vista principal que cargará los resultados buscados por el usuario. Los tipos de resultados a mostrar pueden ser varios (Personas, Comunidades, Perfiles de usuario…).
+Dentro de esta vista, dependiendo del resultado a mostrar, se mostrará la subView que corresponda.
+En esta vista, se dispone como vista parcial de un contenedor de vistas modales, que se utiliza para mostrar en ella las vistas modales dinámicas de las acciones a realizar 
+sobre un elemento encontrado o listado.
+Las acciones que se gestionan en el servicio principal de Core (AccionesPerfil.csthml) llamarán al modal y ejecutarán el JS el cual pasará por JS el modal a visualizarse en el contenedor
+de modales padre.
+(Ej: Si se están buscando personas o perfil de personas, cada item resultado será _"ResultadoPerfil")
+
+Variables
+----------------------------------------------
+*@
+@{
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista para mostrar todos los posibles resultados de una búsqueda --------------------*@
+
+
+@if (Model != null)
+{
+    //string clasePrincipal = "listadoRecursos";
+    //string claseResource = "resource-list listView";
+
+    if (Model.MapView)
+    {
+        //clasePrincipal = "fichaMapa";
+        //claseResource = "resource-list mapView";
+    }
+
+    @*<div class="@clasePrincipal">
+        <div>*@
+            if (Model.NumeroResultadosTotal != -1)
+            {
+                <div id="numResultadosRemover">
+                    @Model.NumeroResultadosTotal                   
+                </div>
+            }
+            @*<div class="@claseResource">*@
+                
+                if (Model.ListaResultados != null && Model.ListaResultados.Count > 0)
+                {
+                    foreach (ObjetoBuscadorModel resultado in Model.ListaResultados)
+                    {
+                        if (resultado is CommunityModel)
+                        {
+                            @Html.PartialView("_ResultadoComunidad", (CommunityModel)resultado)
+                        }
+                        if (resultado is BlogModel)
+                        {
+                            @Html.PartialView("_ResultadoBlog", (BlogModel)resultado)
+                        }
+                        else if (resultado is ResourceModel)
+                        {
+                            if (Model.TipoBusqueda == ResultadoModel.TiposBusquedaMVC.Contribuciones)
+                            {
+                                @Html.PartialView("_ResultadoRecursoContribuciones", (ResourceModel)resultado)
+                            }
+                            else if (Model.TipoBusqueda == ResultadoModel.TiposBusquedaMVC.EditarRecursosPerfil)
+                            {
+                                @Html.PartialView("_ResultadoRecursoMisRecursos", (ResourceModel)resultado)
+                            }
+                            else
+                            {
+                                
+                                    @Html.PartialView("_ResultadoRecurso", (ResourceModel)resultado)
+                                
+                               
+                            }
+                        }
+                        else if (resultado is ProfileModel)
+                        {
+                            @Html.PartialView("_ResultadoPerfil", (ProfileModel)resultado)
+                        }
+                        else if (resultado is GroupCardModel)
+                        {
+                            @Html.PartialView("_ResultadoGrupo", (GroupCardModel)resultado)
+                        }
+                        else if (resultado is MessageModel)
+                        {
+                            @Html.PartialView("_ResultadoMensaje", (MessageModel)resultado)
+                        }
+                        else if (resultado is CommentSearchModel)
+                        {
+                            if (Model.TipoBusqueda == ResultadoModel.TiposBusquedaMVC.Contribuciones)
+                            {
+                                @Html.PartialView("_ResultadoComentarioContribuciones", (CommentSearchModel)resultado)}
+                            else
+                            {
+                                @Html.PartialView("_ResultadoComentario", (CommentSearchModel)resultado)
+                            }
+                        }
+                        else if (resultado is InvitationModel)
+                        {
+                            @Html.PartialView("_ResultadoInvitacion", (InvitationModel)resultado)
+                        }
+                        else if (resultado is ContactModel)
+                        {
+                            @Html.PartialView("_ResultadoContacto", (ContactModel)resultado)
+                        }
+                        else if (resultado is PaginaCMSModel)
+                        {
+                            @Html.PartialView("_ResultadoPaginaCMS", (PaginaCMSModel)resultado)
+                        }
+                    }
+                }
+                else
+                {
+                    <p>@Model.TextoSinResultados</p>
+                }
+            @*</div>*@
+            @* Paginador de resultados - Sustituido por scrolling de resultados                         
+            @Html.PartialView("_partial-views/_results-pagination", Model)  
+            *@
+    @*
+        </div>
+    </div>
+    *@
+}

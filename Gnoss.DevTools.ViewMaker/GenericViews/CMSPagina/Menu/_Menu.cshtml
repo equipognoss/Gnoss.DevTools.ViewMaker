@@ -1,0 +1,31 @@
+﻿@model CMSComponentMenu
+@if (Model != null)
+{
+    <ul>
+        @PintarOpciones(Model.ItemList)
+    </ul>
+}
+
+@functions{
+    string PintarOpciones(List<CMSComponentMenu.CMSComponentMenuItem> pListaOpciones)
+    {
+        foreach (CMSComponentMenu.CMSComponentMenuItem opcion in pListaOpciones)
+        {
+            string activo = "";
+            if (opcion.Active)
+            {
+                activo = "class=\"activo\"";
+            }
+            <li @Html.Raw(activo)>
+                <a href="@opcion.Link">@opcion.Name</a>
+                @if (opcion.ItemList != null && opcion.ItemList.Count > 0)
+                {
+                    <ul>
+                        @PintarOpciones(opcion.ItemList)
+                    </ul>
+                }
+            </li>
+        }
+        return string.Empty;
+    }
+}

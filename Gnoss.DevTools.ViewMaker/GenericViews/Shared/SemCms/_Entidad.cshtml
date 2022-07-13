@@ -1,0 +1,174 @@
+﻿@model SemanticEntityModel
+
+@{
+    string idControl = "";
+    bool readMode = Model.ReadMode;
+
+    if (!Model.SemanticResourceModel.ReadMode)
+    {
+        if (Model.SemanticResourceModel.RootEntities.Contains(Model))
+        {
+            idControl = "panel_" + Model.Key;
+        }
+        else
+        {
+            idControl = "pE_" + Model.Key;
+        }
+    }
+
+
+    string display = "";
+
+    if (Model.Hidden)
+    {
+        display = "style=\"display:none;\"";
+    }
+
+    string claseEnt = "contEnt contEnt_" + Model.Entity.TipoEntidadGeneracionClases;
+
+    if (Model.SpecificationEntity.ClaseCssPanel != null)
+    {
+        if (readMode || Model.Entity.SuperclasesUtiles.Count == 0)
+        {
+            claseEnt = Model.Entity.EspecifEntidad.ClaseCssPanel;
+        }
+        else
+        {
+            claseEnt += " " + Model.Entity.EspecifEntidad.ClaseCssPanel;
+        }
+    }
+
+    string tipoEntidadHtml = "";
+
+    if (!readMode && Model.SuperEntity != null)
+    {
+        claseEnt += " SuperEnt_" + Model.SuperEntity.Entity.TipoEntidadGeneracionIDs;
+        tipoEntidadHtml = "typeEnt=\"" + Model.Entity.TipoEntidad + "\"";
+    }
+
+    string typeOfRDFa = "";
+    string aboutRDFa = "";
+    string microDatos = "";
+    string microFormatos = "";
+
+    if (Model.SemanticResourceModel.ReadMode)
+    {
+        typeOfRDFa = "typeof=\"" + Model.TypeofRDFA + "\"";
+        aboutRDFa = "about=\"" + Model.AboutRDFA + "\"";
+
+        if (Model.SpecificationEntity.Microdatos != null)
+        {
+            microDatos = "itemprop=\"" + Model.SpecificationEntity.Microdatos + "\"";
+        }
+
+        foreach (string microKey in Model.SpecificationEntity.Microformatos.Keys)
+        {
+            if (microKey != "class")
+            {
+                microFormatos += microKey + "=\"" + Model.SpecificationEntity.Microformatos[microKey] + "\" ";
+            }
+            else
+            {
+                claseEnt += " " + Model.SpecificationEntity.Microformatos[microKey];
+            }
+        }
+    }
+}
+
+<div @Html.GetParam("id", idControl) @Html.Raw(display) class="@claseEnt" @Html.Raw(typeOfRDFa) @Html.Raw(aboutRDFa) @Html.Raw(microDatos) @Html.Raw(microFormatos) @Html.Raw(tipoEntidadHtml)>
+    @if (!readMode && Model.SubEntities != null && Model.SubEntities.Count > 0)
+    {
+        string classCmb = "select big cmbSubClass cmbSubClass_" + Model.Entity.TipoEntidadGeneracionIDs;
+        string onchangeCmb = "AjustarHerederasEntidad(this, '" + Model.Entity.TipoEntidad + "', true);";
+        
+        <select class="@classCmb" onchange="@onchangeCmb">
+			@if(Model.SelectedSubEntity == null && Model.SemanticResourceModel.RootEntities[0] == Model)
+			{
+				<option value="">@Html.GetText("COMMON", "SELECCIONATIPO")</option> 
+
+            }
+                @foreach (SemanticEntityModel entMod in Model.SubEntities)
+            {
+                    string textoCombo = entMod.SpecificationEntity.NombreEntidad(false);
+
+                    if (textoCombo == null)
+                    {
+                        textoCombo = entMod.Entity.TipoEntidad;
+                    }
+
+                    string selected = "";
+
+                    if (Model.SelectedSubEntity != null && Model.SelectedSubEntity == entMod)
+                    {
+                        selected = "selected";
+                    }
+
+                <option value="@entMod.Entity.TipoEntidad" @Html.GetParam("selected", selected)>@textoCombo</option> 
+            }
+        </select>
+        
+        foreach (SemanticEntityModel entMod in Model.SubEntities)
+        {
+            @Html.PartialView("SemCms/_Entidad", entMod);
+        }
+    }
+    else
+    {
+        if (readMode && Model.SpecificationEntity.EsMapaGoogle)
+        {
+            Html.GetListaJS().Add("//www.google.com/jsapi?key=" + Model.GoogleMapInfo.JsApiGoogleKey);
+            string idMap = "mapGoogle_" + Model.Entity.TipoEntidadGeneracionClases;
+            
+            if (!Model.SpecificationEntity.NoSustituirEntidadEnMapaGoogle)
+            {
+                <div id="@idMap" class="mapGoogle"></div>
+            }
+
+            if (!string.IsNullOrEmpty(Model.GoogleMapInfo.Latitude) && !string.IsNullOrEmpty(Model.GoogleMapInfo.Longitude))
+            {
+                Html.GetListaJS().Add("defer/" + Html.GetBaseUrlStatic() + "/jsNuevo/markerclusterer.js");
+
+                string latitud = Model.GoogleMapInfo.Latitude.Replace(",", ".");
+                string longitud = Model.GoogleMapInfo.Longitude.Replace(",", ".");     
+                
+                <script type="text/javascript">
+                    google.load("maps", "3",  {other_params:"sensor=false&key=@Model.GoogleMapInfo.JsApiGoogleKey"});
+
+                    var puntoActual=[[1],",,@latitud,@longitud"];
+                    $(document).ready(function () { utilMapas.fichaRecurso = true; utilMapas.MontarMapaResultados('#@idMap', puntoActual); });
+                </script>
+            }
+            else if (!string.IsNullOrEmpty(Model.GoogleMapInfo.Route))
+            {
+                <script type="text/javascript">
+                    google.load("maps", "3", { other_params: "sensor=false&key=@Model.GoogleMapInfo.JsApiGoogleKey" });
+                    $(document).ready(function () { InitializeRouteMapGoogle('@idMap', '@Html.Raw(Model.GoogleMapInfo.Route)', '@Html.Raw(Model.GoogleMapInfo.RouteColor)'); });
+                </script>
+            }
+        }
+        else if (Model.SuperEntity != null)
+        {
+            @Html.PartialView("SemCms/_TituloEntidad", Model)
+        }
+
+        if (!readMode || !Model.SpecificationEntity.EsMapaGoogle || Model.SpecificationEntity.NoSustituirEntidadEnMapaGoogle)
+        {
+            if (readMode && Model.Properties.Count > 0 && Model.Properties[0].Element.EsGrupo && Model.Properties[0].Element.TipoGrupo == "dl")
+            {
+                <dl>
+                    @foreach (SemanticPropertyModel semPropModel in Model.Properties)
+                    {
+                        @Html.PartialView("SemCms/_Propiedad", semPropModel);
+                    }
+                </dl>
+            }
+            else
+            {
+                foreach (SemanticPropertyModel semPropModel in Model.Properties)
+                {
+                    @Html.PartialView("SemCms/_Propiedad", semPropModel);
+                }
+            }
+        }
+    }
+</div>

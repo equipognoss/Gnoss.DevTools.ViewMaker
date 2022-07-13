@@ -1,0 +1,190 @@
+﻿@model ResourceViewModel
+
+@{
+    ResourceModel fichaRecurso = Model.Resource;
+    CommunityModel Comunidad = Html.GetComunidad();
+    HeaderModel cabecera = Html.GetCabecera();
+    UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+
+    if (!string.IsNullOrEmpty(Model.Action))
+    {
+        switch (Model.Action)
+        {
+            case "report-page":
+                <div class="reportPage">
+                    <fieldset>
+                        <legend class="tituloPanelInterior">@Html.GetText("PERFILBASERECURSOSFICHA", "REPORTAR_RECURSO_INFO")</legend>
+                        <textarea style="width:100%"></textarea>
+                        @{string funcionReportarAceptar = "AccionRecurso_ReportPage_Aceptar('" + fichaRecurso.ListActions.UrlReportPage + "', '" + fichaRecurso.Key + "')";}
+                        <input type="button" onclick="@funcionReportarAceptar" value="@Html.GetText("PERFILBASERECURSOSFICHA", "REPORTAR_RECURSO_ENVIAR")" />
+                    </fieldset>
+                </div>
+                break;
+            case "add-personal-space":
+                @Html.PartialView("_modal-views/_add-personal-space", Model);
+                break;
+            case "restore-version":
+                <div>
+                    <h3>
+                        @Html.GetText("PERFILBASE", "DESEARESTAURAR")
+                    </h3>
+                    @{string funcionAceptarRestaurar = "AccionRecurso_RestaurarVersion_Aceptar('" + fichaRecurso.ListActions.UrlRestoreVersion + "', '" + fichaRecurso.Key + "')";}
+                    <input type="button" class="btn btn-primary" onclick="@funcionAceptarRestaurar" value="@Html.GetText("COMMON", "SI")" />
+                    @*Cambiado el nombre del panel donde aparecerá el formulario para Comprobar si realmente se desea Restaurar o no (Se hace desde modal específico)*@
+                    @*@{string funcionCancelarRestaurar = "CerrarPanelAccion('despAccionRec_" + fichaRecurso.Key + "')";}*@
+                    @{string funcionCancelarRestaurar = "CerrarPanelAccion('despAccionRec_history')";}
+                    <input type="button" class="btn btn-outline-primary" onclick="@funcionCancelarRestaurar" value="@Html.GetText("COMMON", "NO")" />
+
+                </div>
+                break;
+            case "add-categories":
+                @Html.PartialView("_modal-views/_categories", Model);
+                break;
+
+            case "add-tags":
+                @Html.PartialView("_modal-views/_tag", Model);
+                break;
+            case "share":
+                @Html.PartialView("_modal-views/_share", Model);
+                break;
+            case "duplicate":
+                <div>
+                    <div class="compartirRec">
+                        <fieldset>
+                            @{
+                                string textoDuplicar = Html.GetText("CONTROLESDOCUMENTACION", "DUPLICARRECURSO");
+                                if (fichaRecurso.TypeDocument == ResourceModel.DocumentType.Pregunta)
+                                {
+                                    textoDuplicar = Html.GetText("CONTROLESDOCUMENTACION", "DUPLICARPREGUNTA");
+                                }
+                            }
+                            <legend class="tituloPanelInterior">@textoDuplicar</legend>
+                            @if (fichaRecurso.Duplicates != null && fichaRecurso.Duplicates.Count > 0)
+                            {
+                                <div class="box">
+                                    <p>
+                                        <label>@Html.GetText("CONTROLESDOCUMENTACION", "COMUNIDADESYADUPLICADO");</label>
+                                        @foreach (ResourceModel.SharedBRModel brCompartido in fichaRecurso.Duplicates)
+                                        {
+                                            <label class="destacado">@brCompartido.Name</label>
+                                        }
+                                    </p>
+                                </div>
+                            }
+                        </fieldset>
+                        <fieldset>
+                            <p>
+                                <label>@Html.GetText("CONTROLESDOCUMENTACION", "DUPLICAREN")</label>
+                                <select id="ddlCompartir">
+                                    @foreach (string urlComunidad in Model.UserComunities.Keys)
+                                    {
+                                        <option value="@urlComunidad" rel="@Model.UserComunities[urlComunidad].Value">@Model.UserComunities[urlComunidad].Key</option>
+                                    }
+                                </select>
+                            </p>
+                        </fieldset>
+
+                        <fieldset id="panBotonAceptar">
+                            <div>
+                                @{
+                                    string funcionAccionRecurso_Duplicar_Aceptar = "AccionRecurso_Duplicar_Aceptar('" + fichaRecurso.ListActions.UrlDuplicate + "', '" + fichaRecurso.Key + "', '" + fichaRecurso.CompletCardLink + "')";
+                                }
+                                <input type="button" onclick="@funcionAccionRecurso_Duplicar_Aceptar" value="@Html.GetText("COMMON", "ACEPTAR")" />
+
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+                break;
+            case "send-newsletter":
+                @Html.PartialView("_modal-views/_send-newsletter", Model);
+                break;
+            case "send-newsletter-groups":
+                <div>
+                    <fieldset>
+                        <p>@Html.GetText("INVITACIONES", "SELECCIONAGRUPOS")</p>
+                        <fieldset class="filtroRapido">
+                            <p>
+                                <input type="text" autocomplete="off" class="filtroFaceta ac_input" id="txtFiltroGrupos_@fichaRecurso.Key" />
+                                <input type="hidden" id="txtFiltroGrupos_@{@fichaRecurso.Key}_Hack" />
+                                <span class="searchButton"></span>
+                            </p>
+                        </fieldset>
+                        <input type="hidden" id="txtHackGrupos_@fichaRecurso.Key" />
+                        <p></p>
+                    </fieldset>
+                    <div style="display:none" id="contenedorEnviar_@fichaRecurso.Key">
+                        <fieldset>
+                            <div id="panContenedorGrupos_@fichaRecurso.Key">
+                                <p>@Html.GetText("PERFILBASERECURSOSFICHA", "NEWSLETERGRUPOS")</p>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <p>@Html.GetText("PERFILBASERECURSOSFICHA", "PEGUNTAENVIARCORREOTODOSMIEMBROSGRUPOS")</p>
+                        </fieldset>
+                        <fieldset>
+                            <p>
+                                @foreach (KeyValuePair<string, string> idioma in cabecera.Languajes)
+                                {
+                                    string funcionEnviarNewsletterGrupoIdioma = "AccionRecurso_EnviarNewsletterGrupos_Aceptar('" + idioma.Key + "', '" + fichaRecurso.ListActions.UrlSendNewsletterGroups + "', '" + fichaRecurso.Key + "', $('#txtHackGrupos_" + fichaRecurso.Key + "').val())";
+
+                                    <input type="button" value="@idioma.Value" onclick="@funcionEnviarNewsletterGrupoIdioma" />
+                                }
+                            </p>
+                            <p>
+                                @{string funcionCancelarEnviarNewsletterGrupo = "CerrarPanelAccion('despAccionRec_" + fichaRecurso.Key + "')";}
+                                <input type="button" value="@Html.GetText("PERFILBASE", "CANCELAR")" onclick="@funcionCancelarEnviarNewsletterGrupo    ;" />
+                            </p>
+                        </fieldset>
+
+                        <script type="text/javascript">
+                                CargarAutocompletarGrupos('txtFiltroGrupos_@fichaRecurso.Key', 'txtHackGrupos_@fichaRecurso.Key', '@IdentidadActual.KeyIdentity', '@IdentidadActual.KeyMetaProyectIdentity', '@IdentidadActual.KeyOrganization', '@Comunidad.Key', $('input#inpt_urlServicioAutocompletar').val());
+
+                                $('#txtFiltroGrupos_@fichaRecurso.Key').result(function (event, data, formatted) { seleccionarAutocompletar(data[0], data[1], 'panContenedorGrupos_@fichaRecurso.Key', 'txtHackGrupos_@fichaRecurso.Key', 'contenedorEnviar_@fichaRecurso.Key', 'txtFiltroGrupos_@fichaRecurso.Key'); })
+                        </script>
+                    </div>
+                </div>
+                break;
+            case "link-resource":
+                @Html.PartialView("_modal-views/_link", Model);
+                break;
+            case "lock-unlock-comments":
+                @Html.PartialView("_modal-views/_lock-comments", Model);
+                break;
+                
+            case "certify":
+                @Html.PartialView("_modal-views/_certify", Model);
+                break;
+            case "delete":
+                @Html.PartialView("_modal-views/_delete", Model);
+                break;
+            case "delete-selective":
+                @Html.PartialView("_modal-views/_delete-selective", Model);                
+                break;
+        }
+    }
+}
+
+@functions{
+    string PintarCategoria(CategoryModel pCategoriaTesauro, int pNivel)
+    {
+        ResourceModel fichaRecurso = Model.Resource;
+        bool tieneHijos = ((List<CategoryModel>)Model.Categories).Count(cat => cat.ParentCategoryKey == pCategoriaTesauro.Key) > 0;
+
+        string nombre = "";
+        for (int i = 0; i < pNivel; i++)
+        {
+            nombre += "&nbsp;";
+        }
+        nombre += pCategoriaTesauro.Name;
+        <option value="@pCategoriaTesauro.Key">@Html.Raw(nombre)</option>
+        if (tieneHijos)
+        {
+            foreach (CategoryModel categoria in ((List<CategoryModel>)Model.Categories).Where(cat => cat.ParentCategoryKey == pCategoriaTesauro.Key).OrderBy(cat => cat.Order))
+            {
+                @PintarCategoria(categoria, pNivel + 1);
+            }
+        }
+        return string.Empty;
+    }
+}

@@ -1,0 +1,31 @@
+﻿@model string
+
+@{ 
+    Html.SetBodyClass("full operativaRegistro layout03");
+}
+
+<div id="col02">
+    <div class="form formtheme01 formularioRegistroUsuarios">
+        <div class="box box01">
+            <div class="box box01">
+                <div id="divinfo">
+                    <div id="info" class="info columms">
+                        <h3>
+                            <span></span>@Html.GetText("COMINICIOLOGIN", "INVITACIONACEPTADA")
+                        </h3>
+                        <div class="col-4">
+                            <div class="box">
+                                <div id="ctl00_CPH1_divMensPrincipal">
+
+
+                                    <p>@Html.GetText("ACEPTARINVITACION", "BIENVENIDO", Model)</p> 
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

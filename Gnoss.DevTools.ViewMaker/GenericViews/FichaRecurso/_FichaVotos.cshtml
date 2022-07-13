@@ -1,0 +1,87 @@
+﻿@model VotesModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista que contiene información de los siguientes datos de un recurso.
+- Nº de votos positivos
+- Nº de votos negativos.
+Contine también utiles existentes o funcionalidades de Core anteriores.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Ficha de Votos de un recurso --------------------
+*@
+
+<div class="interacciones-recurso">
+    @* Gestión de Votos positivos *@
+
+    <div class="likes @( (Model.IsVotedPositive) ? "activo" : null)">           
+        @if (!Model.IsOwnedAuthor)
+        {
+            if (Model.IsVotedPositive)
+            {
+                if (Model.AllowNegativeVotes)
+                {
+                    <span id="op_Like" onclick="AccionRecurso_VotarEliminar(this, '@Model.UrlDeleteVote', '@Model.UrlVotePositive')" class="material-icons eleccionUsuario iconizer">thumb_up_alt</span>
+                }
+                else
+                {
+                    <span id="op_Like" onclick="AccionRecurso_VotarEliminar(this, '@Model.UrlDeleteVote', '@Model.UrlVotePositive')" class="material-icons eleccionUsuario iconizer">thumb_up_alt</span>
+                }
+            }
+            else
+            {
+                <span id="op_Like" onclick="AccionRecurso_VotarPositivo(this, '@Model.UrlVotePositive', '@Model.UrlDeleteVote')" class="material-icons iconizer">thumb_up_alt</span>
+
+            }
+        }
+        else { 
+            @*Es el propietario del recurso -> No puede votar *@ 
+            <span id="op_Like" title="El propietario del recurso no puede votar" style="color: #ccc;" class="material-icons eleccionUsuario iconizer">thumb_up_alt</span>
+        }
+        <span class="number">@Model.NumVotes</span>
+    </div>
+</div>
+
+
+    @* Otro panel de votos - Sin diseño en dewenir - De momento lo dejo comentado
+        @if (Model.ShowVoters && (Model.IsVotedPositive || Model.IsVotedNegative || Model.IsOwnedAuthor))
+        {
+            <p class="votosPositivos">
+                <a href="#panelVotosAmpliado">@Html.GetText("PERFILBASERECURSOSFICHA", "QUIENHAVOTADO")</a>
+            </p>
+            <div id="panelVotosSimple" class="panelVotosSimple">
+                <div id="panelVotosSimpleInt" class="wrap"></div>
+                @if (Model.Voters != null)
+                {
+                    <ul>
+                    @foreach (VotesModel.VoterModel votante in Model.Voters)
+                    {
+                        string voto = "positivo";
+                        if (votante.Vote == -1)
+                        {
+                            voto = "negativo";
+                        }
+                        <li class="@voto"><span>@votante.Name</span></li>
+                    }
+                    </ul>
+                }
+            </div>
+
+            <div id="panelVotosAmpliado" class="panelVotosAmpliado no-data-panel">
+                <div class="wrap">
+                    <div id="panelVotantes"></div>
+                </div>
+            </div>
+        }
+    *@
+

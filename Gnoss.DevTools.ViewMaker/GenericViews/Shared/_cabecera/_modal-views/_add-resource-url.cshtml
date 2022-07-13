@@ -1,0 +1,61 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista modal que se utiliza para cargar un URL a modo de recurso en una comunidad. Se llama, cuando el usuario pulsa en (+).
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista Modal para Añadir un URL a modo de recurso en una comunidad --------------------
+*@
+
+<div class="modal modal-top fade show"
+     tabindex="-1"
+     role="dialog"
+     id="modal-add-resource-url">
+
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            @* Título del modal *@
+            <div class="modal-header">
+                <p class="modal-title">
+                    <span class="material-icons">link</span>@Html.GetText("PERFILBASESUBIR", "DIRECCIONURL_T")
+                </p>
+                <span class="material-icons cerrar"
+                      data-dismiss="modal"
+                      aria-label="Close">close</span>
+            </div>
+            @* Cuerpo del modal *@
+            <div class="modal-body">
+                <div class="formulario-edicion">
+                    <div id="lblSelecionaUnDoc" class="form-group">
+                        <label class="control-label">@Html.GetText("PERFILBASESUBIR", "DIRECCIONURL")</label>
+                    </div>
+                    @* Input para introducir la URL a modo recurso *@
+                    <div id="divURL" class="form-group">
+                        <label id="lblIntroducirURL">@Html.GetText("PERFILBASESUBIR", "DIRECCIONURL_T")</label>
+                        <input id="txtURLDoc" placeholder="Introduce una @Html.GetText("PERFILBASESUBIR", "DIRECCIONURL_T")" type="text" class="form-control" aria-describedby="txtURLHelp" onkeydown="if(event.which || event.keyCode){if ((event.which == 13) || (event.keyCode == 13)) {return false;}}" />
+                        <small id="txtURLHelp" class="form-text text-muted"></small>
+                    </div>
+
+                    @* Caja para mensajes de posibles errores (Ej: La url ya se ha compartido) *@
+                    <div id="modal-add-resource-link-messages-wrapper">
+                        <div class="ko"></div>
+                    </div>
+
+
+                    @* Botón de acción de subir URL *@
+                    <div class="form-actions">
+                        <input id="lbSiguienteURL" class="btn btn-primary" type="submit" value="@Html.GetText("PERFILBASESUBIR", "SIGUIENTE")" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

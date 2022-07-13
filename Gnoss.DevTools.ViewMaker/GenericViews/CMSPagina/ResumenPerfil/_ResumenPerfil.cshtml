@@ -1,0 +1,59 @@
+﻿@model CMSComponentProfileSummary
+@if (Model != null)
+{   
+    <div class="group mgResumenPerfil">
+        <div class="head-group">
+            <h4>@Model.Title</h4>
+        </div>
+        <div class="body-group">
+            <div class="resource">
+                <div class="box description">
+                    <div class="group title">
+                        <h4>
+                            <a href="@Model.ProfileUrl">@Model.ProfileName</a>
+                        </h4>
+
+                        @{
+    string classResourceType = "resourceType persona";
+    if (!string.IsNullOrEmpty(Model.ProfileUrlImage))
+    {
+        classResourceType += " conImagenPerfil";
+    }
+                        }
+
+
+                        <div class="@classResourceType">
+                            <a href="@Model.ProfileUrl">
+                                @if (!string.IsNullOrEmpty(Model.ProfileUrlImage))
+                                {
+                                    <img alt="@Model.ProfileName" src="@Model.ProfileUrlImage"/>
+                                }
+                            </a>
+                        </div>
+                    </div>
+                     <div class="group content">
+                         <ul class="estadisticas">
+                             <li class="usuarioSeguidores">
+                                 <span class="clave">@Html.GetText("PERFIL", "SEGUIDORES") </span>
+                                 <a class="valor" href="@Model.ProfileFollowersUrl">@Model.ProfileFollowersNumber</a>
+                             </li>
+                             <li class="usuarioSiguiendo">
+                                 <span class="clave">@Html.GetText("PERFIL", "SIGUIENDO") </span>
+                                 <a class="valor" href="@Model.ProfileFollowingUrl">@Model.ProfileFollowingNumber</a>
+                             </li>
+                             <li class="usuarioRecursosEspacio">
+                                 <span class="clave">@Html.GetText("PERFIL", "RECURSOSENESPACIOPERSONAL") </span>
+                                 <a class="valor" href="@Model.ProfilePersonalResourcesUrl">@Model.ProfilePersonalResourcesNumber</a>
+                             </li>
+                             <li class="usuarioRecursosPublicados">
+                                 <span class="clave">@Html.GetText("PERFIL", "MISCONTRIBUCIONES") </span>
+                                 <a class="valor" href="@Model.ProfileCommunityResourcesUrl">@Model.ProfileCommunityResourcesNumber</a>
+                             </li>
+                         </ul>
+                     </div>
+                </div>
+               
+            </div>
+        </div>
+    </div>
+}

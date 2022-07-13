@@ -1,0 +1,136 @@
+﻿@model EditProfileViewModel
+@*
+Descripción
+-----------------------------------------------
+Vista que se utilizara para mostrar/editar los datos de la organización. El usuario debe tener privilegios para realizar o acceder a modificar esta información
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+EditProfileViewModel.ProfileOrganizationViewModel Perfil = Model.ProfileOrganization;
+
+@* Identificadores de elementos HTML para lógica JS *@
+@* ID del input Razón Social *@
+string idNameOrganization = "ProfileOrganization_NameOrganization";
+string inputNameOrganization = "ProfileOrganization.NameOrganization";
+@* ID del input país *@
+string idCountryOrganization = "ProfileOrganization_Country";
+string inputCountryOrganization = "ProfileOrganization.Country";
+@* ID del input de código Postal de Organización *@
+string idPostalCodeOrganization = "ProfileOrganization_PostalCode";
+string inputPostalCodeOrganization = "ProfileOrganization.PostalCode";
+@* ID del input de código Localidad de Organización *@
+string idLocationOrganization = "ProfileOrganization_Location";
+string inputLocationOrganization = "ProfileOrganization.Location";
+@* ID del alias/nombre corto de Organización *@
+string idAliasOrganization = "ProfileOrganization_Alias";
+string inputAliasOrganization = "ProfileOrganization.Alias";
+@* ID de la web de la Organización *@
+string idWebsiteOrganization = "ProfileOrganization_WebSite";
+string inputWebOrganization = "ProfileOrganization.WebSite";
+@* ID de la dirección de la Organización *@
+string idAddressOrganization = "ProfileOrganization_Address";
+string inputAddressOrganization = "ProfileOrganization.Address";
+
+@* Título de labels*@
+string textoNombre = Html.GetText("REGISTROORGANIZACION", "RAZONSOCIAL");
+string textoAlias = Html.GetText("REGISTROORGANIZACION", "ALIAS");
+string textoDireccion = Html.GetText("REGISTROORGANIZACION", "DIRECCIONSEDE");
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Editar datos de la organización ( Razón Social, País, Código Postal, Localidad, Nombre corto de la organización ...) --------------------
+*@
+
+@* Razón social *@
+<div class="form-group mb-5 edit-nombre">
+    <label class="control-label d-block" for="@idNameOrganization">@textoNombre</label>
+    <input placeholder="Introduce la razón social"
+           type="text"
+           name="@inputNameOrganization"
+           id="@idNameOrganization"
+           value="@Perfil.NameOrganization"
+           class="form-control not-outline" />
+</div>
+
+@* País de la organización *@
+@if (Model.CountryList != null && Model.CountryList.Count > 0)
+{
+    <div class="form-group mb-5">
+        <label class="control-label d-block" for="@idCountryOrganization">@Html.GetText("PERFIL", "PAIS")</label>
+        <select id="@idCountryOrganization" name="@inputCountryOrganization" class="js-select2" data-select-search="true">
+            <option value="@Guid.Empty">@Html.GetText("REGISTRO", "SINESPECIFICAR")</option>
+            @foreach (Guid paisID in Model.CountryList.Keys)
+            {
+                <option value="@paisID" @(paisID == Perfil.Country ? "selected=selected" : "")>@Model.CountryList[paisID]</option>
+            }
+        </select>
+    </div>
+}
+
+@* Código Postal de la organización *@
+<div class="form-group mb-5">
+    <label class="control-label d-block" for="@idPostalCodeOrganization">@Html.GetText("REGISTRO", "CODIGOPOSTAL")</label>
+    <div class="input-wrap">
+        <input placeholder="Introduce tu código postal"
+            type="text"
+            id="@idPostalCodeOrganization"
+            value="@Perfil.PostalCode"
+            name="@inputPostalCodeOrganization"
+            class="form-control not-outline" />
+    </div>
+</div>
+
+@* Localidad de la organización *@
+<div class="form-group mb-5">
+    <label for="@idLocationOrganization"
+           class="control-label d-block">@Html.GetText("REGISTRO", "POBLACION")</label>
+        <input placeholder=""
+               type="text"
+               name="@inputLocationOrganization"
+               id="@idLocationOrganization"
+               value="@Perfil.Location"
+               class="form-control not-outline" />
+</div>
+
+@* Nombre corto / Alias de la organización *@
+<div class="form-group mb-5 edit-nombre">
+    <label class="control-label d-block" for="@idAliasOrganization">@textoAlias</label>
+    <input placeholder="Introduce un nombre corto para la organización"
+           type="text"
+           name="@inputAliasOrganization"
+           id="@idAliasOrganization"
+           value="@Perfil.Alias"
+           class="form-control not-outline" />
+</div>
+
+@* Web de la organización *@
+<div class="form-group mb-5 edit-nombre">
+    <label class="control-label d-block" for="@idWebsiteOrganization">@Html.GetText("REGISTROORGANIZACION", "WEB")</label>
+    <input placeholder="Introduce la página web de la organización"
+           type="text"
+           name="@inputWebOrganization"
+           id="@idWebsiteOrganization"
+           value="@Perfil.WebSite"
+           class="form-control not-outline" />
+</div>
+
+@* Provincia *@
+@if (Model.CountryList != null && Model.CountryList.Count > 0)
+{
+    @Html.PartialView("_Provincia", Model)
+}
+
+@* Dirección de organización *@
+<div class="form-group mb-5 edit-nombre">
+    <label class="control-label d-block" for="@idAddressOrganization">@textoDireccion</label>
+    <input placeholder="Introduce un nombre corto para la organización"
+           type="text"
+           name="@inputAddressOrganization"
+           id="@idAddressOrganization"
+           value="@Perfil.Address"
+           class="form-control not-outline" />
+</div>

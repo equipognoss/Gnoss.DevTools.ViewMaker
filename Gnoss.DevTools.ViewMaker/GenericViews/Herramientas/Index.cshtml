@@ -1,0 +1,65 @@
+﻿<div id="col01">
+    <h2>@Html.GetText("DESCARGAS", "TITULO")</h2>
+    <div>
+        <span>
+            @{
+                string texto1 = Html.GetText("DESCARGAS", "INST1IE");
+                string texto2 = Html.GetText("DESCARGAS", "INF21") + Html.GetText("DESCARGAS", "INF22IE");
+                if (Context.Request.Headers["User-Agent"].ToString() == "Firefox")
+                {
+                    texto1 = Html.GetText("DESCARGAS", "INST1FF");
+                    texto2 = Html.GetText("DESCARGAS", "INF21") + Html.GetText("DESCARGAS", "INF22FF");
+                }
+            }
+            @Html.Raw(Html.GetText("DESCARGAS", "TEXTO1", texto1))
+        </span>
+        <div style="align: center;">
+            @{
+                string VERSION_ACTUAL = "2.1.1890";
+                          
+                string urlAddTo = Html.GetBaseUrl() + "/" + Html.GetText("URLSEM", "ANYADIRAGNOSS");
+
+                string antiguoAddToGnoss = "var descp=(window.getSelection?window.getSelection():(document.getSelection)?document.getSelection():'')+'',e=encodeURIComponent,g=document.getElementsByTagName('meta'),i=(g)?g.length:0,tags='',n,redireccionar,parametros,url;redireccionar=function(){location.href=url;};function obtenerMetaInfo(cadena){var v,i=(g)?g.length:0;while(i--){n=g[i].getAttribute('name');if(n){if(n.toLowerCase()==cadena){v=g[i].getAttribute('content');break;}}};return%20(v)?e(v.substring(0,1000)):'';};descp=(descp=='')?obtenerMetaInfo('description'):descp.substring(0,1000);tags=(tags=='')?obtenerMetaInfo('keywords'):tags.substring(0,1000);parametros='?addToGnoss='%20+e(location.href)%20+'&titl='+e(document.title.replace(/\\n/g,\"\").replace(/\\t/g,\"\"))%20+'&descp='+descp%20+'&tags='+%20tags;url='" + urlAddTo + "'%20+parametros;if(/Firefox/.test(navigator.userAgent))setTimeout(redireccionar,0);else redireccionar();";
+
+                string linkAddToGnoss = "javascript:(function(){if(!document.getElementById('gnoss-script-addtoGnoss'))try{verAddTo='" + VERSION_ACTUAL + "';urlAddTo='" + urlAddTo + "';var%20codigo=document.createElement('script');codigo.type='text/javascript';codigo.id='gnoss-script-addtoGnoss';codigo.src='" + Html.GetBaseUrl() + "/js/AddToGnoss/AnyadirAGnoss.js';(document.body||document.documentElement).appendChild(codigo);}catch(x){" + antiguoAddToGnoss + "}%20else%20EjecutarFunciones();})()";
+
+                string onclickAddToGnoss = "if($.browser.msie){alert('Arrastre el botón sobre la barra de herramientas de tu navegador.');}else{alert('Pulse el botón derecho y selecciones añadir a favoritos.');} return false;";
+            }
+            <a style="margin-right: -30px;" class="marcador" href="@linkAddToGnoss" onclick="@onclickAddToGnoss">
+                <img alt="@Html.GetText("ANYADIRHERRAMIENTA", "AGREGARAGNOSS")" src="@Html.GetBaseUrl()/favicon.ico?v=@Html.GetVersion()" />
+            </a>
+            <a class="marcador" href="@linkAddToGnoss" onclick="@onclickAddToGnoss">@Html.GetText("ANYADIRHERRAMIENTA", "AGREGARAGNOSS")</a>
+        </div>
+
+        <div class="clear"></div>
+        @{
+            UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+            string link200332 = "";
+            string link200732 = "";
+            string link200364 = "";
+            string link200764 = "";
+            string linkplugin32 = "";
+            string linkplugin64 = "";
+
+            if (!IdentidadActual.IsGuestUser)
+            {
+                link200332 = Html.GetBaseUrl() + "/aplic/gnossoffice2003addin32.exe";
+                link200732 = Html.GetBaseUrl() + "/aplic/gnossoffice2007addin32.exe";
+                linkplugin32 = Html.GetBaseUrl() + "/aplic/gnosswindowsplugin32.msi";
+                link200364 = Html.GetBaseUrl() + "/aplic/gnossoffice2003addin64.exe";
+                link200764 = Html.GetBaseUrl() + "/aplic/gnossoffice2007addin64.exe";
+                linkplugin64 = Html.GetBaseUrl() + "/aplic/gnosswindowsplugin64.msi";
+            }
+            else
+            {
+                link200332 = Html.GetBaseUrlIdioma() + "/login/redirect/" + "herramientas-gnoss#officeGnoss";
+                link200732 = Html.GetBaseUrlIdioma() + "/login/redirect/" + "herramientas-gnoss#officeGnoss";
+                linkplugin32 = Html.GetBaseUrlIdioma() + "/login/redirect/" + "herramientas-gnoss#anadirGnoss";
+                link200364 = Html.GetBaseUrlIdioma() + "/login/redirect/" + "herramientas-gnoss#officeGnoss";
+                link200764 = Html.GetBaseUrlIdioma() + "/login/redirect/" + "herramientas-gnoss#officeGnoss";
+                linkplugin64 = Html.GetBaseUrlIdioma() + "/login/redirect/" + "herramientas-gnoss#anadirGnoss";
+            }
+        }
+        @Html.Raw(Html.GetText("DESCARGAS", "TEXTO2", texto2, Html.GetBaseUrlStatic() + "/img/office.png", link200332, link200732, link200364, link200764, linkplugin32, linkplugin64, Html.GetBaseUrlStatic() + "/img/download-exe.png"))
+    </div>
+</div>

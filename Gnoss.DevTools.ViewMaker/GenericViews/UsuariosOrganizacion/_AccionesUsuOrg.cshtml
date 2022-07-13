@@ -1,0 +1,121 @@
+﻿@model List<ProyectosUsuViewModel>
+
+@*
+Descripción
+-----------------------------------------------
+Vista modal para que lista todos los usuarios para poder asociarse a una comunidad (Acciones de usuarios de la comunidad).
+
+Variables
+----------------------------------------------------------------*@
+@{
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista de listado de usuarios para hacer acciones de "Añadir usuarios a la comunidad" --------------------
+*@
+
+@* Header del Modal *@
+<div class="modal-header">
+    <p class="modal-title">
+        <span class="material-icons">person_add_alt_1</span>
+            Asignar usuarios a comunidad
+    </p>
+    <span class="material-icons cerrar" data-dismiss="modal" aria-label="Close">close</span>
+</div>
+@* Contenido donde se mostrará el contenido del Modal cargado *@
+<div class="modal-body" id="accionesUsuOrg">
+    <div class="form-group modal-resultados">
+        @* Buscador / Filtrador *@        
+        <div class="buscador-coleccion">
+            <div>
+                <span class="buscar">
+                    <input type="text" value="" class="texto inputFiltro" placeholder="@Html.GetText("METABUSCADOR", "ENCONTRAR")">
+                    <span class="material-icons lupa">search</span>
+                </span>
+            </div>
+        </div>
+    </div>
+    @* CheckBox para Mostrar comunidades en las que participa el usuario *@
+    <div class=" custom-control themed little custom-checkbox d-flex justify-content-end">
+        <input
+            type="checkbox"
+            class="custom-control-input mostrarParticipa"
+            id="mostrarParticipa"
+        />
+        <label class="custom-control-label"
+               for="mostrarParticipa">
+            Mostrar solo comunidades en las que participa
+        </label>
+    </div>
+
+    @* Tabla de usuarios para Acciones del Proyecto Organización *@
+    <table id="tblAccionesUsuOrgProyOrg" class="table">
+        <thead>
+            <tr>
+                <th scope="col">Nombre</th>
+                <th scope="col">Personal</th>
+                <th scope="col">Corporativo</th>
+            </tr>
+        </thead>
+        <tbody>
+            @* Listar cada una de las comunidades / items *@
+            @foreach (ProyectosUsuViewModel proyParticipa in Model) {
+                bool participa = proyParticipa.Participa;
+                bool administra = proyParticipa.Administra;
+                <tr class="proyecto" data-proyecto="@proyParticipa.Key">                    
+                    <td>
+                        <div class="custom-control themed little custom-checkbox d-flex justify-content-between">
+                            @* Input de Administra o no*@
+                            <input type="checkbox" 
+                                   class="custom-control-input chkProyecto"
+                                   id="chkProyecto_@proyParticipa.Key"                                   
+                                   name="chkProyecto_@proyParticipa.Key"
+                                   @Html.Raw(participa ? "checked=\"checked\"" : "") 
+                                   @Html.Raw(administra ? "disabled=\"disabled\"" : "")
+                                   onclick="javascript: marcarElementosSelProy(this, '@proyParticipa.Key')">
+                            @* Nombre del usuario *@
+                            <label class="custom-control-label" for="chkProyecto_@proyParticipa.Key">@proyParticipa.Nombre</label>
+                            @if (administra)
+                            {
+                                <label class="text-muted">Administrador</label>                                
+                            }
+                        </div>
+                    </td>
+                    @* Participa (Personal y Corporativo) *@
+                    <td>
+                        <div class="form-check @(!participa ? "d-none" : "")">
+                            <input type="radio" 
+                                   class="form-check-input position-static" 
+                                   value="1" name="tipo_@proyParticipa.Key"
+                                   @Html.Raw(proyParticipa.TipoParticipacion == 1 ? "checked=\"checked\"" : "")
+                                   aria-label="tipo_@proyParticipa.Key">                       
+                        </div>
+
+                    </td>
+                    <td>
+                        <div class="form-check @(!participa ? "d-none" : "")">
+                            <input type="radio" 
+                                   class="form-check-input position-static"
+                                   value="2" name="tipo_@proyParticipa.Key"
+                                   @Html.Raw(proyParticipa.TipoParticipacion == 2 ? "checked=\"checked\"" : "") 
+                                   aria-label="tipo_@proyParticipa.Key">                                                   
+                        </div>
+                    </td>                                                    
+                </tr>
+            }       
+        </tbody>
+    </table>
+
+    @* Botón de acciones *@
+    <div class="form-actions">
+        <button data-dismiss="modal" class="btn btn-outline-primary">
+            @Html.GetText("COMMON", "CANCELAR")
+        </button>
+
+        <button class="btn btn-primary ml-1 btnAceptarAccionesProyOrg">
+            @Html.GetText("COMMON", "ACEPTAR")
+        </button>
+    </div>
+</div>

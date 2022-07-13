@@ -1,0 +1,102 @@
+﻿@using Es.Riam.Util;
+@model ResourceModel
+
+@if (Model != null)
+{    
+    <div class="resource actividad">
+        <div class="box description">
+            <div class="group title">
+                <h4>
+                    <a href="@Model.CompletCardLink">@Model.Title</a>
+                </h4>
+            </div>
+            <div class="group content">
+                @{
+                    string descripcionCorta = UtilCadenas.EliminarHtmlDeTexto(Model.Description.Replace("<p>", "<p> ").Replace("</n>", "</n> "));
+                    if (descripcionCorta.Length > 150)
+                    {
+                        descripcionCorta = descripcionCorta.Substring(0, 150) + "...";
+                    }
+                    if (!string.IsNullOrEmpty(descripcionCorta))
+                    {
+                        descripcionCorta = "<p>" + descripcionCorta + "</p>";
+                    }
+
+                }
+                @if(!string.IsNullOrEmpty(descripcionCorta))
+                {
+                    <div class="descripcionResumida">
+                        <p>@Html.Raw(descripcionCorta)</p>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="box description">
+            @if (Model.Categories.Count() > 0)
+            {                    
+                <div class="group categorias">
+				    <p>
+                        @Html.GetText("COMMON", "CATEGORIAS"):  
+				    </p>
+				    <ul id="listCat">
+                        @{
+                            int cont = 0;
+                            foreach (CategoryModel categoria in Model.Categories)
+                            {
+                                string separador = "";
+                                if (cont > 0) { separador = ", "; }
+                                <li>@separador<a href="@Model.UrlSearch/@Html.GetText("URLSEM","CATEGORIA")/@Html.EliminarCaracteresUrlSem(categoria.Name)/@categoria.Key/"><span>@categoria.Name</span></a></li>
+                                cont++;
+                            }
+                        }
+				    </ul>
+			    </div>  
+            }
+            @if (Model.Tags.Count() > 0)
+            {             
+                <div class="group etiquetas">
+                    <p>
+                        @Html.GetText("COMMON", "ETIQUETAS"):
+                    </p>
+                    <ul class="listTags">
+                        @{
+                            int cont = 0;
+                            foreach (string tag in Model.Tags)
+                            {
+                                string separador = "";
+                                if (cont > 0) { separador = ", "; }
+                                    
+                                <li>@separador<a resource="@Model.UrlSearch/@Html.GetText("URLSEM","TAG")/@tag" rel="sioc:topic" href="@Model.UrlSearch/@Html.GetText("URLSEM","TAG")/@tag"><span about="@Model.UrlSearch/@Html.GetText("URLSEM","TAG")/@tag" property="dcterms:name" typeof="sioc_t:Tag">@tag</span></a></li>
+                                cont ++;
+                            }
+                        }
+                    </ul>
+                </div>
+            }
+            <div class="group content">
+                <p>
+                    @{
+                        string url = "";
+                        string nombre = "";
+                        if (Model.Publisher.TypeProfile == ProfileType.Personal || Model.Publisher.TypeProfile == ProfileType.Teacher)
+                        {
+                            url = Model.Publisher.UrlPerson;
+                            nombre = Model.Publisher.NamePerson;
+                        }
+                        else if (Model.Publisher.TypeProfile == ProfileType.ProfessionalPersonal)
+                        {
+                            url = Model.Publisher.UrlPerson;
+                            nombre = Model.Publisher.NamePerson + " " + ConstantesDeSeparacion.SEPARACION_CONCATENADOR + " " + Model.Publisher.NameOrganization;
+                        }else
+                        {
+                            url = Model.Publisher.UrlOrganization;
+                            nombre = Model.Publisher.NameOrganization;
+                        }
+                    }
+                    @Html.GetText("COMMON", "PUBLICADOR") <a href="@url">@nombre</a>
+                </p>
+            </div>
+        </div>
+    </div> 
+    
+}

@@ -1,0 +1,93 @@
+﻿@model ResourceViewModel
+@*
+Descripción
+-----------------------------------------------
+Vista que se utiliza para mostrar un editor de un comentario en un recurso. Tendrá un editor CKEditor o TextArea.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+ResourceModel FichaDocumento = Model.Resource;
+CommunityModel Comunidad = Html.GetComunidad();
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+UserProfileModel perfil = Html.GetPerfil();
+
+    // Nombre función para "Enviar comentario"
+    string funcionComentario_CrearComentario = "Comentario_CrearComentario('" + FichaDocumento.ListActions.UrlCreateComment + "', '" + FichaDocumento.Key + "');";
+    // Fotografía del usuario que realizará el comentario
+    string urlFoto = "";
+    // Controlar si dispone o no de fotografía el usuario
+    bool containsUrlFoto = true;
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Vista Editor para añadir un comentario --------------------
+*@
+
+@* Carga de CKEditor*@
+@{
+    //Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/ckeditor.js?v=" + Html.GetVersion());
+    //Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/adapters/jquery.js?v=" + Html.GetVersion());
+}
+
+
+@*Cargar fotografía del usuario*@
+@if (!IdentidadActual.IsGuestUser)
+{
+    if (string.IsNullOrEmpty(perfil.Foto))
+    {
+        urlFoto = Html.ObtenerFotoAnonimaDePerfil(perfil.TypeProfile);
+        containsUrlFoto = false;
+    }
+    else
+    {
+        urlFoto = perfil.Foto;
+    }
+}
+
+<div id="panComentario" class="escribir-comentario">
+    <div class="comentario">
+        <div class="bloque-comentario">
+            <div class="col-usuario">
+                <div class="user-miniatura">
+                    <div class="imagen-usuario-wrap">
+                        <div>
+                            <div class="imagen @( (containsUrlFoto == false) ? "sinImagen" : null) ">
+                                @if (containsUrlFoto == false)
+                                {
+                                    <span class="material-icons">person</span>
+                                }
+                                else
+                                {
+                                    <span style="background-image: url(@Html.GetBaseUrlContent()@urlFoto);"></span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-comentario">
+                <div class="form-group">
+                    <textarea cols="20" rows="2" id="txtNuevoComentario_@FichaDocumento.Key" class="cke ckeSimple comentarios"></textarea>
+                </div>
+                <div class="accion-comentario">
+                    <a class="btn btn-outline-grey"
+                       onclick="@Html.Raw(funcionComentario_CrearComentario)">
+                        <span class="texto">
+                            @Html.GetText("COMMON", "ENVIAR")
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+

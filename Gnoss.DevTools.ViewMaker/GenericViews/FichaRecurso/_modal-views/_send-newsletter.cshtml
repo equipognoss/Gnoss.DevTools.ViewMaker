@@ -1,0 +1,63 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista modal que servirá para enviar el recurso vía Newsletter. En el modal aparecerá la opción del idioma en el que se desea realizar el envío de la newsletter.
+Para ahorrar código, esta vista modal se cargará en un modal "padre" que es el "__resourece-modal-container"
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+ResourceModel fichaRecurso = Model.Resource;
+HeaderModel cabecera = Html.GetCabecera();
+
+// Función para Enviar newsletter idioma
+string funcionEnviarNewsletterIdioma = "";
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista Modal enviar Recurso por Newsletter --------------------
+*@
+       @* Título del modal*@
+      <div class="modal-header">
+        <p class="modal-title">
+          <span class="material-icons">email</span>@Html.GetText("PERFILBASERECURSOSFICHA", "ENVIARCORREOTODOSUSUARIO")
+        </p>
+        <span
+          class="material-icons cerrar"
+          data-dismiss="modal"
+          aria-label="Close"
+          >close</span
+        >
+      </div>
+      @* Cuerpo del modal *@
+      <div class="modal-body">
+        <div class="formulario-edicion">
+          <div class="form-group">
+            <label class="control-label">@Html.GetText("PERFILBASERECURSOSFICHA", "PEGUNTAENVIARCORREOTODOSUSUARIO")</label>
+
+              @* Opciones de idiomas para realizar envío de Newsletter *@
+                @foreach (KeyValuePair<string, string> idioma in cabecera.Languajes)
+                {
+                    funcionEnviarNewsletterIdioma = "AccionRecurso_EnviarNewsletter_Aceptar('" + idioma.Key + "', '" + fichaRecurso.ListActions.UrlSendNewsletter + "', '" + fichaRecurso.Key + "')";                    
+                    <button onclick="@funcionEnviarNewsletterIdioma" type="button" class="btn btn-outline-primary mb-2 mt-2">@idioma.Value</button>
+                }
+          </div>
+
+            @* Mensaje informativo del proceso*@
+            <div id="despAccionRec_@fichaRecurso.Key">
+                <div>
+                    <div id="menssages">
+                        <div class="ok"></div>
+                        <div class="ko"></div>
+                    </div>
+                </div>                        
+            </div>
+            <div class="form-actions">
+                @* Botón que guardará posibles cambios *@
+                <button data-dismiss="modal" class="btn btn-primary">@Html.GetText("PERFILBASE", "CANCELAR")</button>                
+            </div>
+        </div>
+      </div>

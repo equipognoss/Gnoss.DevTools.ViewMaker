@@ -1,0 +1,210 @@
+﻿@model ProfileModel
+@*
+Descripción
+-----------------------------------------------
+Vista parcial que muestra cada uno de los items (personas/contactos) de lista de contactos a los que un determinado usuario sigue o está siguiendo. Esta vista parcial se utiliza dentro de la vista "index" de "FichaPerfil".
+Estos datos listados son mostrados en paneles de tipo "TabPanel".
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+string nombrePerfil = "";
+string urlPerfil = "";
+string urlFoto = "";
+string tipoPerfil = "";
+string collapsePanelID = "";
+
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+
+@* Controlar si dispone o no de fotografía el usuario *@
+bool containsUrlFoto = true;
+@* Controlar el nº de acciones para mostrar o no las opciones de "hamburguesa" *@
+int actionsAllowedCounter = 0;
+
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Vista de cada item (Persona) de tipo Following y de tipo Followers --------------------
+*@
+
+
+@if (Model != null)
+{
+    @* Carga de datos en variables para el posterior uso en la vista *@
+    if (Model.TypeProfile == ProfileType.Personal || Model.TypeProfile == ProfileType.Teacher)
+    {
+        tipoPerfil = "persona conImagenPerfil";
+        nombrePerfil = Model.NamePerson;
+        urlPerfil = Model.UrlPerson;
+
+        if (Model.UrlFoto != null)
+        {
+            urlFoto = Model.UrlFoto;
+        }
+        else
+        {
+            tipoPerfil = "persona";
+            urlFoto = Html.ObtenerFotoAnonimaDePerfil(Model.TypeProfile);
+            containsUrlFoto = false;
+        }
+    }
+    else if (Model.TypeProfile == ProfileType.ProfessionalPersonal)
+    {
+        tipoPerfil = "persona conImagenPerfil";
+        nombrePerfil = Model.NamePerson + " " + ConstantesDeSeparacion.SEPARACION_CONCATENADOR + " " + Model.NameOrganization;
+        urlPerfil = Model.UrlPerson;
+
+        if (Model.UrlFoto != null)
+        {
+            urlFoto = Model.UrlFoto;
+        }
+        else
+        {
+            tipoPerfil = "persona";
+            urlFoto = Html.ObtenerFotoAnonimaDePerfil(Model.TypeProfile);
+            containsUrlFoto = false;
+        }
+    }
+    else
+    {
+        tipoPerfil = "organizacion conImagenPerfil";
+        nombrePerfil = Model.NameOrganization;
+        urlPerfil = Model.UrlOrganization;
+
+        if (Model.UrlFoto != null)
+        {
+            urlFoto = Model.UrlFoto;
+        }
+        else
+        {
+            tipoPerfil = "organizacion";
+            urlFoto = Html.ObtenerFotoAnonimaDePerfil(Model.TypeProfile);
+            containsUrlFoto = false;
+        }
+    }
+
+    @*Cada item encontrado de tipo Persona-Contacto*@
+    <article class="resource">
+        <div class="wrap">
+            @* Contenedor de la imagen en miniatura del usuario *@
+            <div class="user-miniatura">
+                <div class="imagen-usuario-wrap">
+                    <div class="imagen @( (containsUrlFoto == false) ? "sinImagen" : null) ">                                
+                            @if (containsUrlFoto == false)
+                            {
+                                <span class="material-icons">person</span>
+                            }
+                            else {
+                                <span style="background-image: url(@Html.GetBaseUrlContent()@urlFoto)"></span>
+                            } 
+                    </div>
+                </div>
+                @* Contenedor del nombre del usuario *@
+                <div class="nombre-usuario-wrap">
+                    @if (!string.IsNullOrEmpty(urlPerfil))
+                    {
+                        <a href="@urlPerfil">
+                            <p class="nombre">@nombrePerfil</p>
+                            @*<p class="nombre-completo">@nombrePerfil</p>*@
+                        </a>
+                    }
+                    else
+                    {
+                        <p class="nombre">@nombrePerfil</p>
+                        @*<p class="nombre-completo">@nombrePerfil</p>*@
+                    }                    
+                </div>
+                
+                @* Contenedor de las acciones + Botón desplegar acciones - Comprobar acciones a realizar (No permitir acciones si uno es seguidor) *@ 
+                @if (Model.ListActions != null && !IdentidadActual.IsGuestIdentity && IdentidadActual.KeyMetaProyectIdentity != Model.Key) { 
+                    <div class="acciones-usuario-wrap">
+                        <ul class="no-list-style">
+                            @* Acción de No/Seguir a usuario*@
+                            @if (Model.Actions.Follow)
+                            {
+                                <li>
+                                    @* No Seguir *@
+                                    @if (Model.Actions.FollowingProfile)
+                                    {
+                                        <a class="btn btn-primary btn-seguir"
+                                           onclick="AccionPerfil_NoSeguir(this, '@Model.ListActions.UrlUnfollow')">
+                                            <span class="seguir">
+                                                <span class="material-icons">person_remove_alt_1</span>
+                                                <span>@Html.GetText("COMMON", "NOSEGUIR")</span>
+                                            </span>
+                                        </a>
+                                    }
+                                    @* Seguir *@
+                                    else
+                                    {
+                                        <a class="btn btn-primary btn-seguir"
+                                           onclick="AccionPerfil_Seguir(this, '@Model.ListActions.UrlFollow')">
+                                            <span class="seguir">
+                                                <span class="material-icons">person_add_alt_1</span>
+                                                <span>@Html.GetText("COMMON", "SEGUIR")</span>
+                                            </span>
+                                        </a>
+                                    }
+                                </li>
+                            }
+                        </ul>
+
+                        @* Revisar cada acción para comprobar si se disponen de acciones disponibles para mostrar o no hamburgesa de acciones *@
+                        @if (Model.Actions != null)
+                        {
+                            foreach (System.Reflection.PropertyInfo propiedad in Model.Actions.GetType().GetProperties())
+                            {
+                                @* Comprobar que la propiedad sea de tipo ActionsModel *@
+                                var tipoAction = propiedad.DeclaringType.Name;
+                                var dataType = propiedad.PropertyType.Name;
+
+                                if (tipoAction == "ActionsModel" && dataType == "Boolean")
+                                {
+                                    @* Comprobar valor Booleano y sumar contador si es true *@
+                                    Boolean allowAction = (Boolean)propiedad.GetValue(Model.Actions);
+                                    if (allowAction == true) {
+                                        @* Comprobar si la acción es "Follow" o "Unfollow" ya que están presentes en botones y no haría falta *@
+                                        if ( (propiedad.Name != "UrlFollow" || propiedad.Name != "UrlUnfollow") && propiedad.Name != "FollowingProfile" )
+                                        {
+                                            actionsAllowedCounter += 1;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        @if (actionsAllowedCounter > 0) { 
+                            @* Contenedor de las acciones + Botón desplegar acciones - Comprobar acciones a realizar *@           
+                            <div class="acciones-recurso-listado">
+                                <div class="dropdown">
+                                    <a href="#"
+                                    class="dropdown-toggle"
+                                    role="button"
+                                    id="dropdownMasOpciones"
+                                    data-toggle="dropdown"
+                                    aria-haspopup="true"
+                                    aria-expanded="false">
+                                        <span class="material-icons">more_vert</span>
+                                    </a>                            
+                                    <div class="dropdown-menu basic-dropdown dropdown-icons dropdown-menu-right dropdown-sobre-toggle"
+                                        aria-labelledby="dropdownMasOpciones"
+                                        style="will-change: transform">
+                                        <p class="dropdown-title pl-3 ml-3">Acciones</p>
+                                        <span class="material-icons cerrar-dropdown">close</span>
+                                        @* Contenedor de las acciones a realizar al usuario (Bloquear, No enviar newsletter, Expulsar, Cambiar rol) *@
+                                        <div id="accionesListado" class="group acciones noGridView">
+                                            @* Aquí irán las acciones para cada "Perfil".*@
+                                            @Html.PartialView("ControlesMVC/_AccionesPerfil", Model)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                </div>
+                }                
+            </div>
+        </div>
+    </article>
+}

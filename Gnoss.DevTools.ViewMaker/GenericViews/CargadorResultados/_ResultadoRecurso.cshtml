@@ -1,0 +1,344 @@
+﻿@model ResourceModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista perteneciente al servicio externo "ServicioResultados" que se utiliza para mostrar los resultados obtenidos al realizar una búsqueda de Recursos.
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+// Cadena de texto para un recurso de tipo "Privado". Utilizarlo para HTML
+string privado = "";
+// Texto para añadir a modo de clase extra al contenido o descripción del Recurso
+string claseExtraDescripcion = "";
+//string fechaRecurso = Model.PublishDate.ToString("dddd, MMMM. yyyy");
+string fechaRecurso = Model.PublishDate.ToString("dd/MM/yyyy");
+// Publicador del recurso
+ProfileModel publicador = Model.Publisher;
+// Nombre que se mostrará para "Seguir" dependiendod el tipo de "Publicador"
+String nombrePublicador = "";
+Boolean permitirFollow = false;
+
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+
+// Funciones para seguir o no seguir a un publicador
+string funcion_seguir = "";
+// Icono seguir-no seguir 
+string icono_seguir = "";
+// Título del botón para seguir o no seguir
+string titulo_seguir = "";
+
+// Nombre adicional para el tipo de recurso y ser usado a modo de clase
+string claseTipoRecurso = Html.ObtenerNombreClasePorTipoRecurso(Model.TypeDocument);
+// Data-Attribute que indicará si se está siguiendo al Publisher del recurso
+string dataAttributeFollowing = "";
+// Contador de categorias y labels
+int cont = 0;
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Lista donde se mostrarán los los items o recursos del buscador --------------------
+*@
+
+@{
+    @* Controlar el tipo de recurso (Privado?)*@
+    if (Model.Private)
+    {
+        privado = " privado";
+    }
+
+    @* Obtener el nombre, organizacion o información del publicador para poder seguir *@
+    switch(publicador.TypeProfile) 
+    {
+        case ProfileType.Personal:
+            nombrePublicador = publicador.NamePerson;
+        break;
+        case ProfileType.Organization:
+            nombrePublicador = publicador.NamePerson;
+        break;
+        case ProfileType.ProfessionalCorporate:
+            // code block
+            nombrePublicador = publicador.NameOrganization;
+        break;
+        case ProfileType.ProfessionalPersonal:
+            // code block
+            nombrePublicador = publicador.NamePerson;
+        break;
+
+        case ProfileType.Teacher:
+            // code block
+            nombrePublicador = publicador.NamePerson;
+        break;
+        default:
+            // code block
+            nombrePublicador = "";
+        break;
+    }
+
+    @* Obtener el nombre para la acción de Seguir/NoSeguir*@    
+    int indexNameActionFollowUnFollow = publicador.ListActions.UrlFollow.Count(f => f == '/') - 1;
+    List<string> publisherNameActionFollowUnFollowList = new List<string>(
+    publicador.ListActions.UrlFollow.Split(new string[] { "/" }, StringSplitOptions.None));
+    string publisherNameActionFollowUnFollow = publisherNameActionFollowUnFollowList[indexNameActionFollowUnFollow];
+
+    @* Comprobar si es posible seguir al publicador *@
+    if (!IdentidadActual.IsGuestUser && IdentidadActual.KeyPerson != publicador.KeyPerson) {
+        permitirFollow = true;
+        @* Comprobar si se puede seguir o no seguir *@
+    if (publicador.Actions.FollowingProfile) {
+        //funcion_seguir = "AccionPerfil_NoSeguir(this, '" + publicador.ListActions.UrlUnfollow + "')";
+        funcion_seguir = "AccionPerfil_Seguir_Listado(this, '" + publicador.ListActions.UrlUnfollow + "','" + publisherNameActionFollowUnFollow + "')";
+        icono_seguir = "person_remove_alt_1";
+        titulo_seguir = "Dejar de seguir";
+        dataAttributeFollowing = "data-follow";
+    }
+    else {
+        //funcion_seguir = "AccionPerfil_Seguir(this, '" + publicador.ListActions.UrlFollow + "')";            
+        funcion_seguir = "AccionPerfil_Seguir_Listado(this, '" + publicador.ListActions.UrlFollow + "','" + publisherNameActionFollowUnFollow + "')";
+        icono_seguir = "person_add_alt_1";
+        titulo_seguir = "Seguir";
+    }
+}else {
+    permitirFollow = false;
+}
+}
+
+
+@if (Model != null)
+{
+    @* Detectar privacidad de un recurso *@
+    string clasePrivado = "";
+    if (Model.Private) { 
+        clasePrivado = "private";
+    }
+
+ @*Item devuelto de tipo "Recurso"*@   
+<article id="resource_@Model.Key" typeof="sioc_t:Item" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:sioc_t="http://rdfs.org/sioc/types#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:sioc="http://rdfs.org/sioc/ns#" class="resource @claseTipoRecurso @clasePrivado" >
+    <div class="wrap">
+       
+        @* Permitir checkbox en el título del Recurso (Mantenida funcionalidad para nuevo Front) *@
+        @if (Model.SelectionCheckAvailable)
+        {
+            string idCheck = "ficha_" + Model.Key;
+
+            <div class="check-wrapper">
+                @* Checkbox que permitirá seleccionar/deseleccionar *@
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input ListaRecursosCheckBox" id="@idCheck">
+                    <label class="custom-control-label" for="@idCheck"></label>
+                </div>
+            </div>
+        }
+
+        @* Título del recurso *@
+        <div class="middle-wrap">
+            <div class="title-wrap">
+                @* Título del recurso + Link*@
+                <h2 class="resource-title">
+                    <a href="@Model.CompletCardLink">@Model.Title</a>
+                </h2>
+            </div>
+
+            @* Información del autor del recurso *@
+            <div class="info-wrap">
+                @* Nombre del autor / Compartido por *@
+                <p class="autor">
+                    <span class="font-weight-light">@Html.GetText("COMMON", "PUBLICADOR")</span>
+                    @if (Model.Publisher.TypeProfile == ProfileType.Personal || Model.Publisher.TypeProfile == ProfileType.Teacher)
+                    {
+                        <span><a property="foaf:name" typeof="foaf:Person" href="@Model.Publisher.UrlPerson">@Model.Publisher.NamePerson</a></span>
+                    }
+                    else if (Model.Publisher.TypeProfile == ProfileType.ProfessionalPersonal)
+                    {
+                        <span><a property="foaf:name" typeof="foaf:Group" href="@Model.Publisher.UrlPerson">@Model.Publisher.NamePerson @ConstantesDeSeparacion.SEPARACION_CONCATENADOR @Model.Publisher.NameOrganization</a></span>
+                    }
+                    else if (Model.Publisher.TypeProfile == ProfileType.ProfessionalCorporate && !string.IsNullOrEmpty(Model.Publisher.NamePerson))
+                    {
+                        string idTemp = Guid.NewGuid().ToString();
+                        <span>
+                            <a property="foaf:name" typeof="foaf:Group" href="@Model.Publisher.UrlOrganization">@Model.Publisher.NameOrganization</a><span class="userAuthor">
+                                <span style="display:none;" id="@idTemp"> (@Model.Publisher.NamePerson) </span><a onclick="javascript:DesplegarImgMas(this, '@idTemp');" style="cursor:pointer;">
+                                    <img src="@ViewBag.BaseURLStatic/img/verMas.gif" alt="+">
+                                </a>
+                            </span>
+                        </span>
+                    }
+                    else
+                    {
+                        <span><a property="foaf:name" typeof="foaf:Group" href="@Model.Publisher.UrlOrganization">@Model.Publisher.NameOrganization</a></span>
+                    }
+                </p>
+                <p class="fecha">@fechaRecurso</p>
+            </div>
+
+            @* Imagen Miniatura del recurso *@
+            <div class="content-wrap">
+                @if (!string.IsNullOrEmpty(Model.UrlPreview))
+                {
+                    <div class="image-wrap">
+                        <div class="image">
+                            <a href="@Model.CompletCardLink">
+                                <img alt="@Model.Title" title="@Model.Title"
+                                     src="@Model.UrlPreview" />
+                            </a>
+                        </div>
+                    </div>
+                }
+                @* Contenedor de la Descripción del contenido del artículo *@
+                <div class="description-wrap">
+                    @* Clase adicional al contenido o descripción del artículo (Mantenida función para nuevo Front) *@
+                    @{
+                        if ((Model.ViewSettings != null && ((!Model.MapView && (Model.ViewSettings.DescriptionOnList || Model.ViewSettings.DescriptionOnMosaic)) || (Model.MapView && Model.ViewSettings.DescriptionOnMap))))
+                        {
+                            if (Model.ViewSettings != null)
+                            {
+                                if (!Model.ViewSettings.DescriptionOnList)
+                                {
+                                    claseExtraDescripcion += " noListView";
+                                }
+                                if (!Model.ViewSettings.DescriptionOnMosaic)
+                                {
+                                    claseExtraDescripcion += " noGridView";
+                                }
+                            }
+                        }
+                    }
+                    @* Descripción del contenido del artículo *@
+                    <div class="desc @claseExtraDescripcion text-justify descripcionResumida">
+                        @* Contenido o descripción preliminar del Recurso *@
+                        @if ((Model.ViewSettings == null) || (!Model.MapView && (Model.ViewSettings.DescriptionOnList || Model.ViewSettings.DescriptionOnMosaic)) || (Model.MapView && Model.ViewSettings.DescriptionOnMap))
+                        {
+                            if (!string.IsNullOrEmpty(Model.Description) && ((Model.Description.Substring(0, 3) == "<p ") || (Model.Description.Substring(0, 3) == "<p>")))
+                            {
+                                <p>
+                                @{                                    
+                                    String descriptionFormatted = Html.CleanHtmlParagraphsStringHtml(Model.Description);                                    
+                                    @Html.Raw(Html.TruncateString(@Html.CleanHtmlFromMultimediaItems(descriptionFormatted), 800))
+                                }
+                                </p>
+                            }
+                            else
+                            {
+                                <p>
+                                    @{
+                                        String descriptionFormatted = Html.CleanHtmlParagraphsStringHtml(Model.Description);
+                                        @Html.Raw(Html.TruncateString(@Html.CleanHtmlFromMultimediaItems(descriptionFormatted), 800))
+                                    }                                                                           
+                                </p>                                
+                            }
+                        }
+                    </div>
+                </div>
+
+                @* Opciones de visualización aplicando clase al div (Funcionalidad mantenida para el nuevo Front). *@
+                @if (Model.ViewSettings != null)
+                {
+                    if (!Model.MapView && !string.IsNullOrEmpty(Model.ViewSettings.InfoExtraList))
+                    {
+                        <div class="listado">                            
+                            @Html.Raw(Model.ViewSettings.InfoExtraList)
+                        </div>
+                    }
+                    if (!Model.MapView && !string.IsNullOrEmpty(Model.ViewSettings.InfoExtraMosaic))
+                    {
+                        <div class="mosaico">
+                            @Html.Raw(Model.ViewSettings.InfoExtraMosaic)
+                        </div>
+                    }
+                    if (Model.MapView && !string.IsNullOrEmpty(Model.ViewSettings.InfoExtraMap))
+                    {
+                        <div class="mapa">
+                            @Html.Raw(Model.ViewSettings.InfoExtraMap)
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+
+        @* Información adicional del recurso (Categorías del recurso, Etiquetas, Nº Vistas, Likes, Seguir al editor/autor) *@
+        <div class="down-wrap">
+            @if (Model.Categories.Count > 0) { 
+                @* Categorías de un recurso de un recurso *@
+            <div class="categorias">
+                <p>@Html.GetText("COMMON", "CATEGORIAS")</p>
+                    <ul class="no-list-style d-flex align-items-center">
+                    @{
+                        cont = 0;                        
+                        foreach (CategoryModel categoria in Model.Categories) { 
+                            string separador = "";
+                            if (cont > 0) { separador = ", "; }                            
+                            <li rel="sioc:topic">
+                                @separador
+                                <a resource="@Model.UrlSearch/@Html.GetText("URLSEM", "TAG")/@categoria"                                             
+                                             href="@Model.UrlSearch/@Html.GetText("URLSEM","CATEGORIA")/@Html.EliminarCaracteresUrlSem(Html.ObtenerTextoDeIdioma(categoria.LanguageName))/@categoria.Key/"
+                                             property="skos:prefLabel" 
+                                             typeof="skos:Concept">
+                                @Html.ObtenerTextoDeIdioma(categoria.LanguageName)
+                                </a>
+                            </li>
+                        }
+                    } 
+                    </ul>
+            </div>
+            }        
+
+            @* Etiquetas de un recurso *@
+            <div class="etiquetas">
+                <p>@Html.GetText("COMMON", "ETIQUETAS")</p>
+                <ul class="no-list-style d-flex align-items-center">                    
+                    @{
+                        cont = 0;
+                        foreach (string tag in Model.Tags) {
+                            string separador = "";
+                            if (cont > 0) { separador = ", "; }                            
+                            <li rel="sioc:topic" >
+                                @separador
+                                <a resource="@Model.UrlSearch/@Html.GetText("URLSEM", "TAG")/@tag"                                             
+                                             href="@Model.UrlSearch/@Html.GetText("URLSEM", "TAG")/@tag"
+                                             property="dcterms:name" 
+                                             typeof="sioc_t:Tag"
+                                             about="@Model.UrlSearch/@Html.GetText("URLSEM", "TAG")/@tag">
+                                @tag
+                                </a>
+                            </li>
+                        }
+                    }                        
+                </ul>
+            </div>
+
+
+            <div class="social">
+                @* Nº Visualizaciones del Recurso *@
+                <div class="visualizacion-recurso">
+                    <span class="material-icons">visibility</span>
+                    <span class="number">@Model.NumVisits</span>
+                </div>
+
+                @* Likes del recurso *@
+                @Html.PartialView("_partial-views/_list-votes", Model)
+
+                @* Acción de seguir al usuario *@
+                @if (permitirFollow)
+                {
+                    <div class="seguir-usuario followAction_@publisherNameActionFollowUnFollow" @(publicador.Actions.FollowingProfile ? @dataAttributeFollowing : null)>
+                        <span class="material-icons icon">@icono_seguir</span>
+                        <span class="texto" onclick="@funcion_seguir">@titulo_seguir</span>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</article>
+}
+
+
+
+
+
+
+
+

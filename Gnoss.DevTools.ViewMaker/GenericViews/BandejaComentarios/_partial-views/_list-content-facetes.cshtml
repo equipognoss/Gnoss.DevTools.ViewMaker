@@ -1,0 +1,29 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista contenedora que contiene cada una de las Facetas que se utilizarán para poder hacer filtros de los resultados obtenidos de mensajes.
+Esta vista se situará en la zona izquierda de la pantalla. Básicamente son filtros disponibles para los resultados de mensajería MyGnoss.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Contenedor de las facetas para buscar mensajes de Mygnoss por Facetas --------------------
+*@
+
+<div class="wrapCol">
+    @* Cabecera de Filtros de Facetas *@
+    <div class="header-facetas">
+        <p>@Html.GetText("COMADMINFACETAS", "FILTROS")</p>
+        <a href="javascript: void(0);" class="cerrar">
+            <span class="material-icons">close</span>
+        </a>
+    </div>
+    @* Contenedor donde se añadirán todas las facetas existentes para mensajería de myGnoss. Se cargan con llamada Post *@
+    <div id="divFac" class="facetas-wrap"></div>
+</div>

@@ -1,0 +1,333 @@
+﻿@model SendInvitationComViewModel
+
+@{
+    CommunityModel Comunidad = Html.GetComunidad();
+    UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+
+    Html.SetBodyClass("layout04 comGnoss");
+    Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/ckeditor.js?v=" + Html.GetVersion());
+    Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/adapters/jquery.js?v=" + Html.GetVersion());
+
+    if (!string.IsNullOrEmpty(Context.Request.Query["new-community-wizard"]))
+    {
+        Html.GetListaCSS().Add(Html.GetBaseUrlStatic() + "/cssNuevo/administracion.css?v=" + Html.GetVersion());
+        Html.GetListaCSS().Add(Html.GetBaseUrlStatic() + "/jsUnificar/JCrop/css/Jcrop.css?v=" + Html.GetVersion());
+        Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/ckeditor.js?v=" + Html.GetVersion());
+        Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/adapters/jquery.js?v=" + Html.GetVersion());
+    }
+}
+
+<div id="col01">
+    <div class="form formtheme01 formularioRegistroUsuarios">
+        <h2>@Html.GetText("USUARIOS", "INVITARACOM")</h2>
+        <fieldset id="fsContactos">
+            @if (Model.AllowInviteContacts && Model.AllowInviteEmail)
+            {
+            <div class="envioInv">
+                <div class="group acciones tabspresentation">
+                    <ul id="pestanyasInvitacion">
+                        <li class="active" id="botonImportar"><a onclick="MostrarContactosCorreos(this);">@Html.GetText("INVITACIONES", "INVITARAEXTERNOS")</a></li>
+                        <li id="botonContactos" class=""><a onclick="MostrarContactosCorreos(this);">@Html.GetText("INVITACIONES", "INVITARAUSUARIOS")</a></li>
+                    </ul>
+                </div>
+            </div>
+            }
+
+            <div id="panels" class="stateShowForm" style="display: block;">
+                <div style="display: block;" id="action" class="box form activeForm">
+                    @if(Model.AllowInviteContacts)
+                    {
+                        string clssDivContactos = "";
+                        if (Model.AllowInviteEmail)
+                        {
+                            clssDivContactos = "oculto";
+                        }
+                    <fieldset id="divContactos" class="@clssDivContactos" >
+                        @Html.Raw(Html.GetText("INVITACIONES", "INSTRUCCIONESINVCOM", Comunidad.Name))
+                        <fieldset class="filtroRapido">
+                            <p>
+                                <input type="text" id="txtFiltro" class="filtroFaceta ac_input" autocomplete="off" />
+                                <span class="searchButton"></span>
+                            </p>
+                        </fieldset>
+                    </fieldset>
+                    }
+                    @if(Model.AllowInviteEmail)
+                    {
+                    <fieldset id="divCorreos" class="">
+                        <p>
+                            <label>@Html.GetText("INVITACIONES", "CORREOAINVITAR")</label>
+                        </p>
+                        <p class="textarea">
+                            <textarea id="txtCorreoAInvitar" cols="20" rows="2"></textarea>
+                            <em class="help">@Html.GetText("INVITACIONES", "SEPARADASCOMAS")</em>
+                        </p>
+                        <input type="button" value="Agregar correos" onclick="javascript: agregarCorreo();" id="litAñadirCorreo" />
+                        <div class="ko">
+                            <p>
+                                <label id="lblInfoCorreo"></label>
+                            </p>
+                        </div>
+                    </fieldset>
+                    }
+                    @if (Model.AllowGroupsInvitations)
+                    {
+                        <fieldset id="divGrupos">
+                            @Html.Raw(Html.GetText("INVITACIONES", "SELECCIONAGRUPOS"))
+                            <fieldset class="filtroRapido">
+                                <p>
+                                    <input type="text" id="txtFiltroGrupos" class="filtroFaceta ac_input" autocomplete="off" />
+                                    <span class="searchButton"></span>
+                                </p>
+                            </fieldset>
+                        </fieldset>
+                    }
+                </div>
+            </div>
+
+            <fieldset class="editorLector">
+                <p>
+                    <label>
+                        @Html.GetText("INVITACIONES", "INVITACIONESSEENVIANA")
+                    </label>
+                </p>
+                <div id="panContenedorInvitados">
+                    <div class="icoEliminar" id="divInvitados">
+                    </div>
+                </div>
+                <div id="panChecksContactos">
+                </div>
+            </fieldset>
+            @if (Model.AllowGroupsInvitations)
+            {
+                <fieldset class="editorLector" id="divGruposInf">
+                    <p>
+                        <label>
+                            @Html.GetText("INVITACIONES", "INVITACIONESSEENVIANAGRUPOS")
+                        </label>
+                    </p>
+                    <div id="panContenedorGrupos"></div>
+                </fieldset>
+            }
+            @if(Model.AllowPersonlizeMessage)
+            {
+            <div>
+                <fieldset>
+                    <p>
+                        <label>@Html.GetText("COMMON", "TITULONOTAPERS")</label>
+                    </p>
+                    <p class="textarea">
+                        <textarea class="cke mensajes" id="txtNotas">@Model.Message</textarea>
+                    </p>
+                </fieldset>
+            </div>
+            }
+            <input type="hidden" id="txtHackInvitados" />
+            <input type="hidden" id="txtHackGrupos" />
+
+            <fieldset>
+                <p>
+                    <input type="button" onclick="enviarFormularioPagina();" value="@Html.GetText("INVITACIONES", "ENVIARINVITACIONES")" class="submit principal" />
+                    @if (!string.IsNullOrEmpty(ViewBag.UrlSiguienteAsistente))
+                    {
+                        <input type="button" onclick="document.location = '@ViewBag.UrlSiguienteAsistente'" value="@Html.GetText("COMADMINCOMUNIDAD", "SALTARPASO")" class="submit" />
+                    }
+                </p>
+            </fieldset>
+        </fieldset>
+        <div style="display: block">
+            <div style="display: none" id="respuesta"></div>
+        </div>
+    </div>
+</div>
+
+<script defer="defer" type="text/javascript">
+    function agregarCorreo() {
+        txtCorreo = document.getElementById('txtCorreoAInvitar');
+        infoCorreo = document.getElementById('lblInfoCorreo');
+
+        $('#txtHackInvitados').val('');
+
+        var correos = txtCorreo.value.split(',');
+        for (var i = 0; i < correos.length; i++) {
+            if (correos[i] != '') {
+                if (!validarEmail(correos[i].replace(/^\s*|\s*$/g, ""))) {
+                    infoCorreo.innerHTML = form.emailValido;
+                    infoCorreo.parentNode.parentNode.style.display = 'block';
+                    return false;
+                }
+            }
+        }
+        infoCorreo.parentNode.parentNode.style.display = '';
+
+        contenedor = document.getElementById('panContenedorInvitados');
+        if (contenedor.innerHTML.trim().indexOf('<ul') == 0) { contenedor.innerHTML = contenedor.innerHTML.replace('<ul class=\"icoEliminar\">', '').replace('</ul>', ''); }
+
+        for (var i = 0; i < correos.length; i++) {
+            if (correos[i] != '') {
+                contenedor.innerHTML = contenedor.innerHTML + '<li> ' + correos[i].replace(/^\s*|\s*$/g, "") + '<a class="remove" onclick="javascript:eliminarCorreo(\'' + correos[i].replace(/^\s*|\s*$/g, "") + '\',this);">' + textoRecursos.Eliminar + '</a></li>';
+                $('#txtHackInvitados').val($('#txtHackInvitados').val() + "&" + correos[i].replace(/^\s*|\s*$/g, ""));
+            }
+        }
+
+        contenedor.innerHTML = '<ul class=\"icoEliminar\">' + contenedor.innerHTML + '</ul>';
+
+        txtCorreo.value = '';
+        infoCorreo.innerHTML = '';
+        return true;
+    }
+
+    function eliminarCorreo(correo, nombre) {
+        txtCorreo = document.getElementById('txtCorreoAInvitar');
+
+        contenedor = document.getElementById('panContenedorInvitados');
+        contenedor.children[0].removeChild(nombre.parentNode);
+        document.getElementById('txtHackInvitados').value = document.getElementById('txtHackInvitados').value.replace('&' + correo, '');
+    }
+
+    function enviarFormularioPagina() {
+        MostrarUpdateProgress();
+        $('#respuesta').hide();
+
+        var invitadosAgregados = true;
+        if ($('#txtCorreoAInvitar').val() != '') {
+            invitadosAgregados = agregarCorreo();
+        }
+        if (invitadosAgregados) {
+            var txt = false;
+            @if (Model.AllowPersonlizeMessage) {
+                <text>
+                    var dataPost = {
+                        Guests: $('#txtHackInvitados').val(),
+                        Message: encodeURIComponent($('#txtNotas').val().replace(/\n/g, '')),
+                        Groups: $('#txtHackGrupos').val()
+                    }
+                </text>
+            }else
+            {
+                <text>
+                    var dataPost = {
+                        Guests: $('#txtHackInvitados').val(),
+                        Message: "",
+                        Groups: $('#txtHackGrupos').val()
+                    }
+                </text>
+            }
+                
+
+            GnossPeticionAjax(
+                '@Html.GetUrlPagina()/save-changes' + document.location.search,
+                dataPost,
+                true
+            ).done(function () {
+                claseDiv = "ok";
+            }).fail(function () {
+                claseDiv = "ko";
+            }).always(function (response) {
+            $('#respuesta').attr("class", claseDiv);
+            $('#respuesta').html("<p>" + response + "</p>");
+            $('#respuesta').show();
+                OcultarUpdateProgress();
+            });
+            } else {
+            OcultarUpdateProgress();
+        }
+    }
+
+    @if(Model.AllowInviteContacts)
+    {
+        <text>
+
+    function MostrarContactosCorreos(pBoton) {
+        if (pBoton.parentNode.id == 'botonContactos') {
+            document.getElementById('botonContactos').className = 'active';
+            document.getElementById('botonImportar').className = '';
+            document.getElementById('divContactos').className = '';
+            document.getElementById('divCorreos').className = 'oculto';
+        }
+        else {
+            document.getElementById('botonContactos').className = '';
+            document.getElementById('botonImportar').className = 'active';
+            document.getElementById('divContactos').className = 'oculto';
+            document.getElementById('divCorreos').className = '';
+        }
+    }
+        </text>
+    }
+
+    @{
+        string identidadOrg = "";
+        if (IdentidadActual.KeyOrganization.HasValue)
+        {
+            identidadOrg = IdentidadActual.KeyOrganization.Value.ToString();
+        }
+    }
+
+    $(document).ready(function () {
+        $('#txtFiltro').keydown(function (event) {
+            if (event.which || event.keyCode) { if ((event.which == 13) || (event.keyCode == 13)) { return false; } }
+        }).autocomplete(
+        null,
+        {
+            url: $('#inpt_urlServicioAutocompletar').val() + "/AutoCompletarInvitaciones",
+            delay: 0,
+            multiple: true,
+            scroll: false,
+            selectFirst: false,
+            minChars: 1,
+            width: 300,
+            cacheLength: 0,
+
+            NoPintarSeleccionado: true,
+            txtValoresSeleccID: 'txtHackInvitados',
+
+            extraParams: {
+                identidad: '@IdentidadActual.KeyIdentity',
+                identidadMyGnoss: '@IdentidadActual.KeyMetaProyectIdentity',
+                identidadOrg: '@identidadOrg',
+                proyecto: '@Comunidad.Key'
+            }
+        });
+
+        $('#txtFiltro').result(function (event, data, formatted) {
+            seleccionarAutocompletar(data[0], data[1], 'panContenedorInvitados', 'txtHackInvitados', null, 'txtFiltro');
+        });
+    });
+
+    @if (Model.AllowGroupsInvitations)
+    {
+        <text>
+    $(document).ready(function () {
+        $('#txtFiltroGrupos').keydown(function (event) {
+            if (event.which || event.keyCode) { if ((event.which == 13) || (event.keyCode == 13)) { return false; } }
+        }).autocomplete(
+        null,
+        {
+            url: $('#inpt_urlServicioAutocompletar').val() + "/AutoCompletarGruposInvitaciones",
+            delay: 0,
+            multiple: true,
+            scroll: false,
+            selectFirst: false,
+            minChars: 1,
+            width: 300,
+            cacheLength: 0,
+
+            NoPintarSeleccionado: true,
+            txtValoresSeleccID: 'txtHackGrupos',
+
+            extraParams: {
+                identidad: '@IdentidadActual.KeyIdentity',
+                identidadMyGnoss: '@IdentidadActual.KeyMetaProyectIdentity',
+                identidadOrg: '@identidadOrg',
+                proyecto: '@Comunidad.Key'
+            }
+        });
+
+        $('#txtFiltroGrupos').result(function (event, data, formatted) {
+            seleccionarAutocompletar(data[0], data[1], 'panContenedorGrupos', 'txtHackGrupos', null, 'txtFiltroGrupos');
+        });
+    });
+    </text>
+    }
+
+</script>

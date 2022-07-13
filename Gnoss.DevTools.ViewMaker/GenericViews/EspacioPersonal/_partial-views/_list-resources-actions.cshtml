@@ -1,0 +1,89 @@
+﻿@model PersonalSpaceModel
+@*
+Descripción
+-----------------------------------------------
+Vista que se utiliza para mostrar las acciones que se pueden realizar con los recursos en el espacio personal de un usuario
+- Marcar como leído, no leído, todo, nada
+- Actualizar mensajes
+- Select para mostrar opciones adicionales
+
+Variables
+----------------------------------------------------------------
+*@
+@{ 
+string urlAdminCategoriesLoadAction = @Model.AdminCategoriesUrl + "/load-action";
+string urlOrganizeResourcesInCategoriesLoadAction = Html.GetBaseUrl () + Html.GetUrlPagina() + "/editcategories";
+    
+}
+
+@*
+----------------------------------------------------------------
+ -------------------- Acciones de mensajes (Marcar, actualizar, select..) --------------------
+*@
+
+@* Listado de acciones para hacer con resultados *@
+<div class="acciones-listado tipo-2 acciones-listado-resource">
+    <div class="wrap">
+        @* Seleccionar todo / nada *@
+        <div class="checkAllWrapper" id="checkAllResourcesWrapper">
+            <div class="custom-control custom-checkbox">
+                <input type="checkbox"
+                       class="custom-control-input"
+                       id="checkAllResources" />
+                <label class="custom-control-label" for="checkAllResources"> </label>
+            </div>
+            <div class="check-actions-wrap">
+                <a href="javascript: void(0);"
+                   class="dropdown-toggle check-actions-toggle"
+                   data-toggle="dropdown"
+                   aria-expanded="false">
+                    <span class="material-icons"> arrow_drop_down </span>
+                </a>
+                <div class="dropdown-menu basic-dropdown check-actions"
+                     id="checkActions"
+                     style="will-change: transform">
+                    <a href="javascript: void(0)" class="item-dropdown checkall">Todo</a>
+                    <a href="javascript: void(0)" class="item-dropdown decheckall">Nada</a>
+                </div>
+            </div>
+        </div>
+
+        @* Botón para ver más acciones - Solo se visualizará en móvil *@
+        <div class="acciones-recursos dropdown d-block d-sm-none">
+            <a href="javascript: void(0);" class="dropdown-toggle no-flecha" data-toggle="dropdown">
+                <span class="material-icons">
+                    more_vert
+                </span>
+            </a>
+            <div class="dropdown-menu basic-dropdown">
+                <a 
+                   id="organizar-categorias-mis-recursos-movil"
+                   class="item-dropdown"
+                   onclick="EditarCategoriasRecsBRPersonal('@urlOrganizeResourcesInCategoriesLoadAction');">@Html.GetText("PERFIL", "ORGANIZARENCATEGORIAS")</a>
+            </div>
+        </div>
+
+        @* Botón para editar categorías del espacio personal - Modal *@
+        <a class="btn btn-outline-grey"
+           id="editar-categorias-mis-recursos"
+           data-toggle="modal"
+           data-target="#modal-container"
+           onclick="DeployActionInModalPanel('@urlAdminCategoriesLoadAction', this, 'modal-dinamic-content', '');">
+            <span class="material-icons-outlined">source</span>
+            <span class="pl-2">@Html.GetText("PERFILBASE", "EDITACATEGORIAS")</span>
+        </a>
+
+        @* Botón para organizar recursos en categorías - Modal - No se visualizará en móvil *@
+        <a class="btn btn-outline-grey"
+           id="organizar-categorias-mis-recursos"
+           onclick="EditarCategoriasRecsBRPersonal('@urlOrganizeResourcesInCategoriesLoadAction');">
+            <span class="material-icons-outlined">folder_special</span>
+            <span class="pl-2">@Html.GetText("PERFIL", "ORGANIZARENCATEGORIAS")</span>
+        </a>
+
+        @* Botón para borrado múltiple de mensajes *@
+        <div class="btn btn-outline-grey" id="deleteResources">
+            <span class="material-icons">delete</span>
+        </div>
+    </div>
+</div>

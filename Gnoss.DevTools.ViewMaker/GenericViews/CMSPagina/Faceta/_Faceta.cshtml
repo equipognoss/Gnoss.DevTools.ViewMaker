@@ -1,0 +1,225 @@
+﻿@using Es.Riam.Gnoss.Web.MVC.Models;
+@model CMSComponentFacet
+@if (Model != null)
+{
+    if (Model.FacetModel != null && Model.FacetModel.FacetItemList.Count > 0)
+    {
+        switch (Model.PresentatioType)
+        {
+            case CMSComponentFacet.CMSComponentFacetPresentation.Normal:
+                @PintarFaceta()
+                break;
+            case CMSComponentFacet.CMSComponentFacetPresentation.Bars:
+                <div class="componenteFaceta graficoBarras">
+                    @PintarFaceta()
+                    <script>
+                        FormatearFacetasGraficas();
+                    </script>
+                </div>
+                break;
+            case CMSComponentFacet.CMSComponentFacetPresentation.Sectors:
+                <div class="componenteFaceta graficoSectores">
+                    @PintarFaceta()
+                    <script>
+                        FormatearFacetasGraficas();
+                    </script>
+                </div>
+                break;
+        }
+    }
+}
+
+@functions{
+
+    string PintarFaceta()
+    {
+        <div id="facetedSearch" class="facetedSearch">
+            @if (Model.FacetModel.ThesaurusID != Guid.Empty)
+            {
+                string contenidoID = "contenido_" + Model.FacetModel.Key;
+                if (Model.FacetModel.ThesaurusID != ProyectoAD.MetaProyecto)
+                {
+                    contenidoID += "_" + Model.FacetModel.ThesaurusID.ToString().ToUpper();
+                }
+
+                <div id="@contenidoID">
+                    <div id="@contenidoID">
+                        <div class="box" id="@Model.FacetModel.Key">
+                            @if (!string.IsNullOrEmpty(Model.Title))
+                            {
+                                <span class="faceta-title">@Model.Title</span>
+                            }
+                            else
+                            {
+                                <span class="faceta-title">@Model.FacetModel.Name</span>
+                            }
+                            @PintarCajaBusqueda()
+                            <div class="section">
+                                <ul class="listadoFacetas">
+                                    @foreach (FacetItemModel item in Model.FacetModel.FacetItemList)
+                                    {
+                                        @PintarItemFaceta(item)
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                string noCollapse = "";
+                string ulClass = "";
+                if (Model.FacetModel.Key == "rdf_type")
+                {
+                    noCollapse = "noCollapse";
+                }
+                else
+                {
+                    ulClass = "listadoFacetas";
+                }
+
+                string contenidoOut = "out_" + Model.FacetModel.Key;
+                string contenidoIn = "in_" + Model.FacetModel.Key;
+                <div id="@contenidoOut">
+                    <div id="@contenidoIn">
+                        <div class="box @noCollapse" id="@Model.FacetModel.Key">
+                            @if (!string.IsNullOrEmpty(Model.Title))
+                            {
+                                <span class="faceta-title">@Model.Title</span>
+                            }
+                            else
+                            {
+                                <span class="faceta-title">@Model.FacetModel.Name</span>
+                            }
+                            @PintarCajaBusqueda()
+                            <ul class="@ulClass">
+                                @foreach (FacetItemModel item in Model.FacetModel.FacetItemList)
+                                {
+                                    @PintarItemFaceta(item)
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            }
+        </div>
+        return string.Empty;
+    }
+
+    string PintarItemFaceta(FacetItemModel pItem)
+    {
+        <li>
+            @{
+                string clase = "faceta";
+                if (pItem.Selected)
+                {
+                    clase += " applied";
+                }
+            }
+            @if (pItem.FacetItemlist != null && pItem.FacetItemlist.Count > 0)
+            {
+                if (pItem.Selected)
+                {
+                    <img class="imgMas" onclick="DesplegarImgMas(this, 'cat_@pItem.Tittle')" alt="-" src="@Html.GetBaseUrlStatic()/img/verMenos.gif" />
+                }
+                else
+                {
+                    <img class="imgMas" onclick="DesplegarImgMas(this, 'cat_@pItem.Tittle')" alt="+" src="@Html.GetBaseUrlStatic()/img/verMas.gif" />
+                }
+            }
+            <a href="@pItem.Filter" class="@clase" name="@pItem.Name" title="@pItem.Tittle">@pItem.Tittle (@pItem.Number)</a>
+        </li>
+        if (pItem.FacetItemlist != null && pItem.FacetItemlist.Count > 0)
+        {
+            <ul style="display: none" id="cat_@pItem.Tittle">
+                @foreach (FacetItemModel item in pItem.FacetItemlist)
+                {
+                    @PintarItemFaceta(item)
+                }
+            </ul>
+        }
+        return string.Empty;
+    }
+
+    string PintarCajaBusqueda()
+    {
+        string inputID1 = Model.FacetModel.Key + "f1";
+        string inputID2 = Model.FacetModel.Key + "f2";
+
+
+        if (Model.FacetModel.SearchBoxType.Equals(SearchBoxType.Simple))
+        {
+            @PintarCajaBusquedaSimple()
+        }
+        else if (Model.FacetModel.SearchBoxType.Equals(SearchBoxType.FromToRank))
+        {
+            <div class="facetedSearchBox fechaDesdeHasta">
+                <label for="@inputID1" class="botonBuscarFaceta"></label>
+                <input type="text" value="@Html.GetText("METABUSCADOR", "DESDE")" onblur="if(this.value == ''){this.value = '@Html.GetText("METABUSCADOR", "DESDE")'; this.style.color = 'gray';} return true;" onfocus="if(this.value == '@Html.GetText("METABUSCADOR", "DESDE")'){this.value = ''; this.style.color = '';} return true;" name="@inputID1" class="filtroFaceta ac_input" id="@inputID1" style="color: gray;"><input type="text" value="@Html.GetText("METABUSCADOR", "HASTA")" onblur="if(this.value == ''){this.value = '@Html.GetText("METABUSCADOR", "HASTA")'; this.style.color = 'gray';} return true;" onfocus="if(this.value == '@Html.GetText("METABUSCADOR", "HASTA")'){this.value = ''; this.style.color = '';} return true;" name="@inputID2" class="filtroFaceta ac_input" id="@inputID2" style="color: gray;">
+                <a name="@Model.FacetModel.FacetKey" class="searchButton"></a>
+            </div>
+        }
+        else if (Model.FacetModel.SearchBoxType.Equals(SearchBoxType.FromToDates))
+        {
+            <div class="facetedSearchBox fechaDesdeHasta">
+                <label for="@inputID1" class="botonBuscarFaceta"></label>
+                <input type="text" class="filtroFacetaFecha ac_input hasDatepicker" value="@Html.GetText("METABUSCADOR", "DESDE")" onchange="ComprobarFechas(this, this, 2);" name="@inputID1" id="@inputID1"><input type="text" class="filtroFacetaFecha ac_input hasDatepicker" value="@Html.GetText("METABUSCADOR", "HASTA")" onchange="ComprobarFechas(this, this, 2);" name="@inputID2" id="@inputID2">
+                <a name="@Model.FacetModel.FacetKey" class="searchButton"></a>
+            </div>
+        }
+        else if (Model.FacetModel.SearchBoxType.Equals(SearchBoxType.Calendar))
+        {
+            <div name="@Model.FacetModel.Key" class="divdatepicker"></div>
+        }
+        else if (Model.FacetModel.SearchBoxType.Equals(SearchBoxType.TreeList))
+        {
+            <div style="height: 20px;">
+                <p>
+                    @{
+                        string cambioTipoPresentacion = Model.FacetModel.FacetKey + "_Lista";
+                    }
+
+                    <a onclick="VerFaceta('@cambioTipoPresentacion', '@Model.FacetModel.Key');" style="display: inline; float:right;">@Html.GetText("TESAURO", "LISTA")</a>
+                    <span style="float: right;">@Html.GetText("TESAURO", "ARBOL") | </span>
+                </p>
+            </div>
+        }
+        return string.Empty;
+    }
+
+    string PintarCajaBusquedaSimple()
+    {
+
+        string butId = Model.FacetModel.Key + "fbotonBuscar";
+        string facetaIDf = Model.FacetModel.Key + "f";
+
+        <div class="facetedSearchBox">
+            <label for="@facetaIDf" class="botonBuscarFaceta"></label>
+            @if (Model.FacetModel.AutocompleteTypeSearchBox.Equals(AutocompleteTypeSearchBox.AutocompleteUser))
+            {
+                <input type="text" name="@Model.FacetModel.FacetKey" class="filtroFaceta ac_input" id="@facetaIDf"
+                       onfocus="autocompletarUsuario(this, '@Model.FacetModel.FacetKey', '@Model.FacetModel.Order', '@Html.GetParametros()', '@Html.GetGrafoID()');" />
+            }
+            else if (Model.FacetModel.AutocompleteTypeSearchBox.Equals(AutocompleteTypeSearchBox.AutocompleteTipedTags))
+            {
+                string languajeCode = Html.GetUtilIdiomas().LanguageCode;
+                <input type="text" name="@Model.FacetModel.FacetKey" class="filtroFaceta ac_input" id="@facetaIDf"
+                       onfocus="autocompletarEtiquetasTipado(this, '@Model.FacetModel.FacetKey', @Model.FacetModel.Multilanguage);" />
+            }
+            else if (Model.FacetModel.AutocompleteTypeSearchBox.Equals(AutocompleteTypeSearchBox.AutocompleteGeneric))
+            {
+                <input type="text" name="@Model.FacetModel.FacetKey" class="filtroFaceta ac_input" id="@facetaIDf"
+                       onfocus="autocompletarGenerico(this, '@Model.FacetModel.FacetKey', '@Model.FacetModel.Order', '@Html.GetParametros()');" />
+            }
+            else if (Model.FacetModel.AutocompleteTypeSearchBox.Equals(AutocompleteTypeSearchBox.AutocompleteGenericWithContextFilter))
+            {
+                <input type="text" name="@Model.FacetModel.FacetKey" class="filtroFaceta ac_input" id="@facetaIDf"
+                       onfocus="autocompletarGenericoConFiltroContexto(this, '@Model.FacetModel.FacetKey', '@Model.FacetModel.Order', '@Html.GetParametros()', '@Html.GetFiltroContextoWhere()');" />
+            }
+            <a name="@Model.FacetModel.FacetKey" class="searchButton" id="@butId"></a>
+        </div>
+        return string.Empty;
+    }
+}

@@ -1,0 +1,68 @@
+﻿@model PersonalSpaceModel
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra la sección de "Espacio personal" del usuario donde podrá ver sus recursos, y realizar búsquedas mediante el servicio de Facetas
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+@* Utilizado para las rutas de "Migas de Pan" *@
+CommunityModel Comunidad = Html.GetComunidad();
+@* Perfil del usuario *@
+UserProfileModel perfil = Html.GetPerfil();
+
+@* Nombre del proyecto en el que se encuentra el usuario *@
+string nombreProyectoEcosistema = Html.GetNombreProyectoEcosistema();
+@* Url de la página actual *@
+string urlPagina = Html.GetUrlPagina();
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Index de la página de "Espacio personal" --------------------
+*@
+
+@{ 
+    @* Establecer nombre al body para comportamiento JS (espacio-personal) *@
+    Html.SetBodyClass("layout02 listadoComunidad comGnoss listadoMisFavoritos espacio-personal showResultsScrolling listado");
+    Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/jsUnificar/MVC.EditarRecurso.js?v=" + Html.GetVersion());
+    string jsExtra = Html.GetJSExtra();
+}
+
+
+<div class="row">
+    @*Breadcrumb / Migas de pan en la home*@
+    <div class="col col-12 col-breadcrumb" id="breadcrumb">
+        <ul>
+            <li><a href="@Comunidad.Url"><strong>@Html.GetText("COMMON", "HOME")</strong></a></li>
+            <li>@Html.GetNombreEspacioPersonal()</li>            
+        </ul>
+    </div>
+
+    @* Header o cabecera donde aparecen los resultados o recursos de una comunidad *@
+    @Html.PartialView("_partial-views/_list-header")
+
+    @* Columna para filtrado de mensajes: Columna izquierda *@
+    <div class="col col-12 col-xl-3 col-facetas col-lateral izquierda">
+        @Html.PartialView("_partial-views/_list-content-facetes")
+    </div>
+
+    @* Columna central-derecha para listado de recursos *@
+    <div class="col col-12 col-xl-9 col-contenido derecha">        
+        <div class="wrapCol">
+            @* Contenedor del buscador principal *@
+            @Html.PartialView("_partial-views/_searcher")
+
+            @* Listado de resultados (resource-list) donde aparecerán los recursos *@            
+            @Html.PartialView("_partial-views/_list-content", Model)            
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    @Html.Raw(jsExtra);
+    urlPaginaActual = '@urlPagina';
+</script>

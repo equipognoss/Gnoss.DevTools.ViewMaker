@@ -1,0 +1,175 @@
+﻿@model MyCommunitiesViewModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra un listado de todas las comunidades a las que pertenece el usuario
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+CommunityModel Comunidad = Html.GetComunidad();
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+
+@* Lista de comunidades del usuario *@
+List<MyCommunitiesViewModel.MyCommunityModel> communityItems = new List<MyCommunitiesViewModel.MyCommunityModel>();
+
+}
+@*
+----------------------------------------------------------------
+-------------------- Vista de listado de todas las comunidades de un usuario en myGnoss  --------------------
+*@
+
+
+
+@{
+    Html.SetBodyClass("layout02 listadoMyGnoss ");
+}
+
+@functions{
+
+    string PintarComunidad(MyCommunitiesViewModel.MyCommunityModel comunidad){        
+
+        @* Tipo de la comunidad (Abierta, Privada...)*@
+        string communityType = "";
+        @* Logo de la comunidad *@
+        bool hasLogo = false;
+
+        switch ((CommunityModel.TypeAccessProject)comunidad.AccessType)
+        {
+            case CommunityModel.TypeAccessProject.Private:
+                communityType = Html.GetText("COMUNIDADES", "COMUNIDADPRIVADA");
+                break;
+            case CommunityModel.TypeAccessProject.Public:
+                communityType = Html.GetText("COMUNIDADES", "COMUNIDADPUBLICA");
+                break;
+            case CommunityModel.TypeAccessProject.Reserved:
+                communityType = Html.GetText("COMUNIDADES", "COMUNIDADRESERVADA");
+                break;
+            case CommunityModel.TypeAccessProject.Restricted:
+                communityType = Html.GetText("COMUNIDADES", "COMUNIDADRESTRINGIDA");
+                break;
+        }
+
+        @* Logo de la comunidad *@
+        if ( !String.IsNullOrEmpty(comunidad.Logo)) { 
+            hasLogo = true;
+        }
+
+        <div id="card-community-@comunidad.Key" class="col-md-4 card-community">
+            <div class="card p-3 mb-2">
+                <div class="d-flex justify-content-between">
+                    <div class="d-flex flex-row align-items-center">
+                        <div class="user-miniatura" style="align-items: center">
+                            <div class="imagen-usuario-wrap">
+                                <a href="@comunidad.Url">
+                                   <div class="imagen @( !hasLogo ? "sinImagen" : null) ">  
+                                       @if (hasLogo)
+                                       {
+                                            <span style="background-image: url(@comunidad.Logo);"></span>
+                                       }
+                                       else { 
+                                            <span class="material-icons">groups</span>
+                                       }                                    
+                                    </div>                                                                
+                                </a>
+                            </div>
+                            <div class="nombre-usuario-wrap">
+                                <a href="@comunidad.Url">
+                                    @* Nombre de la comunidad *@
+                                    <p class="nombre">@comunidad.Name</p>
+                                    @* Privacidad de la Comunidad *@
+                                    <span class="text-muted">@Html.Raw(communityType)</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @* Información adicional de la comunidad 
+                <div class="mt-3">
+                    <div class="mt-2">
+                        <p class="card-text">
+                            <small class="text-muted">@comunidad.Name</small>
+                        </p>
+                    </div>
+                </div>
+                *@
+            </div>
+        </div>
+
+        @*Acceder a posibles comunidades hijas con X niveles *@
+        @foreach (MyCommunitiesViewModel.MyCommunityModel comunidadHija in Model.Communities.Where(com => com.ParentKey == comunidad.Key))
+        {
+            @PintarComunidad(comunidadHija);
+        }
+
+        return String.Empty;
+    }
+
+}
+
+<div class="row">
+    @if (Comunidad.Key != ProyectoAD.MetaProyecto)
+    {
+        @*Breadcrumb / Migas de pan en la ficha del recurso*@
+        <div class="col col-12 col-breadcrumb" id="breadcrumb">
+            <ul>
+                <li><a href="@Comunidad.Url"><strong>@Html.GetText("COMMON", "HOME")</strong></a></li>
+            </ul>
+        </div>
+    }
+    else
+    {
+        @*Breadcrumb / Migas de pan en la ficha del recurso*@
+        <div class="col col-12 col-breadcrumb" id="breadcrumb">
+            <ul>
+                <li><strong>@Html.GetText("COMMON", "HOME")</strong></li>
+            </ul>
+        </div>
+    }
+
+    @* Título de la página *@
+    <div class="col col-12 header-listado">
+        <div class="h1-container">
+            <h1>@Html.GetText("COMMON", "MISCOMUNIDADES")</h1>
+        </div>
+    </div>
+
+    <div class="col col-12 col-xl-12 col-contenido izquierdo">
+        <div class="wrapCol">            
+            @* Buscador de comunidades *@
+            <div class="col-buscador">
+                <form onsubmit="return false">
+                    <fieldset style="display: block">
+                        <div class="finderUtils" id="divCajaBusqueda">
+                            <div class="group finderSection txtFiltrarItems">
+                                <label for="finderSection">Encontrar</label>
+                                <input type="text" id="txtFiltrarItems" 
+                                       name="txtFiltrarItems" 
+                                       class="not-outline finderSectionText ac_input" 
+                                       autocomplete="off"
+                                       onkeyup="javascript: MVCFiltrarItems(this,'panResultados','card-community','nombre-usuario-wrap')"
+                                       placeholder="@Html.GetText("METABUSCADOR", "ENCONTRAR")" />
+                                <input title="@Html.GetText("METABUSCADOR", "ENCONTRAR")" type="button" class="encontrar findAction" />                                     
+                            </div>               
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+
+
+            @* Pintar las comunidades *@
+            <div id="panResultados" class="resource-list listView">                
+                <div class="container">
+                    <div class="row pr-2 pl-2">
+                        @foreach (MyCommunitiesViewModel.MyCommunityModel comunidad in Model.Communities.Where(com => com.ParentKey == Guid.Empty))
+                        {
+                            @PintarComunidad(comunidad)
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

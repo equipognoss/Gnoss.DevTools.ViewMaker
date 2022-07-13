@@ -1,0 +1,22 @@
+﻿@model EditSuscriptionViewModel
+
+@foreach (CategoryModel categoria in Model.Categories.OrderBy(cat => cat.Name))
+{ 
+    <div>
+	    <img style="border-width:0px;" src="@Html.GetBaseUrlStatic()/img/miniWhiteSpace.gif" />
+    
+        <span class="@categoria.Key">
+            @{
+                string accionClick = "MVCMarcarElementoSelCat(this, 'selectorCategoriasSusc');";
+                string cadenaChecked = "";
+                if (categoria.Selected)
+                {
+                    cadenaChecked = "checked=\"checked\"";
+                }
+            }
+        
+            <input type="checkbox" id="chk_list_@categoria.Key" onclick="@accionClick" @cadenaChecked/>
+            <label for="chk_list_@categoria.Key">@categoria.Name</label>
+        </span>
+    </div>
+}

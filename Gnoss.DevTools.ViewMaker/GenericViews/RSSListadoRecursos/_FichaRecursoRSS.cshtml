@@ -1,0 +1,61 @@
+﻿@model RSSListadoRecursosViewModel.FichaRecursoRSS
+
+<div class="resource" id="divResource">
+    <div class="box description @(Model.EstaCompleto ? "fuenteSeleccionada" : "")" id="divResourceInt">
+        <div class="wrapDescription"  style="padding:10px">
+            <div class="group title">
+                <p class="selectorFuenteRSS">
+                    <input type="checkbox" id="ficha_@Model.Key" class="checkbox">
+                </p>
+                <h3>
+                    <a href="@Model.EnlaceEditar" property="dcterms:title">
+                        @Model.Titulo
+                    </a>
+                </h3>
+                <p class="resourceType hipervinculo"><span>tipo de documento</span><a>hipervinculo</a></p>
+            </div>
+            <div id="divGroupAccionesRec">
+            </div>
+            <div class="group content">
+                <div class="descripcionResumida">
+                    @Html.Raw(Html.AcortarDescripcionHtml(Model.Descripcion, 300))
+                </div>
+                @*<div class="verMasRecurso">
+                    <p><a href="">...</a></p>
+                </div>*@
+            </div>
+            @if (Model.Categorias != null && Model.Categorias.Count > 0)
+            {
+                <div class="group categorias">
+                    <p>
+                        Categorías:
+                    </p>
+                    <ul id="listCat">
+                        @foreach (Guid catID in Model.Categorias.Keys)
+                        {
+                            <li>
+                                <a>@Model.Categorias[catID]</a>@(!catID.Equals(Model.Categorias.Last().Key) ? ", " : "")
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+            @if (Model.Tags != null && Model.Tags.Count > 0)
+            {
+                <div class="group etiquetas">
+                    <p>
+                        Etiquetas:
+                    </p>
+                    <ul id="listTags">
+                        @foreach (string tag in Model.Tags)
+                        {
+                            <li>
+                                <a>@tag</a>@(!tag.Equals(Model.Tags.Last()) ? ", " : "")
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+        </div>
+    </div>
+</div>

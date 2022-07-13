@@ -1,0 +1,194 @@
+﻿@model HomeViewModel
+@*@model dynamic*@
+@*
+Descripción
+-----------------------------------------------
+Vista que contiene los elementos principales para cargar el html cuando el usuario está en la home de una comunidad.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+Html.SetBodyClass("comGnoss layout01 homeComunidad comunidad");
+CommunityModel Comunidad = Html.GetComunidad();
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+@* Nº de items que se mostrarán como máximo en Widgets de usuarios*@
+int numMaxItemsDisplayed = 5;
+
+
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Vista de la Home cuando el usuario está en la Home de una comunidad --------------------
+*@
+
+
+@* Tener en cuenta el nº máximo de usuarios más activos para evitar errores si no hay más de 5 usuarios *@
+@if (Model.MostActiveUsers.Count < numMaxItemsDisplayed) {
+    numMaxItemsDisplayed = Model.MostActiveUsers.Count;
+}
+
+@if (Comunidad.ProjectState != CommunityModel.StateProject.Definition || !IdentidadActual.IsGuestIdentity)
+{
+    @* Row principal *@
+    <div class="row">
+        @*Breadcrumb / Migas de pan en la home*@
+        <div class="col col-12 col-breadcrumb" id="breadcrumb">
+            <ul>
+                <li><a href="@Comunidad.Url"><strong>@Html.GetText("COMMON", "HOME")</strong></a></li>
+                <li>@Html.GetText("CONTROLESLIVE", "TITULOCONTROLEVENTOS")</li>
+            </ul>
+        </div>
+        @* Contenedor del buscador principal - Eliminar el buscador Home -> Solo estará el Metabuscador Lateral
+        <div class="col col-12 col-buscador">
+            @* Buscador de elementos en la home - Vista parcial 
+            @Html.PartialView("_partial-views/_searcher")
+        </div>
+        *@
+
+        @* Contenedor izquierda/central del Home *@
+        <div class="col col-12 col-xl-8 col-contenido izquierda">
+            <div class="wrapCol">
+                @* Título de la home: Actividad Reciente *@
+                <div class="header-contenido">
+                    <div class="h1-container">
+                        <h1>@Html.GetText("CONTROLESLIVE", "TITULOCONTROLEVENTOS")</h1>
+                    </div>
+                </div>
+
+                @* Contenedor para listado de actividad *@
+                @if (Model.RecentActivity.RecentActivityItems.Count > 0)
+                {
+                    @* Listado de sección Actividad Reciente *@
+                    <div class="resource-list listView resource-list-personas">
+                        <div class="resource-list-wrap">                            
+                            @* Item de cada comunidad *@
+                            @if (Model.RecentActivity.RecentActivityItems.Count > 0)
+                            {
+                                @Html.PartialView("ControlesMVC/_ActividadReciente", Model.RecentActivity)
+                            }
+                        </div>
+                    </div>
+                }
+                @* No hay actividad reciente. Mensaje para empezar ahora mismo añadiendo recursos. *@
+                else if (!IdentidadActual.IsExpelled && Comunidad.ProjectState != CommunityModel.StateProject.Close && Comunidad.ProjectState != CommunityModel.StateProject.CloseTemporaly && Comunidad.ProjectState != CommunityModel.StateProject.Definition || IdentidadActual.IsProyectAdmin || IdentidadActual.IsProyectSupervisor)
+                {
+                    <div>
+                        <div class="group content">
+                            <p>
+                                @Html.Raw(Html.GetText("CONTROLESLIVE", "ACTIVIDADRECIENTEVACIOCOM", (string)Comunidad.Url + "/" + Html.GetText("URLSEM", "SUBIRRECURSO")))
+                            </p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        @* Contenedor derecho (Nº de Recursos, Nº Personas, Administradores, Lo más interesante, Últimos usuarios Regitrados...) *@
+        <div class="col col-12 col-xl-4 col-contexto col-lateral derecha">
+            @* Contenedor de información de la comunidad (Nº de Recursos, Personas, Admins)*@
+            <div class="wrapCol">
+                <div class="resumen-comunidad">
+                    @* Bloque de Nº de Recursos *@
+                    <div class="bloque">
+                        <div class="titulo">@Html.GetText("COMMON", "RECURSOS")</div>
+                        <div class="contenido">
+                            <a href="@Comunidad.Url/@Html.GetText("URLSEM", "RECURSOS")">@Comunidad.NumberOfResources</a>
+                        </div>
+                    </div>
+                    @* Bloque Nº de Personas y Organizaciones *@
+                    <div class="bloque">
+                        <div class="titulo">@Html.GetText("COMMON", "PERSONAS")</div>
+                        <div class="contenido">
+                            <a href="@Comunidad.Url/@Html.GetText("URLSEM", "PERSONASYORGANIZACIONES")"><span class="count">@(Comunidad.NumberOfPerson + Comunidad.NumberOfOrganizations)</span></a>
+                        </div>
+                    </div>
+                    @* Bloque Nº de Administradores *@
+                    <div class="bloque">
+                        <div class="titulo">@Html.GetText("COMINICIO", "ADMININSTRADORES")</div>
+                        <div class="contenido">
+                            <span>@Comunidad.Administrators.Count</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* Panel/es de posibles Plugins/Widgets asociados a la comunidad *@
+            @if (Model.Gadgets != null && Model.Gadgets.Count > 0)
+            {
+                <div id="divContPanGadgets">
+                    @foreach (GadgetModel gadget in ((List<GadgetModel>)Model.Gadgets).OrderBy(gadget => gadget.Order))
+                    {
+                        @Html.PartialView("ControlesMVC/_FichaGadget", gadget)
+                    }
+                </div>
+            }
+
+            @* Contenedor de últimos usuarios registrados *@
+            <div id="lastRegisteredUsers" class="wrapCol grupo-personas">
+                <h2 class="section-title">@Html.GetText("COMADMIN", "ULTIMOSUSUARIOS")</h2>
+                <div class="resource-list usuarios con-borde">
+                    @foreach (ProfileModel usuario in Model.LastUsers)
+                    {
+                        @* Cada uno de los usuarios *@
+                        @Html.PartialView("_partial-views/_list-user-item", usuario)
+                    }
+                </div>
+            </div>
+
+            @* Contenedor de últimos usuarios más activos *@
+            <div id="moreActivityUsers" class="wrapCol grupo-personas">
+                <h2 class="section-title">@Html.GetText("COMADMIN", "MASACTIVOS")</h2>
+                <div class="resource-list usuarios con-borde">
+                    @* No mostrar todos -> Mostrar un número determinado de usuarios
+                    @foreach (ProfileModel usuario in Model.MostActiveUsers)
+                    {
+                        @* Cada uno de los usuarios
+                        @Html.PartialView("_partial-views/_list-user-item", usuario)
+                    }
+                    *@
+                    @for (int i = 0; i < numMaxItemsDisplayed; i++)
+                    {
+                        ProfileModel usuario = Model.MostActiveUsers[i];
+                        @* Cada uno de los usuarios *@
+                        @Html.PartialView("_partial-views/_list-user-item", usuario)
+                    }
+                    <a href="@Comunidad.Url/@Html.GetText("URLSEM", "PERSONASYORGANIZACIONES")" class="ver-mas ver-mas-icono con-icono-after">@Html.GetText("COMMON", "VERTODOS")</a>
+                </div>
+            </div>
+
+            @* Contenedor de usuarios Administradores*@
+            <div class="wrapCol grupo-personas">
+                <h2 class="section-title">@Html.GetText("COMINICIO", "ADMININSTRADORES")</h2>
+                <div class="resource-list usuarios con-borde">
+                    @foreach (ProfileModel usuario in Comunidad.Administrators)
+                    {
+                        @* Cada uno de los usuarios *@                        
+                        @Html.PartialView("_partial-views/_list-user-item", usuario)
+                    }
+                </div>
+            </div>
+
+            @* Comunidades relacionadas que están como Gadgets *@            
+            @if (Model.Gadgets != null && Model.Gadgets.Count > 0) { 
+
+                foreach (GadgetModel gadget in ((List<GadgetModel>)Model.Gadgets).OrderBy(gadget => gadget.Order))
+                {
+                    if (gadget is GadgetCommunitiesListModel) { 
+                        @Html.PartialView("ControlesMVC/_FichaGadgetComunidadesRelacionadas", gadget)
+                    }                    
+                }                
+            }
+            
+        </div>
+    </div>
+
+    @* Script JS cuando cargue la página *@
+    @section javascript {
+        <script type="text/javascript">
+            MontarFechas();
+            @Html.Raw(Html.GetJSExtra())
+        </script>
+    }
+}

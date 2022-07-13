@@ -1,0 +1,43 @@
+﻿@*
+    Descripción
+    -----------------------------------------------
+    Vista que muestra todos los mensajes en modo Lista después haber sido cargados al cargar la página de "Comentarios"
+
+    En esta vista se cargarán las subvistas de los items devueltos del buscador. Estas subvistas pertenecen al servicio "ServicioResultados".
+
+    Variables
+    ----------------------------------------------------------------
+*@
+@{
+    // Saber si la lista se debe mostrar compactada o como listview
+    bool compactView = false;
+}
+@*
+    ----------------------------------------------------------------
+    -------------------- Lista donde se mostrarán los los items o recursos del buscador --------------------
+*@
+
+@* Contenedor de items (recursos) de resultados *@
+<div id="panelResultados" class="resource-list @(compactView ? "compacView" : "listView")">
+
+    @* Mostrado de resultados de mensajes *@
+    @* Envoltorio de los items devueltos por el buscador *@
+    <div class="resource-list-wrap">
+        @* Cargar los resultados obtenidos del servicio "Cargador Resultados" *@
+        <div id="divRel"></div>
+    </div>
+</div>
+
+@* Cargando más datos *@
+<div class="loading-more-results d-none">
+    <div class="d-flex flex-column align-items-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">@Html.GetText("COMMON", "CARGANDO")</span>
+        </div>
+        <p class="text-muted mt-2">@Html.GetText("COMMON", "CARGANDO")</p>
+    </div>
+</div>
+
+
+@* Panel de nueva búsqueda cogida de la versión anterior *@
+<div id="navegadorBusqueda"></div>

@@ -1,0 +1,47 @@
+﻿@model InvitationModel
+@if (Model != null)
+{
+    string nombreIdentidadOrigen = Html.ObtenerNombrePerfil(Model.Sender);
+    string urlIdentidadOrigen = Html.ObtenerUrlPerfil(Model.Sender);
+    
+    <div id="invitation_@Model.Key" class="resource ">
+        <div class="box description">
+            <div class="group title">
+                <h3><a href="@urlIdentidadOrigen">@Model.Subject</a></h3>
+				<p class="resourceType persona @(!string.IsNullOrEmpty(Model.Sender.UrlFoto)?"conImagenPerfil":"")">
+					<a href="@urlIdentidadOrigen">
+                    @if(!string.IsNullOrEmpty(Model.Sender.UrlFoto))
+                    {
+                        <img alt="@nombreIdentidadOrigen" src="@ViewBag.BaseUrlContent@Model.Sender.UrlFoto" />
+                    }
+					</a>
+				</p>
+            </div>
+            <div class="group content">
+                <div class="descripcionResumida">
+                    @Html.Raw(Model.Body)
+                </div>
+            </div>
+            <div class="group utils-2">
+                <p>
+                    Enviado por 
+					<a href="@urlIdentidadOrigen">@nombreIdentidadOrigen</a>
+                </p>
+            </div>
+            <div class="group acciones">
+                <ul>
+                    <li><a onclick="javascript:AceptarInvitacion('@Model.Key')">Aceptar</a></li>
+                    <li><a onclick="javascript:IgnorarInvitacion('@Model.Key')">Ignorar</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+
+
+
+
+

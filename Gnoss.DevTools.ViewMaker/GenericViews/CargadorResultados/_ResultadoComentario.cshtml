@@ -1,0 +1,94 @@
+﻿@model CommentSearchModel
+
+@*Descripción
+    -----------------------------------------------
+    Vista que muestra cada comentario que es visualizado en la listado de resultados
+
+    Variables
+    ----------------------------------------------
+*@
+@{
+    // Formateo de la fecha de recepción del mensaje
+    string fecha = "";
+
+
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Vista para mostrar cada mensaje (Mensajería myGNOSS) en la lista de resultados --------------------*@
+
+@if (Model != null)
+{
+    // Fecha formateada de recepción del mensaje
+    fecha = Model.DateComment.ToString("dd/MM/yyyy");
+
+    @* Contenedor del mensaje *@    
+    <article id="@Model.Key" class="resource comentario @(!Model.Readed?"no-leido":"")">
+
+        <div class="wrap" style="margin-left:35px">
+
+            @* Título / Asunto del mensaje *@
+            <h2>
+                <a href="@Model.ResourceUrl">@Model.ResourceTitle</a>
+            </h2>
+
+            @* Autor y fecha del mensaje *@
+            <div class="info-wrap">
+                @* Autor del mensaje *@
+                <p class="autor">
+                    <a href="@Html.ObtenerUrlPerfil(Model.Publisher)">@Html.ObtenerNombrePerfil(Model.Publisher) </a>
+                </p>
+                @* Fecha del mensaje *@
+                <p class="fecha">@fecha</p>
+
+                @if (!Model.Readed)
+                {
+                    @* Acciones a realizar con/el mensaje Mostrar la opcion solo si el Comentario está sin leer *@
+                    <div class="acciones-recurso-listado">
+                        <div class="dropdown">
+                            <a href="#"
+                            class="dropdown-toggle"
+                            role="button"
+                            data-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false">
+                                <span class="material-icons">more_vert</span>
+                            </a>
+                            @* Acciones a realizar con el mensaje *@                        
+                            <div class="dropdown-menu basic-dropdown dropdown-icons dropdown-menu-right">
+                                <ul class="no-list-style">
+                                    @* Acción reenviar *@
+                                    <li>
+                                        <a class="item-dropdown"
+                                        href=""
+                                        onclick="MarcarComentarioLeidoPorID('@Model.Key')"
+                                        title="@Html.GetText("COMENTARIOS", "MARCARLEIDO")">
+                                            <span class="material-icons">mark_chat_read</span>
+                                            <span>@Html.GetText("COMENTARIOS", "MARCARLEIDO")</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>                        
+                        </div>
+                    </div>
+                    }
+            </div>
+
+            @* Vista preliminar descripción del mensaje *@            
+            <div class="desc descripcionResumida">
+                <p>                    
+                    @Html.Raw(@Html.CleanHtmlFromMultimediaItems(Model.Description))
+                </p>
+            </div>
+        </div>
+    </article>
+}
+
+
+
+
+
+
+
+

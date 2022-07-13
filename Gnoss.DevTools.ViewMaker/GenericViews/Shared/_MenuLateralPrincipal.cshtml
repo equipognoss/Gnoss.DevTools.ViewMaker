@@ -1,0 +1,157 @@
+﻿@using Es.Riam.Gnoss.Web.MVC.Models;
+@if (Html.GetComunidad() != null)
+{
+   
+        HeaderModel cabecera = Html.GetCabecera();
+        UserProfileModel perfil = Html.GetPerfil();
+        CommunityModel Comunidad = Html.GetComunidad();
+        UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+        CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
+    
+<aside id="menuLateralPrincipal" class="menuLateral pmd-sidebar sidebar-default pmd-sidebar-left pmd-sidebar-left-fixed pmd-sidebar-slide-push pmd-sidebar-open" role="navigation">
+
+    <div class="header">
+        <div class="wrap-header">
+           <!-- <p class="logo">
+                <i>my</i><span>GNOSS</span>
+            </p>-->
+            @if (Comunidad.Key == new Guid("11111111-1111-1111-1111-111111111111"))
+            {
+                <div class="logo">
+                    <h6>
+                        <a href="@Html.GetBaseUrlIdioma()/home">
+                            <img alt="Gnoss" title="Gnoss" style="width:50%;" src="@Html.GetBaseUrlStatic()/img/logo_gnoss.png" />
+                        </a>
+                    </h6>
+                    <!-- <a href="javascript: void(0);">
+                 <i>my</i><span>GNOSS</span>
+
+             </a>-->
+                </div>
+            }
+            else
+            {
+                            <!-- Panel Logo -->
+                <div class="logoCustomRIAM">
+                    <@(!Html.GetPintarH1().HasValue || Html.GetPintarH1().Value ? "h1" : "div")>
+                        <a href="@Comunidad.Url">
+                            @if (!string.IsNullOrEmpty(Comunidad.Logo))
+                            {
+                                <img src="@Comunidad.Logo" title="@Comunidad.Name" alt="@Comunidad.Name" style="width:50%;" />
+                            }
+                            else
+                            {
+                                <span>@Comunidad.Name</span>
+                            }
+                        </a>
+                        <@(!Html.GetPintarH1().HasValue || Html.GetPintarH1().Value ? "/h1" : "/div")>
+
+                            @if (!Comunidad.IsCatalog)
+                            {
+                                <p class="small">
+                                    <span>
+                                        @switch ((CommunityModel.TypeAccessProject)Comunidad.AccessType)
+                                        {
+                                            case CommunityModel.TypeAccessProject.Private:
+                                                @Html.Raw(Html.GetText("COMUNIDADES", "COMUNIDADPRIVADA"))
+                                                break;
+                                            case CommunityModel.TypeAccessProject.Public:
+                                                @Html.Raw(Html.GetText("COMUNIDADES", "COMUNIDADPUBLICA"))
+                                                break;
+                                            case CommunityModel.TypeAccessProject.Reserved:
+                                                @Html.Raw(Html.GetText("COMUNIDADES", "COMUNIDADRESERVADA"))
+                                                break;
+                                            case CommunityModel.TypeAccessProject.Restricted:
+                                                @Html.Raw(Html.GetText("COMUNIDADES", "COMUNIDADRESTRINGIDA"))
+                                                break;
+                                        }
+
+                                        @if (Comunidad.CertificationLevels != null && Comunidad.CertificationLevels.Count > 0)
+                                        {
+                                            @Html.GetText("COMMON", "CON") <a href="@Comunidad.Url/@Html.GetText("URLSEM", "ACERCADE")">@Html.GetText("COMUNIDADES", "CONTENIDOSCERTIFICADOS")</a>
+                                        }
+                                    </span>
+                                    @if (Comunidad.ProjectState != CommunityModel.StateProject.Open)
+                                    {
+                                        string estado = "";
+
+                                        if (Comunidad.ProjectState == CommunityModel.StateProject.Close)
+                                        {
+                                            estado = Html.GetText("COMADMIN", "CERRADO");
+                                        }
+                                        else if (Comunidad.ProjectState == CommunityModel.StateProject.CloseTemporaly)
+                                        {
+                                            estado = Html.GetText("COMADMIN", "CERRADOTMP");
+                                        }
+                                        else if (Comunidad.ProjectState == CommunityModel.StateProject.Closing)
+                                        {
+                                            estado = Html.GetText("COMADMIN", "CERRANDOSE");
+                                        }
+                                        else if (Comunidad.ProjectState == CommunityModel.StateProject.Definition)
+                                        {
+                                            estado = Html.GetText("COMADMIN", "DEFINICION");
+                                        }
+
+                                        <span style="display:block;">@Html.GetText("COMADMINCATEGORIAS", "COMUNIDAD") @Html.GetText("COMUNIDADES", "ENESTADO") @estado</span>
+
+                                        if (Comunidad.ProjectState == CommunityModel.StateProject.CloseTemporaly)
+                                        {
+                                            <span style="display:block;">@Html.GetText("COMADMIN", "FECHAREAPERTURA") @Comunidad.OpenDate.ToShortDateString()</span>
+                                        }
+                                        else if (Comunidad.ProjectState == CommunityModel.StateProject.Closing)
+                                        {
+                                            <span style="display:block;">@Html.GetText("COMADMIN", "DIASPARAELCIERRE") @Math.Truncate((Comunidad.PeriodoDeGracia - DateTime.Now).TotalDays + 1)</span>
+                                        }
+                                    }
+                                </p>
+                            }
+                </div>
+            }
+            @if (Comunidad.ProjectState != CommunityModel.StateProject.Definition || !IdentidadActual.IsGuestIdentity)
+            {   
+            <div class="datos-comunidad">
+                <p>@Comunidad.NumberOfResources <span>@Html.GetText("COMMON", "RECURSOS")</span></p>
+                <p>@(Comunidad.NumberOfPerson + Comunidad.NumberOfOrganizations)<span> @Html.GetText("COMMON", "PERSONASYORGANIZACIONES") </span><p>
+            </div>
+            }
+        </div>
+        <span class="material-icons cerrar">close</span>
+    </div>
+    @if (!IdentidadActual.IsGuestUser)
+    {
+        <div class="body">
+            <p>Comunidades</p>
+            <ul class="pmd-sidebar-nav ulComunidades">
+                @{
+
+                    List<UserProfileModel.ProfileCommunitiesModel> masUsados = perfil.Communities.OrderByDescending(comunidadPerfil => comunidadPerfil.NumberOfConnections).Take(10).ToList();
+
+                    foreach (UserProfileModel.ProfileCommunitiesModel comunidadPerfil in masUsados.OrderBy(comunidadPerfil => comunidadPerfil.Name))
+                    {
+                        string clase = "publica";
+                        if (comunidadPerfil.Type == 1 || comunidadPerfil.Type == 3) { clase = "privada"; }
+                        <li class="@clase"><a href="@comunidadPerfil.Url" title="@comunidadPerfil.Name"><span class="icono"></span>@Html.AcortarTexto(comunidadPerfil.Name, 29)</a></li>
+                    }
+                }
+            </ul>
+            @if (perfil.Communities.Count > 10)
+            {
+                <ul class="pmd-sidebar-nav ulComunidades listadoAmpliado" style="display: none;">
+                    @foreach (UserProfileModel.ProfileCommunitiesModel comunidadPerfil in (perfil.Communities).OrderBy(comunidadPerfil => comunidadPerfil.Name))
+                    {
+                        string clase = "publica";
+                        if (comunidadPerfil.Type == 1 || comunidadPerfil.Type == 3) { clase = "privada"; }
+                        <li class="@clase"><a href="@comunidadPerfil.Url" title="@comunidadPerfil.Name"><span class="icono"></span>@Html.AcortarTexto(comunidadPerfil.Name, 28)</a></li>
+                    }
+                </ul>
+                <p class="mostrarListadoAmpliado"><a rel="Contraer -">@Html.GetText("MENU", "AMPLIAR")</a></p>
+                <p style="display: none;" class="mostrarListadoTodos"><a href="@perfil.Url@Html.GetText("URLSEM", "MISCOMUNIDADES")">@Html.GetText("INICIO", "VERTODOS")</a></p>
+            }
+
+                @*<li class="ver-todas">
+                <a href="javascript: void(0);" data-target="menuLateralIdentidades" data-placement="right" data-position="slidepush" class="pmd-sidebar-toggle">Ver todas</a>
+            </li>*@
+</div>
+     }
+</aside>
+}

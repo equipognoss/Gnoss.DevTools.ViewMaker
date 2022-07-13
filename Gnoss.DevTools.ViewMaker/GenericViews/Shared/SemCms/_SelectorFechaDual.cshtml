@@ -1,0 +1,67 @@
+﻿@model Es.Riam.Gnoss.Web.MVC.Models.SemanticPropertyModel.PropertyValue
+
+@{
+    string idContolCmb = Model.Property.OntologyPropInfo.ControlID + "mCmbMes";
+    string idContolTxt = Model.Property.OntologyPropInfo.ControlID + "mTxtAnyo";
+
+    Dictionary<string, string> mesNombre = new Dictionary<string, string>();
+    mesNombre.Add("0", Html.GetText("CONTROLESCVSEM", "MES"));
+
+    mesNombre.Add("01", Html.GetText("CONTROLESCVSEM", "MES_ENE"));
+    mesNombre.Add("02", Html.GetText("CONTROLESCVSEM", "MES_FEB"));
+    mesNombre.Add("03", Html.GetText("CONTROLESCVSEM", "MES_MAR"));
+    mesNombre.Add("04", Html.GetText("CONTROLESCVSEM", "MES_ABR"));
+    mesNombre.Add("05", Html.GetText("CONTROLESCVSEM", "MES_MAY"));
+    mesNombre.Add("06", Html.GetText("CONTROLESCVSEM", "MES_JUN"));
+    mesNombre.Add("07", Html.GetText("CONTROLESCVSEM", "MES_JUL"));
+    mesNombre.Add("08", Html.GetText("CONTROLESCVSEM", "MES_AGO"));
+    mesNombre.Add("09", Html.GetText("CONTROLESCVSEM", "MES_SEP"));
+    mesNombre.Add("10", Html.GetText("CONTROLESCVSEM", "MES_OCT"));
+    mesNombre.Add("11", Html.GetText("CONTROLESCVSEM", "MES_NOV"));
+    mesNombre.Add("12", Html.GetText("CONTROLESCVSEM", "MES_DIC"));
+
+    string mesSeleccionado = "0";
+    string anoSeleccionado = Html.GetText("CONTROLESCVSEM", "YEAR");
+    string styleCombo = "style=\"color:gray;\"";
+    string styleTxt = "style=\"color:gray;\"";
+    
+    if (!string.IsNullOrEmpty(Model.Value))
+    {
+        mesSeleccionado = Model.Value.Trim().Split('/')[1];
+        anoSeleccionado = Model.Value.Trim().Split('/')[2];
+        styleCombo = "";
+        styleTxt = "";
+    }
+
+    string disabledControl = "";
+
+    if (Model.Property.SpecificationProperty.CampoDeshabilitado)
+    {
+        disabledControl = "disabled=\"disabled\"";
+    }
+}
+
+<select id="@idContolCmb" @Html.Raw(styleCombo) onclick="GuardarCampoFechaMesAnyo(this, '@Model.Property.Element.Propiedad.Nombre', '@Model.Property.Element.Propiedad.ElementoOntologia.TipoEntidad');if(this.value==0){this.style.color='gray';}else{this.style.color='';}" @Html.Raw(disabledControl)>
+    @foreach (string mes in mesNombre.Keys)
+    {
+        string selected = "";
+        string style = "";
+
+        if (mes == mesSeleccionado)
+        {
+            selected = "selected";
+        }
+
+        if (mes == "0")
+        {
+            style = "style=\"color:gray;\"";
+        }
+        else
+        {
+            style = "style=\"color:black;\"";
+        }
+            
+        <option value="@mes" @Html.GetParam("selected", selected) @Html.Raw(style)>@mesNombre[mes]</option>
+    }
+</select>
+<input id="@idContolTxt" type="text" @Html.Raw(styleTxt) value="@anoSeleccionado" onkeypress="if(this.value.length > 3){var tecla=0;if(event.which){tecla=event.which;}else if(event.keyCode){tecla=event.keyCode;}if(tecla == 46 || tecla == 8 || tecla == 37 || tecla == 39 || tecla == 35 || tecla == 36){return true;}else{return false;}}" onfocus="if(this.value == '@Html.GetText("CONTROLESCVSEM", "YEAR")'){this.value='';this.style.color='black';}" onblur="GuardarCampoFechaMesAnyo(this, '@Model.Property.Element.Propiedad.Nombre', '@Model.Property.Element.Propiedad.ElementoOntologia.TipoEntidad');if(this.value == ''){this.value='@Html.GetText("CONTROLESCVSEM", "YEAR")';this.style.color='gray';}" @Html.Raw(disabledControl) />

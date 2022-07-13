@@ -1,0 +1,173 @@
+﻿@using Es.Riam.Gnoss.Web.MVC.Models;
+@if (Html.GetComunidad() != null)
+{
+@*
+Descripción
+-----------------------------------------------
+Menú lateral derecho que aparecerá al pulsar sobre la "Lupa" de la la sección "Header".
+Este panel se deslizará de derecha a izquierda para realizar búsquedas de metadatos en la web.
+@*
+
+Variables
+----------------------------------------------------------------
+*@
+CommunityModel Comunidad = Html.GetComunidad();
+@*
+----------------------------------------------------------------
+--------------------Menú Lateral Metabuscador --------------------
+*@
+
+<aside id="menuLateralMetabuscador" class="menuLateral metabuscador">
+    <div class="header">
+        <div class="wrap-header">
+            <div id="buscador" class="buscador">
+                <form method="post" id="formBuscador">
+                    <div class="fieldsetGroup searchGroup">
+                        <div class="textoBusquedaPrincipalInput">
+                            <input type="text" id="txtBusquedaPrincipal" class="not-outline text txtBusqueda autocompletar personalizado ac_input" placeholder="Escribe algo..." autocomplete="off">
+                            <span class="botonSearch">
+                                <span class="material-icons">search</span>
+                            </span>
+                        </div>
+                    </div>
+                    <input type="submit" style="display: none;" id="enviarFormBuscador" value="enviar" title="enviar">
+                </form>
+            </div>
+        </div>
+        <span class="material-icons cerrar">close</span>
+    </div>
+    <div class="body custom-css-scroll">
+        <div class="resultados" id="resultadosMetabuscador">
+            <ul id="listaMetabuscadorResultados">
+                @*
+                <li class="bloque recursos">                    
+                    <p class="title">Recursos</p>
+                    <ul>
+                        <li class="con-icono-before icono-recurso">
+                            <a href="javascript: void(0);">Recurso. Departamento diseño de producto</a>
+                        </li>
+                        <li class="con-icono-before icono-recurso">
+                            <a href="javascript: void(0);">Recurso. Extensión MVC a Comunidades del ecosistema: Detalles a tener en cuenta</a>
+                        </li>
+                        <li class="con-icono-before icono-recurso">
+                            <a href="javascript: void(0);">Recurso. Detalles a tener en cuenta</a>
+                        </li>
+                        <li class="con-icono-after ver-mas-icono ver-mas">
+                            <a href="javascript: void(0);">Ver más en la comunidad</a>
+                        </li>
+                    </ul>                        
+                </li>                    
+                <li class="bloque debates">                   
+                    <p class="title">Debate</p>
+                    <ul>
+                        <li class="con-icono-before icono-debate">
+                            <a href="javascript: void(0);">Debate. Informe de diseño conceptual Previsión Previsión Previsión</a>
+                        </li>
+                        <li class="con-icono-before icono-debate">
+                            <a href="javascript: void(0);">Debate. Informe de cálculos de diseño</a>
+                        </li>
+                        <li class="con-icono-before icono-debate">
+                            <a href="javascript: void(0);">Debate. Previsión de diseño</a>
+                        </li>
+                        <li class="con-icono-before icono-debate">
+                            <a href="javascript: void(0);">Debate. Plan de validación del diseño</a>
+                        </li>
+                        <li class="con-icono-after ver-mas-icono ver-mas">
+                            <a href="javascript: void(0);">Ver más en la comunidad</a>
+                        </li>
+                    </ul>                       
+                </li>
+                <li class="bloque preguntas">                  
+                    <p class="title">Pregunta</p>
+                    <ul>
+                        <li class="con-icono-before icono-pregunta">
+                            <a href="javascript: void(0);">Pregunta. Diseño y desarrollo de producto</a>
+                        </li>
+                        <li class="con-icono-before icono-pregunta">
+                            <a href="javascript: void(0);">Pregunta. ¿Cuántos servicios hay?</a>
+                        </li>
+                        <li class="con-icono-before icono-pregunta">
+                            <a href="javascript: void(0);">Pregunta. 201811214 Pantallas de vistas V2 - Mygnoss y CRFP</a>
+                        </li>
+                        <li class="con-icono-after ver-mas-icono ver-mas">
+                            <a href="javascript: void(0);">Ver más en la comunidad</a>
+                        </li>
+                    </ul>                        
+                </li>
+                <li class="bloque personas">                   
+                    <p class="title">Personas</p>
+                    <ul>
+                        <li class="con-icono-before icono-persona">
+                            <a href="javascript: void(0);">Ricardo Alonso Maturana</a>
+                        </li>
+                        <li class="con-icono-before icono-persona">
+                            <a href="javascript: void(0);">Rafael Nadal</a>
+                        </li>
+                        <li class="con-icono-before icono-persona">
+                            <a href="javascript: void(0);">Garbiñe Muguruza García</a>
+                        </li>
+                    </ul>                      
+                </li>                    
+                <li id="verMasEcosistema" class="con-icono-before icono-mundo ver-mas-ecosistema">
+                    <a class="con-icono-after ver-mas-icono" href="">Ver más en todo el ecosistema</a>
+                </li>
+                *@
+            </ul>
+        </div>
+        <div class="sugerencias" id="sugerenciasMetabuscador">
+            <ul class="nav pmd-sidebar-nav">
+                <li>
+                    <p class="title">Últimas búsquedas</p>
+                    <ul id="sugerenciasMetabuscadorItems">
+                        <li class="reciente con-icono-before icono-busqueda">
+                            <a href="javascript: void(0);">documentos de conformidad</a>
+                        </li>
+                        <li class="reciente con-icono-before icono-busqueda">
+                            <a href="javascript: void(0);">manual de entrega</a>
+                        </li>
+                        <li class="reciente con-icono-before icono-busqueda">
+                            <a href="javascript: void(0);">documentacion departamento</a>
+                        </li>
+                        <li class="reciente con-icono-before icono-busqueda">
+                            <a href="javascript: void(0);">diseño de proceso</a>
+                        </li>
+                    </ul>
+                </li>
+            <ul>
+        </div>        
+        <div class="cargadores" id="sugerenciasMetabuscador">
+            @*
+            <div class="progress-loader" id="loader-recursos-wrap">
+                <p class="progress-loader-label">Buscando en recursos</p>
+            </div>
+            <div class="progress-loader" id="loader-debates-wrap">
+                <p class="progress-loader-label">Buscando en debates</p>
+            </div>
+            <div class="progress-loader" id="loader-preguntas-wrap">
+                <p class="progress-loader-label">Buscando en preguntas</p>
+            </div>
+            <div class="progress-loader" id="loader-personas-wrap">
+                <p class="progress-loader-label">Buscando en personas</p>
+            </div>
+                *@
+        </div>
+
+        @* Panel informativo de que no se ha encontrado nada *@
+        <div class="sinresultadosMetabuscador d-none" id="sinResultadosMetabuscador">
+            @*
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="errorPlantilla">
+                            <h3 style="font-size:18px">Sin resultados</h3>
+                            <div class="detallesError"><p class="text-muted">Lo sentimos pero no se ha encontrado ningún resultado con <span id="metabuscadorBusqueda" class="font-weight-bold"></span></p></div>                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            *@
+        </div>
+    </div>
+</aside>
+
+}

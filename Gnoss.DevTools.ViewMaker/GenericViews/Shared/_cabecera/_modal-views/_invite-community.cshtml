@@ -1,0 +1,226 @@
+﻿@*
+    Descripción
+    -----------------------------------------------
+    Vista modal que se utiliza para poder invitar a amigos a una comunidad.
+    Esta vista se realizaba en una página independiente, pero ahora se realiza de forma modal.
+    La anterior vista independiente corresponde con: Views - EnviarInvitacionCom - Index.csthml
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+CommunityModel Comunidad = Html.GetComunidad();
+HeaderModel Cabecera = Html.GetCabecera();
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+
+// Identificadores para lógica JS
+
+//Id del input para buscar contactos
+string idTxtFiltro_invite_community = "txtFiltro_invite_community_invite_community";
+// Id del input para escribir el email de los usuarios a los que enviar la invitación
+string idTxtCorreoAInvitar_invite_community = "txtCorreoAInvitar_invite_community";
+// Id del botón para añadir un email a destinatarios de la invitación
+string idButtonLitAniadirCorreo_invite_community = "litAniadirCorreo_invite_community";
+
+//Id del input vacío donde se añadirán los invitados para enviar el email.
+string idTxtHackInvitados_invite_community = "txtHackInvitados_invite_community";
+
+// Id de Contenedor general de destinatarios
+string idPanContenedorInvitados_invite_community = "panContenedorInvitados_invite_community";
+// Id de Contenedor donde irán los items seleccionados
+string idListaDestinatarios_invite_community = "lista-destinatarios_invite_community";
+// Id de Contenedor informativo de "No destinatarios"
+string idNoDestinatarios_invite_community = "no-destinatarios_invite_community";
+// Id del botón para enviar las invitaciones
+string idBtnEnviarInvitaciones_invite_community = "btnEnviarInvitaciones_invite_community";
+
+// Panel donde se mostrarán los mensajes de error o OK
+string idPanelInfoInvitationSent_invite_community = "panelInfoInvitationSent_invite_community";
+// Etiqueta que indica si hay o no destinatarios seleccionados para enviar la invitación
+string idLblInfoCorreo_invite_community = "lblInfoCorreo_invite_community";
+
+// Parametros para servicio autocompletar
+string idInpt_urlServicioAutocompletar_invite_community = "inpt_urlServicioAutocompletar";
+// Identidad de la Organización
+string identidadOrg_invite_community = "";
+// Comunidad privada o no para autocomplete
+string boolPrivada_invite_community = "true";
+// Método que se utilizará para el envío en autocomplete
+string metodoEnvio_invite_community = "AutoCompletarEnvioEnlaceComunidad";
+// Controlar si es EcosistemasinMetaProyecto
+string isEcosistemaSinMetaProyecto_invite_community = "false";
+
+
+// Url a la que habrá que mandar la petición para invitar a comunidad
+string urlSendInvitation_invite_community = $"{@Html.GetComunidad().Url}/{@Html.GetText("URLSEM", "INVITARACOMUNIDAD")}/save-changes";
+
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Vista Modal para Enviar a amigos a la comunidad --------------------
+*@
+
+@* Control de la identidad para el servicio autocompletar*@
+@if (IdentidadActual.KeyOrganization.HasValue)
+{
+    identidadOrg_invite_community = IdentidadActual.KeyOrganization.Value.ToString();
+}
+@* Control de si la comunidad es privada o no *@
+@if (Comunidad.AccessType == CommunityModel.TypeAccessProject.Public || Comunidad.AccessType == CommunityModel.TypeAccessProject.Restricted)
+{
+    boolPrivada_invite_community = "false";
+}
+
+@* Control de si es EcosistemasinMetaProyecto *@
+@if (!Html.GetEsEcosistemaSinMetaProyecto()){
+    isEcosistemaSinMetaProyecto_invite_community = "true";
+    metodoEnvio_invite_community = "AutoCompletarEnvioEnlace";
+}
+
+
+<div class="modal modal-top fade show"
+     tabindex="-1"
+     role="dialog"
+     id="modal-invite-community">
+
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            @* Título del modal *@
+            <div class="modal-header">
+                <p class="modal-title">
+                    <span class="material-icons">send</span>Invitar a comunidad
+                </p>
+                <span class="material-icons cerrar"
+                      data-dismiss="modal"
+                      aria-label="Close">close</span>
+            </div>
+            <div class="modal-body">
+                <div class="formulario-edicion formulario-enviar">
+
+                    <div class="form-group mb-1">
+                        <div id="panDesplegableDestinatarios">
+                            @* Quitar Tabs ya que solo habrá una opción -> Invitar vía email
+                            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                @* Mostrar Tabs de "Destinatarios" dependiendo del tipo de comunidad  
+                                @if (Comunidad.AccessType == CommunityModel.TypeAccessProject.Public || Comunidad.AccessType == CommunityModel.TypeAccessProject.Restricted)
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link active"
+                                           id="botonCorreos_invite_community"
+                                           data-toggle="tab"
+                                           href="#cuentas-correo_invite_community"
+                                           role="tab"
+                                           aria-controls="cuentas-correo_invite_community"
+                                           aria-selected="false">@Html.GetText("INVITACIONES", "INVITARAEXTERNOS")</a>
+                                    </li>
+                                }
+                                <li class="nav-item">
+                                    <a class="nav-link"
+                                       id="botonContactos_invite_community"
+                                       data-toggle="tab"
+                                       href="#miembros_invite_community"
+                                       role="tab"
+                                       aria-controls="miembros_invite_community"
+                                       aria-selected="true">@Html.GetText("INVITACIONES", "INVITARAUSUARIOS")</a>
+                                </li>
+                            </ul>
+                            *@
+
+                            <div class="tab-content">
+                                @* Panel para introducir correos DE MIS CONTACTOS 
+                                <div class="tab-pane fade active show"
+                                     id="miembros_invite_community"
+                                     role="tabpanel"
+                                     aria-labelledby="miembros-tab_invite_community">
+                                    <div class="filtroRapido">
+                                        <input type="text"
+                                               placeholder=""
+                                               onkeydown="if(event.which || event.keyCode){if ((event.which == 13) || (event.keyCode == 13)) {return false;}}"
+                                               id="@idTxtFiltro_invite_community"
+                                               class="form-control ac_input"
+                                               autocomplete="off" />
+                                        <span class="icon material-icons">search</span>
+                                    </div>
+                                </div>
+                                *@            
+
+                                @* Panel para introducir correos a enviar el recurso 
+                                <div class="tab-pane fade"
+                                     id="cuentas-correo_invite_community"
+                                     role="tabpanel"
+                                     aria-labelledby="cuentas-correo-tab_invite_community">*@
+                                    <div class="autocompletar autocompletar-tags form-group">
+                                        <div class="input-wrap form-sticky-button">
+                                            <input type="text"
+                                                   placeholder="Introduce los correos separados por comas y haz clic en añadir"
+                                                   id="@idTxtCorreoAInvitar_invite_community"
+                                                   class="form-control"
+                                                   autocomplete="off" />
+                                            <a id="@idButtonLitAniadirCorreo_invite_community"
+                                               class="btn btn-primary uppercase">Añadir</a>
+                                        </div>
+                                    </div>
+                                @*</div>*@
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Panel informativo de Destinatarios/No Destinatarios *@
+                    <div id="@idPanContenedorInvitados_invite_community" class="mb-4 @idPanContenedorInvitados_invite_community">
+                        @* Panel No Destinatarios *@
+                        <span id="@idNoDestinatarios_invite_community" class="@idNoDestinatarios_invite_community texto-gris-claro mb-3">Ningún destinatario añadido...</span>
+                        @* Panel con Destinatarios ELEGIDOS PARA ENVIAR *@
+                        <span class="tag-list @idListaDestinatarios_invite_community" id="@idListaDestinatarios_invite_community">
+                        </span>
+                    </div>
+
+                    @* Mensaje de error de detección de emails a enviar*@
+                    <div style="display: none" id="@idPanelInfoInvitationSent_invite_community">
+                        <p>
+                            <label id="@idLblInfoCorreo_invite_community"></label>
+                        </p>
+                    </div>
+
+                    @* Input que guardará los correos/contactos seleccionados*@
+                    <input type="hidden" id="@idTxtHackInvitados_invite_community" />
+
+                    @* Panel para aceptar/enviar email *@
+                    <div class="form-actions">
+                        <a id="@idBtnEnviarInvitaciones_invite_community" class="btn btn-primary">@Html.GetText("INVITACIONES", "ENVIARINVITACIONES")</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    // Gestión de operativa de enviar invitaciones de una comunidad
+    const pParamsInviteCommunity = {
+        idTxtFiltro: "@idTxtFiltro_invite_community",
+        idTxtCorreoAInvitar: "@idTxtCorreoAInvitar_invite_community",
+        idButtonLitAniadirCorreo: "@idButtonLitAniadirCorreo_invite_community",
+        idTxtHackInvitados: "@idTxtHackInvitados_invite_community",
+        idPanContenedorInvitados: "@idPanContenedorInvitados_invite_community",
+        idListaDestinatarios: "@idListaDestinatarios_invite_community",
+        idNoDestinatarios: "@idNoDestinatarios_invite_community",
+        idBtnEnviarInvitaciones: "@idBtnEnviarInvitaciones_invite_community",
+        idPanelInfoInvitationSent: "@idPanelInfoInvitationSent_invite_community",
+        idLblInfoCorreo: "@idLblInfoCorreo_invite_community",
+        urlSend: "@urlSendInvitation_invite_community",
+        autocompleteParams: {
+            identidad: "@IdentidadActual.KeyIdentity",
+            identidadMyGnoss: "@IdentidadActual.KeyMetaProyectIdentity",
+            identidadOrg: "@identidadOrg_invite_community",
+            proyecto: "@Comunidad.Key",
+            idInpt_urlServicioAutocompletar: "@idInpt_urlServicioAutocompletar_invite_community",
+            metodo: "@metodoEnvio_invite_community",
+            isEcosistemasinMetaProyecto: @isEcosistemaSinMetaProyecto_invite_community,
+            esPrivada: @boolPrivada_invite_community,
+        }
+    };
+    // Gestión de operativa para cambio de contraseña
+    operativaEnviarResource_Link_Community_Invitation.init(pParamsInviteCommunity);
+</script>

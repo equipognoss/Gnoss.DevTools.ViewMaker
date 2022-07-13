@@ -1,0 +1,66 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista modal que servirá para eliminar un recurso. Se mostrará cuando en la ficha del recurso, se pulse sobre "Eliminar".
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+ResourceModel fichaRecurso = Model.Resource;
+
+// Función para hacer "borrado selectivo - Si hiciera falta dependiendo del usuario si es Editor"
+string funcionEliminarSelectivo = "DesplegarAccionMVC('" + fichaRecurso.ListActions.UrlLoadActionDeleteSelective + "', this, 'despAccionRec_" + fichaRecurso.Key + "', '')";
+// Función Eliminar Aceptar / Cancelar
+string funcionEliminarAceptar = "AccionRecurso_Eliminar_Aceptar('" + fichaRecurso.ListActions.UrlDelete + "', '" + fichaRecurso.Key + "')";
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Vista Modal para Eliminar un recurso --------------------
+*@
+
+<div class="modal-header">
+    <p class="modal-title">
+        @* Título del Modal *@
+        <span class="material-icons">delete</span>@Html.GetText("COMMON", "ELIMINAR")
+    </p>
+    <span class="material-icons cerrar"
+          data-dismiss="modal"
+          aria-label="Close">close</span>
+</div>
+@* Contenido del Modal *@
+<div class="modal-body" id="eliminar_@fichaRecurso.Key">
+    <div class="formulario-edicion">
+
+        @* Mensaje para Eliminar o no el recurso *@
+        <div class="form-group">
+            <label class="control-label">@Html.GetText("PERFILBASE", "ELIMINARUNO", fichaRecurso.Title)</label>
+        </div>
+
+        @* Botones de "SÍ-NO-BORRADO SELECTIVO" para borrar el recurso *@
+        <div class="form-actions">
+            <button data-dismiss="modal" class="btn btn-outline-primary">@Html.GetText("COMMON", "NO")</button>
+            @* Controlar si el usuario es editor para permitir borrado Selectivo *@
+            @if (Model.IsDocumentEditor)
+            {                
+                // Cerrar el actual modal y abrir uno nuevo con la llamada a "Borrado Selectivo"
+                <a onclick="resetModalContainer.resetModalContent();DeployActionInModalPanel('@fichaRecurso.ListActions.UrlLoadActionDeleteSelective', this, 'modal-dinamic-content', '');"
+                    class="item-dropdown btn btn-outline-primary">                                        
+                    <span class="texto">@Html.GetText("PERFILBASERECURSOSFICHA", "ELIMINARSELECTIVO")</span>
+                </a>
+            }            
+            <button onclick="@funcionEliminarAceptar" class="btn btn-primary">@Html.GetText("COMMON", "SI")</button>
+        </div>
+
+        @* Mensaje informativo del proceso*@
+        <div id="despAccionRec_@fichaRecurso.Key">
+            <div>
+                <div id="menssages">
+                    <div class="ok"></div>
+                    <div class="ko"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

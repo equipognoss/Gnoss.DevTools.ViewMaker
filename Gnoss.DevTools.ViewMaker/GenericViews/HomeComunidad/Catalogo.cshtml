@@ -1,0 +1,55 @@
+﻿@model HomeCatalogoViewModel
+@{    
+    Html.SetBodyClass("comGnoss layout02 homeCatalogo listadoCatalogo  ");
+
+    CommunityModel Comunidad = Html.GetComunidad();
+    
+    <script type="application/ld+json">
+	{
+		"@@context": "http://schema.org",
+		"@@type": "WebSite",
+		"url": "@Comunidad.Url",
+		"potentialAction": {
+			"@@type": "SearchAction",
+			"target": "@Comunidad.Url/@Html.GetText("URLSEM", "RECURSOS")?search={search_term_string}",
+			"query-input": "required name=search_term_string"
+		}
+	}
+    </script>
+}
+
+<div id="col01">
+    <div class="resaltarAccion" style="" id="facetaEncuentra">
+        <p>@Html.GetText("BUSCADORFACETADO", "ENCUENTRA")</p>
+    </div>
+    <div id="panFacetas">
+    </div>
+</div>
+<div id="col02">
+    <div class="group listadoRecursos">
+        @foreach (HomeCatalogoViewModel.SectionHome seccion in Model.Sections)
+        {                                
+            <div class="group-title">
+                <h2>@seccion.Title</h2>
+            </div>
+            <div>
+                <div class="resource-list @(seccion.ViewType==HomeCatalogoViewModel.SectionHome.ResourceViewType.Grid?"gridView":"listView")">
+                    @foreach (ResourceModel recurso in seccion.Resources)
+                    { 
+                        @Html.PartialView("_ResourceCatalogo", recurso)
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+@section javascript {
+    <script type="text/javascript">
+        MontarFechas();
+
+        @Html.Raw(Html.GetJSExtra());
+    </script>
+}
+

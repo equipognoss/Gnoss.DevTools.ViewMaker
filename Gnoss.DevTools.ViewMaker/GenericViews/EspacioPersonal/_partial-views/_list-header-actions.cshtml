@@ -1,0 +1,166 @@
+﻿@model PersonalSpaceModel
+@*
+Descripción
+-----------------------------------------------
+Nueva vista que muestra las acciones disponibles a realizar para el buscador. Estas se muestran en la cabecera del listado, correspondiente con el fichero "_list-header". Estas acciones serán:
+    - ComboBox para "Descargar"
+    - ComboBox para "Ordenar"
+    - ComboBox para "Visualizar"
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+//Opciones para filtrar los resultados del buscador
+Dictionary<string, string> listaFiltrosOrden = Model.SearchViewModel.FilterOrderList;
+// Filtro por defecto para obtener los resultados de los recursos del usuario
+string FiltroOrdenSeleccionado = Model.SearchViewModel.FilterOrderSelected;
+
+}
+
+@*
+    ----------------------------------------------------------------
+     -------------------- Cabecera-Header de lista de recursos de un usuario en espacio personal --------------------
+*@
+
+@* Listado de acciones para hacer con resultados *@
+<div class="acciones-listado">
+    <div class="wrap">
+        @* Opciones - Acciones (Descargar búsquedas, Ordenar resultados...) *@
+        @* Botón de descargar el listado *@
+        @if (Model.SearchViewModel.ListExportation != null && Model.SearchViewModel.ListExportation.Count == 1 && Model.SearchViewModel.ListExportation[0].ExportationFormats.Count == 1)
+        {
+            string nombreExportacion = Model.SearchViewModel.ListExportation[0].ExportationName;
+            Guid exportacionID = Model.SearchViewModel.ListExportation[0].Key;
+            string formatoExportacion = Model.SearchViewModel.ListExportation[0].ExportationFormats[0];
+            string id = "liDescarga" + formatoExportacion.ToUpper();
+
+            @* Botón de descarga *@
+            <div id="@id" class="descargar dropdown">
+                <form method="post" id="FormExportarBusqueda">
+                    <a id="@nombreExportacion @formatoExportacion"
+                       class="dropdown-toggle"
+                       data-toggle="dropdown"
+                       aria-expanded="false"
+                       onclick="ExportarBusqueda('@exportacionID','@nombreExportacion', '@formatoExportacion');">
+                        <span class="material-icons">download</span>
+                        <span class="texto">@nombreExportacion @formatoExportacion.ToUpper()</span>
+                    </a>
+                    <input class="activo" type="hidden" id="ParametrosExportacion" name="ParametrosExportacion" />
+                </form>
+            </div>
+        }
+        @* Descarga de múltiples tipos de recursos *@
+        else if (Model.SearchViewModel.ListExportation != null && Model.SearchViewModel.ListExportation.Count > 0)
+        {
+            <div class="descargar dropdown">
+                <form method="post" id="FormExportarBusqueda">
+                    <a class="dropdown-toggle"
+                       data-toggle="dropdown"
+                       aria-expanded="false">
+                        <span class="material-icons">download</span>
+                        <span class="texto">Descargar</span>
+                    </a>
+                    <input class="activo" type="hidden" id="ParametrosExportacion" name="ParametrosExportacion" />
+                    @* Lista de opciones para descargar/exportar *@
+                    <div id="listaExportaciones"
+                         class="dropdown-menu basic-dropdown dropdown-menu-right"
+                         style="will-change: transform">
+                        @foreach (SearchViewModel.ExportationModel fila in Model.SearchViewModel.ListExportation)
+                        {
+                            foreach (string formato in fila.ExportationFormats)
+                            {
+                                <a id="@fila.ExportationName @formato"
+                                   class="item-dropdown"
+                                   onclick="ExportarBusqueda('@fila.Key','@fila.ExportationName','@formato');">@fila.ExportationName @formato.ToUpper()</a>
+                            }
+                        }
+                    </div>
+                </form>
+            </div>
+        }
+
+        @* Botón de filtrar resultados *@                
+            @* Opciones de Ordenar los resultados obtenidos *@
+            <div id="panel-orderBy" class="ordenar dropdown dropdown-select ddlOrdenarPor">
+                @* Coger por defecto la primera opción*@
+                <a class="dropdown-toggle active" 
+                   data-toggle="dropdown" 
+                   aria-expanded="false"
+                   data-orderBy="gnoss:hasfechapublicacion"
+                   >
+                    <span class="material-icons">swap_vert</span>
+                    <span class="texto">@Html.GetText("PERFILRECURSOSCOMPARTIDOS", "FECHA") @Html.GetText("COMMON", "DESCENDENTE").ToLower()</span>
+                </a>                                                          
+
+                <div class="dropdown-menu basic-dropdown dropdown-menu-right" style="will-change: transform;">                                                                
+                    <a class="item-dropdown activeView" data-orderBy="gnoss:hasfechapublicacion" data-order="orden|desc">
+                        <span class="material-icons">swap_vert</span>
+                        <span class="texto">@Html.GetText("PERFILRECURSOSCOMPARTIDOS", "FECHA") @Html.GetText("COMMON", "DESCENDENTE").ToLower()</span>
+                    </a>
+                    
+                    <a class="item-dropdown" data-orderBy="gnoss:hasfechapublicacion" data-order="orden|asc">
+                        <span class="material-icons">swap_vert</span>
+                        <span class="texto">@Html.GetText("PERFILRECURSOSCOMPARTIDOS", "FECHA") @Html.GetText("COMMON", "ASCENDENTE").ToLower()</span>
+                    </a>   
+                    
+                    <a class="item-dropdown" data-orderBy="gnoss:hasPopularidad" data-order="orden|desc">
+                        <span class="material-icons">swap_vert</span>
+                        <span class="texto">@Html.GetText("PERFILRECURSOSCOMPARTIDOS", "POPULARIDAD") @Html.GetText("COMMON", "DESCENDENTE").ToLower()</span>
+                    </a> 
+                    
+                    <a class="item-dropdown" data-orderBy="gnoss:hasPopularidad" data-order="orden|asc">
+                        <span class="material-icons">swap_vert</span>
+                        <span class="texto">@Html.GetText("PERFILRECURSOSCOMPARTIDOS", "POPULARIDAD") @Html.GetText("COMMON", "ASCENDENTE").ToLower()</span>
+                    </a> 
+                </div>
+            </div>
+        
+            @* Opciones de Ordenar los resultados obtenidos 
+            <div id="panel-orderAscDesc" class="ordenar dropdown dropdown-select">
+                @* Coger por defecto la primera opción
+                <a class="dropdown-toggle active" data-toggle="dropdown" aria-expanded="false" data-order="orden|asc">
+                    <span class="material-icons">swap_vert</span>
+                    <span class="texto">@Html.GetText("COMMON","ASCENDENTE")</span>
+                </a>
+                
+                <div class="dropdown-menu basic-dropdown dropdown-menu-right" style="will-change: transform;">
+                    <a class="item-dropdown activeView" data-order="orden|asc">
+                        <span class="material-icons">swap_vert</span>
+                        <span class="texto">@Html.GetText("COMMON", "ASCENDENTE")</span>
+                    </a>
+                    <a class="item-dropdown" data-order="orden|desc">
+                        <span class="material-icons">swap_vert</span>
+                        <span class="texto">@Html.GetText("COMMON","DESCENDENTE")</span>
+                    </a>
+                </div>
+            </div>*@
+
+        @* Opciones de visualización los resultados - Tener en cuenta opciones de visualización según la configuración *@
+                
+            @*Sección vistas de resultados (Listado, Mosaico...)*@
+            <div id="panel-viewBy" class="visualizacion dropdown dropdown-select">
+
+                @* Visualizar por defecto los resultados *@                
+                <a id="buscador" class="dropdown-toggle active" data-toggle="dropdown">
+                    <span class="material-icons">view_agenda</span>
+                    <span class="texto">@Html.GetText("COMBUSQUEDAAVANZADA", "LISTADO")</span>
+                </a>                       
+                
+                @* Opciones disponibles para visualizar los resultados *@
+                <div class="dropdown-menu basic-dropdown dropdown-icons dropdown-menu-right">                                                      
+                    @* Visualización LISTA *@                            
+                    <a class="item-dropdown aListView activeView" data-class-resource-list="listView">
+                        <span class="material-icons">view_agenda</span>
+                        <span class="texto">@Html.GetText("COMBUSQUEDAAVANZADA", "LISTADO")</span>
+                    </a>
+                    @* Visualización GRID - COMPACTO *@                            
+                    <a class="item-dropdown aCompacView" data-class-resource-list="compacView">
+                        <span class="material-icons">reorder</span>
+                        <span class="texto">@Html.GetText("COMBUSQUEDAAVANZADA", "COMPACTADA")</span>
+                    </a>
+                </div>
+            </div>       
+    </div>
+</div>
+

@@ -1,0 +1,1284 @@
+﻿@model ModifyResourceModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista parcial que se utiliza en la página principal cuando se desea crear un nuevo recurso desde 0.
+(Ej: Crear un nuevo recurso de tipo "Nota").
+
+Variables
+----------------------------------------------    
+*@  
+@{
+UserIdentityModel identidadActual = Html.GetIdentidadActual();
+string urlPagina = Html.GetUrlPagina();
+// Título de sección Categorías
+string tituloCat = null;
+// ID del contenedor donde estarán todos los Tags (lógica Js)
+string idTagsContainer = "tagsContainer";
+// ID del inputHack de Tags
+string idTxtTags = "txtTags_Hack";
+// Url de la página de la que se viene - Redireccionar cuando se pulse en "Cancelar"
+string urlVuelta = "";
+@* Controlar la urlVuelta para cancelar/salir de creacion/edición del recurso *@
+if (Context.Request.Headers["Referer"].ToString() == "") {
+    urlVuelta = Model.UrlCancelButton;
+}
+else {
+    urlVuelta = Context.Request.Headers["Referer"].ToString();                     
+}
+
+
+if (Model.DocumentType == ResourceModel.DocumentType.Semantico && Model.SemanticResourceModel.EditingMassiveResourceLoad)
+{
+    urlPagina = urlPagina.Substring(0, urlPagina.LastIndexOf("/"));
+}
+}
+
+<script type="text/javascript">
+    urlPaginaActual = '@urlPagina';
+    idIdentidadActual = '@identidadActual.KeyIdentity';
+
+    @{
+        string idOrgDeIdentActual = "";
+
+        if ((identidadActual.KeyOrganization).HasValue)
+        {
+            idOrgDeIdentActual = identidadActual.KeyOrganization.Value.ToString();
+        }
+    }
+
+    idOrgDeIdentidadActual = '@idOrgDeIdentActual';
+
+    @{
+        string multiplesEditores = "false";
+        string creandoVersionJS = "false";
+        string redireccionJS = Html.GetUrlPagina() + "/2'";
+
+        if (Model.MultipleEditors)
+        {
+            multiplesEditores = "true";
+        }
+
+        if (Model.CreatingVersion && Model.EditFileAvailable)
+        {
+            creandoVersionJS = "true";
+        }
+
+        bool editando = (Model.EditResourceModel.TypePage == EditResourceModel.TypePageEditResource.EditResource || Model.EditResourceModel.TypePage == EditResourceModel.TypePageEditResource.EditSemanticResource);
+    }
+
+    var creandoVersion = @creandoVersionJS;
+    var multiplesEditores = @multiplesEditores;
+    var redireccionJS = '@redireccionJS';
+
+    @if (Model.DocumentType != ResourceModel.DocumentType.Semantico)
+    {
+        @Html.Raw("$(function(){InicializarModificarRecurso(" + editando.ToString().ToLower() + ")});");
+        @Html.Raw("var formSemVirtual = false;");
+        @Html.Raw("var formSemCargaMasiva = false;");
+    }
+    else
+    {
+        @Html.Raw("$(function(){InicializarModificarRecursoSemantico('" + Model.SemanticResourceModel.TitlePropretyIDs + "','" + Model.SemanticResourceModel.DescriptionPropretyIDs + "', " + editando.ToString().ToLower() + ");});");
+        @Html.Raw("var formSemVirtual = " + Model.SemanticResourceModel.VirtualForm.ToString().ToLower() + ";");
+        @Html.Raw("var formSemCargaMasiva = " + Model.SemanticResourceModel.MassiveResourceLoad.ToString().ToLower() + ";");
+
+        if (Model.SemanticResourceModel.VirtualForm)
+        {
+            @Html.Raw("esEdicionDocumentoVirtual = "+(Model.EditResourceModel.TypePage == EditResourceModel.TypePageEditResource.EditSemanticResource).ToString().ToLower()+";");
+            @Html.Raw("emailUsuDocVirtual = '" + identidadActual.PersonFamilyName + "';");
+            @Html.Raw("nombreUsuDocVirtual = '" + identidadActual.PersonName + "';");
+            @Html.Raw("apellUsuDocVirtual = '" + identidadActual.PersonFamilyName + "';");
+            @Html.Raw("fechaServidorDocVirtual = '" + DateTime.Now.ToString("dd/MM/yyy") + "';");
+        }
+    }
+
+    var txtHackTagsTituloID = 'txtHackTagsTitulo';
+    var txtHackTagsDescripcionID = 'txtHackTagsDescripcion';
+    var txtTagsID = 'txtTags';
+
+    @if (!Model.DocumentEditionModel.Key.Equals(Guid.Empty))
+    {
+        @Html.Raw("var documentoID = '" + Model.DocumentEditionModel.Key + "';");
+    }
+    else
+    {
+        @Html.Raw("var documentoID = guidGenerator().toLowerCase();");
+    }
+</script>
+
+@if (Model.DocumentEditionModel.SharedDocumentJustInPrivateProject)
+{
+    <script type="text/javascript" defer="defer">
+
+        function AjustarPropiedadIntelectual(pRdbAutor, pRdbCompartir) {
+            if (document.getElementById('panPropIntelectual') != null) {
+                if (pRdbAutor.checked && pRdbCompartir.checked) {
+                    document.getElementById('panPropIntelectual').className = '';
+                }
+                else {
+                    document.getElementById('panPropIntelectual').className = 'oculto';
+                }
+            }
+        }
+
+    </script>
+}
+else
+{
+    <script type="text/javascript" defer="defer">
+
+        function AjustarPropiedadIntelectual(pRdbAutor, pRdbCompartir) {
+            if (document.getElementById('panPropIntelectual') != null) {
+                if (pRdbAutor.checked) {
+                    document.getElementById('panPropIntelectual').className = '';
+                }
+                else {
+                    document.getElementById('panPropIntelectual').className = 'oculto';
+                }
+            }
+        }
+
+    </script>
+}
+
+@if (Model.DocumentType == ResourceModel.DocumentType.Wiki)
+{
+    <script type="text/javascript" defer="defer">
+
+        $(function () {
+            setInterval("AutoGuardarWikiTem()", 300000);
+        });
+
+        function AutoGuardarWikiTem() {
+            if ($('#panelRecuperarAutoGuardado').length == 0) {
+                EnviarDatosServidor('AutoGuardar');
+            }
+        }
+
+    </script>
+}
+
+@if (Model.DocumentType == ResourceModel.DocumentType.Semantico)
+{
+    string valorTxtHackHayCambios = "false";
+
+    if (Model.SemanticResourceModel.MassiveResourceLoad)
+    {
+        valorTxtHackHayCambios = "true";
+    }
+
+    <script type="text/javascript" defer="defer">
+        TxtHackHayCambios = @valorTxtHackHayCambios;
+
+        function ComprobarCambios(){
+            if(TxtHackHayCambios && !GuardandoCambios){
+                return(Encoder.htmlDecode('@Html.GetText("COMMON", "PERDERAINFORMASINGUARDAR")'));
+            }
+        }
+    </script>
+}
+
+@{
+    Html.SetBodyClass("layout03 editarRecurso");
+    //Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/ckeditor.js?v=" + Html.GetVersion());
+    //Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/adapters/jquery.js?v=" + Html.GetVersion());
+
+    string claseTitulo = "";
+
+    CommunityModel Comunidad = Html.GetComunidad();
+
+    if (Comunidad.Key == ProyectoAD.MetaProyecto)
+    {
+        claseTitulo = "class=\"BRSinBordeConPading\"";
+    }
+
+    string tituloPagina = "";
+
+    if (Model.EditResourceModel.TypePage == EditResourceModel.TypePageEditResource.CreateResource2)
+    {
+        if (Model.DocumentType == ResourceModel.DocumentType.Pregunta)
+        {
+            tituloPagina = Html.GetText("PERFILBASE", "SUBIRPREGUNTA");
+        }
+        else if (Model.DocumentType == ResourceModel.DocumentType.Encuesta)
+        {
+            tituloPagina = Html.GetText("PERFILBASE", "SUBIRENCUESTA");
+        }
+        else if (Model.DocumentType == ResourceModel.DocumentType.Debate)
+        {
+            tituloPagina = Html.GetText("PERFILBASE", "SUBIRDEBATE");
+        }
+        else if (Model.DocumentType == ResourceModel.DocumentType.Newsletter)
+        {
+            tituloPagina = Html.GetText("COMMON", "SUBIRNEWSLETTER");
+        }
+        else
+        {
+            tituloPagina = Html.GetText("PERFILBASE", "SUBIRRECURSO");
+        }
+    }
+    else if ((Model.EditResourceModel.TypePage == EditResourceModel.TypePageEditResource.AddToGnossResource) || (Model.EditResourceModel.TypePage == EditResourceModel.TypePageEditResource.AddToCommunityResource))
+    {
+        tituloPagina = Html.GetText("ANYADIRGNOSS", "TIT_ANYADIRGNOSS");
+    }
+    else
+    {
+        if (Model.DocumentType == ResourceModel.DocumentType.Pregunta)
+        {
+            if (Model.CreatingVersion)
+            {
+                tituloPagina = Html.GetText("PERFILBASERECURSOEDITAR", "VERSIONARPREGUNTA");
+            }
+            else
+            {
+                tituloPagina = Html.GetText("PERFILBASERECURSOEDITAR", "EDITARPREGUNTA");
+            }
+        }
+        else if (Model.DocumentType == ResourceModel.DocumentType.Encuesta)
+        {
+            tituloPagina = Html.GetText("PERFILBASERECURSOEDITAR", "EDITARENCUESTA");
+        }
+        else if (Model.DocumentType == ResourceModel.DocumentType.Debate)
+        {
+            if (Model.CreatingVersion)
+            {
+                tituloPagina = Html.GetText("PERFILBASERECURSOEDITAR", "VERSIONARDEBATE");
+            }
+            else
+            {
+                tituloPagina = Html.GetText("PERFILBASERECURSOEDITAR", "EDITARDEBATE");
+            }
+        }
+        else if (Model.DocumentType == ResourceModel.DocumentType.Newsletter)
+        {
+            tituloPagina = Html.GetText("PERFILBASE", "EDITANEWSLETTERTITULO");
+        }
+        else if (Model.DocumentType == ResourceModel.DocumentType.Semantico)
+        {
+            if (Model.SemanticResourceModel.MassiveResourceLoad)
+            {
+                tituloPagina = Html.GetText("CREARDOCUMENTO", "PASO1CARMAS");
+            }
+            else if (Model.EditResourceModel.TypePage == EditResourceModel.TypePageEditResource.CreateSemanticResource)
+            {
+                tituloPagina = Html.GetText("PERFILBASESUBIR", "CREARRECURSO");
+            }
+            else
+            {
+                tituloPagina = Html.GetText("PERFILBASERECURSOEDITAR", "EDITARRECURSO");
+            }
+        }
+        else
+        {
+            if (Model.CreatingVersion)
+            {
+                tituloPagina = Html.GetText("PERFILBASERECURSOEDITAR", "VERSIONARRECURSO");
+            }
+            else
+            {
+                tituloPagina = Html.GetText("PERFILBASERECURSOEDITAR", "EDITARRECURSO");
+            }
+        }
+    }
+}
+
+
+@* Inicio de HTML para la creación de un recurso *@
+<form id="preventLeavingFormWithoutSaving" class="formulario-edicion background-blanco">
+@* Contenedor de opciones para crear un recurso *@
+    
+    @* Título inicial de la página 
+    <h1 id="htitPag" @Html.Raw(claseTitulo) class="mb-3"><span id="lblTituloPagina">@tituloPagina</span></h1>
+    *@
+    @if (Model.DocumentType == ResourceModel.DocumentType.Semantico && Model.SemanticResourceModel.MassiveResourceLoad)
+    {
+        <h3 id="htitPagCargMas" @Html.Raw(claseTitulo) style="display:none;"><span>@Html.GetText("CREARDOCUMENTO", "PASO2CARMAS")</span></h3>
+        <h3 id="htitPagCargMas2" @Html.Raw(claseTitulo) style="display:none;"><span>@Html.GetText("CREARDOCUMENTO", "PASO3CARMAS")</span></h3>
+    }
+
+    @* Permitir subir fichero -> Sin diseño de Dewenir - Lo obtengo de viejo Front*@
+    @if (Model.EditAttachedAvailable)
+    {
+        <div id="panPrimeraParte">
+            <div id="panSeleccionarRecurso">
+                <div id="seleccionarRecurso" class="box tituloComunidad">
+                    <fieldset class="labels">
+                        <legend>
+                            <span id="lblSubirRecurso">@Html.GetText("PERFILBASERECURSOEDITAR", "REEMPLAZARRECURSO")</span>
+                            @if (Model.DocumentEditionModel.UrlDownloadAttached != null)
+                            {
+                                string textoDescarga = " (" + Model.DocumentEditionModel.Link + ")";
+                                <a id="hlDescargarRecurso" class="tituloEnlace" href="@Model.DocumentEditionModel.UrlDownloadAttached">@textoDescarga</a>
+                            }
+                        </legend>
+                    </fieldset>
+                    @* Sección Editar subir fichero adjunto para del recurso  *@
+                    @if (Model.EditFileAvailable)
+                    {
+                        @* Contenedor para la subida de fichero*@
+                        <div class="form-group mb-5 upload-file">
+                            @* Label del subida de fichero *@
+                            <label id="lblSelecionaUnDoc" class="control-label">@Html.GetText("PERFILBASESUBIR", "NUEVOARCHIVO_T")</label>
+                            @* Loading de carga del fichero *@
+                            <div id="imgEsperaArchivo" class="spinner-border spinner-border-sm texto-primario ml-3" role="status" style="display:none;">
+                                <span class="sr-only">Cargando...</span>
+                            </div>
+                            @* Contenedor para el input y botón de subida de fichero adjunto*@
+                            <div id="recursoTipo0" class="custom-file">                                        
+                                <input type="file" id="fuExaminar" class="custom-file-input"/>
+                                <label class="custom-file-label" for="fuExaminar" data-browse="@Html.GetText("PERFILBASESUBIR", "NUEVOARCHIVO_T")">@Html.GetText("PERFILBASESUBIR", "NUEVOARCHIVO_T")</label>
+                            </div>
+                            @* Posible error de carga - Label*@
+                            <label id="lblErrorCargarArchivo" class="error ko" style="display:none;">@Html.GetText("PERFILBASESUBIR", "ERRORSUBIRDOC")</label>
+                        </div>
+                        /*
+                        string srcImagenEspera = Html.GetBaseUrlStatic() + "/images/espera.gif";
+
+                        <fieldset id="recursoTipo0" class="labels">
+                            <p>
+                                <span id="lblSelecionaUnDoc">@Html.GetText("PERFILBASESUBIR", "NUEVOARCHIVO_T")</span>
+                            </p>
+                            <img id="imgEsperaArchivo" src="@srcImagenEspera" style="display:none;" alt="Espere..." />
+                            <input type="file" id="fuExaminar" />
+                            <label id="lblErrorCargarArchivo" class="error" style="display:none;">@Html.GetText("PERFILBASESUBIR", "ERRORSUBIRDOC")</label>
+                        </fieldset>*/
+                    }
+                    <div id="udpParte1TiposNoArchivo">
+                        @if (Model.EditLocationAvailable)
+                        {
+                           <fieldset id="recursoTipo2">
+                                <div class="form-group mb-5 edit-titulo">
+                                    <label class="control-label d-block" id="lblDescribaUbic" for="txtUbicacionDoc">@Html.GetText("PERFILBASESUBIR", "REFERENCIAADOC_T")</label>
+                                    <input type="text" id="txtUbicacionDoc" class="form-control not-outline" value="@Model.DocumentEditionModel.Link">
+                                </div>
+                            </fieldset>
+                        }
+                        @* Sección Editar URL del recurso  *@
+                        else if (Model.EditUrlAvailable)                        
+                        {
+                            <fieldset id="recursoTipo2">
+                                <div class="form-group mb-5 edit-titulo">
+                                    <label class="control-label d-block" id="lblIntroducirURL" for="txtURLDoc">@Html.GetText("PERFILBASESUBIR", "DIRECCIONURL_T")</label>
+                                    <input type="text" id="txtURLDoc" class="form-control not-outline" value="@Model.DocumentEditionModel.Link">
+                                </div>
+                            </fieldset>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.UploadedAttachedNameByAddin))
+                        {
+                            <span id="recursoActualizado">
+                                <h3>
+                                    <span id="lblRecursoActualizado">@Html.GetText("ACTUALIZARRECURSO", "POR") </span>
+                                    <span ID="lblNombreRecursoActualizado">@Model.UploadedAttachedNameByAddin</span>
+                                </h3>
+                            </span>
+                        }
+                    </div>
+                </div>
+                    </div>
+        </div>
+    }
+    @* FIN PERMITIR SUBIR DOCUMENTO --> SIN DISEÑO DEWENIR*@
+
+    @* Editar Propiedades *@
+    @if (Model.EditPropertiesAvailable)
+    {
+        // Uso de clases para el FRONT
+        string checkedCompartir = "";
+
+        if (Model.DocumentEditionModel.ShareAllowed)
+        {
+            checkedCompartir = "checked=\"checked\"";
+        }
+
+        string classlbAgregarAutores = "submit";
+        string classfielAutores = "labels oculto";
+
+        if (!string.IsNullOrEmpty(Model.DocumentEditionModel.Authors))
+        {
+            classlbAgregarAutores = "submit oculto";
+            classfielAutores = "labels";
+        }
+
+        string disabledTitulo = "";
+
+        if (Model.DocumentType == ResourceModel.DocumentType.Wiki)
+        {
+            disabledTitulo = "disabled=\"disabled\"";
+        }
+
+        @* Permitir añadir recursos semánticos al recurso a crear - Sin diseño de Dewenir *@
+        if (Model.DocumentType == ResourceModel.DocumentType.Semantico && Model.SemanticResourceModel.SemCmsContainsTitleAndDescription)
+        {
+            @Html.PartialView("../Shared/SemCms/_GeneradorSemCms", Model.SemanticResourceModel);
+        }
+
+        @* Componente nuevo de "AddToGnossAvailable -> Sin diseño de dewenir *@
+        if (!string.IsNullOrEmpty(Model.NewVersionMessageAddToGnossAvailable) || !string.IsNullOrEmpty(Model.NewVersionMessageAddToGnossOfficeAvailable))
+        {
+            <div id="panels" style="display:block;">
+                <div id="action" class="box form activeForm" style="height: 70px">
+                    @if (!string.IsNullOrEmpty(Model.NewVersionMessageAddToGnossOfficeAvailable))
+                    {
+                        <div>
+                            <span style="line-height: 35px;" id="lblActualizaciones">@Html.Raw(Model.NewVersionMessageAddToGnossOfficeAvailable)</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div style="padding-top:20px;">
+                            @Html.Raw(Model.NewVersionMessageAddToGnossAvailable)
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        @* Subir un recurso -> -> Sin diseño de dewenir*@
+        <div id="SubirRecurso" class="box">
+            @if (Model.DocumentType == ResourceModel.DocumentType.Encuesta)
+            {
+                <h3 id="h3LblTituloGrande"><span id="lblTituloGrande">@Html.GetText("COMADMIN", "PREGUNTA")</span></h3>
+            }
+            @if (Model.DocumentEditionModel.AutosaveAvailable)
+            {
+                string onclickRecuperarAutoGuardado = "MostrarUpdateProgress();window.location.href ='" + Model.DocumentEditionModel.UrlRecoverAutosave + "';";
+
+                <div id="panelRecuperarAutoGuardado" class="confirmar">
+                    <div id="panels" class="stateShowForm" style="display: block;">
+                        <div style="display: block;" id="action" class="box form activeForm">
+                            <fieldset>
+                                <p><span id="lblPreguntaRecuperarAutoGuardado">@Html.GetText("PERFILBASERECURSOEDITAR", "INFORECUPERARAUTOGUARDADO")</span></p>
+                            </fieldset>
+                            <fieldset>
+                                <p>
+                                    <input id="lbEliminarAutoGuardado" value="@Html.GetText("PERFILBASERECURSOEDITAR", "ELIMINARAUTOGUARDADO")" type="button" />
+                                    <input id="lbNoRecuperarAutoGuardado" value="@Html.GetText("COMMON", "NO")" type="button" onclick="$('#panelRecuperarAutoGuardado').remove();" />
+                                    <input id="lbSiRecuperarAutoGuardado" value="@Html.GetText("COMMON", "SI")" type="button" onclick="@onclickRecuperarAutoGuardado" />
+                                </p>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (Model.DocumentType != ResourceModel.DocumentType.Semantico || !Model.SemanticResourceModel.MassiveResourceLoad || Model.SemanticResourceModel.EditingMassiveResourceLoad)
+            {
+                <fieldset class="labels">
+                    @{
+                        string tipoDocHack = ((short)Model.DocumentType).ToString();
+                    }
+                    <input type="hidden" id="txtTipoDocHack" value="@tipoDocHack" />
+                </fieldset>
+
+                @* Sección Título y Label del recurso *@
+                if (Model.EditTitleAvailable)
+                {
+                    <fieldset>
+                        <div class="form-group mb-5 edit-titulo">
+                            @if (Model.DocumentType != ResourceModel.DocumentType.Encuesta)
+                            {
+                                // Ocultamos la label -> Nuevo Front <label id="lblTituloSegundaParte">@Html.GetText("PERFILBASERECURSOEDITAR", "EDITARPROPIEDADESRECURSO")</label>
+                            }
+                            @if (Model.DocumentType != ResourceModel.DocumentType.Encuesta)
+                            {
+                                <label class="control-label d-block" id="lblTitulo" for="txtTitulo">@Html.GetText("PERFILBASESUBIRRECURSO", "TITULO")</label>
+                            }
+                            <input placeholder=""
+                                    type="text"
+                                    id="txtTitulo"
+                                    value="@Model.DocumentEditionModel.Title" @Html.Raw(disabledTitulo)
+                                    class="form-control not-outline" />
+                        </div>
+                    </fieldset>
+                }
+                @* Input oculto con el título. Cogerá el dato título al salir del foco del input "Titulo" *@
+                <input type="hidden" id="txtHackTagsTitulo" value="@Model.DocumentEditionModel.AutomaticTagsTitle" />
+
+                @* Sección Descripción + Label del recurso *@
+                if (Model.EditDescriptionAvailable)
+                {
+                    string classDivDescp = "";
+
+                    @* Label de Descripción del Recurso *@
+                    <div class="form-group mb-5 edit-descripcion">
+                        <label id="lblDescipcion" class="control-label d-block" for="txtDescripcion">@Html.GetText("PERFILBASESUBIRRECURSO", "DESCRIPCION")</label>
+                        @* Tener en cuenta el tipo de Recurso a crear  *@
+                        @if (Model.DocumentType == ResourceModel.DocumentType.Newsletter)
+                        {
+                            string rbNewsletterManualChecked = "";
+                            string rbNewsletterDesdeArchivoChecked = "";
+                            string txtHackModosNewsletterText = "";
+
+                            if (Model.DocumentEditionModel.Description != "" || Model.DocumentEditionModel.Key.Equals(Guid.Empty))
+                            {
+                                rbNewsletterManualChecked = "checked=\"checked\"";
+                                txtHackModosNewsletterText = "manual";
+                            }
+                            else
+                            {
+                                rbNewsletterDesdeArchivoChecked = "checked=\"checked\"";
+                                txtHackModosNewsletterText = "archivo";
+                            }
+
+                            string classDivNewsletter = "";
+                            string srcIframeNewsletter = "";
+
+                            if (rbNewsletterManualChecked != "")
+                            {
+                                classDivNewsletter = "class=\"oculto\"";
+                            }
+                            else
+                            {
+                                srcIframeNewsletter = "src=\"" + Html.GetBaseUrlIdioma() + "/objetonewsletter.aspx?docid=" + Model.DocumentEditionModel.Key + "&temp=false\"";
+                                classDivDescp = "class=\"oculto\"";
+                            }
+                            @* Newsletter *@
+                            <div class="box newsletter">
+                                <label>@Html.GetText("PERFILBASESUBIR", "MODONEWSLETTER")</label>
+                                <input type="radio" id="rbNewsletterManual" onclick="MostrarNewsletter('manual')" name="tbTipoNewsletter" @Html.Raw(rbNewsletterManualChecked) /><label for="rbNewsletterManual">@Html.GetText("PERFILBASESUBIR", "MODOEDITADO")</label>
+                                <input type="radio" id="rbNewsletterDesdeArchivo" onclick="MostrarNewsletter('archivo')" name="tbTipoNewsletter" @Html.Raw(rbNewsletterDesdeArchivoChecked) /><label for="rbNewsletterDesdeArchivo">@Html.GetText("PERFILBASESUBIR", "MODOARCHIVO")</label>
+                                <div id="contTxtHackModosNewsletter">
+                                    <input type="hidden" id="txtHackModosNewsletter" value="@txtHackModosNewsletterText" />
+                                </div>
+                            </div>
+                            @* Newsletter *@
+                            <div id="divNewsletter" @Html.Raw(classDivNewsletter)>
+                                <div><input type="file" ID="fuExaminarNewsletter" /></div>
+                                <div id="contenedorIframeNewsletter">
+                                    <iframe id="iframeNewsletter" class="newsletter" style="display:none;" width="837" onload="newsletterLoad()" @Html.Raw(srcIframeNewsletter)></iframe>
+                                </div>
+                            </div>
+                        }
+                        @* TextArea de Descripción *@
+                        <div id="divDescripcion" @Html.Raw(classDivDescp)>
+                            <textarea id="txtDescripcion" class="cke ckeSimple form-control recursos" cols="20" rows="2">@Model.DocumentEditionModel.Description</textarea>
+                        </div>
+                    </div>
+                }
+
+                @* Campo oculto que almacenará Tags de descripción *@
+                <input type="hidden" id="txtHackTagsDescripcion" />
+
+                @* Opciones si el recurso es de tipo Encuestas *@
+                if (Model.EditPollAnswersAvailable)
+                {
+                    @Html.PartialView("_RespuestasEncuesta", Model.PollAnswersModel);
+                }
+
+
+                @* Sección Añadir Etiquetas/Tags *@
+                <div class="form-group mb-5 edit-etiquetas">
+                    <label id="lblEtiquetas" for="txtTags" class="control-label d-block">@Html.GetText("PERFILBASESUBIRRECURSO", "ETIQUETAS")</label>
+                    <div class="autocompletar-tags form-group">
+                        <div class="input-wrap form-sticky-button autocompletar" onclick="$('#txtTags').focus();">
+                            @* Input de Tags *@
+                            <input type="text"
+                                    placeholder="Introduce una etiqueta y pulsa AÑADIR"
+                                    id="txtTags"
+                                    class="form-control txtAutocomplete"
+                                    value="@Model.DocumentEditionModel.Tags"
+                                    autocomplete="off" />
+
+                            @* Botón de Añadir Etiqueta/Tag *@
+                            <a id="anadir-tag" class="btn btn-grey uppercase">Añadir</a>
+
+                            @* Campo oculto que almacenará los Tags del recurso *@
+                            <input type="hidden" id="@idTxtTags" />
+                        </div>
+                        @* Tags añadidas por el usuario o por auto *@
+                        <span id="@idTagsContainer" class="contenedor tag-list mb-4"></span>
+                    </div>
+                </div>
+
+                @* Campo oculto que almacenará los Tags/Etiquetas Enlaces *@
+                <input type="hidden" id="txtTagsEnlaces" />
+            }
+            @if (Model.SemanticResourceModel == null || !Model.SemanticResourceModel.ThesaurusCategoryNotRequired)
+            {
+
+                if ((Model.EditResourceModel.TypePage != EditResourceModel.TypePageEditResource.AddToGnossResource) && (Model.EditResourceModel.TypePage != EditResourceModel.TypePageEditResource.AddToCommunityResource))
+                {
+                    if (Model.DocumentType == ResourceModel.DocumentType.Debate)
+                    {
+                        tituloCat = Html.GetText("PERFILBASERECURSOSFICHA", "AGREGARDEBATEACATEGORIA");
+                    }
+                    else if (Model.DocumentType == ResourceModel.DocumentType.Pregunta)
+                    {
+                        tituloCat = Html.GetText("PERFILBASERECURSOSFICHA", "AGREGARPREGUNTAACATEGORIA");
+                    }
+                    else if (Model.DocumentType == ResourceModel.DocumentType.Encuesta)
+                    {
+                        tituloCat = Html.GetText("PERFILBASERECURSOSFICHA", "AGREGARENCUESTAACATEGORIA");
+                    }
+                    else
+                    {
+                        tituloCat = Html.GetText("PERFILBASERECURSOSFICHA", "AGREGARCATEGORIA");
+                    }
+                }
+                @* Sección Agregar a Categoría*@
+                <div class="form-group edit-categorias">
+                    @* Título de la sección *@
+                    <label class="control-label d-block">@tituloCat</label>
+                    @* Añadir a Gnoss Share -> Sin diseño de dewenir *@
+                    @if (Model.EditResourceModel.TypePage == EditResourceModel.TypePageEditResource.AddToGnossResource)
+                    {
+                        <p>@Html.GetText("ANYADIRGNOSS", "AGREGA_BR_Y_SELE")</p>
+                        <input type="hidden" id="txtHackCatBRAddToGnoss" />
+                        <ul id="listaCatBRAddToGnoss" class="icoEliminar"></ul>
+                        <br />
+                        <select id="cmbBaseRecursos" style="width:350px;">
+                            @foreach (Guid brID in Model.AddToGnossShareSites.Keys)
+                            {
+                                <option value="@brID.ToString()">@Model.AddToGnossShareSites[brID]</option>
+                            }
+                        </select>
+                    }
+
+                    
+                    @Html.PartialView("EditorTesauro/_EditorTesauro", Model.ThesaurusEditorModel)
+                    
+
+                    @if (Model.EditResourceModel.TypePage == EditResourceModel.TypePageEditResource.AddToGnossResource)
+                    {
+                        <input class="submit" id="lbAddBr" type="button" value="@Html.GetText("ANYADIRGNOSS", "AGREGA_A_BR")">
+                    }
+                </div>
+            }
+            else if (Model.SemanticResourceModel.OtherCommunityEditCategoriesUrl != null)
+            {
+                <div class="infoNoEditTexComAuto">
+                    @Html.Raw(Html.GetText("CREARDOCUMENTO", "INFONOEDICIONTESCOMPAUTO", Model.SemanticResourceModel.OtherCommunityEditCategoriesUrl))
+                </div>
+            }
+        </div>
+
+        @* Crear un tipo de recurso usando el Generador de SemCms *@
+        if (Model.DocumentType == ResourceModel.DocumentType.Semantico && !Model.SemanticResourceModel.SemCmsContainsTitleAndDescription)
+        {
+            @Html.PartialView("../Shared/SemCms/_GeneradorSemCms", Model.SemanticResourceModel)
+        }
+
+        @* Sección de privacidad y Seguridad del recurso a crear *@
+        if (Model.SetPermissionsEditionAvailable || Model.ResourcePropertiesAvailable)
+        {
+
+            @* Sección de Privacidad (Compartir recurso) *@
+            <div id="panPrivacidadYSeguridad">
+                @* Título de la sección *@
+                <div class="form-section-title mb-4 uppercase">
+                    <span>@Html.GetText("PERFILBASERECURSOEDITAR", "PRIVACIDADYSEGURIDAD")</span>
+                </div>
+                        
+                @* Sección Editar Permisos *@
+                @if (Model.SetPermissionsEditionAvailable)
+                {
+                    @* Permisos Editores (Personas que pueden editar y ver el recurso *@
+                    <div id="panEditoresRec">
+                            @* Añadir Editores al recurso *@
+                            @if (Model.SelectorEditionAvailable)
+                            {
+                                @* Contenedor Editores del recurso *@
+                                <div class="form-group mb-4 edit-permisos-edicion">
+                                    <div id="panAgregarEditoresRec">
+                                        @* Título de la sección *@
+                                        <div class="form-group mb-4 edit-permisos-edicion">
+                                                <label class="control-label d-block mb-3">@Html.GetText("PERFILBASERECURSOEDITAR", "INICIOEDITORES")</label>
+                                        </div>
+                                        @* Opciones Editar el documento *@                                        
+                                        @{
+                                            string checkEditoresYo = "checked=\"checked\"";
+                                            string chackEditoresOtros = "";
+                                            string classDivEdit = "class=\"oculto\"";
+
+                                            if ((Model.UsersSelectorEditionModel.SelectedProfilesList.Count + Model.UsersSelectorEditionModel.SelectedGroupsList.Count) > 1 || Model.UsersSelectorEditionModel.SelectedGroupsList.Count > 0 || (Model.UsersSelectorEditionModel.SelectedProfilesList.Count == 1 && !Model.UsersSelectorEditionModel.SelectedProfilesList.ContainsKey(identidadActual.KeyProfile)))
+                                            {
+                                                //Si hay mas de uno significa que hay mas editores aparte del usuario.
+                                                checkEditoresYo = "";
+                                                chackEditoresOtros = "checked=\"checked\"";
+                                                classDivEdit = "";
+                                            }
+                                        }
+                                                                                   
+                                        @* Opción: Permisos solo yo *@  
+                                        <div class="custom-control themed little custom-radio">                                            
+                                            <input type="radio" class="custom-control-input" id="rbEditoresYo" name="editores" @Html.Raw(checkEditoresYo) onclick="AjustarPrivacidadRecurso(this);" />
+                                            <label for="rbEditoresYo" class="custom-control-label">@Html.GetText("PERFILBASERECURSOEDITAR", "SOLOYO")</label>                                            
+                                        </div>
+                                        @* Opción: Permisos Otros grupos específicos (Buscador) *@  
+                                        <div class="custom-control themed little custom-radio">                                            
+                                            <input type="radio" class="custom-control-input" id="rbEditoresOtros" name="editores" @Html.Raw(chackEditoresOtros) onclick="AjustarPrivacidadRecurso(this);" />
+                                            <label for="rbEditoresOtros" class="custom-control-label">@Html.GetText("PERFILBASERECURSOEDITAR", "PERSONASESPECIFICAS")</label>                                            
+                                        </div>
+                                        @* Visualizar buscador de personas *@
+                                        <div id="divContDespEdit" @Html.Raw(classDivEdit)>
+                                            @Html.PartialView("_SelectorUsuarios", Model.UsersSelectorEditionModel)
+                                        </div>                                            
+                                    </div>
+                                </div>                                        
+                                }
+                            @* Añadir que el tipo de recurso sea o no Privado *@
+                            @if (Model.PrivateResourcesAvailable)
+                            {
+                                <div class="form-group mb-4 edit-permisos-ver">
+                                    <div id="paneLectores">
+                                        @* Título de la sección *@
+                                        @if (!Model.DocumentType.Equals(ResourceModel.DocumentType.Debate))
+                                        {
+                                            <label id="lblInicioLectores" class="control-label d-block mb-3">@Html.GetText("PERFILBASERECURSOEDITAR", "INICIOLECTORES")</label>
+                                        }
+                                        else
+                                        {
+                                            <label id="lblInicioLectores" class="control-label d-block mb-3">@Html.GetText("PERFILBASERECURSOEDITAR", "INICIODEBATES")</label>
+                                        }
+                                        @* Opciones para ver el documento *@
+                                        @{
+                                            string checkedAbierto = "";
+                                            string checkedLecCom = "";
+                                            string checkedLectEditores = "checked=\"checked\"";
+                                            string chcheckLectEspecificos = "";
+                                            string classDivLect = "class=\"oculto\"";
+
+                                            if (Model.DocumentEditionModel.PrivateEditors)
+                                            {
+                                                if ((Model.UsersSelectorReadingModel.SelectedProfilesList.Count + Model.UsersSelectorReadingModel.SelectedGroupsList.Count) > 0)
+                                                {
+                                                    checkedLectEditores = "";
+                                                    chcheckLectEspecificos = "checked=\"checked\"";
+                                                    classDivLect = "";
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (Model.VisibilityMembersCommunity)
+                                                {
+                                                    checkedLecCom = "checked=\"checked\"";
+
+                                                    if (Model.CommunityReadersAvailable)
+                                                    {
+                                                        checkedLectEditores = "";
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    checkedAbierto = "checked=\"checked\"";
+
+                                                    if (Model.OpenResourcesAvailable)
+                                                    {
+                                                        checkedLectEditores = "";
+                                                    }
+                                                }
+                                            }
+
+                                            @* Opción Abierto - Ver recurso Abierto al público *@
+                                            if (Model.OpenResourcesAvailable)
+                                            {                                                        
+                                                <div class="custom-control themed little custom-radio">
+                                                    <input type="radio" id="rbAbierto" class="custom-control-input" @Html.Raw(checkedAbierto) name="lectores" onclick="AjustarPrivacidadRecurso(this);" />
+                                                    <label class="custom-control-label" for="rbAbierto"> @Html.GetText("PERFILBASERECURSOEDITAR", "ABIERTO")</label>
+                                                </div>
+                                            }
+                                            @* Opción Cualquier miembro de la comunidad *@
+                                            if (Model.CommunityReadersAvailable)
+                                            {
+                                                string textoRbLetores = " " + Html.GetText("PERFILBASERECURSOEDITAR", "LECTORESCOMUNIDAD");
+
+                                                if (Model.DocumentType.Equals(ResourceModel.DocumentType.Debate))
+                                                {
+                                                    textoRbLetores = " " + Html.GetText("PERFILBASERECURSOEDITAR", "PARTICIPANTESDEBATE");
+                                                }                                                        
+                                                <div class="custom-control themed little custom-radio">
+                                                    <input type="radio" id="rbLectoresComunidad" class="custom-control-input" @Html.Raw(checkedLecCom) name="lectores" onclick="AjustarPrivacidadRecurso(this);" />
+                                                    <label class="custom-control-label" for="rbLectoresComunidad">@textoRbLetores</label>
+                                                </div>
+                                            }
+
+                                            @* Opción Sólo Editores *@
+                                            if (Model.SelectorEditionAvailable)
+                                            {                                                        
+                                                <div class="custom-control themed little custom-radio">
+                                                    <input type="radio" id="rbLectoresEditores" class="custom-control-input" @Html.Raw(checkedLectEditores) name="lectores" onclick="AjustarPrivacidadRecurso(this);" />
+                                                    <label class="custom-control-label" for="rbLectoresEditores"> @Html.GetText("PERFILBASERECURSOEDITAR", "LECTORESEDITORES")</label>
+                                                </div>
+                                            }
+                                            else if (!string.IsNullOrEmpty(checkedLectEditores))
+                                            {
+                                                chcheckLectEspecificos = "checked=checked";
+                                                classDivLect = "";
+                                            }
+                                        }
+
+                                        @* Opción: Permisos Otras Personas específicas (Buscador) *@
+                                        <div class="custom-control themed little custom-radio">                                                    
+                                            <input type="radio" class="custom-control-input" id="rbLectoresEspecificos" @Html.Raw(chcheckLectEspecificos) name="lectores" onclick="AjustarPrivacidadRecurso(this);" />
+                                            <label for="rbLectoresEspecificos" class="custom-control-label">@Html.GetText("PERFILBASERECURSOEDITAR", "LECTORESESPECIFICOS")</label>
+                                        </div>
+                                        @* Visualizar buscador de personas *@
+                                        <div id="divContDespLect" @Html.Raw(classDivLect)>
+                                            @Html.PartialView("_SelectorUsuarios", Model.UsersSelectorReadingModel)
+                                        </div>
+                                    </div>
+                                </div>                               
+                                }
+                    </div>
+                }
+
+                @* Propiedades del recurso (Proteger versión, Compartir ...) *@
+                @if (Model.ResourcePropertiesAvailable)
+                    {
+                        @* Sección del protección de la versión y compartir recurso *@
+                        <div id="PropiedadesDelRecurso">
+                            @* Opción proteger versión del recurso *@
+                            <div id="panPropiedadesDelRecurso">
+                                @* Protección de la versión *@
+                                @if (Model.ResourceProtectionAvailable)
+                                {
+                                    string checkedProg = "";
+                                    string textoLabelCheckProg = null;
+                                    string enabledChechProg = "";
+
+                                    if (Model.DocumentEditionModel.Protected)
+                                    {
+                                        checkedProg = "checked=\"checked\"";
+
+                                        textoLabelCheckProg = Html.GetText("PERFILBASESUBIRRECURSO", "DOCPROTEGIDO", new string[] { Model.DocumentEditionModel.ProtectionInfo.Key, Model.DocumentEditionModel.ProtectionInfo.Value });
+
+                                        if (Model.DocumentType == ResourceModel.DocumentType.Wiki && identidadActual.IsProyectSupervisor)
+                                        {
+                                            textoLabelCheckProg = Html.GetText("PERFILBASESUBIRRECURSO", "DOCBLOQUEADO", new string[] { Model.DocumentEditionModel.ProtectionInfo.Key, Model.DocumentEditionModel.ProtectionInfo.Value });
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (Model.DocumentType == ResourceModel.DocumentType.Wiki && identidadActual.IsProyectSupervisor)
+                                        {
+                                            textoLabelCheckProg = Html.GetText("PERFILBASESUBIRRECURSO", "DOCBLOQUEAR");
+                                        }
+                                        else
+                                        {
+                                            textoLabelCheckProg = Html.GetText("PERFILBASESUBIRRECURSO", "DOCPROTEGER");
+                                        }
+                                    }
+
+                                    if (!Model.DocumentEditionModel.ModificationProtectionAvailable)
+                                    {
+                                        enabledChechProg = "disabled=\"disabled\"";
+                                    }
+                                    @* Sección HTML protección versión recurso *@
+                                    <div class="form-group mb-4 edit-proteger-version">
+                                        @* Título sección Protección *@
+                                        <label class="control-label d-block mb-3">@Html.GetText("PERFILBASESUBIRRECURSO", "DOCPROTEGERVERSION")</label>
+                                        @* Opción protección de versión del recurso *@
+                                        <div class="custom-control little custom-checkbox">
+                                            <input type="checkbox"
+                                                    id="chkDocumentoProtegido"
+                                                    @Html.Raw(checkedProg)
+                                                    @Html.Raw(enabledChechProg)
+                                                    class="custom-control-input" />
+                                            <label class="custom-control-label" id="lblDocumentoProtegido" for="chkDocumentoProtegido">@Html.Raw(textoLabelCheckProg)</label>
+                                        </div>
+                                    </div>
+                                }
+                                @* Opción permitir modificación del recurso *@
+                                @if (!Model.DocumentEditionModel.ModificationProtectionAvailable)
+                                {
+                                    <div class="custom-control little custom-checkbox">
+                                        <input type="checkbox"
+                                                id="chkProtegerDocProtegido"
+                                                class="custom-control-input" />
+                                        <label id="lblProtegerDocProtegido" class="custom-control-label" for="chkProtegerDocProtegido">@Html.GetText("PERFILBASERECURSOEDITAR", "PROTEGERDOCPROTEGIDO")</label>
+                                    </div>
+                                }
+
+                                @* Sección permitir compartir recurso *@
+                                @if (Model.ShareAvailable)
+                                {
+                                    <div id="divContChkCompartir">
+                                        @* Opción Compartir recurso *@
+                                        <div class="form-group mb-5 edit-compartir">
+                                            <label class="control-label d-block mb-3">@Html.GetText("PERFILBASERECURSOSFICHA", "COMPARTIR")</label>
+                                            <div class="custom-control little custom-checkbox">
+
+                                                <input type="checkbox"
+                                                        id="chkCompartir"
+                                                        class="custom-control-input"
+                                                        onclick="javascript:ReajustarCompartir();" @Html.Raw(checkedCompartir) />
+
+                                                @{
+                                                    string displaySpanComPubli = "";
+                                                    string displaySpanComPriv = "";
+
+                                                    if (Model.DocumentEditionModel.PrivateEditors)
+                                                    {
+                                                        displaySpanComPubli = "style=\"display:none;\"";
+                                                    }
+                                                    else
+                                                    {
+                                                        displaySpanComPriv = "style=\"display:none;\"";
+                                                    }
+                                                }                                                        
+                                                <label class="custom-control-label" for="chkCompartir">
+                                                @* Labels para cada tipo de opción de Compartir*@
+                                                    <span id="spanCompartirPublico" @Html.Raw(displaySpanComPubli)>
+                                                        <strong>
+                                                            <span id="lblChkCompartir">@Html.GetText("PERFILBASESUBIRRECURSO", "MEN_COMPARTIR")</span>
+                                                        </strong>
+                                                        <span id="lblChkCompartir2">@Html.GetText("PERFILBASESUBIRRECURSO", "MEN_COMPARTIR2")</span>
+                                                    </span>
+                                                    <span id="spanCompartirPrivado" @Html.Raw(displaySpanComPriv)>
+                                                        <strong>
+                                                            <span id="lblChkCompartirPrivado">@Html.GetText("PERFILBASESUBIRRECURSO", "MEN_COMPARTIR_PRIVADO")</span>
+                                                        </strong>
+                                                        <span id="lblChkCompartir2Privado">@Html.GetText("PERFILBASESUBIRRECURSO", "MEN_COMPARTIR2_PRIVADO")</span>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>                                            
+                                }
+                            </div>
+                        </div>
+                    }
+            </div>
+                }
+
+                @* Sección de Copyright del recurso *@
+                if (Model.CopyrightAvailable)
+                {
+                    <div id="panAutoria">
+                        @* Título sección Copyright*@
+                        <div class="form-section-title mb-4 uppercase">
+                            <span>@Html.GetText("PERFILBASESUBIRRECURSO", "TITPROPIEDADINTELECTUAL")</span>
+                        </div>
+                        @* Ajustes de Copyright*@
+                        <div class="form-group mb-4 edit-autor-recurso">
+                            @if (Model.DocumentEditionModel.ActualIdentityIsCreator)
+                            {
+                                string checkedAutorProp = "";
+                                string chechekNoAutorProp = "";
+
+                                if (Model.DocumentEditionModel.CreatorIsAuthor)
+                                {
+                                    checkedAutorProp = "checked=\"checked\"";
+                                }
+                                else
+                                {
+                                    chechekNoAutorProp = "checked=\"checked\"";
+                                }
+
+                                string lbAutorProp = " " + Html.GetText("COMMON", "SI");
+                                string lbNoAutorProp = " " + Html.GetText("COMMON", "NO");
+
+                                string disabledRbAutores = "";
+
+                                if (Model.LicenseEditorModel != null && Model.LicenseEditorModel.NotEditable)
+                                {
+                                    disabledRbAutores = "disabled=\"disabled\"";
+                                }
+
+                                @* Panel de selección autor propio *@
+                                <div id="panAutorPropio">
+                                    @* Título de opción - "Soy el autor ..." *@
+                                    <label id="lblElegirAutor" class="control-label d-block mb-3">@Html.GetText("PERFILBASESUBIRRECURSO", "AUTORPROPIO")</label>
+
+                                    @* Opcion Sí (Autor propio) *@
+                                    <div class="custom-control themed little custom-radio">
+                                        <input type="radio"
+                                                id="rbAutorPropio"
+                                                class="custom-control-input"
+                                                @Html.Raw(checkedAutorProp)
+                                                @Html.Raw(disabledRbAutores)
+                                                onclick="checkOtrosAutores()"
+                                                name="autores" />
+                                        <label class="custom-control-label" for="rbAutorPropio">@lbAutorProp</label>
+                                    </div>
+
+                                    @* Editor Licencia del recurso -revisarlo *@
+                                    @if (Model.DocumentEditionModel.ActualIdentityIsCreator && Model.DocumentEditionModel.AllowsLicense)
+                                    {
+                                        string displayPanIntel = "";
+
+                                        if (string.IsNullOrEmpty(Model.DocumentEditionModel.License))
+                                        {
+                                            if (!(Model.DocumentEditionModel.CreatorIsAuthor && (Model.DocumentEditionModel.ShareAllowed || (Comunidad.Key != ProyectoAD.MetaProyecto && (Comunidad.AccessType == CommunityModel.TypeAccessProject.Public || Comunidad.AccessType == CommunityModel.TypeAccessProject.Restricted)))))
+                                            {
+                                                displayPanIntel = "class=\"oculto\"";
+                                            }
+                                        }
+                                        @* Panel de editar la licencia (Al seleccionar SÍ)*@
+                                        <div id="panPropIntelectual" @Html.Raw(displayPanIntel)>
+                                            @Html.PartialView("_EditorLicencia", Model.LicenseEditorModel)
+                                        </div>
+                                    }
+
+                                    @* Opcion No (Autor propio) *@
+                                    <div class="custom-control themed little custom-radio">
+                                        <input type="radio"
+                                                id="rbNoAutorPropio"
+                                                class="custom-control-input"
+                                                @Html.Raw(chechekNoAutorProp)
+                                                @Html.Raw(disabledRbAutores)
+                                                onclick="checkOtrosAutores()"
+                                                name="autores" />
+                                        <label class="custom-control-label" for="rbNoAutorPropio">@lbNoAutorProp</label>
+                                    </div>
+                                </div>
+                            }
+
+                            @* Sección Añadir autores adicionales*@
+                            <div class="form-group mb-4 anadir-autor">
+                                @* Botón para poder añadir más autores*@
+                                <input class="btn btn-grey uppercase mb-4 @classlbAgregarAutores"
+                                        id="lbAgregarAutores"
+                                        type="button"
+                                        onclick="BtnAgregarAutores_Click()"
+                                        value="@Html.GetText("PERFILBASESUBIRRECURSO", "AGREGARAUTORES")" />
+                                        
+                                <div id="fielAutores" class="@classfielAutores form-group">
+                                    <label id="lblTiuloAgregarAutores" class="control-label">@Html.GetText("PERFILBASESUBIRRECURSO", "AUTOR")</label>
+                                    <div class="input-wrap form-sticky-button autocompletar">
+                                        @* Input de Autores por añadir *@
+                                        <input type="text"
+                                                id="txtAutores"
+                                                placeholder="Introduce un autor"
+                                                class="txtAutocomplete ac_input form-control"
+                                                value=""
+                                                autocomplete="off" />
+                                        @* Input oculto donde se guardarán autores elegidos *@
+                                        <input type="hidden" id="txtAutores_Hack" />
+                                    </div>
+                                    @* Listado de Autores añadidos *@
+                                    <span class="contenedor tag-list mb-4 mt-3"></span>
+                                </div>
+                            </div>
+                        </div>                                
+                    </div>                        
+                }
+                @* Sección de carga masiva de recursos *@
+                if (Model.DocumentType == ResourceModel.DocumentType.Semantico && Model.SemanticResourceModel.MassiveResourceLoad)
+                {
+                string tituloSeccion = Html.GetText("CREARDOCUMENTO", "PROPRECCARMAS") + "@1@";
+                <div id="panCargaMasiva">
+                    <div id="divFuExaminarMasivo" style="display:none;">
+                        <input type="file" id="fuExaminarMasivo" multiple />
+                        <div id="divRecMasAgregados">
+                            <p><strong>@Html.GetText("CREARDOCUMENTO", "ARCHSELECCIONADOS")</strong></p>
+                        </div>
+                    </div>
+                    <div id="divContListaRecCarMas" style="display:none"></div>
+                    <div id="divTitDespTagAux" style="display:none;">
+                        <div id="wrapDivTitDespTagAux">
+                            <h3 id="hTitDivTitDespTagAux">@tituloSeccion</h3>
+                            <fieldset id="fsTitDesTagAux" class="labels">
+                                <p id="pTituloAux">
+                                    <label id="lblTituloAux" style="display:block;" for="txtTituloAux">@Html.GetText("PERFILBASESUBIRRECURSO", "TITULO")</label>
+                                    <input type="text" id="txtTituloAux" name="titulo" class="text big" />
+                                    <input type="text" id="txtHackTagsTituloAux" class="oculto" />
+                                </p>
+                                <p id="pDescripcionAux">
+                                    <label id="lblDescipcionAux" for="txtDescripcionAux">@Html.GetText("PERFILBASESUBIRRECURSO", "DESCRIPCION")</label>
+                                    <textarea id="txtDescripcionAux" class="ckeAux recursos"></textarea>
+                                    <input type="text" id="txtHackTagsDescripcionAux" class="oculto" />
+                                </p>
+                                <p class="textarea">
+                                    <label id="lblEtiquetasAux" for="txtTagsAux">@Html.GetText("PERFILBASESUBIRRECURSO", "ETIQUETAS")</label>
+                                </p>
+                                <div class="autocompletar" onclick="$('#txtTagsAux').focus();">
+                                    <span class="contenedor"></span>
+                                    <input type="text" id="txtTagsAux" class="txtAutocomplete" />
+                                    <input type="text" id="txtTagsAux_Hack" style="display:none" />
+                                </div>
+                            </fieldset>
+                            <fieldset>
+                                <p>
+                                    <input id="lbCancelarTitDespTagGuarCatMas" type="button" class="submit" onclick="CancelarGuardarPropPrinCargMas()" value="@Html.GetText("PERFILBASE", "CANCELAR")" />
+                                    <input id="lbGuardarTitDespTagGuarCatMas" type="button" class="submit principal btn btn-primary" value="@Html.GetText("CREARDOCUMENTO", "GUARDAR")" />
+                                </p>
+                            </fieldset>
+                            <div id="divErrorTitDespTagGuarCatMas"></div>
+                        </div>
+                    </div>
+                    <input id="txtHackGuardPropPrincCarMas" type="text" class="oculto" />
+                </div>
+
+                <script type="text/javascript">
+            function ObtenerHtmlRecMasivos(recursoID, titulo, descripcion, tags, archivo, publicado, link) {
+                var titulo = QuitarMultiidomaValor(titulo);
+                var descripcion = QuitarMultiidomaValor(descripcion);
+
+                if (tags != '' && tags[tags.length - 1] == ',') {
+                    tags = tags.substring(0, tags.length - 1);
+                }
+
+                if (archivo.indexOf(".") != -1)
+                {
+                    var extension = archivo.substring(archivo.lastIndexOf("."));
+                    archivo = archivo.substring(0, archivo.lastIndexOf("."));
+                    archivo = archivo.substring(0, archivo.lastIndexOf("_"));
+                    archivo += extension;
+                }
+                else
+                {
+                    archivo = archivo.Substring(0, archivo.LastIndexOf("_"));
+                }
+
+                var htmlTit = null;
+
+                if (publicado && link != null) {
+                    htmlTit = '<a class="valor valTituloMas" href=' + link + '>' + titulo + '</a>';
+                }
+                else {
+                    htmlTit = '<span class="valor valTituloMas">' + titulo + '</span>';
+                }
+
+                var html = '<div id="recTemp_' + recursoID + '" class="recursoMasivo">'
+                html += '<p class="tituloMas"><span class="clave">@Html.GetText("PERFILBASESUBIRRECURSO", "TITULO"): </span>'+htmlTit+'</p>';
+                html += '<div class="descpMas"><p><span class="clave">@Html.GetText("PERFILBASESUBIRRECURSO", "DESCRIPCION"): </span></p><div class="valor valDescpMas">' + descripcion + '</div></div><p class="tagsoMas"><span class="clave">@Html.GetText("COMMON", "ETIQUETAS"): </span><span class="valor valTagsoMas">' + tags + '</span></p><p class="FichMas"><span class="clave">@Html.GetText("BLOGS", "ARCHIVO"): </span><span class="valor">' + archivo + '</span></p>';
+
+                if (publicado && link != null) {
+                    html += '<div class="ok" style="display:block;"><p class="publicadoMas"><span>@Html.GetText("CONTROLESCVSEM", "PUBLICADOCORRECTAMENTERECMAS")</span></p></div>';
+                }
+                else {
+                    html += '<p class="editarMas"><a onclick="EditarRecursoCargaMasiva(\''+recursoID+'\');">@Html.GetText("CREARDOCUMENTO", "EDITARRECCOMPLETO")</a></p>';
+                    html += '<p class="editarMas"><a onclick="EditarPropsPrincRecCarMas(event, \''+recursoID+'\');">@Html.GetText("CREARDOCUMENTO", "EDITARPROPSPRINCREC")</a></p>';
+                    html += '<div id="recTempDesple_' + recursoID + '" class="divRecTempDesple"></div><div id="recTempError_' + recursoID + '" class="divRecTempError"></div>';
+
+                    if (publicado) {
+                        html += '<div class="ko" style="display:block;"><p class="publicadoMas"><span>@Html.GetText("CONTROLESCVSEM", "ERRORALPUBLICARRECMAS")</span></p></div>';
+                    }
+                }
+
+                html += '</div>';
+                return html;
+            }
+
+            @if (Model.SemanticResourceModel.EditingMassiveResourceLoad)
+            {
+                @Html.Raw("var recursoEditandoCargMasID = '" + Model.SemanticResourceModel.EditingMassiveResourceID + "';");
+            }
+                </script>
+                }
+                }
+
+                @* Nombres que tendrán los botones para el proceso de guardado del recurso*@
+                @{
+                    string textoPublicacion = Html.GetText("PERFILBASESUBIRRECURSO", "GUARDAR");
+
+                    if (Model.DocumentType == ResourceModel.DocumentType.Semantico && Model.SemanticResourceModel.MassiveResourceLoad)
+                    {
+                        if (!Model.SemanticResourceModel.EditingMassiveResourceLoad)
+                        {
+                            textoPublicacion = Html.GetText("COMMON", "CONTINUAR");
+                        }
+                    }
+                    else if (Model.CreatingVersion)
+                    {
+                        if (Model.DocumentType != ResourceModel.DocumentType.Semantico)
+                        {
+                            textoPublicacion = Html.GetText("PERFILBASESUBIRRECURSO", "GUARDARVERSION");
+                        }
+                        else
+                        {
+                            textoPublicacion = Html.GetText("CREARDOCUMENTO", "CREARVERSION");
+                        }
+                    }
+                    else if (Model.DocumentEditionModel.Draft || Model.EditResourceModel.TypePage == EditResourceModel.TypePageEditResource.AddToGnossResource)
+                    {
+                        textoPublicacion = Html.GetText("PERFILBASESUBIRRECURSO", "PUBLICAR");
+                    }
+                }
+
+                @* Panel de botones para la gestión del guardado del recurso (Cancelar, Guardar borrador, publicar) *@                       
+                <div id="divContPanelBotonera">
+                    <fieldset id="panelBotonera">
+                        <p>
+                            @{
+                                string onclickPublicar = "if(validarCamposGuardado(false)){comprobarReemplazarArchivo();}else{return false;}";
+
+                                if (Model.DocumentType == ResourceModel.DocumentType.Semantico)
+                                {
+                                    onclickPublicar = "if (RecogerValoresRDF2(true)){$('#divContLblErrorDocumento').html('');EnviarDatosServidor('Publicar');}else{crearErrorFormSem(mensajeErrorFormSemPrinc, 'divContLblErrorDocumento');}";
+                                }
+                            }
+                            <input class="submit principal btn btn-primary" id="lbPublicar" type="button" value="@textoPublicacion" onclick="@onclickPublicar" />
+
+                            @if (Model.DocumentEditionModel.Draft || (Model.DocumentType == ResourceModel.DocumentType.Semantico && Model.SemanticResourceModel.MassiveResourceLoad))
+                            {
+                                string onclickDraft = "if(validarCamposGuardado(true)){EnviarDatosServidor('GuardarBorrador');}else{return false;};";
+
+                                if (Model.DocumentType == ResourceModel.DocumentType.Semantico)
+                                {
+                                    if (!Model.SemanticResourceModel.MassiveResourceLoad)
+                                    {
+                                        onclickDraft = "if (RecogerValoresRDF2(false)){$('#divContLblErrorDocumento').html('');EnviarDatosServidor('GuardarBorrador');}else{crearErrorFormSem(mensajeErrorFormSemPrinc, 'divContLblErrorDocumento');}";
+                                    }
+                                    else
+                                    {
+                                        onclickDraft = "AceptarArchivosCargaMas();";
+                                    }
+                                }
+
+                                string displayBorrador = "";
+                                string classBorrador = "submit btn btn-link";
+                                string textoBotonBorrador = Html.GetText("PERFILBASESUBIRRECURSO", "GUARDARBORRADOR");
+                                string valueAux = "";
+                                if (Model.DocumentType == ResourceModel.DocumentType.Semantico && Model.SemanticResourceModel.MassiveResourceLoad)
+                                {
+                                    displayBorrador = "style=\"display:none;\"";
+                                    classBorrador += " principal";
+                                    textoBotonBorrador = Html.GetText("COMMON", "CONTINUAR");
+                                    valueAux = "valueaux=\"" + Html.GetText("CONTROLESCVSEM", "PUBLICARERRONEOS") + "\"";
+                                }
+
+                                <input class="@classBorrador" id="lbGuardarBorrador" type="button" value="@textoBotonBorrador" onclick="@onclickDraft" @Html.Raw(displayBorrador) @Html.Raw(valueAux) />
+                                @*<input class="submit btn btn-link" id="lnkCancelar" type="button" value="@Html.GetText("PERFILBASE", "CANCELAR")" onclick="document.location='@Model.UrlCancelButton';" />*@
+                                <input class="submit btn btn-link" id="lnkCancelar" type="button" value="@Html.GetText("PERFILBASE", "CANCELAR")" onclick="document.location = '@urlVuelta';" />
+                            }else{
+                                /* Añadir botón de Cancelar aunque se esté editando un recurso */                                
+                                @*<input class="submit btn btn-link" id="lnkCancelar" type="button" value="@Html.GetText("PERFILBASE", "CANCELAR")" onclick="document.location='@Model.UrlCancelButton';" />*@
+                                <input class="submit btn btn-link" id="lnkCancelar" type="button" value="@Html.GetText("PERFILBASE", "CANCELAR")" onclick="document.location = '@urlVuelta';" />
+                            }
+                        
+                            @if (Model.DocumentType == ResourceModel.DocumentType.Semantico && Model.SemanticResourceModel.MassiveResourceLoad)
+                            {
+                                string srcImagenEspera = Html.GetBaseUrlStatic() + "/images/espera.gif";
+                                string textopublicando = Html.GetText("CREARDOCUMENTO", "PUBLICANDOCARMAS") + "...";
+                                string onclickIrHome = "TxtHackHayCambios=false;window.location.href = '" + Model.UrlGoHomeButton + "';";
+
+                                <input id="lbIrAHome" type="button" class="submit principal" style="display:none" onclick="@onclickIrHome" value="@Html.GetText("CREARDOCUMENTO", "IRALAHOME")" />
+                                <img ID="imgEsperaArchivo" src="@srcImagenEspera" style="display:none;" alt="Espere..." />
+                                <span id="lblErrorCargarArchivo" style="display:none;">@Html.GetText("CONTROLESCVSEM", "CARGANDOFICHEROS")</span>
+                                <span id="lblCargarPublicandoCarMas" style="display:none;">@textopublicando</span>
+                                <input type="hidden" id="txtHackCargaMasiva" />
+                                <input type="hidden" id="txtHackCargaMasivaRecSub" />
+                            }
+                        </p>
+                    </fieldset>
+                </div>
+
+                @* Panel donde se mostrarán los posibles errores durante el proceso de guardado del recurso*@
+                <div id="divContLblErrorDocumento"></div>
+
+                @* Campos ocultos para funcionamiento del proceso de guardado*@
+                <input type="hidden" id="txtHackReemplazar" />
+                <input type="hidden" id="txtHackArchivo" />
+
+                @* Campos oculto para funcionamiento del proceso de guardado *@
+                @if (Model.EditResourceModel.TypePage == EditResourceModel.TypePageEditResource.CreateResource2 || Model.EditResourceModel.TypePage == EditResourceModel.TypePageEditResource.AddToGnossResource || Model.EditResourceModel.TypePage == EditResourceModel.TypePageEditResource.AddToCommunityResource)
+                {
+                    <input type="hidden" id="txtHackEnlaceDoc" value="@Model.DocumentEditionModel.Link" />
+                }
+                
+</form>
+<script type="text/javascript">
+    // Parámetros para operativaTagsEditable
+    (function ($) {
+        const pParamsTags = {
+            idTagsContainer: "@idTagsContainer",
+            idTagsInputHack: "@idTxtTags",
+        }  
+        // Gestión de operativa para funcionamiento de Edición de Tags
+        operativaTagsEditable.init(pParamsTags);
+    })();
+</script>

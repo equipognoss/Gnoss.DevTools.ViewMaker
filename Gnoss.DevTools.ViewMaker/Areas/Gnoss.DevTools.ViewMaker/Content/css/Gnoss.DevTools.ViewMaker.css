@@ -1,0 +1,493 @@
+﻿/*body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}*/
+
+.btn-default {
+    border-color: #ccc;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 15px;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+input#URL{
+    width: 100%;
+    max-width: 750px;
+}
+input[type=text]#SessionID{
+    width: 100%;
+}
+
+input + a.verPassword{
+    font-size: 22px;
+    position: absolute;
+    right: 22px;
+}
+
+body.configuracion .form-group label{
+    text-align : left;
+}
+
+body.configuracion .form-group input[type=text], 
+body.configuracion .form-group input[type=password]{
+    width: 100%;
+    max-width: 100%;
+}
+
+body.configuracion .form-group label span.fa.fa-trash,
+body.configuracion .form-group label span.fa.fa-cloud-upload,
+body.configuracion .form-group label span.fa.fa-cloud-download,
+body.configuracion .form-group label span.fa.fa-random {
+    padding-right: 20px;
+    cursor: pointer;
+    font-size: 20px;
+    top: 5px;
+}
+
+body.configuracion .form-group label span.fa.fa-random
+{
+    padding-right: 67px;
+}
+
+body.configuracion .form-group label span.fa.fa-cloud-upload.disabled,
+body.configuracion .form-group label span.fa.fa-cloud-upload.no-changes,
+body.configuracion .form-group label span.fa.fa-cloud-download.no-changes{
+    color: lightgrey;
+    cursor: not-allowed;
+}
+
+body.configuracion .form-group label span.fa.fa-trash.disabled{
+    color: lightgrey;
+    cursor: not-allowed;
+}
+
+body.configuracion .form-horizontal,
+body.configuracion .form-group  {
+    padding-left: 20px;
+}
+
+body.configuracion .form-group.save {
+    padding-top: 30px;
+}
+
+body.configuracion .upload .form-horizontal{
+    padding: 30px 40px 0 10px;
+}
+
+body.configuracion #confirmationModal .panCambios label{
+    font-weight: bold
+}
+body.configuracion #confirmationModal .panCambios{
+    padding: 30px 15px 0 15px;
+}
+
+body.configuracion .panCambios  span.ModifiedInWorkdir:before {
+    content: "\f05a";
+    color: red;
+    padding: 5px;
+}
+
+body.configuracion .panCambios  span.DeletedFromWorkdir:before {
+    content: "\f057";
+    color: red;
+    padding: 5px;
+}
+
+body.configuracion .panCambios  span.NewInWorkdir:before {
+    content: "\f055";
+    color: blue;
+    padding: 5px;
+}
+
+
+
+.modal .modal-title{
+        float: left;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.modal  button.btn.btn-primary .fa {
+    margin-right: 10px;
+}
+
+.modal .modal-body #userUpload{    
+    height: 35px;
+    width: 100%;
+    padding: 0 5px;
+    max-width: 100%;
+}
+
+
+body .form-horizontal .form-group.estilosPersonalizados div.textbox .fa{
+    display: none;
+} 
+
+h3 a,
+h3 a:hover
+h3 a:focus {
+    color: initial !important;
+    text-decoration: none !important;
+    outline: none !important;
+}
+span.fa.fa-lock {
+    padding: 0 5px;
+}
+
+.form-group input[type=text], .form-group input[type=password]{
+    height: 35px;
+    padding: 0 5px;
+}
+
+
+/* PALCO */
+
+body.palco * {
+    margin: 0;
+    display: inline-block;
+    position: relative;
+}
+body.palco datalist {
+    display: none;
+}
+
+body.palco .navbar-dark {
+    background: none;
+    border: none;
+    min-height: 40px;
+    height: 40px;
+    width: 100px;
+    max-width: 100px;
+    float: left;
+    padding: 10px;
+}
+
+body.palco .navbar-header a.navbar-brand{
+    text-indent: -10000px;
+    display: block !important;
+    float: left;
+    width: 20px;
+    margin: 0 10px;
+    padding: 0;
+    max-height: 25px;
+}
+
+body.palco .navbar-header a, 
+body.palco .navbar-header span {
+    display: inline !important;
+    float: none;
+    padding-bottom: 0;
+}
+
+body.palco .container.body-content {width: calc(100% - 100px);max-width: calc(100% - 100px);padding: 0;height: 40px;border-bottom: 1px solid #343a40;}
+
+body.palco .container {}
+
+body.palco .navbar-dark .container {
+    padding: 0;
+    /* margin-top: 13px; */
+    max-width : 100%;
+    max-height: 35px;
+}
+
+body.palco {
+    padding: 0;
+    margin: 0;
+    display: block;
+    height: 40px;
+    overflow: hidden;
+    background: lightgray;
+}
+
+body.palco h2 {
+    display: none;
+}
+body.palco h2 strong {
+    text-indent: 0;
+    float: left;
+}
+
+input.btn.btn-default {
+    display: inline !important;
+    float: left;
+}
+
+body.palco h3 {
+    display: none !important;
+}
+
+body.palco [hidden]{
+    display:none !important
+}
+
+body.palco .form-group.botones {}
+
+body.palco .form, body.palco .form-horizontal {
+    width: 100%;
+    max-width: 100%;
+    height: 40px;
+}
+
+body.palco .form-horizontal .form-group {
+    margin: 0;
+    height: 40px;
+}
+
+body.palco .form-horizontal .form-group.url {
+    width: 30%;
+    padding-right: 20px;
+}
+
+body.palco .form-horizontal .form-group.session {
+    width: 25%;
+}
+
+
+body.palco .form-horizontal .form-group.estilosPersonalizados .control-label {
+    display: none;
+}
+
+body.palco .form-horizontal .form-group.botones{
+    width: 241px;
+    right: 0;
+    position: absolute;
+}
+body.palco .form-horizontal .form-group.estilosPersonalizados{
+    width: 160px;
+    top: -2px;
+}
+
+body.palco .form-horizontal .form-group.botones div {
+    width: 181px;
+    padding: 0;
+}
+body.palco.showBasicAuth .form-horizontal .form-group.botones div{
+    right: 50px;
+}
+
+body.palco .form-horizontal .form-group.estilosPersonalizados div.textbox {
+    width: 125px;
+    height: 40px;
+}
+body.palco .form-horizontal .form-group.estilosPersonalizados div.textbox .fa{
+    display: inline;
+    top: 5px;
+    font-size: 25px;
+} 
+
+body.palco .textbox {
+    width: 100%;
+}
+
+
+body.palco iframe {width:100%;height:100%;border:none;position: absolute !important;left: 0;top: 40px;padding-bottom: 40px;}
+
+body.palco .form-group.autentication {
+    width: 50px;
+    float: right;
+    padding: 7px 0;
+}
+
+body.palco .form-group.autentication h3 {
+    display: block !important;
+    right: 10px;
+}
+
+body.palco .form-group.autentication h3 a {
+    z-index: 999999;
+    width: 293px;
+    font-size: 25px;
+    text-indent: -10000000px;
+}
+
+body.palco h3 span.fa.fa-lock, 
+body.palco h3 span.caret {
+    text-indent: 0;
+    float: left;
+}
+
+
+body.palco .form-group.autentication .panel-collapse{
+    width: 305px;
+    z-index: 99999;
+    float: right;
+    height: 229px;
+    background: lightgray;
+    border: 1px solid #343a40;
+    border-top: none;
+    border-right: none;
+    margin-top: 2px;
+    padding-top: 10px;
+}
+
+body.palco .form-group.autentication .panel-collapse input{
+    width: 100%
+}
+
+
+body.palco .form-group.autentication .panel-collapse.collapse.in {
+    display:block !important;
+    border: 1px solid grey;
+    z-index: 1000;
+    margin-top: 8px;
+    position: absolute;
+    padding: 10px 1px;
+    background: lightgrey;
+    width: 300px;
+    left: -250px;
+}
+
+body.palco .form-group.autentication .panel-collapse.collapse.in *{
+    display:block;
+    width: 100%;
+    text-align: left;
+}
+
+body.palco hr {
+    display: none;
+}
+
+body.palco .navbar-inverse * {
+    color: initial !important;
+}
+
+body.palco .textbox input {
+    width: 100%;
+    max-width: 100%;
+    border: 1px solid darkgrey;
+    padding: 2px 5px;
+    height: 35px;
+    margin-top: 2px;
+}
+
+
+body.palco .navbar-header span.fa {
+    text-indent: 0;
+    float: left;
+}
+
+body.palco .navbar-header {
+    max-height: 25px;
+}
+
+
+body.palco span.navbar-brand {
+    display: none !important;
+}
+
+body.palco .form-group.session label.control-label.col-md-3 {
+    width: 75px;
+    max-width: 100%;
+    padding: 0;
+}
+
+body.palco .form-group.session .col-md-9 {
+    width: calc(100% - 80px);
+    padding: 0;
+}
+
+body.palco .form-group.url label.control-label.col-md-3 {
+    width: 25px;
+    padding: 0;
+}
+
+body.palco .form-group.url .col-md-9 {
+    width: calc(100% - 30px);
+    padding: 0;
+    max-width: 100%;
+}
+
+input.btn.btn-default {
+    margin: 0 5px;
+    background-color: white;
+}								  
+							 
+ body.palco .form {
+    padding-left: 5px;
+    height: 40px;
+    max-height: 40px;
+}
+
+ body.palco .form-horizontal .form-group.estilosPersonalizados .btn-group a.btn, body.palco .form-horizontal .form-group.estilosPersonalizados .btn-group a.btn.btn-default {
+    height: 35px;
+    z-index: 99999;
+    top: -1px;
+}
+ body.palco .form-horizontal .form-group.estilosPersonalizados .btn-group a.btn.btn-default{
+    background-color: white;
+    border: 1px solid white;
+}
+
+input:focus, input.form-control:focus, a:focus, .btn:focus, a:hover, a:active {
+    outline:none !important;
+    outline-width: 0 !important;
+    box-shadow: none;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+}
+
+body.palco.showBasicAuth .form-horizontal .form-group.botones {
+    top: 210px;
+    z-index: 99999;
+}
+
+body #authBasic h4 {
+    display:none;
+    padding-left: 17px;
+    padding-top: 6px;
+    padding-bottom: 10px;
+}
+
+body.palco.showBasicAuth #authBasic h4 {
+    display:block;
+}
+
+body.palco.showBasicAuth .form-group.autentication h3 a {
+    float: right;
+    text-indent: 0;
+}
+
+body.palco.showBasicAuth h3 span.fa.fa-lock {
+    float: initial;
+}
+
+.palco:not(.showBasicAuth)  .dropdown-toggle::after {float: left;margin-top: 7px;}
+
+body.palco.showBasicAuth .form-group.autentication h3 {
+    right: 0;
+}
+
+body.palco.showBasicAuth .form-group.autentication {
+    padding: 6px 0;
+    z-index: 99999;
+    width: 305px;
+    float: right;
+    background-color: lightgray;
+    top: 0;
+    position: absolute;
+    right: 0px;
+}
+
+body #authBasic input[type=text],
+body #authBasic input[type=password]{
+    width: 100%;
+    max-width: 100%
+}
+body.palco.showBasicAuth #authBasic .col-md-3{
+    width: 100%;
+    max-width: 100%
+}
+body.palco.showBasicAuth #authBasic .textbox{
+      padding-right: 10px;
+}

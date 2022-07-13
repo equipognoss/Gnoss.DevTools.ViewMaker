@@ -1,0 +1,94 @@
+﻿@model NotificationViewModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra un listado de comentarios del usuario similar a la bandeja de mensajes
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+// Utilizado para las rutas de "Migas de Pan"
+CommunityModel Comunidad = Html.GetComunidad();
+
+// Botones de acciones: Pertenecen a _list-messages-actions
+string idMessageActionSelectAll = "messageActionSelectAll";
+string idMessageActionSelectNone = "messageActionSelectNone";
+string idMessageActionSelectRead = "messageActionSelectRead";
+string idMessageActionSelectNotRead = "messageActionSelectNotRead";
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista de comentarios en myGnoss  --------------------
+*@
+@{ 
+Html.SetBodyClass("layout02 listadoMyGnoss listadoMensajesMyGnoss usuarioConectado listado showResultsScrolling");
+@* Carga funcionamiento de mensajes / comentarios *@
+Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/jsUnificar/MVC.Mensajes.js?v=" + Html.GetVersion());
+}
+
+
+<div class="row">
+    @*Breadcrumb / Migas de pan en la home*@
+    <div class="col col-12 col-breadcrumb" id="breadcrumb">
+        <ul>
+            <li><a href="@Comunidad.Url"><strong>@Html.GetText("COMMON", "HOME")</strong></a></li>
+            <li>@Html.GetText("BANDEJAENTRADA", "COMENTARIOS")</li>
+        </ul>
+    </div>
+
+
+    @* Header o cabecera donde aparecen los resultados o recursos de una comunidad *@
+    @Html.PartialView("_partial-views/_list-header")
+
+    @* Columna para filtrado de mensajes: Columna izquierda *@
+    <div class="col col-12 col-xl-3 col-facetas col-lateral izquierda">
+        @Html.PartialView("_partial-views/_list-content-facetes")
+    </div>
+
+    @* Columna central-derecha para listado de mensajes *@
+    <div class="col col-12 col-xl-9 col-contenido derecha">
+        <input type="hidden" value="recibidos" class="tipoBandeja" />
+
+        <div class="wrapCol">
+            @* Contenedor del buscador principal *@
+            @Html.PartialView("_partial-views/_searcher")
+
+            @* Listado de resultados (resource-list) donde aparecerán los mensajes-items *@
+            @Html.PartialView("_partial-views/_list-content", Model)
+        </div>
+    </div>
+</div>
+
+
+<script defer="defer" lang="javascript" type="text/javascript">
+
+    $(function () {
+        FiltrarPorFacetas(ObtenerHash2());
+        MontarFechas();
+    });
+
+
+    @Html.Raw(Html.GetJSExtra());
+    
+	(function ($) {
+        // Inicio de scripts para gestión de mensajes / comentarios de Gnoss
+        const pParams = {
+            urlDeleteMessages: '',
+            msgConfirmacionEliminar: '',
+            actionButtons: {
+                idMessageActionSelectAll: '@idMessageActionSelectAll',
+                idMessageActionSelectNone: '@idMessageActionSelectNone',
+                idMessageActionSelectRead: '@idMessageActionSelectRead',
+                idMessageActionSelectNotRead: '@idMessageActionSelectNotRead',
+            },
+            loadMessages: false,
+        }
+        operativaMensajeriaGnoss.init(pParams);
+	 })();
+
+</script>

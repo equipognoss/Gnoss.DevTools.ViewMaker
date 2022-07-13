@@ -1,0 +1,54 @@
+﻿@using Es.Riam.Gnoss.Web.MVC.Models;
+@if (Html.GetComunidad() != null)
+{
+@*
+Descripción
+-----------------------------------------------
+Vista que se utiliza principalmente en la home de la comunidad y sirve para realizar búsquedas en la comunidad. El buscador se encuentra en la parte superior de la home, justo después del breadcrumb/migas de pan.
+Variables
+----------------------------------------------------------------
+*@
+
+HeaderModel cabecera = Html.GetCabecera();
+//UserProfileModel perfil = Html.GetPerfil();
+CommunityModel Comunidad = Html.GetComunidad();
+//UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
+
+@*
+----------------------------------------------------------------
+-------------------- Buscador de la home de la comunidad --------------------
+*@
+
+@*Buscador utilizado para buscar en toda la comunidad o en todo GNOSS*@
+
+
+<div id="buscador" style="position: relative">
+    @* Formulario del buscador *@
+    <form id="formBuscador">
+        <fieldset style="display: block" class="form-inline">
+            <legend class="nota">buscador</legend>           
+            @* Buscador *@            
+            <div class="fieldsetGroup finderUtils">
+                <div class="group finderSection position-relative">
+                    <label for="criterio" class="nota">Buscar en &nbsp;</label>
+                    @* Caja de texto para buscar *@                    
+                    <input type="text" id="txtBusquedaPrincipal" class="autocompletar not-outline finderSectionText" autocomplete="off" placeholder="Buscar en sección" />
+
+                    @* Loading de carga de Metabuscdor *@                    
+                    <div id="metabuscador-loading" class="spinner-border spinner-border-sm d-none" role="status">
+                        <span class="sr-only">Cargando</span>
+                    </div>   
+
+                    @* Botón de búsqueda que será la propia lupa*@
+                    <input type="button" title="@Html.GetText("METABUSCADOR", "ENCONTRAR")" class="encontrar findAction" id="btnBuscarPrincipal" />
+
+                    @* Vista de resultados del metaBuscador*@
+                    @Html.PartialView("_partial-views/_meta-searcher-results")
+                </div>
+            </div>
+        </fieldset>
+    </form>
+</div>
+
+}

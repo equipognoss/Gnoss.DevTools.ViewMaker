@@ -1,0 +1,36 @@
+﻿@model SolicitudesGrupoViewModel
+@*
+Descripción
+-----------------------------------------------
+Nueva vista que muestra el header de la lista de items-recursos que aparecerá en la zona central-derecha de la página web. Contendría:
+- Recursos y el número de estos
+- ComboBox para "Descargar" (__resource-list-actions)
+- ComboBox para "Ordenar" (__resource-list-actions)
+- ComboBox para "Visualizar" (__resource-list-actions)
+- Panel con etiquetas con las búsquedas realizadas
+
+
+Variables
+----------------------------------------------------------------*@
+@{
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Cabecera-Header de lista de recursos dentro de una comunidad --------------------
+*@
+
+@* Contenedor de la cabecera de resultados con recursos de la Comunidad *@
+<div class="header-contenido">
+    <div class="h1-container">
+        @if (Model.GrupoFiltroID.Equals(Guid.Empty) || !Model.Grupos.ContainsKey(Model.GrupoFiltroID))
+        {
+            <h2>@Html.GetText("GRUPO", "SOLICITUDES")</h2>
+        }
+        else
+        {
+            <h2>@Html.GetText("GRUPO", "SOLICITUDESALGRUPO", Model.Grupos[Model.GrupoFiltroID])</h2>
+        }        
+    </div>
+</div>

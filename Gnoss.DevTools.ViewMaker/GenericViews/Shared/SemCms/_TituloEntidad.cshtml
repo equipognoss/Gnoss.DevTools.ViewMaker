@@ -1,0 +1,33 @@
+﻿@model SemanticEntityModel
+
+@if (Model.Entity.TipoEntidad != "DocumentoGnoss" && !string.IsNullOrEmpty(Model.EntityNameForTitle))
+{
+    if (!Model.SpecificationEntity.DivEntidadDesplegable)
+    {
+        string classTit = "";
+
+        if (Model.SpecificationEntity.ClaseCssPanelTitulo != null)
+        {
+            classTit = " class=" + Model.SpecificationEntity.ClaseCssPanelTitulo;
+        }
+
+        if (!Model.ReadMode && Model.SpecificationEntity.TagNameTituloEdicion != null)
+        {
+            @Html.Raw("<" + Model.SpecificationEntity.TagNameTituloEdicion + classTit + ">" + Model.EntityNameForTitle + "</" + Model.SpecificationEntity.TagNameTituloEdicion + ">");
+        }
+        else if (Model.ReadMode && Model.SpecificationEntity.TagNameTituloLectura != null)
+        {
+            @Html.Raw("<" + Model.SpecificationEntity.TagNameTituloLectura + classTit + ">" + Model.EntityNameForTitle + "</" + Model.SpecificationEntity.TagNameTituloLectura + ">");
+        }
+        else
+        {
+            @Html.Raw("<h" + Model.Depth + classTit + (Model.Depth == 1 ? " id=\"htitPag\"" : "") + ">" + Model.EntityNameForTitle + "</h" + Model.Depth + ">");
+        }
+    }
+    else //TODO XX
+    {
+        <div>
+            <a>@Model.EntityNameForTitle</a>
+        </div>
+    }
+}

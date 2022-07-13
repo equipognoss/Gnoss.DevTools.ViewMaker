@@ -1,0 +1,92 @@
+﻿@model ProfilePageViewModel
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra información de la ficha de perfil de un usuario cuando el usuario no está logueado, es decir, es invitado.
+
+Variables
+----------------------------------------------------------------
+*@
+@{ 
+ProfileModel Perfil = Model.Profile;
+CommunityModel Comunidad = Html.GetComunidad();
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+
+string nombreCompleto = Html.ObtenerNombreCompletoDeFichaIdentidad(Perfil);
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista ficha de perfil de un usuario cuando se está como Invitado o no logueado --------------------
+*@
+
+@* Row principal *@
+<div class="row">
+    @*Breadcrumb / Migas de pan en la home*@
+    <div class="col col-12 col-breadcrumb" id="breadcrumb">
+        <ul>
+            <li><a href="@Comunidad.Url"><strong>@Html.GetText("COMMON", "HOME")</strong></a></li>
+            <li><a href="@Comunidad.Url/@Html.GetText("URLSEM", "PERSONASYORGANIZACIONES")">@Html.GetText("COMMON", "PERSONASYORGANIZACIONES")</a></li>
+            <li>@nombreCompleto</li>
+        </ul>
+    </div>
+
+    @* Sección izquierda-central*@
+    <div class="col col-12 col-xl-8 col-contenido izquierda">
+        @* Contenedor de columna *@
+        <div class="wrapCol">
+            @* Contenido - Data de la columna izquierda-central *@
+            <div class="contenido">
+                @* Cabecera de perfil del usuario - Nombre, Puesto, Fotografía... *@
+                <div class="perfil-cabecera">
+                    @* Contenedor del usuario: Nombre, Miniatura Imagen del usuario y Acciones del usuario *@
+                    <div class="user-miniatura">
+                        <div class="imagen-usuario-wrap">
+                            <div class="imagen sinImagen">
+                                <span class="material-icons">person</span>
+                            </div>
+                        </div>
+                        @* Contenedor para Nombre y puesto *@
+                        <div class="nombre-usuario-wrap">
+                            <p class="nombre">@Html.TruncateString(nombreCompleto, 30)</p>                           
+                            @*<p class="nombre-completo">@Html.TruncateString(nombreCompleto, 30)</p>*@
+                        </div>
+                    </div>
+                </div>
+
+                @* Controlar si el usuario está logueado -> Ver toda la información o no (Sin diseño de Dewenir) *@
+                @if (IdentidadActual.IsGuestIdentity)
+                {
+                    <div class="group content">
+                        <p>
+                            @if (IdentidadActual.IsGuestUser)
+                            {
+                                @Html.GetText("BUSQUEDAAVANZADA", "INICIOPERESPECIFICA")
+                                <a href="@Comunidad.Url/@Html.GetText("URLSEM", "HAZTEMIEMBRO")">@Html.GetText("COMINICIOLOGIN", "REGISTRATEPARTICIPA")</a>
+                                @Html.GetText("COMADMINCATEGORIAS", "O")
+                                <a href="@Comunidad.Url/@Html.GetText("URLSEM", "LOGIN")">@Html.GetText("COMINICIOLOGIN", "INICIASESION")</a>
+                            }
+                            else
+                            {
+                                @Html.GetText("BUSQUEDAAVANZADA", "INICIOPERESPECIFICA")
+                                <a href="@Comunidad.Url/@Html.GetText("URLSEM", "HAZTEMIEMBRO")">@Html.GetText("COMINICIOLOGIN", "HACERSEMIEMBRO")</a>
+                            }
+                        </p>
+                    </div>
+                }
+                @* Perfil no encontrado*@
+                else if (Perfil.Key == Guid.Empty)
+                {
+                    <div class="group content">
+                        <p>No se ha encontrado el perfil que está buscando</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+
+
+
+</div>
+    

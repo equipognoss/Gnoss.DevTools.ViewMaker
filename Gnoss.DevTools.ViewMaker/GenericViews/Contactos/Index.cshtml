@@ -1,0 +1,540 @@
+﻿@model int
+
+@{
+    int NumInvitacionesPendientes = Model;
+    
+    Html.SetBodyClass("layout02 listadoMyGnoss listadoContactosMyGnoss ");
+    
+    UserProfileModel Perfil = Html.GetPerfil();
+    UserIdentityModel Identidad = Html.GetIdentidadActual();
+
+    Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/ckeditor.js?v=" + Html.GetVersion());
+    Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/adapters/jquery.js?v=" + Html.GetVersion());
+}
+<div id="col01">
+    <div class="facetedSearch">
+        <div class="mgHerramientas">
+@*            <div class="group mgPerfil">
+                <div class="head-group">
+                    <p class="title">
+                        <strong>@Html.GetText("COMMON", "MODULOCONTACTOS", Html.GetNombreProyectoEcosistema())</strong>
+                    </p>
+                </div>
+                <div class="body-group">
+                    <ul class="listado">
+                        <li>
+                            <a href="@Perfil.Url@Html.GetText("URLSEM", "IMPORTARCONTACTOS")/@Html.GetText("URLSEM", "IMPORTAREMAIL")" title="@Html.GetText("COMMON", "INVITARGNOSS")">@Html.GetText("COMMON", "INVITARGNOSS")</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>*@
+            <div class="group mgPerfil">
+                <div class="head-group">
+                    <p class="title">
+                        <strong>@Html.GetText("CONTACTOS", "GESTIONCONTACTOS")</strong>
+                    </p>
+                </div>
+                <div class="body-group">
+                    <ul class="listado">
+                        <li>
+                            @if (NumInvitacionesPendientes == 0)
+                            { 
+                                @Html.GetText("BANDEJAENTRADA", "NOHAYINVITACIONES")
+                            }
+                            else
+                            {
+                                <a href="@Perfil.Url@Html.GetText("URLSEM", "INVITACIONES")">
+                                    @if (NumInvitacionesPendientes == 1)
+                                    {
+                                        @Html.GetText("BANDEJAENTRADA", "UNAINVITACION")
+                                    }
+                                    else
+                                    {
+                                        @Html.GetText("BANDEJAENTRADA", "NUMINVITACIONES", NumInvitacionesPendientes.ToString())
+                                    }
+                                </a>
+                            }
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="display: none" class="resaltarAccion" id="facetaEncuentra">
+        <h2>@Html.GetText("BUSCADORFACETADO", "ENCUENTRA")</h2>
+    </div>
+    <div id="divFac"></div>
+</div>
+<div id="col02">
+    <h2>Contactos</h2>
+    <div id="messagetools" class="messagetools listToolBar">
+        <div class="toolbar">
+            <ul id="panCrearGrupo">
+                <li class="looksbutton principal">
+                    <a onclick="javascript:seleccionarGrupos();">@Html.GetText("CONTACTOS", "CREARGRUPO")</a>
+                </li>
+            </ul>
+            <div style="display: block" id="panels">
+                <div  style="display: none" id="mensaje">
+                    <p>
+                        <span id="lblMensaje"></span>
+                    </p>
+                    <p class="cerrar">
+                        <a title="cerrar formulario" onclick="CerrarPanelAccion('mensaje')">cerrar x</a>
+                    </p>
+                </div>
+            </div>
+            <div style="display: block" id="panels">
+                <div id="contenedorPanEditorGrupos">
+                    <div class="stateShowForm" style="display: none;" id="panEditorGrupos">
+                        <div style="display: block;" class="box form activeForm" id="action">
+                            <div>
+                                <fieldset id="crearGrupo">
+                                    <legend>@Html.GetText("CONTACTOS", "CREARGRUPO")</legend>
+                                    <fieldset class="labels">
+                                        <p>
+                                            <label>@Html.GetText("COMMON", "NOMBRE"):</label>
+                                            <input type="text" class="text big" id="txtGroupName" />
+                                        </p>
+                                    </fieldset>
+                                    <fieldset>
+                                        <p>
+                                            <input type="button" onclick="crearGrupo();" value="@Html.GetText("CONTACTOS", "CREARGRUPO")" />
+                                        </p>
+                                    </fieldset>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <p class="cerrar">
+                            <a onclick="javascript:ocultarGrupos();">cerrar x</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="finderUtils"">
+            <div class="group filterSpace">
+                <div style="display: none" id="divFiltros">
+                    <p>
+                        <span>@Html.GetText("COMBUSQUEDAAVANZADA", "FILTROS"): </span>
+                        <a style="margin-left: 5px;" class="limpiarfiltros">@Html.GetText("COMBUSQUEDAAVANZADA", "LIMPIARFILTROS")</a>
+                    </p>
+                </div>
+                <ul class="facetedSearch tags"></ul>
+                <p id="divNumResultadosBusqueda"></p>
+            </div>
+            <div class="panelOrdenContenedor">
+                <div>
+                    <label>
+                        <select class="filtro">
+                            <option value="foaf:firstName">@Html.GetText("INVITACIONES", "NOMBRE")</option>
+                            <option value="foaf:familyName">@Html.GetText("INVITACIONES", "APELLIDOS")</option>
+                        </select>
+                    </label>
+                    <ul>
+                        <li class="ordenDescendente">
+                            <a class="filtro" name="orden|desc"></a>
+                        </li>
+                        <li class="ordenAscendente">
+                            <a class="filtro" name="orden|asc"></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="resource-list listView" id="divPanListado">
+            <div class="listadoRecursos">
+                <div id="divRel">
+                </div>
+            </div>
+        </div>
+        <div id="navegadorBusqueda">
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    $(function () {
+        FiltrarPorFacetas(ObtenerHash2());
+    });
+
+    function seleccionarGrupos() {
+        $('#panCrearGrupo').hide();
+        $('#panEditorGrupos').show();
+    }
+
+    function ocultarGrupos() {
+        $('#panCrearGrupo').show();
+        $('#panEditorGrupos').hide();
+    }
+
+    function crearGrupo()
+    {
+        MostrarUpdateProgress();
+
+        var params = {
+            GroupName: $('#txtGroupName').val()
+        }
+        GnossPeticionAjax("@Html.GetUrlPagina()/create-group", params, true).done(function (texto) {
+            $('#mensaje').attr("class", "ok");
+            $('#txtGroupName').val('');
+            FiltrarPorFacetas(ObtenerHash2());
+        }).fail(function (texto) {
+            $('#mensaje').attr("class", "ko");
+        }).always(function (texto) {
+            $('#lblMensaje').html(texto);
+            $('#mensaje').show();
+            OcultarUpdateProgress();
+        });
+    }
+
+    function MostrarConfirmacionMVC(control, mensaje, accion) {
+        if (control.children('.confirmar').length > 0) {
+            var anterior = control.children('.confirmar')[0];
+            anterior.remove();
+        }        
+        var htmlConfirmar =
+        '<div class="confirmar confirmacionSencilla" style="display:block;z-index:1000">' +
+        '<div class="mascara"></div>' +
+        '<div class="pregunta"><span>' + mensaje + '</span>' +
+        '<label class="btAzul boton botonancho floatRight right10"><strong><a class="botonConfirmacion">' + borr.si + '</a></strong></label>' +
+        '<label class="btAzul boton botonancho floatRight right10"><strong><a class="botonConfirmacion">' + borr.no + '</a></strong></label>' +
+        '</div>' +
+        '</div>';
+
+        var panConfirmar = $([htmlConfirmar].join(''));
+
+        panConfirmar.prependTo(control)
+        .find('a.botonConfirmacion').click(function () { // Ambos botones hacen desaparecer la mascara
+            panConfirmar.css('display', 'none');
+        }).eq(0).click(accion); // pero solo el primero activa la funcionConfirmada
+    }
+
+    function EliminarContacto(pIdentidad) {
+        MostrarConfirmacionMVC($('#contact_' + pIdentidad), '@Html.GetText("CONTACTOS", "CONFIRMACIONELIMINARCONTACTO")', function () {
+            MostrarUpdateProgress();
+
+            var params = {
+                ContactID: pIdentidad
+            }
+
+            GnossPeticionAjax("@Html.GetUrlPagina()/delete-contact", params, true)
+            .done(function () {
+                FiltrarPorFacetas(ObtenerHash2());
+            });
+        });
+    }
+
+    function EliminarGrupo(pIdGrupo) {
+        MostrarConfirmacionMVC($('#contact_' + pIdGrupo), '@Html.GetText("CONTACTOS", "CONFIRMACIONELIMINARGRUPO")', function () {
+            MostrarUpdateProgress();
+
+            var params = {
+                GroupID: pIdGrupo
+            }
+
+            GnossPeticionAjax("@Html.GetUrlPagina()/delete-group", params, true)
+            .done(function () {
+                FiltrarPorFacetas(ObtenerHash2());
+            });
+        });
+    }
+
+    function EliminarContactoDeGrupo(pGrupo, pIdentidad) {
+        MostrarConfirmacionMVC($('#contact_' + pGrupo), '@Html.GetText("CONTACTOS", "CONFIRMACIONELIMINARDEGRUPO")', function () {
+            MostrarUpdateProgress();
+
+            var params = {
+                ContactID: pIdentidad,
+                GroupID: pGrupo
+            }
+
+            GnossPeticionAjax("@Html.GetUrlPagina()/delete-member-group", params, true)
+            .done(function () {
+                FiltrarPorFacetas(ObtenerHash2());
+            });
+        });
+    }
+
+    function EliminarGrupoDeContacto(pIdentidad, pGrupo) {
+        MostrarConfirmacionMVC($('#contact_' + pIdentidad), '@Html.GetText("CONTACTOS", "CONFIRMACIONELIMINARDEGRUPO")', function () {
+            MostrarUpdateProgress();
+
+            var params = {
+                ContactID: pIdentidad,
+                GroupID: pGrupo
+            }
+
+            GnossPeticionAjax("@Html.GetUrlPagina()/delete-member-group", params, true)
+            .done(function () {
+                FiltrarPorFacetas(ObtenerHash2());
+            });
+        });
+    }
+
+    function AccionEditarNombreGrupoMVC(texto, grupoId, textoInferior) {
+        var $c = $('#' + grupoId);
+        var $anterior = $c.children();
+        if ($anterior.length > 0) {
+            $anterior.remove();
+        }
+
+        var accion = "javascript:EditarNombreGrupoMVC('" + grupoId + "');";
+
+        var $confirmar = $(['<div><p>', texto, '</p><br><p class="small"><br>', textoInferior, '</p><br><input type="text" id="txtNombreGrupo"></input><input type="button" value="Aceptar" onclick="' + accion + '" class="btMini"></input></div>'].join(''));
+        $confirmar.prependTo($c)
+    .find('button').click(function () { // Ambos botones hacen desaparecer la mascara
+        $c.parents('.stateShowForm').css({ display: 'none' });
+        $confirmar.css({ display: 'none' });
+    }).eq(0).click(accion); // pero solo el primero activa la funcionConfirmada
+    }
+
+    function EditarNombreGrupoMVC(grupoId) {
+        MostrarUpdateProgress();
+        var nombreGrupo = $('#desplegable_' + grupoId + ' input#txtNombreGrupo').val().replace(/&/g, '[-|-]');
+
+        var params = {
+            GroupID: grupoId,
+            GroupName: nombreGrupo
+        }
+
+        GnossPeticionAjax("@Html.GetUrlPagina()/change-group-name", params, true)
+        .done(function () {
+            contenedorNombre = $('#contact_' + grupoId).find('.title h3');
+            contenedorNombre.text(nombreGrupo);
+            CerrarPanelAccion('desplegable_' + grupoId);
+        }).fail(function (error) {
+            AceptarPanelAccion("desplegable_" + grupoId, false, error);
+        }).always(function (error) {
+            OcultarUpdateProgress();
+        });
+    }
+
+    function AccionEnviarMensajeContacto(id, esGrupo) {
+        var $c = $('#' + id);
+        var $anterior = $c.children();
+        if ($anterior.length > 0) {
+            $anterior.remove();
+        }
+
+        if (CKEDITOR.instances["txtDescripcion_" + id] != null) {
+            CKEDITOR.instances["txtDescripcion_" + id].destroy();
+        }
+
+        var accion = "javascript:EnviarMensajeContacto('" + id + "', '" + esGrupo + "');";
+
+        var $confirmar = $(['<fieldset class="mediumLabels"><legend>', mensajes.enviarMensaje, '</legend><p><label for="txtAsunto_', id, '">', mensajes.asunto, '</label><input type="text" id="txtAsunto_', id, '" class="text big"></p><p><label for="txtDescripcion_', id, '">', mensajes.descripcion, '</label></p><p><textarea class="cke mensajes" id="txtDescripcion_', id, '" rows="2" cols="20"></textarea></p><p><label class="error" id="error_', id, '"></label></p><input type="button" onclick="', accion, '" value="', mensajes.enviar, '" class="text medium"></p></fieldset>'].join(''));
+        // Incrustamos el elemento a la vez que lo mostramos y definimos los eventos: 
+        $confirmar.prependTo($c)
+    .find('button').click(function () { // Ambos botones hacen desaparecer la mascara
+        $c.parents('.stateShowForm').css({ display: 'none' });
+        $confirmar.css({ display: 'none' });
+    }).eq(0).click(accion); // pero solo el primero activa la funcionConfirmada
+
+        if ($('#divContMensajesPerf').length > 0 && $('#divContMensajesPerf').html() == '') {
+            $('#divContMensajesPerf').html($('#desplegable_' + id).parent().html());
+            $('#desplegable_' + id).parent().html('');
+        }
+
+        MostrarPanelAccionDesp("desplegable_" + id, null);
+        RecargarTodosCKEditor();
+    }
+
+    function EnviarMensajeContacto(id, esGrupo) {
+        if ($('#txtAsunto_' + id).val() != '' && $('#txtDescripcion_' + id).val() != '') {
+            var asunto = $('#txtAsunto_' + id).val().replace(/&/g, '[-|-]');
+            var descripcion = $('#txtDescripcion_' + id).val().replace(/&/g, '[-|-]');
+            MostrarUpdateProgress();
+
+            var params = {
+                ContactID: id,
+                Subject: asunto,
+                Body: Encoder.htmlEncode(descripcion.replace(/\n/g, ''))
+            }
+
+            var url = "@Html.GetUrlPagina()/send-message";
+
+            if (esGrupo == "True")
+            {
+                url = "@Html.GetUrlPagina()/send-message-group";
+            }
+
+            GnossPeticionAjax(url, params, true)
+             .done(function () {
+                 AceptarPanelAccion("desplegable_" + id, true, "@Html.GetText("BANDEJAENTRADA", "MENSAJEENVIADO")");
+             }).fail(function (error) {
+                 AceptarPanelAccion("desplegable_" + id, false, "@Html.GetText("BANDEJAENTRADA", "MENSAJENOENVIADO")");
+             }).always(function (error) {
+                 OcultarUpdateProgress();
+             });
+        }
+        else {
+            $('#error_' + id).html(mensajes.mensajeError);
+        }
+    }
+
+    function AgregarContactosGrupo(grupoID)
+    {
+        MostrarPanelAccionDesp('desplegable_' + grupoID, null, false, true);
+
+        $("#input_" + grupoID).autocomplete(
+            null,
+            {
+                url: $('#inpt_urlServicioAutocompletar').val() + "/AutoCompletarContactosYGrupos",
+                delay: 0,
+                multiple: true,
+                scroll: false,
+                selectFirst: false,
+                minChars: 1,
+                width: 300,
+                cacheLength: 0,
+                NoPintarSeleccionado: true,
+                txtValoresSeleccID: "input_" + grupoID + "_hack",
+                extraParams: {
+                    identidad: "@Identidad.KeyIdentity",
+                    esOrganizacion: false,
+                    traerContactos: true,
+                    traerGrupos: false
+                }
+            });
+        $("#input_" + grupoID).result(function (event, data, formatted) {
+            crearMiembro(null, data[0], data[1], "input_" + grupoID, "divResultados_" + grupoID, "input_" + grupoID + "_hack");
+        });
+    }
+
+    function crearMiembro(ficha, nombre, identidad, regionAutocompletar, contenedorID, regionAutocompletarHack) {
+        $('#' + regionAutocompletar).val('');
+        $('#selector').css('display', 'none');
+
+        var contenedor = $('#' + contenedorID);
+        if (contenedor.html().trim().indexOf('<ul') == 0) { contenedor.html(contenedor.html().replace('<ul class=\"tags\">', '').replace('</ul>', '')); }
+        contenedor.html('<ul class=\"tags\">' + contenedor.html() + '<li identidad = \"' + identidad + '\" nombre = \"' + nombre + '\">' + nombre + '<a class="remove" onclick="javascript: eliminarMiembro(null,this,\'' + identidad + '\',\'' + contenedorID + '\',\'' + regionAutocompletarHack + '\');">' + borr.eliminar + '</a></li>' + '</ul>');
+
+        $('#' + regionAutocompletarHack).val($('#' + regionAutocompletarHack).val() + "," + identidad);
+    }
+
+    function AgregarTodosContactosAGrupos(grupoID) {
+        var elemLista = $('#divResultados_' + grupoID).find('li');
+
+        var listaContactos = "";
+        var identidad = '';
+        var nombre = '';
+        contenedorResultados = $('#divResultados_' + grupoID);
+        contenedorEtiquetas = $('#divMembers_' + grupoID);
+
+        for (var i = 0; i < elemLista.length; i++) {
+            listaContactos += (elemLista[i].getAttribute('identidad') + '&');
+            identidad = elemLista[i].getAttribute('identidad');
+            nombre = elemLista[i].getAttribute('nombre');
+            if (contenedorEtiquetas.html().indexOf('<li id=') != -1) {
+                contenedorEtiquetas.find('ul.tags').html(contenedorEtiquetas.find('ul.tags').html() + '<li id="' + grupoID + '_' + identidad + '">' + nombre + '<a class="remove"  onclick="javascript:EliminarContactoDeGrupo(\'' + grupoID + '\',\'' + identidad + '\');">Eliminar</a>');
+
+            } else {
+                contenedorEtiquetas.html('<div><p>Personas: </p><ul class="tags"><li id="' + grupoID + '_' + identidad + '">' + nombre + '<a class="remove"  onclick="javascript:EliminarContactoDeGrupo(\'' + grupoID + '\',\'' + identidad + '\');">Eliminar</a></div>');
+            }
+        }
+
+        contenedorResultados.find('ul.tags').html('');
+        CerrarPanelAccion('desplegable_' + grupoID);
+
+        var params = {
+            GroupID: grupoID,
+            ContactsList: listaContactos
+        }
+        GnossPeticionAjax("@Html.GetUrlPagina()/add-contacts-group", params, true);
+    }
+
+    function eliminarMiembro(fichaId, nombre, identidad, contenedorID, regionAutocompletarHack) {
+        contenedor = $('#' + contenedorID);
+        contenedor[0].children[0].removeChild(nombre.parentNode);
+        $('#' + regionAutocompletarHack).val($('#' + regionAutocompletarHack).val().replace(',' + identidad, ''));
+
+    }
+
+    function AgregarGruposContacto(contactoID) {
+        MostrarPanelAccionDesp('desplegable_' + contactoID, null, false, true);
+
+        $("#input_" + contactoID).autocomplete(
+            null,
+            {
+                url: $('#inpt_urlServicioAutocompletar').val() + "/AutoCompletarContactosYGrupos",
+                delay: 0,
+                multiple: true,
+                scroll: false,
+                selectFirst: false,
+                minChars: 1,
+                width: 300,
+                cacheLength: 0,
+                NoPintarSeleccionado: true,
+                txtValoresSeleccID: "input_" + contactoID + "_hack",
+                extraParams: {
+                    identidad: "@Identidad.KeyIdentity",
+                    esOrganizacion: false,
+                    traerContactos: false,
+                    traerGrupos: true
+                }
+            });
+        $("#input_" + contactoID).result(function (event, data, formatted) {
+            crearMiembro(null, data[0], data[1], "input_" + contactoID, "divResultados_" + contactoID, "input_" + contactoID + "_hack");
+        });
+    }
+
+
+    function AgregarTodosGruposAContactos(contactoID) {
+        var elemLista = $('#divResultados_' + contactoID).find('li');
+
+        var listaGrupos = '';
+        var identidad = '';
+        var nombre = '';
+        contenedorResultados = $('#divResultados_' + contactoID);
+        contenedorEtiquetas = $('#divGroups_' + contactoID);
+
+        for (var i = 0; i < elemLista.length; i++) {
+
+            listaGrupos += (elemLista[i].getAttribute('identidad') + '&');
+
+            identidad = elemLista[i].getAttribute('identidad');
+            nombre = elemLista[i].getAttribute('nombre');
+            if (contenedorEtiquetas.html().indexOf('<li id=') != -1) {
+                contenedorEtiquetas.find('ul.tags').html(contenedorEtiquetas.find('ul.tags').html() + '<li id="' + contactoID + '_' + identidad + '">' + nombre + '<a class="remove"  onclick="javascript:EliminarGrupoDeContacto(\'' + contactoID + '\',\'' + identidad + '\')">Eliminar</a>');
+
+            } else {
+                contenedorEtiquetas.html('<div><p>Añadido a: </p><ul class="tags"><li id="' + contactoID + '_' + identidad + '">' + nombre + '<a class="remove"  onclick="javascript:EliminarGrupoDeContacto(\'' + contactoID + '\',\'' + identidad + '\')">Eliminar</a>');
+            }
+
+            contenedorResultados.find('ul.tags').html('');
+            CerrarPanelAccion('desplegable_' + contactoID);
+
+            var params = {
+                ContactID: contactoID,
+                GroupsList: listaGrupos
+            }
+            GnossPeticionAjax("@Html.GetUrlPagina()/add-groups-contact", params, true);
+        }
+    }
+
+
+   
+    //function DarAccesoAGrupoAMiembros(pPanID, pIdGrupo) {
+
+    //    //Ocultamos los paneles desplegables anteriores.
+    //    $('.divContAccList').children().each(function limpiarPaneles() {
+    //        $(this).remove();
+    //    });
+
+    //    MostrarUpdateProgress();
+    //    //Mostrar el selector de miembros de la comunidad
+    //    var args = 'FichaGrupo_DarAccesoAGrupoAMiembros&' + pIdGrupo;
+    //    WebForm_DoCallback('__Page', args, ReceiveServerData, '', null, false);
+
+
+    //}
+
+
+    @Html.Raw(Html.GetJSExtra());
+       
+</script>

@@ -1,0 +1,263 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Como su propio nombre indica, es el footer de la web. Contiene:
+- Aviso legal
+- Política de cookies
+- Link a Gnoss.com
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+UserProfileModel Perfil = Html.GetPerfil();
+CommunityModel Comunidad = Html.GetComunidad();
+@* Controlar NombreEcosistema para mostrar o no enlaces *@
+string NombreProyectoEcosistema = Html.GetNombreProyectoEcosistema();
+
+bool isGnossEcosistema = NombreProyectoEcosistema.ToLower().Contains("gnoss") ? true : false;
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Pie / Footer --------------------
+*@
+ 
+<div class="container">
+    <footer id="footer" class="row">
+        <div class="col">
+            <div class="wrapCol">
+                <div class="logo">
+                    <p>
+                        @if (!string.IsNullOrEmpty(Comunidad.Copyright))
+                        {
+                            @Comunidad.Copyright @DateTime.Now.Year.ToString();
+                        }
+                        else
+                        {
+                            <text>© RIAM I+L Lab </text> @DateTime.Now.Year.ToString() <text> myGNOSS - Todos los derechos reservados</text>;
+                        }
+
+                    </p>
+                </div>
+                @* Enlaces del footer *@
+                <div class="enlaces">
+                    <ul>
+                        @* Aviso Legal *@
+                        @if (!string.IsNullOrEmpty(Comunidad.ExternalUrlCookieNotice))
+                        {
+                            <li>
+                                <a href="@Comunidad.ExternalUrlCookieNotice" target="_blank">Aviso Legal</a>
+                            </li>
+                        }else{
+                            <li>
+                                @*
+                                <a 
+                                   style="cursor:pointer"
+                                   class="link"
+                                   data-toggle="modal"
+                                   data-target="#modal-politica-cookies">
+                                    @Html.GetText("FOOTER", "POLITICACOOKIES")
+                                </a>*@
+                                <a
+                                    style="cursor: pointer"
+                                    class="link"
+	                                onclick="DeployActionInModalPanel('@Comunidad.Url/@Html.GetText("URLSEM", "POLITICACOOKIES")/load-modal', this, 'modal-dinamic-content', '');"	                                    
+	                                data-toggle="modal"
+	                                data-target="#modal-container"
+                                >	                                    
+	                                @Html.GetText("FOOTER", "POLITICACOOKIES")
+                                </a>
+                            </li>
+
+                        }
+                        @* Política de privacidad *@
+                        @if (!Comunidad.IsCatalog)
+                        {
+                            <li>
+                                @if (!Comunidad.Key.Equals(ProyectoAD.MetaProyecto))
+                                {
+                                    @*
+                                    <a 
+                                       style="cursor:pointer"
+                                       class="link"
+                                       data-toggle="modal"
+                                       data-target="#modal-politica-privacidad">
+                                        @Html.GetText("FOOTER", "PRIVACIDAD")
+                                    </a>
+                                    *@
+                                    <a
+                                        style="cursor: pointer"
+                                        class="link"
+	                                    onclick="DeployActionInModalPanel('@Comunidad.Url/@Html.GetText("URLSEM", "PRIVACIDADENLACE")/load-modal', this, 'modal-dinamic-content', '');"	                                    
+	                                    data-toggle="modal"
+	                                    data-target="#modal-container"
+                                    >	                                    
+	                                    @Html.GetText("FOOTER", "PRIVACIDAD")
+                                    </a>
+                                }
+                                else
+                                {
+                                    @*
+                                    <a 
+                                       style="cursor:pointer"
+                                       class="link"
+                                       data-toggle="modal"
+                                       data-target="#modal-politica-privacidad">
+                                        @Html.GetText("FOOTER", "PRIVACIDAD")
+                                    </a>*@
+                                    <a
+                                        style="cursor: pointer"
+                                        class="link"
+	                                    onclick="DeployActionInModalPanel('@Perfil.Url/@Html.GetText("URLSEM", "PRIVACIDADENLACE")/load-modal', this, 'modal-dinamic-content', '');"	                                    
+	                                    data-toggle="modal"
+	                                    data-target="#modal-container"
+                                    >	                                    
+	                                    @Html.GetText("FOOTER", "PRIVACIDAD")
+                                    </a>
+                                }
+                            </li>
+                        }
+
+
+                        @* Política de Cookies*@
+                        @if (Comunidad.CookieNotice)
+                        {
+                            <li>
+                                @if (!string.IsNullOrEmpty(Comunidad.ExternalUrlCookieNotice))
+                                {
+                                    @*
+                                    <a 
+                                       style="cursor:pointer"
+                                       class="link"
+                                       data-toggle="modal"
+                                       data-target="#modal-politica-cookies">
+                                        @Html.GetText("FOOTER", "POLITICACOOKIES")
+                                    </a>*@
+                                    <a
+                                        style="cursor: pointer"
+                                        class="link"
+	                                    onclick="DeployActionInModalPanel('@Comunidad.Url/@Html.GetText("URLSEM", "POLITICACOOKIES")/load-modal', this, 'modal-dinamic-content', '');"	                                    
+	                                    data-toggle="modal"
+	                                    data-target="#modal-container"
+                                    >	                                    
+	                                    @Html.GetText("FOOTER", "POLITICACOOKIES")
+                                    </a>
+                                }
+                            </li>
+                        }
+
+                        @* Condiciones de uso *@
+                        @if (!Comunidad.Key.Equals(ProyectoAD.MetaProyecto))
+                        {
+                            if (Comunidad.ClausesRegister)
+                            {
+                                <li>
+                                    <a
+                                        style="cursor: pointer"
+                                        class="link"
+	                                    onclick="DeployActionInModalPanel('@Comunidad.Url/@Html.GetText("URLSEM", "CONDICIONESUSO")/load-modal', this, 'modal-dinamic-content', '');"	                                    
+	                                    data-toggle="modal"
+	                                    data-target="#modal-container"
+                                    >	                                    
+	                                    @Html.GetText("FOOTER", "CONDICIONESDEUSOCOM")
+                                    </a>
+
+                                    @*<a 
+                                       style="cursor:pointer"
+                                       class="link"
+                                       data-toggle="modal"
+                                       data-target="#modal-condiciones-uso">
+                                        @Html.GetText("FOOTER", "CONDICIONESDEUSOCOM")
+                                    </a>
+                                    *@
+                                </li>
+                            }
+                            else
+                            {
+                                <li>
+                                    @*<a 
+                                       style="cursor:pointer"
+                                       class="link"
+                                       data-toggle="modal"
+                                       data-target="#modal-condiciones-uso">
+                                        @Html.GetText("FOOTER", "CONDICIONESDEUSOCOM")
+                                    </a>*@
+                                    <a
+                                        style="cursor: pointer"
+                                        class="link"
+	                                    onclick="DeployActionInModalPanel('@Comunidad.Url/@Html.GetText("URLSEM", "CONDICIONESUSO")/load-modal', this, 'modal-dinamic-content', '');"	                                    
+	                                    data-toggle="modal"
+	                                    data-target="#modal-container"
+                                    >	                                    
+	                                    @Html.GetText("FOOTER", "CONDICIONESDEUSO")
+                                    </a>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            if (string.IsNullOrEmpty(Comunidad.Copyright))
+                            {
+                                //Si no hay copyright
+                                <li>
+                                    @*<a 
+                                       style="cursor:pointer"
+                                       class="link"
+                                       data-toggle="modal"
+                                       data-target="#modal-condiciones-uso">
+                                        @Html.GetText("FOOTER", "CONDICIONESUSO")
+                                    </a>
+                                    *@
+                                </li>
+                            }
+                            else
+                            {
+                                <li>
+                                    @*
+                                    <a 
+                                       style="cursor:pointer"
+                                       class="link"
+                                       data-toggle="modal"
+                                       data-target="#modal-condiciones-uso">
+                                        @Html.GetText("FOOTER", "TITULOCOM", NombreProyectoEcosistema)
+                                    </a>
+                                    *@
+                                    <a
+                                        style="cursor: pointer"
+                                        class="link"
+	                                    onclick="DeployActionInModalPanel('@Comunidad.Url/@Html.GetText("URLSEM", "CONDICIONESUSO")/load-modal', this, 'modal-dinamic-content', '');"	                                    
+	                                    data-toggle="modal"
+	                                    data-target="#modal-container"
+                                    >	                                    
+	                                    @Html.GetText("FOOTER", "TITULOCOM", NombreProyectoEcosistema)
+                                    </a>
+                                </li>
+                            }
+                        }
+
+                        @* Acerca de *@
+                        @if (Comunidad.IsCatalog && !Comunidad.Key.Equals(ProyectoAD.MetaProyecto))
+                        {
+                            <li>
+                                <a href="@Comunidad.Url/@Html.GetText("URLSEM", "ACERCADE")">@Html.GetText("COMMON", "ACERCADE")</a>
+                            </li>
+                        }                        
+
+                        @* Mostrar Powered by Gnoss si la MetaComunidad no es GNOSS *@
+                        @if (!isGnossEcosistema) {                            
+                            <li>                                
+                                <a href="https://www.gnoss.com/" alt="Powered by Gnoss" title="Powered by Gnoss">
+                                    Powered by Gnoss
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+                @* Idiomas disponibles *@                
+                @Html.PartialView("../Shared/_pie/_partial-views/_select-language")
+            </div>
+        </div>
+    </footer>
+</div>
+

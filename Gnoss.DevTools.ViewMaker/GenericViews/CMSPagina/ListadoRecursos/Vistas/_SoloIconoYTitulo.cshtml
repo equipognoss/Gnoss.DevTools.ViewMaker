@@ -1,0 +1,45 @@
+﻿@model ResourceModel
+@if (Model != null)
+{    
+   
+    string claseAux = "";
+    if (!string.IsNullOrEmpty(Model.UrlPreview))
+    {
+        claseAux += " conImagenAsociada";
+    }
+    <div class="resource @claseAux" >
+        <div class="box description">
+            <div class="wrapDescription">
+	            <div class="group title">
+	                <h2>
+                        <a href="@Model.CompletCardLink">@Model.Title</a>
+	                </h2>
+                    @if (!string.IsNullOrEmpty(Model.UrlPreview))
+                    {
+                        <div class="imagenAsociada">
+                            <p>
+                                <a href="@Model.UrlPreview">
+                                    <img width="120" title="@Model.Title" alt="@Model.Title" src="@Model.UrlPreview">
+                                </a>
+                            </p>
+                        </div>
+                        <p class="resourceType @(Model.TypeDocument == ResourceModel.DocumentType.Semantico?"semantico " + Model.RdfType:Model.NameImage)">
+                            <span>tipo de documento</span>
+                            <a href="@Model.CompletCardLink">@Model.NameImage</a>
+                        </p>
+                    }else{
+                        <p class="resourceType @(Model.TypeDocument == ResourceModel.DocumentType.Semantico?"semantico " + Model.RdfType:Model.NameImage)">
+                            <span>tipo de documento</span>
+                            <a href="@Model.CompletCardLink">@Model.NameImage</a>
+                        </p>
+                    }
+			    </div>	    		
+	        </div>
+	    </div>
+    </div>    
+    
+    
+    
+    
+    
+}

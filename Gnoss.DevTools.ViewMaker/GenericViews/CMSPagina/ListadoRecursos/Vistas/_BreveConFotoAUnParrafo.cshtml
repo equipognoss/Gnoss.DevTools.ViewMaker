@@ -1,0 +1,74 @@
+﻿@using Es.Riam.Util;
+@model ResourceModel
+
+@if (Model != null)
+{    
+    <div class="resource">
+        @if (!string.IsNullOrEmpty(Model.UrlPreview))
+        {
+            <div class="group image">
+                <img src="@Model.UrlPreview">
+            </div>
+        }
+        <div class="group title">
+            <h4>
+                <a href="@Model.CompletCardLink">@Model.Title</a>
+            </h4>
+        </div>
+        <div class="group date">
+            <p class="publicationDate">@Model.PublishDate.Day.ToString().@Model.PublishDate.Month.ToString().@Model.PublishDate.Year.ToString()</p>
+        </div>
+        @{
+        string descripcionAUnParrafo = Model.Description;
+
+        bool parrafoOK = false;
+        while (!parrafoOK)
+        {
+            int inicioParrafo = descripcionAUnParrafo.IndexOf("<p>");
+            if (inicioParrafo != -1)
+            {
+                descripcionAUnParrafo = descripcionAUnParrafo.Substring(inicioParrafo);
+                int finParrafo = descripcionAUnParrafo.IndexOf("</p>");
+                if (finParrafo != -1)
+                {
+                    string descripcionParrafo = descripcionAUnParrafo.Substring(0, finParrafo + 4);
+                    string descripcionParrafoSinHTML = UtilCadenas.EliminarHtmlDeTexto(descripcionParrafo);
+                    if (!string.IsNullOrEmpty(descripcionParrafoSinHTML))
+                    {
+                        parrafoOK = true;
+                        descripcionAUnParrafo = "<p>" + descripcionParrafoSinHTML + "</p>";
+                    }
+                    else
+                    {
+                        descripcionAUnParrafo = descripcionAUnParrafo.Replace(descripcionParrafo, "");
+                    }
+                }
+                else
+                {
+                    parrafoOK = true;
+                    descripcionAUnParrafo = "<p></p>";
+                }
+            }
+            else
+            {
+                parrafoOK = true;
+                descripcionAUnParrafo = "<p></p>";
+            }
+        }
+        }
+
+        @if (!string.IsNullOrEmpty(descripcionAUnParrafo))
+        {
+            <div class="group resume">
+                @Html.Raw(descripcionAUnParrafo)
+            </div>
+        }
+
+    </div>    
+    
+    
+        
+    
+    
+    
+}

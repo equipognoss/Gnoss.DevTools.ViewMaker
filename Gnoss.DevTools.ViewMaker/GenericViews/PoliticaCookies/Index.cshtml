@@ -1,0 +1,29 @@
+﻿@model string
+
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra la política de cookies de la web. Esta página se visualiza en una página "sola" aunque existe también un modal 
+la cual se muestra haciendo click desde el footer/pie.
+  
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Página de Política de Cookies  --------------------
+*@
+
+<div class="row">
+    <div class="col mt-5">
+        <h1>@Html.GetText("POLITICACOOKIES", "TITULO")</h1>        
+        <div class="box">
+                @Html.Raw(Model)
+        </div>        
+    </div>	
+</div>

@@ -1,0 +1,59 @@
+﻿@model AdministrarUsuariosOrganizacionViewModel
+
+@{
+    string urlBaseAcciones = Model.UrlFilter;
+}
+
+@*
+Descripción
+-----------------------------------------------
+Vista que se encarga de administrar las comunidades. El usuario debe disponer de permisos de administrador. En esta vista, se pueden hacer acciones tales como Asignar usuarios a comunidad, Abandonar la comunidad, Activar registro automático…)
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+CommunityModel Comunidad = Html.GetComunidad();
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+string urlAdministracion = Html.GetPerfil().Url + Html.GetText("URLSEM", "ADMINISTRACION") + "/";
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista índice para adminstrar organización: Usuarios, Grupos y Comunidades --------------------
+*@
+
+@* Input que guardará la URL para las acciones *@
+<input type="hidden" id="urlFilter" value="@Model.UrlFilter" />
+
+@* Indicarle a _list-content el tipo de items que se desean mostrar *@
+@{
+    string listItemType = (ViewData["UsuariosOrganizacionListItemType"] ?? string.Empty) as string;
+    if (!string.IsNullOrEmpty(listItemType))
+    {
+        ViewData.Add("UsuariosOrganizacionListItemType", "Comunidades");
+    }
+    else
+    {
+        // Actualizar el el tipo de dato que se desea mostrar en _list-content
+        ViewData["UsuariosOrganizacionListItemType"] = "Comunidades";
+    }
+}        
+
+@* Header de la página de listado de Comunidades *@
+@Html.PartialView("../UsuariosOrganizacion/_partial-views/_list-header", Model)
+
+@* Panel derecho-central donde estará el contenido del "buscador"*@
+<div class="col col-12 col-xl-12">
+    @* Div que envuelve todo el contenido central-derecho*@
+    <div class="wrapCol">
+        @* Buscador *@
+        @Html.PartialView("../UsuariosOrganizacion/_partial-views/_searcher", Model)
+
+        @* Contenido / Listado de resultados de Usuarios *@
+        @Html.PartialView("../UsuariosOrganizacion/_partial-views/_list-content", Model)
+    </div>
+
+</div>

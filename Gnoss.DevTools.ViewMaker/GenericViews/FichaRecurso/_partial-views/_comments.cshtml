@@ -1,0 +1,66 @@
+﻿@model ResourceViewModel
+@{
+    ResourceModel FichaDocumento = Model.Resource;
+    CommunityModel Comunidad = Html.GetComunidad();
+    UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+}
+
+
+@*
+Descripción
+-----------------------------------------------
+Vista que hace de contenedor de comentarios. Muestra todos los comentarios asociados a un determinado recurso. Contendrá:
+    - Vista parcial para añadir un comentario
+    - Vista parcial que contendrá todos los comentarios existentes de un recurso.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Contenedor de Comentarios de un recurso --------------------
+*@
+
+<div class="resource-comentarios" id="comentarios">
+
+    @* Título de sección Comentarios *@
+    <div class="comentarios-header">
+        <h2 class="seccion-title">
+            <span class="material-icons">mode_comment</span>            
+            @(FichaDocumento.NumComments == 1 ? Html.GetText("COMMON", "COMENTARIO").ToLower() : Html.GetText("COMMON", "COMENTARIOS").ToLower())&nbsp;(<span id="numComentarios">@FichaDocumento.NumComments</span>)
+        </h2>        
+    </div>
+
+    @* Controlar identidad para permitir enviar mensaje *@
+    @if (!IdentidadActual.IsGuestIdentity)
+    {
+        if (FichaDocumento.AllowComments)
+        {
+            @Html.PartialView("_partial-views/_comments-add");
+        }
+        else
+        {
+            <label><span>@Html.GetText("CONTROLESDOCUMENTACION", "COMENTARIOSBLOQUEADOS")</span></label>
+        }
+    }
+    else
+    {
+        <p>@Html.GetText("CONTROLESDOCUMENTACION", "QUIERESCOMENTAR") <a href="@Comunidad.Url/@Html.GetText("URLSEM", "HAZTEMIEMBRO")">@Html.GetText("COMMON", "REGISTRARSE")</a> @Html.GetText("PERFIL", "VISITANTEPERFILO") <a href="@Comunidad.Url/@Html.GetText("URLSEM", "LOGIN")">@Html.GetText("COMINICIOLOGIN", "INICIASESION")</a></p>
+    }
+
+    @* Listado de comentarios asociados al recurso *@
+    <div id="panComentarios" class="lista-comentarios">
+        @foreach (CommentModel comentario in FichaDocumento.Comments)
+        {
+            @Html.PartialView("_FichaComentario", comentario)            
+        }
+    </div>
+
+</div>
+
+

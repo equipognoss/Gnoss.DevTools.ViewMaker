@@ -1,0 +1,49 @@
+﻿@model SearchViewModel
+@*
+Descripción
+-----------------------------------------------
+Nueva vista que muestra las TAGS que se han utilizado o relacionadas con la búsqueda de Recursos.
+Estará localizada debajo de las acciones (Ordenar) dentro del header de buscador del recurso.
+
+
+Variables
+----------------------------------------------------------------
+*@
+
+@*
+----------------------------------------------------------------
+-------------------- Tags usados para buscar recursos realizados por el "buscador" de recursos --------------------
+*@
+
+@* Panel con TAGS usados en las búsqueda *@
+
+@* Versión anterior
+    <div style="display: none;" id="panFiltros">
+        <p>
+            <span>@Html.GetText("COMBUSQUEDAAVANZADA", "FILTROS"): </span>
+            <a style="margin-left: 5px;" href="@Html.GetUrlPagina()" class="limpiarfiltros">@Html.GetText("COMBUSQUEDAAVANZADA", "LIMPIARFILTROS")</a>
+        </p>
+        <ul class="facetedSearch tags" id="panListadoFiltros"><li style="display: none;"></li></ul>
+    </div>
+    <p id="panNumResultados">
+        @*<span class="counter" id="lblNumResultadosBusqueda"></span>*@
+@*</p>
+    <input type="submit" style="display: none;" id="enviarFormCajaBusqueda" value="enviar" title="enviar" />*@
+
+
+
+@* Panel con TAGS usados en las búsquedas *@
+<div class="etiquetas" id="panFiltros" style="display: none;">
+    <div class="group filterSpace">        
+            
+            @* Borrado de filtros lo muestro mejor en "CargarFacetas.cshtml" del servicio "ServicioCargarFacetas". Será una flecha que da la sensación que elimina todos los filtros *@
+            @*<p>
+                <span>@Html.GetText("COMBUSQUEDAAVANZADA", "FILTROS"): </span>
+                <a style="margin-left: 5px;" href="@Html.GetUrlPagina()" class="limpiarfiltros">@Html.GetText("COMBUSQUEDAAVANZADA", "LIMPIARFILTROS")</a>
+            </p>*@
+            <ul class="facetedSearch tags" id="panListadoFiltros"><li style="display: none;"></li></ul>
+        
+        <input type="submit" style="display: none;" id="enviarFormCajaBusqueda" value="enviar" title="enviar" />
+    </div>
+</div>
+

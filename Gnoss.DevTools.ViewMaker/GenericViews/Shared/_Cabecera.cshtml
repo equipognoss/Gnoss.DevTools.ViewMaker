@@ -1,0 +1,11 @@
+﻿@*
+    ESTA VISTA NO ES UTILIZADA EN EL NUEVO FRONT. No la elimino ya que puede tener interés de cara a revisión. Anteriormente se utilizaba _Cabecera_AnteriorEAD en el viejo front.
+*@
+@using Es.Riam.Gnoss.Web.MVC.Models;
+@if (Html.GetComunidad() != null)
+{
+    HeaderModel cabecera = Html.GetCabecera();
+
+    // Cabecera superior por defecto
+    @Html.PartialView("../Shared/_cabecera/_header");
+}

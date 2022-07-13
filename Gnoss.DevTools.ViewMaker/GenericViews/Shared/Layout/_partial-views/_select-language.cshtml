@@ -1,0 +1,76 @@
+﻿@using Es.Riam.Gnoss.Web.MVC.Models;
+@if (Html.GetComunidad() != null)
+{
+@*
+Descripción
+----------------------------------------------------------------
+Vista que contiene el botón para poder seleccionar el idioma deseado para la plataforma tratando de que esté accesible tal y como estaba en la versión anterior
+Este elemento se situa en el Pie/Footer, por lo que la vista es utilizada en el fichero "_Pie.cshtml"
+@*
+Variables
+----------------------------------------------------------------
+*@
+HeaderModel cabecera = Html.GetCabecera();
+@*
+----------------------------------------------------------------
+
+-------------------- Botón para seleccionar el idioma en la web --------------------
+    *@
+
+    @* Contenedor idiomas *@
+    <div class="idiomas">
+        @* Título/Label del Idioma *@
+        <p>Idioma:</p>
+        <div class="dropdown">
+            @* Mostrar el idioma que está seleccionado*@
+            <a href="#" class="dropdown-toggle" role="button" id="dropdownIdiomas" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                @Html.GetUtilIdiomas().LanguageCode.ToUpper()
+            </a>
+            @* Menú dropDown para selección de idioma *@
+            <div class="dropdown-menu basic-dropdown dropdown-icons dropdown-menu-right" aria-labelledby="dropdownIdiomas" style="will-change: transform;">
+                <p class="dropdown-title">
+                    @* Icono + Título de Idiomas *@
+                    <span class="material-icons language">language</span>
+                    Seleccionar idioma
+                    <span class="material-icons cerrar-dropdown">close</span>
+                </p>
+                @* Listado de idiomas disponibles *@
+            <ul class="no-list-style">
+                @* Pintar cada uno de los idiomas disponibles *@
+                @foreach (KeyValuePair<string, string> idioma in cabecera.Languajes)
+                {
+                    string urlIdioma = "";
+                    if (cabecera.MultiLingualLinks != null && cabecera.MultiLingualLinks.ContainsKey(idioma.Key))
+                    {
+                        urlIdioma = cabecera.MultiLingualLinks[idioma.Key].Value;
+                    }
+
+                    @* Dejar marcado el idioma actual *@
+                    if (Html.GetUtilIdiomas().LanguageCode == idioma.Key)
+                    {
+                        <li>
+                            <a class="activo item-dropdown" lang="@idioma.Key" href="@urlIdioma" title="@idioma.Value">
+                                <span class="material-icons">done</span>
+                                <span class="texto">@idioma.Value</span>
+                            </a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li>
+                            <a class="item-dropdown" lang="@idioma.Key" href="@urlIdioma" title="@idioma.Value">
+                                @idioma.Value
+                            </a>
+                        </li>
+                    }
+                }
+            </ul>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+}

@@ -1,0 +1,95 @@
+﻿@model ProfileModel
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra cada item de tipo Persona que forma parte de un determinado grupo.
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+// Detectar si dispone de fotografía el usuario
+bool containsUrlFoto = !String.IsNullOrEmpty(@Model.UrlFoto);
+UserIdentityModel identidadActual = Html.GetIdentidadActual();
+@* Id del botón para eliminar del grupo a un usuario *@
+string idBotonEliminar = Model + "_EliminarFichaGrupo";
+}
+
+@{ 
+    @* Controlar el nombre/tipo de usuario *@
+    string nombreCompleto = "";
+    if (Model.TypeProfile == ProfileType.Personal || Model.TypeProfile == ProfileType.Teacher)
+    {
+        nombreCompleto = Model.NamePerson;
+    }
+    else if (Model.TypeProfile == ProfileType.ProfessionalPersonal)
+    {
+        nombreCompleto = Model.NamePerson + " " + ConstantesDeSeparacion.SEPARACION_CONCATENADOR + " " + Model.NameOrganization;
+    }
+    else if (Model.TypeProfile == ProfileType.ProfessionalCorporate && !string.IsNullOrEmpty(Model.NamePerson))
+    {
+        nombreCompleto = Model.NameOrganization + " (" + Model.NamePerson + ")";
+    }
+    else
+    {
+        nombreCompleto = Model.NameOrganization;
+    }
+
+}
+
+
+<article class="resource" id="perfilGrupo_@Model.Key">
+    <div class="wrap">
+        <div class="user-miniatura">
+            @* Imagen del usuario *@
+            <div class="imagen-usuario-wrap">
+                <div class="imagen @( (containsUrlFoto == false) ? "sinImagen" : null) ">
+                    @if (containsUrlFoto == false)
+                    {
+                        <span class="material-icons">person</span>
+                    }
+                    else
+                    {
+                        <span style="background-image: url(@Html.GetBaseUrlContent()@Model.UrlFoto)"></span>                        
+                    }
+                </div>
+            </div>
+
+            @* Nombre del usuario *@
+            <div class="nombre-usuario-wrap">
+                <a href="@Model.UrlPerson">
+                    <p class="nombre">@nombreCompleto</p>
+                </a>
+            </div>
+
+            @* Acciónes de Usuarios *@
+            @if (identidadActual.IsProyectSupervisor || identidadActual.IsProyectAdmin) { 
+                <div class="acciones-usuario-wrap">
+                    <ul id="listaAcciones_@Model.Key" class="no-list-style">
+                        <li>                            
+                            @* Acción para Eliminar Usuarios del Grupo *@
+                            <a id="@idBotonEliminar"
+                               class="btn btn-outline-grey"
+                               data-toggle="modal"
+                               data-target="#modal-container"
+                               onclick="AccionFichaPerfil('@Html.GetText("COMMON","ELIMINAR")',
+                                                       '@Html.GetText("COMMON", "SI")',
+                                                       '@Html.GetText("COMMON", "NO")',
+                                                       '¿Quieres eliminar @nombreCompleto del grupo de la comunidad?',
+                                                       '@Model.Key',
+                                                        function () {                                                                                                                        
+                                                            EliminarIdentidadDeGrupo('@Model.Key');
+                                                        },
+                                                    '');
+                                    ">                                
+                                <span class="material-icons">person_remove</span>
+                                <span>@Html.GetText("COMMON", "ELIMINAR")</span>
+                            </a>
+                        </li>
+                    </ul>                
+                </div>            
+            }
+        </div>
+    </div>
+</article>

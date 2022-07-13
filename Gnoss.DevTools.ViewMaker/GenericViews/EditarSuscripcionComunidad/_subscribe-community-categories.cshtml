@@ -1,0 +1,184 @@
+﻿@model EditSuscriptionViewModel
+@*
+Descripción
+-----------------------------------------------
+Vista modal que se utiliza para que un usuario pueda gestionar las suscripciones a las diferentes categorías existentes en una comunidad.
+Esta vista se realizaba en una página independiente (comunidad/gnosscomunicacioninterna/gestionar-suscripcion-comunidad), pero ahora se realiza de forma modal.
+Existe la posibilidad (si en la comunidad está permitido) la opción de activar la opción de recibir emails de forma semanal o diario.
+La anterior vista independiente corresponde con: Views- EditarSuscripcionComunidad- Index
+Esta vista está metida en este directorio directamente porque el modal es cargado vía llamada url para que el ViewModel devuelva los datos (vía método Modal)
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+// Cargar las categorías en las que el usuario tenga actualmente seleccionadas
+string categorias = "";
+
+//Ids para la lógica JS
+// Nombre que tendrá el control sobre los radioButton
+string nameSuscripcion = "suscripcion";
+// Checkbox para controlar la recepción o no de boletines (newsletters)
+string idChkRecibirBoletin = "chkRecibirBoletin";
+// Id del panel que contendrá las opciones de suscripción de newsletters
+string idPanelFrecuenciaRecibirBoletin = "panelFrecuenciaRecibirBoletin";
+// Id del panel donde se mostrarán posibles mensajes de error/ok
+string idPanelInfoSuscripcionCategorias = "panelInfoSuscripcionCategorias";
+// Input donde se almacenarán las categorías seleccionadas o cargadas
+string idTxtHackCatTesSel = "txtHackCatTesSel";
+
+// Botón para guardar o enviar
+string idBtnSaveSubscriptionPreferences = "btnSaveSubscriptionPreferences";
+
+// Inputs para los radioButtons
+string idRbtnSuscripcionDiaria = "rbtnSuscripcionDiaria";
+string idRbtnSuscripcionSemanal = "rbtnSuscripcionSemanal";
+
+// Url a la que realizar la petición de guardado de suscripciones
+string urlRequestCommunitySubscription = $"{@Html.GetComunidad().Url}/{@Html.GetText("URLSEM", "ADMINISTRARSUSCRIPCIONCOMUNIDAD")}/save-changes";
+}
+@*
+----------------------------------------------------------------
+-------------------- Vista Modal Recibir newsletters --------------------
+*@
+
+@* Carga de las categorías que hay actualmente seleccionadas *@
+@{
+
+foreach (CategoryModel CategoriaTesauro in Model.Categories)
+{
+    if (CategoriaTesauro.Selected)
+    {
+        categorias += CategoriaTesauro.Key + ",";
+    }
+}
+}
+
+
+@* Título del modal *@
+<div class="modal-header">
+    <p class="modal-title">
+        <span class="material-icons">folder_open</span>@Html.GetText("SUSCRIPCIONES", "SUSCRIPCIONESENCOMUNIDAD")
+    </p>
+    <span class="material-icons cerrar"
+          data-dismiss="modal"
+          aria-label="Close">close</span>
+</div>
+@* Cuerpo del modal *@
+<div class="modal-body">
+    <div id="panel_hackCatTesSel" class="formulario-edicion">
+        @* Mensaje de qué se hará en este modal*@
+        <div class="form-group">
+            <label class="control-label">
+                Selecciona las categorías de la comunidad a las que deseas suscribirte.
+            </label>
+        </div>
+
+        @* Checkbox para seleccionar todos los checks *@
+        <div class="form-group form-check">
+	        <input id="chkSeleccionarTodos" 
+                   onclick="MVCMarcarTodosElementosCat(this, 'selectorCategoriasSusc','@idTxtHackCatTesSel');"
+                   class="form-check-input" 
+                   type="checkbox" />
+            <label class="control-label" for="chkSeleccionarTodos">@Html.GetText("SUSCRIPCIONES", "ATODASCATEGORIAS")</label>
+        </div>
+
+        @* Contenido del modal*@
+        <div id="panDesplegableSelCat">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                @* Opción Ver listado en Arbol*@
+                <li class="nav-item">
+                    <a class="nav-link active"
+                       id="ver-arbol-tab"
+                       data-toggle="tab"
+                       href="#ver-arbol"
+                       role="tab"
+                       aria-controls="ver-arbol"
+                       aria-selected="true">@Html.GetText("TESAURO", "ARBOL")</a>
+                </li>
+                @* Opción Ver listado en Lista*@
+                <li class="nav-item">
+                    <a class="nav-link"
+                       id="ver-list-tab"
+                       data-toggle="tab"
+                       href="#ver-lista"
+                       role="tab"
+                       aria-controls="ver-lista"
+                       aria-selected="false">@Html.GetText("TESAURO", "LISTA")</a>
+                </li>
+            </ul>
+            <div id="selectorCategoriasSusc" class="tab-content">
+                @* Listado en "ARBOL" *@
+                @Html.PartialView("../Shared/_cabecera/_partial-views/_subscribe-categories-tesauro-arbol", Model)
+
+                @* Listado en "LISTA"*@                
+                @Html.PartialView("../Shared/_cabecera/_partial-views/_subscribe-categories-tesauro-lista", Model)
+
+                @* Input para guardar las selecciones de categorías *@
+                <div style="visibility:hidden">
+                    <input type="hidden" id="@idTxtHackCatTesSel" class="@idTxtHackCatTesSel" value="@categorias" />
+                </div>
+            </div>
+
+            @if (Model.ActiveNotifications) {
+                @* Checkbox (si existe la posibilidad) de elegir newsletter diario o semanal *@
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="@idChkRecibirBoletin" @(Model.ReceiveSubscription ? "checked=checked" : "")>
+                    <label class="custom-control-label" for="@idChkRecibirBoletin">@Html.GetText("CONFIGURACIONGNOSS", "BOLETINESSUSCRIPCIONES")</label>
+                </div>
+
+                <div id="@idPanelFrecuenciaRecibirBoletin" @(!Model.ReceiveSubscription ? "style=display:none" : "style=display:block") class="mt-3">
+                    <div class="custom-control themed little custom-radio primary">
+                        <input type="radio" 
+                            id="@idRbtnSuscripcionDiaria" 
+                            name="@nameSuscripcion" 
+                            class="custom-control-input"
+                            value="rbtnSuscripcionDiaria"
+                            @(Model.DailySubscription?"checked=checked":"")
+                            >
+                        <label class="custom-control-label" for="rbtnSuscripcionDiaria">@Html.GetText("CONFIGURACIONGNOSS", "DIARIA")</label>
+                    </div>
+
+                    <div class="custom-control themed little custom-radio primary">                    
+                        <input type="radio"
+                            id="@idRbtnSuscripcionSemanal"
+                            name="@nameSuscripcion" 
+                            class="custom-control-input"
+                            value="rbtnSuscripcionSemanal"
+                            @(Model.WeeklySubscription?"checked=checked":"")
+                            >
+                        <label class="custom-control-label" for="rbtnSuscripcionSemanal">@Html.GetText("CONFIGURACIONGNOSS", "SEMANAL")</label>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @* Panel de error o mensaje de OK *@
+        <div id="@idPanelInfoSuscripcionCategorias" style="display: none;" class="alert alert-danger alert-success mt-3" role="alert">
+        </div>
+
+        @* Botón de acción*@
+        <div class="form-actions">
+            <input id="@idBtnSaveSubscriptionPreferences" type="submit" class="btn btn-primary" value="@Html.GetText("PERFIL", "GUARDARPREFERENCIAS")" />
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    // Parámetros para operativaGestionarSuscripcionComunidad
+    (function ($) {
+        const pParamsGestionarSuscripcionComunidad = {
+        nameSuscripcion : "@nameSuscripcion",
+        idChkRecibirBoletin : "@idChkRecibirBoletin",
+        idPanelFrecuenciaRecibirBoletin : "@idPanelFrecuenciaRecibirBoletin",
+        idTxtHackCatTesSel: "@idTxtHackCatTesSel",
+        idPanelInfoSuscripcionCategorias: "@idPanelInfoSuscripcionCategorias",
+        idRbtnSuscripcionDiaria: "@idRbtnSuscripcionDiaria",
+        idRbtnSuscripcionSemanal: "@idRbtnSuscripcionSemanal",
+        idBtnSaveSubscriptionPreferences: "@idBtnSaveSubscriptionPreferences",       
+        urlRequestCommunitySubscription: "@urlRequestCommunitySubscription",
+    };
+        // Gestión de operativa para cambio de contraseña
+        operativaGestionarSuscripcionComunidad.init(pParamsGestionarSuscripcionComunidad);
+    })();
+</script>

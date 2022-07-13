@@ -1,0 +1,290 @@
+﻿@model List<ResourceModel>
+
+@{
+    ResourceModel documento1 = Model.OrderBy(recurso => recurso.Version).First();
+    ResourceModel documento2 = Model.OrderBy(recurso => recurso.Version).Last();
+
+    string titulo1 = documento1.Title;
+    string titulo2 = documento2.Title;
+    string difTitulo = diffString(titulo1, titulo2);
+
+    string descripcion1 = QuitarEtiquetasTodoHTML(documento1.Description);
+    string descripcion2 = QuitarEtiquetasTodoHTML(documento2.Description);
+    string difDescripcion = PonerEtiquetasTodoHTML(diffString(descripcion1, descripcion2));
+}
+
+
+<fieldset>
+    <legend>Comparación de versiones</legend>
+    <fieldset>
+        <p>@Html.Raw(Html.GetText("COMPARARVERSIONES", "COMPARANDO") + " " + Html.GetText("COMPARARVERSIONES", "FORMATOVERSION", documento1.CompletCardLink, documento1.Version.ToString(), documento1.PublishDate.ToShortTimeString(), documento1.PublishDate.ToShortDateString(), documento1.Publisher.NamePerson))</p>
+        <p>@Html.Raw(Html.GetText("COMPARARVERSIONES", "CON") + " " + Html.GetText("COMPARARVERSIONES", "FORMATOVERSION", documento2.CompletCardLink, documento2.Version.ToString(), documento2.PublishDate.ToShortTimeString(), documento2.PublishDate.ToShortDateString(), documento2.Publisher.NamePerson))</p>
+    </fieldset>
+    <hr>
+    <fieldset>
+        <div>
+            <fieldset id="diffTit">
+                <legend>Título</legend>
+                <p>@Html.Raw(difTitulo)</p>
+            </fieldset>
+        </div>
+        <div>
+            <fieldset id="diffDesc"><legend>Descripción</legend>
+                @Html.Raw(difDescripcion)
+            </fieldset>
+            <fieldset id="diffCat"><legend>Categorías</legend>
+                <p>
+                @foreach (CategoryModel cat in documento1.Categories)
+                {
+                    if (documento2.Categories.Find(categoria => categoria.Key.Equals(cat.Key)) != null)
+                    {
+                        @cat.Name@:,
+                    }
+                    else
+                    {
+                        <label class="cod1">@cat.Name</label>@:,
+                    }
+                }
+                @foreach (CategoryModel cat in documento2.Categories)
+                {
+                    if (documento1.Categories.Find(categoria => categoria.Key.Equals(cat.Key)) == null)
+                    {
+                        <label class="cod2">@cat.Name</label>@:,
+                    }
+                }
+                </p>
+            </fieldset>
+            <fieldset id="diffTags"><legend>Etiquetas</legend>
+                <p>
+                @foreach (string tag in documento1.Tags)
+                {
+                    if (documento2.Tags.Contains(tag))
+                    {
+                        @tag@:,
+                    }
+                    else
+                    {
+                        <label class="cod1">@tag</label>@:,
+                    }
+                }
+                @foreach (string tag in documento2.Tags)
+                {
+                    if (!documento1.Tags.Contains(tag))
+                    {
+                        <label class="cod2">@tag</label>@:,
+                    }
+                }
+                </p>
+            </fieldset>
+        </div>
+    </fieldset>
+</fieldset>
+
+
+
+@functions{
+
+    private string QuitarEtiquetasTodoHTML(string cadena)
+    {
+        foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(cadena, @"<(?<contenido>[^>]+)>"))
+        {
+            cadena = cadena.Replace(m.ToString(), " <" + m.Groups["contenido"].ToString().Replace(" ", "-|-") + "> ");
+        }
+        return cadena;
+    }
+
+    private string PonerEtiquetasTodoHTML(string cadena)
+    {
+        foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(cadena, @"<(?<contenido>[^>]+)>"))
+        {
+            cadena = cadena.Replace(m.ToString(), "<" + m.Groups["contenido"].ToString().Replace("-|-", " ") + ">");
+        }
+        return cadena;
+    }
+    
+    private string diffString(string o, string n)
+    {
+        o = o.TrimEnd(null);
+        n = n.TrimEnd(null);
+
+        List<KeyValuePair<List<KeyValuePair<string, int>>, List<KeyValuePair<string, int>>>> salida = new List<KeyValuePair<List<KeyValuePair<string, int>>, List<KeyValuePair<string, int>>>>();
+
+        string[] auxO = System.Text.RegularExpressions.Regex.Split(o, @"\s+");
+        string[] auxN = System.Text.RegularExpressions.Regex.Split(n, @"\s+");
+        List<string> listAuxO = new List<string>();
+        List<string> listAuxN = new List<string>();
+        for (int i = 0; i < auxO.Length; i++)
+        {
+            if(!string.IsNullOrEmpty(auxO[i])){
+                listAuxO.Add(auxO[i]);
+            }
+        }
+        for (int i = 0; i < auxN.Length; i++)
+        {
+            if(!string.IsNullOrEmpty(auxN[i])){
+                listAuxN.Add(auxN[i]);
+            }
+        }
+        salida = Diff(listAuxO, listAuxN);
+
+        List<KeyValuePair<string, int>> outO = salida[0].Key;
+        List<KeyValuePair<string, int>> outN = salida[0].Value;
+
+        string str = "";
+
+        System.Text.RegularExpressions.MatchCollection oSpaceAux = System.Text.RegularExpressions.Regex.Matches(o, @"\s+");
+        List<string> oSpace = new List<string>();
+        for (int i = 0; i < oSpaceAux.Count; i++)
+        {
+            oSpace.Add(oSpaceAux[i].Value);
+        }
+        oSpace.Add("\n");
+
+        System.Text.RegularExpressions.MatchCollection nSpaceAux = System.Text.RegularExpressions.Regex.Matches(n, @"\s+");
+        List<string> nSpace = new List<string>();
+        for (int i = 0; i < nSpaceAux.Count; i++)
+        {
+            nSpace.Add(nSpaceAux[i].Value);
+        }
+        nSpace.Add("\n");
+
+
+        //Nota:
+        //cod0 = texto igual
+        //cod1 = texto eliminado
+        //cod2 = texto nuevo
+
+        if (outN.Count == 0) //Si no hay texto nuevo. Es decir, se ha borrado todo. Se marca todo lo viejo como eliminado.
+        {
+            for (int i = 0; i < outO.Count; i++)
+            {
+                int posSalto = oSpace[i].IndexOf("\n");
+                if (posSalto >= 0)
+                {
+                    string aux = oSpace[i].Substring(0, posSalto + 1);
+                    oSpace[i] = oSpace[i].Substring(posSalto + 1);
+                    oSpace[i] = oSpace[i].Replace("\n", "<div class='cod1' width='900px'>&nbsp;</div>");
+                    oSpace[i] = aux + oSpace[i];
+                }
+                str += "<label class='cod1'>" + outO[i].Key + oSpace[i] + "</label>";
+            }
+        }
+        else
+        {
+            for (int i = 0; i < outN.Count; i++) //Recorremos la nueva cadena
+            {
+                if (outN[i].Key.StartsWith("<") && outN[i].Key.EndsWith(">")) //Guardamos la etiqueta html
+                {
+                    str += " " + outN[i].Key + " ";
+                }
+                else if (outN[i].Value == -1) //Es texto nuevo
+                {
+                    str += " <label class='cod2'>" + outN[i].Key + "</label> ";
+                }
+                else if(outN[i].Value != -1) //Es texto igual [y puede tener eliminado que se mira a continuación en el bucle]
+                {
+                    string pre = "";
+                    //Recorremos en la String vieja a partir de J [como pos. que indica la cadena actual]. Durante J menos que el numero de cadenas de la vieja cadena Y en la vieja cadena J == -1
+                    for (int j = outN[i].Value + 1; j < outO.Count && outO[j].Value == -1; j++) //Miramos si hay texto viejo a continuación
+                    {
+                        if (outO[j].Key.StartsWith("<") && outO[j].Key.EndsWith(">")) //Si es etiqueta html
+                        {
+                            //str += " " + outO[j].Key + " ";
+                        }
+                        else //Si no es texto eliminado.
+                        {
+                            pre += " <label class='cod1'>" + outO[j].Key + "</label> "; //Guardamos el texto eliminado
+                        }
+                    }
+
+                    if (outN[i].Key.StartsWith("<") && outN[i].Key.EndsWith(">")) //No guardamos la etiqueta html
+                    {
+                        str += pre;
+                    }
+                    else
+                    {
+                        str += " <label class='cod0'>" + outN[i].Key + "</label> " + pre; //Mostramos el texto igual y a continuación el eliminado
+                    }
+                }
+            }
+        }
+
+        return str;
+    }
+
+    private List<KeyValuePair<List<KeyValuePair<string, int>>, List<KeyValuePair<string, int>>>> Diff(List<string> o, List<string> n)
+    {
+        Dictionary<string, List<int>> ns = new Dictionary<string, List<int>>();
+        Dictionary<string, List<int>> os = new Dictionary<string, List<int>>();
+
+        //esto es auxiliar, para la devolucion, en vez de usar las listas de entrada
+        List<KeyValuePair<string, int>> oo = new List<KeyValuePair<string, int>>();
+        List<KeyValuePair<string, int>> nn = new List<KeyValuePair<string, int>>();
+
+        //Añado los trozos de texto en los diccionarios. oo = texto viejo | nn = texto nuevo
+        for (int i = 0; i < o.Count; i++)
+        {
+            oo.Add(new KeyValuePair<string, int>(o[i], -1)); //Consideramos el texto viejo como eliminado
+        }
+        for (int i = 0; i < n.Count; i++)
+        {
+            nn.Add(new KeyValuePair<string, int>(n[i], -1)); //Consideramos el texto nuevo como nuevo
+        }
+
+        //Recorremos el texto viejo
+        for (int i = 0; i < n.Count; i++)
+        {
+            if (!ns.ContainsKey(n[i])) //Si no está en ns lo añadimos
+                ns.Add(n[i], new List<int>());
+            ns[n[i]].Add(i); //Añadimos la posición en la que aparece
+        }
+
+        for (int i = 0; i < o.Count; i++)
+        {
+            if (!os.ContainsKey(o[i])) //Lo mismo para texto nuevo
+                os.Add(o[i], new List<int>());
+            os[o[i]].Add(i);
+        }
+
+        //Recorremos las claves de ns y miramos que claves han salido una vez en ambos diccionarios. Entonces
+        //guardamos en nn la posición de la clave no repetida de os, y al revés, se guarda en oo la posición de la clave no repetida de ns.
+        foreach (string clave in ns.Keys)
+        {
+            if (ns[clave].Count == 1 && os.ContainsKey(clave) && os[clave].Count == 1)
+            {
+                nn[ns[clave][0]] = new KeyValuePair<string, int>(nn[ns[clave][0]].Key, os[clave][0]);
+                oo[os[clave][0]] = new KeyValuePair<string, int>(oo[os[clave][0]].Key, ns[clave][0]);
+            }
+        }
+
+        //Recorremos nn de 0 a < elementos - 1
+        //Conclusiones sacadas de este bucle:
+        //La palabra que miramos sale una vez en el documento
+        //La siguiente palabra sale varias veces y es la misma palabar en ambos documentos
+        for (int i = 0; i < nn.Count - 1; i++)
+        {
+            if (nn[i].Value != -1 && nn[i + 1].Value == -1 && nn[i].Value + 1 < oo.Count && oo[nn[i].Value + 1].Value == -1 && nn[i + 1].Key == oo[nn[i].Value + 1].Key && nn[i + 1].Value == oo[nn[i].Value + 1].Value)
+            {
+                nn[i + 1] = new KeyValuePair<string, int>(nn[i + 1].Key, nn[i].Value + 1);
+                oo[nn[i].Value + 1] = new KeyValuePair<string, int>(oo[nn[i].Value + 1].Key, i + 1);
+            }
+        }
+
+        //Recorremos nn de forma inversa
+        for (int i = nn.Count - 1; i > 0; i--)
+        {
+            if (nn[i].Value != -1 && nn[i - 1].Value == -1 && nn[i].Value > 0 && oo[nn[i].Value - 1].Value == -1 && nn[i - 1].Key == oo[nn[i].Value - 1].Key && nn[i - 1].Value == oo[nn[i].Value - 1].Value)
+            {
+                nn[i - 1] = new KeyValuePair<string, int>(nn[i - 1].Key, nn[i].Value - 1);
+                oo[nn[i].Value - 1] = new KeyValuePair<string, int>(oo[nn[i].Value - 1].Key, i - 1);
+            }
+        }
+
+        List<KeyValuePair<List<KeyValuePair<string, int>>, List<KeyValuePair<string, int>>>> dicReturn = new List<KeyValuePair<List<KeyValuePair<string, int>>, List<KeyValuePair<string, int>>>>();
+
+        dicReturn.Add(new KeyValuePair<List<KeyValuePair<string, int>>, List<KeyValuePair<string, int>>>(oo, nn));
+
+        //return { o: o, n: n };
+        return dicReturn;
+    }
+}

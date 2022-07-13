@@ -1,0 +1,156 @@
+﻿@using Es.Riam.Gnoss.Web.MVC.Models;
+@if (Html.GetComunidad() != null)
+{
+@*
+Descripción
+----------------------------------------------------------------
+Menú lateral izquierdo que aparecerá al pulsar sobre el icono de la izquierda *** de la la sección "Header".
+Este panel se deslizará de izquierda a derecha para mostrar un panel con:
+    - Home
+    - Comunidades
+    - Blogs
+    - Contactos
+- Adicionalmente, contendrá las opciones de los idiomas disponibles
+
+*@
+@*
+Variables
+----------------------------------------------------------------
+*@
+HeaderModel cabecera = Html.GetCabecera();
+CommunityModel Comunidad = Html.GetComunidad();
+UserProfileModel perfil = Html.GetPerfil();
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+
+// URL para cada idioma disponible
+string urlIdioma = "";
+@*
+----------------------------------------------------------------
+-------------------- Menú Lateral --------------------
+*@   
+
+@functions{
+    string PintarPestanya(CommunityModel.TabModel pPestanya, bool pPintarEnlaces)
+    {
+        if (pPestanya.Visible)
+        {
+            string clasePest = "nivel01";
+            if (pPestanya.Active)
+            {
+                clasePest += " active";
+            }
+            if (pPestanya.Name == "Home")
+            {
+                clasePest += " navHomeCom";
+            }
+
+            <li class="@clasePest @pPestanya">
+                <a @Html.Raw(pPintarEnlaces ? "href=\"" + pPestanya.Url + "\"" : " disabled=\"disabled\"") @Html.Raw(pPestanya.OpenInNewWindow ? "target=\"_blank\"" : "")>@pPestanya.Name</a>
+                @if (pPestanya.SubTab != null && pPestanya.SubTab.Count > 0)
+                {
+                    <ul>
+                        @foreach (CommunityModel.TabModel pPestanyaInt in pPestanya.SubTab)
+                        {
+                            @PintarPestanya(pPestanyaInt, pPintarEnlaces);
+                        }
+                    </ul>
+                }
+            </li>
+        }
+        return string.Empty;
+    }
+}
+
+
+    <aside id="menuLateral"
+           class="menuLateral"
+           role="navigation">
+        <div class="header">
+            <div class="wrap-header">
+                <div class="menu-logo-wrapper">
+                    <div class="menu-toggle">
+                        <a href="javascript: void(0);"                                                                                 
+                           class="cerrar texto-blanco">
+                            <span class="material-icons">apps</span>
+                        </a>
+                    </div>
+                    <div class="logo-wrapper">
+                        @if (Comunidad.MetaProyect)
+                        {
+                            <a class="texto-blanco" href="@Html.GetBaseUrlIdioma()/home">@Comunidad.Name</a>
+                        }
+                        else
+                        {
+                            <a class="texto-blanco" href="@Comunidad.Url">@Comunidad.Name</a>
+                        }
+                    </div>
+                </div>
+                <span class="material-icons cerrar">close</span>
+            </div>
+        </div>
+
+        <div class="body">
+            <ul class="nav pmd-sidebar-nav">                
+                @if ( Comunidad.NameMetaComunidad.ToLower().Equals(Comunidad.Name.ToLower()) ){
+                    @* Mostrar el menú de la MetaComunidad si la MetaComunidad es igual al nombre de la comunidad *@
+    
+                        bool pintarEnlaces = true;
+                        if (IdentidadActual.IsGuestIdentity && (Comunidad.ProjectState == CommunityModel.StateProject.Definition || Comunidad.ProjectState == CommunityModel.StateProject.Close || Comunidad.ProjectState == CommunityModel.StateProject.CloseTemporaly))
+                        {
+                            pintarEnlaces = false;
+                        }
+                        foreach (CommunityModel.TabModel pPestanya in Comunidad.Tabs)
+                        {
+                            @PintarPestanya(pPestanya, pintarEnlaces);
+                        }
+
+                }else{
+                    @* La comunidad es diferente al de la MetaComunidad *@
+                    @* Links obtenidos de opción Beta *@
+                    <li>
+                        <a href="@perfil.Url@Html.GetText("URLSEM", "HOME")">@Html.GetText("COMMON", "HOME")</a>
+                    </li>
+                    @if (!Comunidad.MetaProyect)
+                    {
+                        <li>
+                            <a href="@perfil.Url@Html.GetText("URLSEM", "INDICE")">@Html.GetText("COMMON", "INDICE")</a>
+                        </li>
+                    } 
+                        <li>
+                            <a href="@perfil.Url@Html.GetText("URLSEM", "COMUNIDADES")">@Html.GetText("COMMON", "COMUNIDADES")</a>
+                        </li>
+                    @if (!Comunidad.MetaProyect) { 
+                        <li>
+                            <a href="@perfil.Url@Html.GetText("URLSEM", "PERSONASYORGANIZACIONES")">@Html.GetText("COMMON", "PERSONASYORGANIZACIONES")</a>
+                        </li>
+                    }                                
+                }
+
+                @* Ver sección de idiomas 
+                <label for="idiomasCard" data-toggle="collapse" href="#idiomasCollapse" aria-expanded="false" aria-controls="idiomasCollapse" class="btn-link">Idiomas</label>
+                <div class="collapse" id="idiomasCollapse">                    
+                    <div class="card card-body idiomas">
+                        @foreach (KeyValuePair<string, string> idioma in cabecera.Languajes)
+                        {
+                            if (cabecera.MultiLingualLinks != null && cabecera.MultiLingualLinks.ContainsKey(idioma.Key))
+                            {
+                                urlIdioma = cabecera.MultiLingualLinks[idioma.Key].Value;
+                            }
+
+                            if (Html.GetUtilIdiomas().LanguageCode == idioma.Key)
+                            {
+                                <a class="activo mb-1" lang="@idioma.Key" href="@urlIdioma" title="@idioma.Value">@idioma.Value</a>
+                            }
+                            else
+                            {
+                                <a lang="@idioma.Key" class="mb-1" href="@urlIdioma" title="@idioma.Value">@idioma.Value</a>
+                            }
+                        }
+                    </div>
+                </div>*@
+                @* FIN ver sección de idiomas*@                
+            </ul>
+        </div>
+    </aside>
+    <!--<div class="pmd-sidebar-overlay" data-rel="menuLateral"></div>-->
+}

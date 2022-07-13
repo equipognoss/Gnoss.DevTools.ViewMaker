@@ -1,0 +1,53 @@
+﻿@model Es.Riam.Gnoss.Web.MVC.Models.GroupCardModel
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra un resultado de tipo "Grupo". Es utilizado en vista resultados, una vez se filtra por Etiqueta que es un Grupo de una comunidad.
+
+Variables
+----------------------------------------------
+*@
+@{
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista para visualizar los resultados del buscador de "Grupos" --------------------*@
+
+@if (Model != null)
+{   
+    @*Cada item encontrado de tipo Grupo *@
+    <article class="resource">
+        <div class="wrap group">
+            @* Contenedor de la imagen en miniatura del grupo *@
+            <div class="user-miniatura">
+                <div class="imagen-usuario-wrap">
+                    <div class="imagen sinImagen">                                                
+                        <span class="material-icons">groups</span>                                                
+                    </div>
+                </div>
+                @* Contenedor del nombre del usuario *@
+                <div class="nombre-usuario-wrap">
+                    @if (!string.IsNullOrEmpty(@Model.UrlGroup))
+                    {
+                        <a href="@Model.UrlGroup">
+                            <p class="nombre">@Model.Name</p>
+                        </a>
+                    }
+                    else
+                    {
+                        <p class="nombre">@Model.Name</p>                        
+                    }
+                </div>
+            </div>
+        </div>
+    </article>
+}
+
+
+
+
+
+
+

@@ -1,0 +1,73 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista modal que muestra las facetas en un listado con un paginador.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista Modal mostrar las facetas en una Lista paginada --------------------
+*@
+
+<div id="modal-resultados-paginado"
+     class="modal modal-top fade modal-resultados modal-resultados-paginado"
+     tabindex="-1"
+     role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                @* Mostrar el título de filtro de facetas / Loading *@                
+                <p class="modal-title">
+                    <span class="spinner-border white-color mr-2 loading-modal-facet"></span>
+                    <span class="loading-modal-facet-title">Cargando ...</span>
+                </p>
+                <span class="material-icons cerrar"
+                      data-dismiss="modal"
+                      aria-label="Close">close</span>
+            </div>
+            <div class="modal-body">
+                <div class="buscador-coleccion">
+                    <form>
+                        @* Input para buscador de Facetas *@
+                        <div>
+                            <span class="buscar">
+                                <input type="text" value="" class="texto" />
+                                <span class="material-icons lupa">search</span>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+                @* Contenedor de resultados (facetas) y header de paginador*@
+                <div class="indice-lista no-letra facetas-wrap">
+                    @* Paginador de resultados (se escribirá por código JS) 
+                    <div class="action-buttons-resultados">
+                        <ul class="no-list-style">
+                            <li class="js-anterior-facetas-modal">
+                                <span class="material-icons">navigate_before</span>
+                                <span class="texto">Anteriores</span>
+                            </li>
+                            <li class="js-siguiente-facetas-modal">
+                                <span class="texto">Siguientes</span>
+                                <span class="material-icons">navigate_next</span>
+                            </li>
+                        </ul>
+                    </div>
+                    *@
+                    @* Listado de facetas *@
+                    <div class="resultados-wrap">
+
+                                   
+                    </div>                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

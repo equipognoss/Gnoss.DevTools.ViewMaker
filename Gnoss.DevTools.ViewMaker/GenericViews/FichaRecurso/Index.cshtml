@@ -1,0 +1,302 @@
+﻿@model ResourceViewModel
+@*
+Descripción
+----------------------------------------------------------------
+Vista existente que muestra el Index de la ficha de un recurso. Contendrá subvistas para poder visualizarse de forma correcta
+la ficha de un determinado recurso.
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+ResourceModel FichaDocumento = Model.Resource;
+CommunityModel Comunidad = Html.GetComunidad();
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+
+//Url de la pestaña para mostrarla en el Breadcrumb
+string urlPestanya = Comunidad.Url + "/" + Html.GetNombreUrlPestanya();
+//Nombre o título de la pestaña para ponerlo en el Breadcrumb
+string nombrePestanya = Html.GetNombrePestanya();
+// Nombre de la clase para un div del recurso
+string claseItem = "resource"; 
+// Nombre adicional para el tipo de recurso y ser usado a modo de clase
+string claseTipoRecurso = Html.ObtenerNombreClasePorTipoRecurso(FichaDocumento.TypeDocument);
+// Comprobar si el recurso es privado o no
+string privado = "";
+
+}
+@*
+    ----------------------------------------------------------------
+    -------------------- Indice Ficha de un recurso ------------------
+*@
+
+
+@{
+@* Comprobar si el recurso es privado*@
+    if (FichaDocumento.Private) { 
+        privado = " private";
+    }
+@* Dependiendo del recurso, cargar un estilo u otro*@
+    if (Comunidad.IsCatalog)
+    {
+        Html.SetBodyClass("layout03 fichaComunidad comunidad fichaCatalogo comGnoss fichaRecurso " + claseTipoRecurso + privado);
+    }
+    else if (FichaDocumento.TypeDocument == ResourceModel.DocumentType.Semantico)
+    {
+        Html.SetBodyClass("layout03 fichaComunidad comunidad fichaRecurso fichaCatalogo comGnoss fichaRecurso " + claseTipoRecurso + privado);
+    }
+    else
+    {
+        Html.SetBodyClass("layout03 fichaComunidad comunidad fichaRecurso comGnoss fichaRecurso " + claseTipoRecurso + privado);
+    }
+
+    if (FichaDocumento.TypeDocument == ResourceModel.DocumentType.Semantico)
+    {
+        Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/jsNuevo/formsemactic.js?v=" + Html.GetVersion());
+        Html.GetListaCSS().Add(Html.GetBaseUrlStatic() + "/cssNuevo/formsemactic.css?v=" + Html.GetVersion());
+    }
+
+    string url = Html.GetUrlContext(FichaDocumento.CompletCardLink, FichaDocumento.Key, Html.GetComunidad().ShortName);
+
+    bool PresentacionNoSocial = Comunidad.ProyectType == CommunityModel.TypeProyect.CatalogoNoSocial || Comunidad.ProyectType == CommunityModel.TypeProyect.CatalogoNoSocialConUnTipoDeRecurso;
+
+    // No parece que se utilice.
+    if (FichaDocumento.IsDraft)
+    {
+        claseItem += " resourceDraft";
+    }
+}
+
+
+<div class="row">
+    @*Breadcrumb / Migas de pan en la ficha del recurso*@
+    <div class="col col-12 col-breadcrumb" id="breadcrumb">
+        <ul>
+            <li><a href="@Comunidad.Url"><strong>@Html.GetText("COMMON", "HOME")</strong></a></li>
+            <li><a href="@urlPestanya">@nombrePestanya</a></li>
+            <li>@FichaDocumento.Title</li>
+        </ul>
+    </div>
+    @* Contenido central del recurso*@
+    <div class="col col-12 col-xl-8 col-contenido izquierda">
+        <div class="wrapCol">
+            @* Control tipo recurso (SemanticFrom) del recurso -> Incluir vista parcial GeneradorSemCMS*@
+            @if (Model.SemanticFrom != null && Model.SemanticFrom.SemCmsDrawOverMenu)
+            {
+                @Html.PartialView("../Shared/SemCms/_GeneradorSemCms", Model.SemanticFrom);
+            }
+            @* Mostrar título, publisher y fecha del recurso - Vista parcial *@
+            @if (Model.SemanticFrom == null || !Model.SemanticFrom.HideResourceTitle)
+            {
+                @Html.PartialView("_partial-views/_header", Model);
+            }
+
+            @* Mostrar útiles del recurso *@
+            @if (!Model.HideUtilsResource)
+            {
+                if (!PresentacionNoSocial)
+                {
+                    @Html.PartialView("_partial-views/_header-utils-panel",Model);
+                }
+            }
+            @* Mostrar Descripción del documento *@
+            <div class="contenido">
+                @if (FichaDocumento.TypeDocument != ResourceModel.DocumentType.Semantico)
+                {
+                    <div class="grupo grupo-principal">
+                        @Html.PartialView("_FichaDescripcion", FichaDocumento)
+                    </div>
+
+                }
+            </div>
+
+            @* Mostrar Generador Semántico *@
+            @if (Model.SemanticFrom != null && !Model.SemanticFrom.SemCmsDrawOverMenu)
+            {
+                @Html.PartialView("../Shared/SemCms/_GeneradorSemCms", Model.SemanticFrom);
+            }
+
+            @* Mostrar panel de autores/editores del recurso y Ficha Compartidos (Comunidades en las que está compartido un recurso) *@
+            @if (!Model.HideUtilsResource)
+            {
+                @* Parámetro adicional la propiedad HidesharedCommunities *@
+                string hideSharedCommunitiesInfo = (ViewData["HideSharedCommunities"] ?? string.Empty) as string;
+                if (!string.IsNullOrEmpty(hideSharedCommunitiesInfo))
+                {
+                    ViewData.Add("HideSharedCommunities", Model.HideSharedCommunities);
+                }
+                else {
+                    // Actualizar el dato
+                    ViewData["HideSharedCommunities"] = Model.HideSharedCommunities;
+                }
+                
+                <div id="contAutoresEditoresLectores">
+                    @*@Html.PartialView("_FichaAutoresEditoresLectores", FichaDocumento)*@
+                    @* Evitar posibles floats de imágenes que haya creado el editor del recurso *@
+                    <div style="clear:both; display:block"></div>
+                    @Html.PartialView("_FichaAutoresEditoresLectores", FichaDocumento)
+                </div>
+            }
+
+            @* Mostrar Nº de versión del recurso - Sin diseño Dewenir *@
+            @if (FichaDocumento.Version > 0)
+            {
+                <div class="group version">
+                    <p>
+                        @Html.GetText("LISTARECURSOS", "VERSIONES")@FichaDocumento.Version
+                    </p>
+                </div>
+            }
+
+            @* Mostrar si se desea newsletter del recurso - Sin diseño Dewenir *@
+            @if (FichaDocumento.TypeDocument == ResourceModel.DocumentType.Newsletter)
+            {
+                <div class="group newsletter">
+                    <p>
+                        <a href="@FichaDocumento.UrlSearch?gnoss:hastipodoc=11">@Html.GetText("PERFILBASERECURSOSFICHA", "VERTODASNEWSLETTERS")</a>
+                    </p>
+                </div>
+            }
+            @* Mostrar Comentarios de un recurso *@
+            @if (FichaDocumento.Comments != null)
+            {
+                @Html.PartialView("_partial-views/_comments",Model);
+                @* Aviso Legal - No mostrar el aviso legal por defecto
+                <p class="text-muted text-center font-weight-light">@Html.GetText("FREEBASE", "AVISOLEGAL")</p>
+                *@
+            }
+        </div>
+    </div>
+  
+    @* Paneles de vinculados al recurso (Vinculados, Gadgets) *@
+    <div class="col col-12 col-xl-4 col-contexto col-lateral derecha">
+        <div id="panVinculadosInt">
+            @Html.PartialView("_FichaVinculados", FichaDocumento)
+        </div>
+               
+        @if (FichaDocumento.Gadgets != null && FichaDocumento.Gadgets.Count > 0)
+        {            
+            @* Gadgets asociados al recurso*@
+            <div id="divContPanGadgets">
+                @foreach (GadgetModel gadget in ((List<GadgetModel>)FichaDocumento.Gadgets).OrderBy(gadget => gadget.Order))
+                {
+                    @Html.PartialView("ControlesMVC/_FichaGadget", gadget)
+                }
+            </div>              
+        }
+    </div> 
+    
+</div>
+
+<script type="text/javascript">
+                            var urlActionSemCms = '@FichaDocumento.ListActions.UrlActionSemCms';
+
+                            $(document).ready(function () {
+                                MontarFechas();
+
+                                cargarGadgets();
+                            });
+
+                            function cargarGadgets() {
+                                var gadgets = "";
+                                var numGadgets = 0;
+                                //Contextos
+                                $('#divContPanGadgets div.group.resources:empty').each(function () {
+                                    if (numGadgets < 3 && $(this).attr("id") != undefined && $(this).attr("id") != "") {
+                                        gadgets += $(this).attr("id") + ",";
+                                        numGadgets++;
+                                    }
+                                });
+                                //Componentes CMS
+                                $('#divContPanGadgets div.group.cmscomponent:empty').each(function () {
+                                    if (numGadgets < 3 && $(this).attr("id") != undefined && $(this).attr("id") != "") {
+                                        gadgets += $(this).attr("id") + ",";
+                                        numGadgets++;
+                                    }
+                                });
+
+                                if (gadgets != "") {
+                                    var dataPostGadgets = {
+                                        callback: "CargarGadgets",
+                                        gadgetsID: gadgets
+                                    }
+
+                                    $.post('@Html.GetUrlContext((string)ViewBag.UrlPagina, FichaDocumento.Key, Html.GetComunidad().ShortName)', dataPostGadgets, function (data) {
+                                        if (typeof data != "undefined" && data != "") {
+                                            // Comprobar si es un objeto o array (La versión 5 devuelve un objeto de arrays)             
+                                            if (!Array.isArray(data)) {
+                                                // V5 -> Objeto de arrays -> Acceder al elemento 2 del objeto
+                                                for (var i in data.$values) {                                                                                                        
+                                                    try {
+                                                        if (data.$values[i].updateTargetId.indexOf("FichaGadget_") == 0) {
+                                                            var panID = data.$values[i].updateTargetId.substr(12);
+                                                            var htmlGadget = data.$values[i].html;
+                                                            if (htmlGadget == "") { $('#divContPanGadgets').find("#" + panID).remove(); }
+                                                            else { $('#divContPanGadgets').find("#" + panID).replaceWith(htmlGadget); }
+                                                        }
+                                                    }
+                                                    catch (err) { }
+                                                }
+                                            } else {
+                                                // V4 -> Array solo ha sido devuelto
+                                                for (var i in data) {
+                                                    try {
+                                                        if (data[i].updateTargetId.indexOf("FichaGadget_") == 0) {
+                                                            var panID = data[i].updateTargetId.substr(12);
+                                                            var htmlGadget = data[i].html;
+                                                            if (htmlGadget == "") { $('#divContPanGadgets').find("#" + panID).remove(); }
+                                                            else { $('#divContPanGadgets').find("#" + panID).replaceWith(htmlGadget); }
+                                                        }
+                                                    }
+                                                    catch (err) { }
+                                                }
+                                            }
+                                        }
+                                        $.each(gadgets.split(','), function (index, id) {
+                                            if (id.trim() != '' && $('#' + id.trim(), $('#divContPanGadgets')).length > 0 && $('#' + id.trim(), $('#divContPanGadgets')).html().trim() == '')
+                                            { $('#' + id.trim(), $('#divContPanGadgets')).remove(); }
+                                        });
+
+                                        cargarGadgets();
+                                    });
+
+                                }
+                                else {
+                                    CompletadaCargaContextos();
+                                }
+                            }
+
+                            @if (FichaDocumento.Graphs.Count > 0)
+                            {
+                                @:var urlPaginaCallBackGrafos = '@FichaDocumento.ListActions.UrlCallbackGraph';
+
+                                Guid docID = FichaDocumento.Key;
+                                string titulo = FichaDocumento.Title.Replace("'", "\\'");
+                                Guid proyID = Comunidad.Key;
+                                string UrlIntragnoss = Model.UrlIntragnoss;
+
+                                Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/jsNuevo/grafos/js/arbor.js?v=" + Html.GetVersion());
+                                Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/jsNuevo/grafos/js/grafo.gnoss.js?v=" + Html.GetVersion());
+                                Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/jsNuevo/grafos/js/jquery.qtip.min.js?v=" + Html.GetVersion());
+                                Html.GetListaCSS().Add(Html.GetBaseUrlStatic() + "/jsNuevo/grafos/css/jquery.qtip.min.css?v=" + Html.GetVersion());
+
+                                int count = 1;
+                                foreach (ResourceModel.GrafoRecurso grafo in FichaDocumento.Graphs)
+                                {
+                                    //@Html.Raw(" var dataPost = {callback: 'peticionajaxrelacionesgrafoficharec',urlintragnoss: '" + UrlIntragnoss + "',proyectoID: '" + proyID + "', documentoID: '" + docID + "', propEnlace: '" + grafo.PropEnlace + "', nodosLimiteNivel: 30,extra: '" + grafo.Extra + "', idioma: $('input.inpt_Idioma').val(), tipoRecurso: '" + grafo.TipoRecurso + "'};");
+                                    @Html.Raw(" var dataPost" + count + " = {urlintragnoss: '" + UrlIntragnoss + "', propEnlace: '" + grafo.PropEnlace + "', nodosLimiteNivel: 30,extra: '" + grafo.Extra + "', idioma: $('input.inpt_Idioma').val(), tipoRecurso: '" + grafo.TipoRecurso + "'};");
+
+                                                                                                                                                                                                                                                                                     //@Html.Raw(" $(function(){MontarGrafoFicRec('" + docID + "', '" + titulo + "', '" + proyID + "', '" + grafo.PropEnlace + "', 30, '" + UrlIntragnoss + "', '" + grafo.Extra + "', '" + grafo.UrlBusqueda + "', '" + grafo.TipoRecurso + "'); $.post('" + Html.GetUrlPagina() + "', dataPost, FinTraerDatosGrafoAJAX);});");
+                                    @Html.Raw(" $(function(){MontarGrafoFicRec('" + docID + "', '" + titulo + "', '" + proyID + "', '" + grafo.PropEnlace + "', 30, '" + UrlIntragnoss + "', '" + grafo.Extra + "', '" + grafo.UrlBusqueda + "', '" + grafo.TipoRecurso + "', '" + grafo.UrlBusquedaGrafo + "'); GnossPeticionAjax('" + FichaDocumento.ListActions.UrlLoadGraph + "', dataPost" + count + ", true).done(function(data){FinTraerDatosGrafoAJAX(data)});});");
+
+                                    count++;
+                                }
+                            }
+</script>
+
+
+
+
+
+

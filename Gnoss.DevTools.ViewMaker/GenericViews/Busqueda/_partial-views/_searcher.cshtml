@@ -1,0 +1,80 @@
+﻿@model SearchViewModel
+@*
+    Descripción
+    -----------------------------------------------
+    Nueva vista que sirve para buscar elementos-recursos dentro de una comunidad. Suele estar en la parte superior de la comunidad.
+
+    Variables
+    ----------------------------------------------------------------
+*@
+@{
+    // Opciones para filtrar los resultados del buscador
+    Dictionary<string, string> listaFiltrosOrden = Model.FilterOrderList;
+    // Filtro por defecto para obtener los resultados de los recursos
+    string FiltroOrdenSeleccionado = Model.FilterOrderSelected;
+
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Buscador de recursos dentro de una comunidad --------------------
+*@
+
+<div class="col-buscador">
+    @* Formularaio buscador*@
+    <form method="post" id="formCajaBusqueda" @*action="@(new Uri($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}").AbsoluteUri)"*@>
+        <fieldset style="display: block">
+            <div class="finderUtils" id="divCajaBusqueda">
+                <div class="group finderSection">
+                    <label for="finderSection">Encontrar</label>
+                    <input type="text" id="finderSection" class="not-outline finderSectionText autocompletar ac_input" autocomplete="off" placeholder="@Html.GetText("METABUSCADOR", "ENCONTRAR")" />
+                    <input title="@Html.GetText("METABUSCADOR", "ENCONTRAR")" type="button" class="encontrar findAction" id="inputLupa" />
+
+                    <input type="hidden" value="@Html.GetUrlPagina()" class="inpt_urlPaginaActual" />
+                    <input type="hidden" value="sioc_t:Tag|foaf:firstName" class="inpt_facetasBusqPag" />
+                    <input type="hidden" class="inpt_parametros" />
+                    @* Opción buscador para dispositivos móviles *@
+                    <a href="javascript: void(0);" class="btn-filtrar-movil">
+                        <span class="material-icons">filter_list</span>
+                        <span class="texto">@Html.GetText("COMMON", "FILTRAR")</span>
+                        <span class="texto resultados"></span>
+                    </a>
+                </div>
+                @* Filtros de búsqueda realizado (Versión anterior - Lo mantengo por si acaso)
+                <div class="group filterSpace">
+                    <div style="display: none;" id="panFiltros">
+                        <p>
+                            <span>@Html.GetText("COMBUSQUEDAAVANZADA", "FILTROS"): </span>
+                            <a style="margin-left: 5px;" href="@Html.GetUrlPagina()" class="limpiarfiltros">@Html.GetText("COMBUSQUEDAAVANZADA", "LIMPIARFILTROS")</a>
+                        </p>
+                        <ul class="facetedSearch tags" id="panListadoFiltros"><li style="display: none;"></li></ul>
+                    </div>
+                    <p id="panNumResultados">
+
+                    </p>
+                    <input type="submit" style="display: none;" id="enviarFormCajaBusqueda" value="enviar" title="enviar" />
+                </div> *@
+
+                @if (listaFiltrosOrden != null && listaFiltrosOrden.Count > 0)
+                {
+                    @* Order de los resultados obtenidos - LO QUITO PORQUE IRÁ MÁS ABAJO
+                    <div class="panelOrdenContenedor panelOrdenContenedor d-flex justify-content-end mt-2">
+                        <div class="form-inline">
+                            <label for="orden">@Html.GetText("BANDEJAENTRADA", "ORDENADOPOR")</label>
+                                <select class="form-control select-custom filtro ml-2" id="orden">
+                                    @foreach (string filtro in listaFiltrosOrden.Keys)
+                                    {
+                                        <option value="@listaFiltrosOrden[filtro]" @if (FiltroOrdenSeleccionado == filtro) { MvcHtmlString.Create("selected=\"selected\""); }>@filtro</option>
+                                    }
+                                </select>
+                        </div>
+                    </div>*@
+                }
+            </div>
+        </fieldset>
+    </form>
+</div>
+
+@* Listado de TAGS usados para las búsquedas *@
+@Html.PartialView("../Busqueda/_partial-views/_list-header-tags", Model)
+

@@ -1,0 +1,128 @@
+﻿@model ResourceViewModel
+@*
+Descripción
+-----------------------------------------------
+Vista modal que servirá para compartir un recurso con cualquier comunidad a la que el usuario pertenezca. Se muestra un listado con las categorías existentes, y el usuario selecciona las comunidades en las que desea compartir dicho recurso.
+Para ahorrar código, esta vista modal se cargará en un modal "padre" que es el "__resourece-modal-container"
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+ResourceModel fichaRecurso = Model.Resource;
+CommunityModel Comunidad = Html.GetComunidad();
+
+@* Título/Texto de Compartir recurso por defecto *@
+string textoCompartir = Html.GetText("CONTROLESDOCUMENTACION", "COMPARTIRRECURSO");
+@* Mensaje explciativo que aparecerá en el panel teniendo en cuenta múltiples variables (Tipo de documento, comunidad pública..). *@
+string mensajeExplicativo = "";
+
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista Modal para Compartir un recurso entre comunidades --------------------
+*@
+
+@* Tener en cuenta el tipo de recurso para el título a mostrar*@
+@if (fichaRecurso.TypeDocument == ResourceModel.DocumentType.Pregunta)
+{
+    textoCompartir = Html.GetText("CONTROLESDOCUMENTACION", "COMPARTIRPREGUNTA");
+}
+
+@* Tener en cuenta el tipo de recurso para la descripción del panel a mostrar*@
+@{    
+    if (fichaRecurso.TypeDocument == ResourceModel.DocumentType.Pregunta)
+    {
+        if (fichaRecurso.Private)
+        {
+            mensajeExplicativo = Html.GetText("CONTROLESDOCUMENTACION", "PUEDESCOMPARTIRPREGUNTACONPRIVADAS");
+        }
+        else
+        {
+            mensajeExplicativo = Html.GetText("CONTROLESDOCUMENTACION", "PUEDESCOMPARTIRPREGUNTACON");
+        }
+    }
+    else
+    {
+        if (fichaRecurso.Private)
+        {
+        mensajeExplicativo = Html.GetText("CONTROLESDOCUMENTACION", "PUEDESCOMPARTIRRECURSOCONPRIVADAS");
+        }
+        else
+        {
+            mensajeExplicativo = Html.GetText("CONTROLESDOCUMENTACION", "PUEDESCOMPARTIRRECURSOCON");
+        }
+    }
+    if (Model.IsDocumentEditor && (Comunidad.AccessType.Equals(CommunityModel.TypeAccessProject.Private) || Comunidad.AccessType.Equals(CommunityModel.TypeAccessProject.Reserved)))
+    {
+        mensajeExplicativo += Html.GetText("CONTROLESDOCUMENTACION", "PUEDESDECIDIRPRIVACIDAD");
+    }
+        mensajeExplicativo += Html.GetText("CONTROLESDOCUMENTACION", "NOOLVIDES");
+
+    if (Model.ResourceBases.Count == 0)
+    {
+        mensajeExplicativo = Html.GetText("CONTROLESDOCUMENTACION", "NOCOMPARTIRPUEDES");
+    }
+
+}
+
+
+@* Título del Modal *@
+<div class="modal-header">
+    <p class="modal-title">
+        <span class="material-icons">share</span>@Html.GetText("CONTROLESDOCUMENTACION", "COMPARTIREN") @Html.GetText("COMMON", "COMUNIDAD").ToLower()
+    </p>
+    <span class="material-icons cerrar" data-dismiss="modal" aria-label="Close">close</span>
+</div>
+<div class="modal-body">
+    <div class="formulario-edicion" id='despAccionRec_@fichaRecurso.Key'>
+        <div class="form-group">
+            @* Título / Mensaje informativo a modo de "Título" *@
+            @* Quitar el título del panel - CORE-3088 *@
+            @*<label class="control-label">@textoCompartir</label>*@
+            <p>@Html.Raw(mensajeExplicativo)</p>
+        </div>
+
+        @* Panel con las opciones disponibles para listar las comunidades *@
+        <div id="panDesplegableSelCat">
+            @* Quitar opción de Listado 
+            <ul class="nav nav-tabs" id="myTab" role="tablist"> *@
+                @* Opción Ver listado en Lista*@
+                @*<li class="nav-item">
+                    <a class="nav-link active"
+                       id="ver-list-tab"
+                       data-toggle="tab"
+                       href="#ver-lista"
+                       role="tab"
+                       aria-controls="ver-lista"
+                       aria-selected="false">@Html.GetText("TESAURO", "VERLISTA")</a>
+                </li>
+            </ul>*@
+            @*<div class="tab-content">*@
+                @* Lista de Categorías donde Compartir el recurso" *@
+                @Html.PartialView("../FichaRecurso/_partial-views/_share-list", Model)
+
+            @*</div>*@
+        </div>
+
+        @* Input guardar guardar las selecciones *@
+        <input type="hidden" id="txtSeleccionados" class="hackCatTesSel" />
+
+        @* Mensaje informativo del proceso*@        
+        <div>
+                <div id="menssages">
+                    <div class="ok"></div>
+                    <div class="ko"></div>
+                </div>
+        </div>
+    </div>
+
+        @* Acciones del Modal - Guardar. Están en la subView de "_resource-share-list *@
+    </div>
+
+<script>    
+    @* Inicializar los SELECT js-select ya que son creadod dinámicamente *@
+    $('.js-select2').select2();
+</script>

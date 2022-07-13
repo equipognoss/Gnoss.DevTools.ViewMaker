@@ -1,0 +1,124 @@
+﻿@model GadgetModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista que se utiliza para mostrar un determinado gadget que pueda estar asociado a un recurso o a una comunidad.
+Panel que se muestra normalmente en la zona derecha de la pantalla.
+La información que puede mostrarse en este tipo de Gadget es:
+- 'Lo más interesante'
+- 'Comunidades relacionadas'
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+// Nº máximo para el nombre de la comunidad que aparecerá en el Gadget correspondiente
+int numMaxCharactersForCommunityNameListItem = 15;
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista de un determinado Gadget asociado a un recurso por ejemplo --------------------
+*@
+
+
+@if (Model is GadgetHtmlModel)
+{
+    <div class="group @Model.ClassName">
+        @if (!Html.GetOcultarPersonalizacion())
+        {
+            <h2>@Model.Title</h2>
+        }
+        @Html.Raw(((GadgetHtmlModel)Model).Html)
+    </div>
+}
+else if (Model is GadgetResourceListModel)
+{
+    GadgetResourceListModel gadgetListado = (GadgetResourceListModel)Model;
+    if (gadgetListado.Resources == null || gadgetListado.Resources.Count == 0)
+    {
+        <div class="group resources grupoPaginado gruppoGadget @Model.ClassName" id="@gadgetListado.Key" style="display:none"></div>
+    }
+    else
+    {
+        string claseGadget = "group resources grupoPaginado gruppoGadget wrapCol";
+
+        if (gadgetListado.Resources.Count == 1 && gadgetListado.Resources.First().TypeDocument == ResourceModel.DocumentType.Encuesta)
+        {
+            claseGadget = "group resources encuestas ultimaEncuesta";
+        }
+
+        <div class="@claseGadget @Model.ClassName" id="@gadgetListado.Key">
+
+            <h2 class="section-title">@Model.Title</h2>
+            
+
+            @if (gadgetListado.ResourcesPagers != null)
+            {
+                string classSiguiente = "siguiente";
+                if (gadgetListado.ResourcesPagers.Count == 0)
+                {
+                    classSiguiente += " desactivado";
+                }
+                @* Quito el paginado de momento 
+                <div class="paginadorSiguienteAnterior">
+                    <ul>
+                        <li id="btnAnterior_@Model.Key" class="anterior desactivado">
+                            <a onclick="paginadorGadget_Anterior('@Html.GetUrlPagina()', '@gadgetListado.Key')"></a>
+                        </li>
+                        <li id="btnSiguiente_@Model.Key" class="@classSiguiente">
+                            <a onclick="paginadorGadget_Siguiente('@Html.GetUrlPagina()', '@gadgetListado.Key')"></a>
+                        </li>
+                    </ul>
+                </div>
+                    *@
+            }
+
+            <div class="contexto resource-list activo">
+                @foreach (ResourceModel ficha in gadgetListado.Resources)
+                {
+                    @Html.PartialView(gadgetListado.ViewNameResources, ficha)
+                }
+            </div>
+
+            @if (gadgetListado.ResourcesPagers != null)
+            {
+                <div class="contexto resource-list" style="display:none">
+                    @foreach (ResourceModel ficha in ((GadgetResourceListModel)Model).ResourcesPagers)
+                    {
+                        @Html.PartialView(gadgetListado.ViewNameResources, ficha)
+                    }
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(gadgetListado.UrlViewMore))
+            {
+                <div class="verMasGadgets">
+                    <p>
+                        <a href="@gadgetListado.UrlViewMore" target="_blank">@Html.GetText("COMBUSQUEDAAVANZADA", "VERMAS")</a>
+                    </p>
+                </div>
+            }
+        </div>
+    }
+}
+else if (Model is GadgetCMSModel)
+{
+    if (((GadgetCMSModel)Model).CMSComponent == null)
+    {
+        <div class="group cmscomponent @Model.ClassName" id="@Model.Key" style="display:none"></div>
+    }
+    else
+    {
+        CMSComponent componente = ((GadgetCMSModel)Model).CMSComponent;
+        <div class="@Model.ClassName block" id="@Model.Key">
+            @{
+                if (componente != null)
+                {
+                    @Html.PartialView(componente.ViewName, componente)
+                }
+            }
+        </div>
+    }
+}

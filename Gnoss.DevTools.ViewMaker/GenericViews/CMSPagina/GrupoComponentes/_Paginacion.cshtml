@@ -1,0 +1,30 @@
+﻿@model CMSComponentGroupComponents
+@if (Model != null)
+{
+    string estilos = Model.Styles + " componentePaginado ";
+    <div class="block @estilos" id="@Model.Key.ToString()">  
+        @if (!string.IsNullOrEmpty(Model.Title))
+        {
+            <p class="tituloComponente">@Model.Title</p>
+        }
+
+        @foreach (CMSComponent fichaComponente in Model.ComponentList)
+        {
+            string estilosComponete = fichaComponente.Styles;
+            <div class="block componente @estilosComponete" id="@fichaComponente.Key.ToString()">  
+            @Html.PartialView(fichaComponente.ViewName, fichaComponente)
+            </div>
+        }
+        <ul class="paginador">
+            <li class="paginadorAnterior">
+                <a href="/">&lt;</a>
+            </li>
+            <li class="paginadorSiguiente">
+                <a href="/">></a>
+            </li>
+            <li class="paginadorContador">
+                <span class="actual">1</span> de <span class="total">@Model.ComponentList.Count</span>
+            </li>
+        </ul>
+    </div>
+}

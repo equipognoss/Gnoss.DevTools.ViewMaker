@@ -1,0 +1,72 @@
+﻿@model RegisterDataViewModel
+@*
+Descripción
+-----------------------------------------------
+Vista que se utiliza para mostrar las preferencias a las que un usuario se puede apuntar durante el proceso de registro.
+Se trata de una vista parcial que se utiliza para mostrar estas "categorias" el proceso de "Registro" en el paso 3 de Opciones de Interés. (_Preferencias.cshtml)
+
+
+Plantillas - Archivos de dewenir
+----------------------------------------------------------------
+
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+// Lista de Preferencias
+Dictionary<Guid, KeyValuePair<string, Dictionary<Guid, string>>> listaPreferencias = Model.ListPreferences;
+// Identificador autonumérico para cada uno de los items de las preferencias
+int numCat = 1;
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista parcial de mostrar Listas en modo Árbol para proceso de Registro --------------------
+*@
+
+@functions{
+    string PintarCategoria(Dictionary<Guid, KeyValuePair<string, Dictionary<Guid, string>>> listaPreferencias, Guid catID, int numCat)
+    {
+        string nombreCategoria = listaPreferencias[catID].Key;
+        // Recorrer y pintar los items de cada nombreCategoria
+        int numCatHija = 0;
+        foreach (Guid catHijaID in listaPreferencias[catID].Value.Keys)
+        {
+            string claseDiv = "item" + numCat + numCatHija;
+            string idInput = "id_" + numCat + "_" + numCatHija;
+
+            @* Pintar cada item *@
+            <div class="custom-control custom-checkbox themed little primary @claseDiv">
+                <input type="checkbox"
+                       id="@catHijaID"                   
+                       data-item="@idInput"
+                       categoriaid="@catHijaID"
+                       class="custom-control-input categoriaPreferencia" />
+                <label class="custom-control-label"
+                       for="@catHijaID">@listaPreferencias[catID].Value[catHijaID]</label>
+            </div>
+            numCatHija += 1;
+        }
+        return string.Empty;
+    }
+}
+
+@* Listado de Categorías en formato "ARBOL" *@
+<div class="tab-pane fade show active"
+     id="ver-arbol"
+     role="tabpanel"
+     aria-labelledby="ver-arbol-tab">
+    <div class="divTesArbol divCategorias clearfix">
+
+        @foreach (Guid catID in listaPreferencias.Keys)
+        {
+            <h4>@listaPreferencias[catID].Key</h4>
+            <hr />
+            @PintarCategoria(listaPreferencias, catID, numCat);
+            numCat += 1;
+        }
+    </div>
+</div>

@@ -1,0 +1,84 @@
+﻿@using Es.Riam.Gnoss.Web.MVC.Models;
+@model CMSComponentUserList
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra el componente de Listado de usuarios para mostrar "Últimos miembros" o "Miembros más activos".
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+}
+@*
+----------------------------------------------------------------Vista CMS del componente de Vista de Usuarios --------------------*@
+
+
+@if (Model != null) {
+    <div class="componente cp0401">
+        @* Título del componente *@
+        <div class="titulo">
+            @if (string.IsNullOrEmpty(Model.Title))
+            {
+                <h2><span>Listado de usuarios</span></h2>
+            }
+            else
+            {
+                <h2><span>@Model.Title</span></h2>
+            }
+        </div>
+        @* Contenido del componente - Listao de usuarios *@
+        <div class="contenido">
+
+            @if (Model.ViewNameResources.Equals(Es.Riam.Gnoss.AD.CMS.TipoPresentacionListadoUsuariosCMS.MosaicoConFoto.ToString()))
+            {
+                <div class="userList">
+                    <ul>
+                        @foreach (ProfileModel perfil in Model.Users)
+                        {
+                            <li class="resourceType persona @(!string.IsNullOrEmpty(perfil.UrlFoto) ? "conImagenPerfil" : "")">
+                                <a title="@perfil.NamePerson" href="@Html.ObtenerUrlPerfil(perfil)">
+                                    @if (!string.IsNullOrEmpty(perfil.UrlFoto))
+                                    {
+                                        <img src="@Html.GetBaseUrlContent()/@perfil.UrlFoto" alt="@perfil.NamePerson" title="@perfil.NamePerson" />
+                                    }
+                                </a>
+                            </li>
+                        }
+
+
+
+                    </ul>
+                </div>
+            }            
+            else
+            {
+                <div class="resource-list">
+                    @foreach (ProfileModel perfil in Model.Users)
+                    {
+                        <div class="resource tipopersona">
+                            <div class="box description">
+                                <div class="group title">
+                                    <h4>
+                                        <a title="@perfil.NamePerson" href="@Html.ObtenerUrlPerfil(perfil)">
+                                            @perfil.NamePerson
+                                        </a>
+                                    </h4>
+                                    <p class="resourceType persona @(!string.IsNullOrEmpty(perfil.UrlFoto) ? "conImagenPerfil" : "")">
+                                        <a title="@perfil.NamePerson" href="@Html.ObtenerUrlPerfil(perfil)">
+                                            @if (!string.IsNullOrEmpty(perfil.UrlFoto))
+                                            {
+                                                <img src="@Html.GetBaseUrlContent()/@perfil.UrlFoto" alt="@perfil.NamePerson" title="@perfil.NamePerson" />
+                                            }
+                                        </a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }                               
+        </div>
+    </div>
+}

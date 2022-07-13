@@ -1,0 +1,174 @@
+﻿@model ResourceModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra los editores, autores de un determinado recurso. Aparecerá justo debajo del cuerpo del recurso. 
+En esta vista también se muestran mediante vista parciales:
+    - Categorías
+    - Etiquetas
+    - Licencias
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+// Nº de autores de un determinado recurso
+int numAutores = 0;
+// Nº de autores de un determinado recurso
+int numEditores = 0;
+// Nº de lectores de un determinado recurso
+int numLectores = 0;
+
+// nombre de la clase de la red social para los iconos de "Compartir en redes sociales"
+string clase = "";
+
+// Obtener el dato pasado en la vista como dato adicional para saber si se puede o no compartir el recurso en comunidades
+var HideSharedCommunities = (bool) ViewData["HideSharedCommunities"];
+
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista Autores Editores de un recurso --------------------
+*@
+
+<div class="info-recurso">
+
+    @* Editores del recurso *@
+    @if (Model.Editors != null && Model.Editors.Count > 0)
+    {
+        <div class="group autor">
+            <p class="group-title">@Html.GetText("USUARIOS", "EDITORES"):</p>
+            <ul id="listEdit">
+                @foreach (string editor in Model.Editors.Keys)
+                {
+                    <li>
+                        @if (numEditores > 0)
+                        {
+                            @* <text>,</text> *@
+                        }
+                        @if (Model.Editors[editor] != "")
+                        {
+                        <a href="@Model.Editors[editor]">@editor</a>
+                        }
+                        else
+                        {
+                        <span>@editor</span>
+                        }
+                    </li>
+                    numEditores++;
+                }
+            </ul>
+        </div>
+    }
+
+    @* Lectores del recurso *@
+    @if (Model.Readers != null && Model.Readers.Count > 0)
+    {
+        <div class="group autor">
+            <p class="group-title">@Html.GetText("USUARIOS", "LECTORES")::</p>
+            <ul id="listEdit">
+                @foreach (string lector in Model.Readers.Keys)
+                {
+                    <li>
+                        @if (numLectores > 0)
+                        {
+                        @* <text>,</text> *@
+                        }
+                        @if (Model.Readers[lector] != "")
+                        {
+                        <a href="@Model.Readers[lector]">@lector</a>
+                        }
+                        else
+                        {
+                        <span>@lector</span>
+                        }
+                    </li>
+                    numLectores++;
+                }
+            </ul>
+        </div>
+    }
+
+    @* Autores del recurso *@
+    @if (Model.Authors != null && Model.Authors.Count > 0)
+    {
+        <div class="group autor">
+            <p class="group-title">@Html.GetText("COMMON", "AUTORES"):</p>
+            <ul id="listAut">
+                @foreach (string autor in Model.Authors.Keys)
+                {
+                    <li>
+                        @if (numAutores > 0)
+                        {
+                            @* <text>,</text> *@
+                        }
+                        <a href="@Model.Authors[autor]" property="dc:creator">@autor</a>
+                    </li>
+                    numAutores++;
+                }
+            </ul>
+        </div>
+    }
+
+    @* Mostrar categorías (Vista Parcial) *@
+    @Html.PartialView("_FichaCategorias", Model)
+
+    @* Mostrar etiquetas (Vista Parcial) *@
+    @Html.PartialView("_FichaEtiquetas", Model)
+
+
+        @if (!HideSharedCommunities) 
+    { 
+        @* No mostrar el div si no hay comunidades donde se esté compartiendo el recurso *@
+
+        if (Model.Shareds != null && Model.Shareds.Count > 0)
+        {
+        <div class="group compartida" id="divCompartido">
+            @Html.PartialView("_FichaCompartidos", Model)
+        </div>  
+        }  
+    }
+
+    @* Mostrar licencia *@
+    @if (Model.Licence != "")
+    {
+        <div class="group license">
+            <p class="group-title">@Html.GetText("VERCVSEMANTICO", "LICENCIAS")</p>
+            <ul class="listTags">
+                <li>@Html.Raw(Model.Licence)</li>
+            </ul>
+        </div>
+    }
+
+    @* Mostrar las opciones de compartir*@
+    @if (Model.SocialNetworks != null && Model.SocialNetworks.Count > 0)
+    {
+        <div class="group redes-sociales">
+            <p class="group-title">@Html.GetText("PERFIL", "COMPARTIR"):</p>
+            <ul class="lista-redes-sociales no-list-style">
+                @{
+                    int numRedSocial = 0;
+                    foreach (string RedSocial in Model.SocialNetworks.Keys)
+                    {                
+                        clase = RedSocial.ToLower();
+                        <li class="@clase">                            
+                            <a href="#" title="@RedSocial"
+                               @foreach (string atributo in Model.SocialNetworks[RedSocial].Keys) { @Html.Raw(atributo.Replace("onclick", "clickJS") + "=\"" + Model.SocialNetworks[RedSocial][atributo] + "\" ") ; }>
+
+                                <i class="fab fa-@clase"></i>
+
+                            </a>
+                        </li>
+                        numRedSocial++;
+                    }
+                }
+            </ul>
+        </div>
+    }
+
+
+
+</div>

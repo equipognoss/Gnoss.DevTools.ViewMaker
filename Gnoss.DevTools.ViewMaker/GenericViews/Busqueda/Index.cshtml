@@ -1,0 +1,131 @@
+﻿@model SearchViewModel
+@*
+Descripción
+-----------------------------------------------
+Vista que se utiliza para mostrar los recursos listados ya se haya realizado una búsqueda o no.
+Podría considerarse como la página índex de una comunidad donde aparecen los recursos filtrados (o no) pertenecientes a la comunidad.
+El acceso a este buscador sería "/comunidad/ayudayfaqs/recursos?search".
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+CommunityModel Comunidad = Html.GetComunidad();
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+string jsExtra = Html.GetJSExtra();
+
+string nombrePestanyaActual = Model.PageName;
+string htmlResultados = Model.HTMLResourceList;
+string htmlFacetas = Model.HTMLFaceted;
+Dictionary<string, string> listaFiltrosOrden = Model.FilterOrderList;
+string FiltroOrdenSeleccionado = Model.FilterOrderSelected;
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Index de la página de "Buscador de recursos" dentro de una comunidad --------------------
+*@
+
+@{
+    @* Iniciar comportamiento de Scrolling para obtener más resultados 'showResultsScrolling' *@
+    Html.SetBodyClass("layout02 comunidad listado comGnoss showResultsScrolling");
+
+    Html.SetPintarH1(false);
+
+    if (Comunidad.ProyectType == CommunityModel.TypeProyect.Catalogo || Comunidad.ProyectType == CommunityModel.TypeProyect.CatalogoNoSocial)
+    {
+        Html.SetBodyClass(Html.GetBodyClass() + " listadoCatalogo ");
+    }
+
+    if (IdentidadActual.IsProyectAdmin && ViewContext.RouteData.Values["admin"] != null && ViewContext.RouteData.Values["admin"].Equals("true"))
+    {
+        Html.GetListaCSS().Add(Html.GetBaseUrlStatic() + "/cssNuevo/administracion.css?v=" + Html.GetVersion());
+
+    }
+}
+
+
+<div class="row">    
+    @if (Comunidad.Key != ProyectoAD.MetaProyecto)
+    {
+        @*Breadcrumb / Migas de pan en la ficha del recurso*@
+        <div class="col col-12 col-breadcrumb" id="breadcrumb">
+            <ul>
+                <li><a href="@Comunidad.Url"><strong>@Html.GetText("COMMON", "HOME")</strong></a></li>
+                <li>@nombrePestanyaActual</li>
+            </ul>
+        </div>
+    }
+    else {
+        @*Breadcrumb / Migas de pan en la ficha del recurso*@
+        <div class="col col-12 col-breadcrumb" id="breadcrumb">
+            <ul>
+                @if (@Comunidad.Url != null)
+                {
+                    <li><a href="@Comunidad.Url"><strong>@Html.GetText("COMMON", "HOME")</strong></a></li>
+                }
+                else
+                {
+                    <li><strong>@Html.GetText("COMMON", "HOME")</strong></li>
+                }
+                
+                @if (@nombrePestanyaActual != null)
+                {
+                    <li>@nombrePestanyaActual</li>
+                }
+                else if (Comunidad.Url != null) {                     
+                    <li>@Comunidad.Name</li>
+                }
+            </ul>
+        </div>
+    }
+
+    @* Header o cabecera donde aparecen los resultados o recursos de una comunidad *@
+    @Html.PartialView("../Busqueda/_partial-views/_list-header", Model)
+
+    @* Panel izquierdo de Facetas *@
+    <div class="col col-12 col-xl-3 col-facetas col-lateral izquierda">
+        @Html.PartialView("../Busqueda/_partial-views/_list-content-facetes", Model)
+    </div>
+
+    @* Panel derecho-central donde estará el contenido del "buscador"*@
+    <div class="col col-12 col-xl-9 col-contenido derecha">
+        @* Div que envuelve todo el contenido central-derecho*@
+        <div class="wrapCol">
+            @* Buscador de recursos *@
+            @if (Model.SearchBoxVisible)
+            {
+                @Html.PartialView("../Busqueda/_partial-views/_searcher", Model);
+            }
+
+            @* Listado de resultados (resource-list) donde aparecerán los recursos-items *@
+            @Html.PartialView("../Busqueda/_partial-views/_list-content", Model)
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+        @Html.Raw(jsExtra)
+
+        @if (htmlFacetas == null && htmlResultados == null && Model.JSONResourceList == null&& Model.JSONFaceted == null)
+        {
+            <text>
+                $(document).ready(function () {
+                    FiltrarPorFacetas(filtrosDeInicio);
+                });
+        </text>
+        }
+
+        @if (!string.IsNullOrEmpty(Html.GetJSMapa()))
+        {
+            @Html.Raw(Html.GetJSMapa())
+        }
+
+        @if (!string.IsNullOrEmpty(Html.GetJSGraficos()))
+        {
+            @Html.Raw(Html.GetJSGraficos())
+        }
+</script>

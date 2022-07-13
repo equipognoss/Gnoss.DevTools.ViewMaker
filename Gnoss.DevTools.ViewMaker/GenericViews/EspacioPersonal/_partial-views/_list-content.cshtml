@@ -1,0 +1,47 @@
+﻿@model PersonalSpaceModel
+@*
+    Descripción
+    -----------------------------------------------
+    Vista que muestra todos los resultados en modo Lista después haber sido cargados al cargar la página de "Espacio personal"
+
+    En esta vista se cargarán las subvistas de los items devueltos del buscador. Estas subvistas pertenecen al servicio "ServicioResultados".
+
+    Variables
+    ----------------------------------------------------------------
+*@
+@{
+    @* Resultados obtenidos por el servicio Resultados *@
+    string htmlResultados = Model.SearchViewModel.HTMLResourceList;
+}
+@*
+    ----------------------------------------------------------------
+    -------------------- Lista donde se mostrarán los los items o recursos del buscador --------------------
+*@
+
+@* Contenedor de items (recursos) de resultados *@
+<div id="panResultados" class="resource-list listView list-con-checks">
+
+    @* Mostrado de resultados *@
+    @if (string.IsNullOrEmpty(htmlResultados) && Model.SearchViewModel.JSONResourceList != null)
+    {
+        Html.PartialView("../CargadorResultados/CargarResultados", Model.SearchViewModel.JSONResourceList);
+    }
+    else
+    {
+        @* Envoltorio de los items devueltos por el buscador *@
+        <div class="resource-list-wrap">
+            @* Cargar los resultados obtenidos del servicio "Cargador Resultados" *@
+            @Html.Raw(htmlResultados)
+        </div>
+    }
+</div>
+
+@* Cargando más datos *@
+<div class="loading-more-results d-none">
+    <div class="d-flex flex-column align-items-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">@Html.GetText("COMMON", "CARGANDO")</span>
+        </div>
+        <p class="text-muted mt-2">@Html.GetText("COMMON", "CARGANDO")</p>
+    </div>
+</div>

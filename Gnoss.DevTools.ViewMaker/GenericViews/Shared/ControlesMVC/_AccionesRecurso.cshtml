@@ -1,0 +1,162 @@
+﻿@model ResourceModel
+@{
+    ResourceModel fichaRecurso = Model;
+    UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+}
+<div class="group acciones noGridView">
+    <p>@Html.GetText("COMMON", "ACCIONES")</p>
+    <ul>
+        @if (fichaRecurso.Actions.Edit)
+        {
+            <li class="acc_editar">
+                <a href="@fichaRecurso.EditCardLink">@Html.GetText("COMMON", "EDITAR")</a> 
+            </li>
+        }
+        @if (fichaRecurso.Actions.CreateVersion)
+        {
+            <li class="acc_versionar">
+                <a href="@fichaRecurso.UrlNewVersion">@Html.GetText("CREARDOCUMENTO", "CREARVERSION")</a>
+            </li>
+        }
+        @if (fichaRecurso.Publisher != null && fichaRecurso.Publisher.Key != IdentidadActual.KeyIdentity)
+        {
+            <li class="acc_seguir">
+                @{
+                    string function_seguir = "";
+
+                    if (!IdentidadActual.IsGuestUser)
+                    {
+                        function_seguir = "AccionPerfil_Seguir(this, '" + fichaRecurso.Publisher.ListActions.UrlFollow + "')";  
+                    }
+                    else
+                    {
+                        function_seguir = "operativaLoginEmergente.init();OcultarUpdateProgress();";
+                    }
+                }
+                <a onclick="@function_seguir" class="opConectar">Seguir a @fichaRecurso.Publisher.NamePerson</a>
+
+            </li>
+        }
+        @if (fichaRecurso.Votes != null)
+        {
+            string jsMeGusta = "AccionRecurso_VotarPositivoListado(this, '" + fichaRecurso.Votes.UrlVotePositive + "');";
+            string jsNoMeGusta = "AccionRecurso_VotarNegativoListado(this, '" + fichaRecurso.Votes.UrlVoteNegative + "');";
+            string jsAnularVoto = "AccionRecurso_VotarEliminarListado(this, '" + fichaRecurso.Votes.UrlDeleteVote + "');";
+
+            if (!fichaRecurso.Votes.IsOwnedAuthor)
+            {
+                string accionMeGusta = jsMeGusta;
+                string accionMeGustaAux = jsAnularVoto;
+                string textoAccionMeGusta = Html.GetText("PERFILBASERECURSOSFICHA", "MEGUSTA");
+                string textoAccionMeGustaAux = Html.GetText("PERFILBASERECURSOSFICHA", "TEGUSTA");
+                bool isVotedPositive = false;
+
+                if (!IdentidadActual.IsGuestUser)
+                {
+                    if (fichaRecurso.Votes.IsVotedPositive)
+                    {
+                        accionMeGusta = jsAnularVoto;
+                        accionMeGustaAux = accionMeGusta;
+                        textoAccionMeGusta = Html.GetText("PERFILBASERECURSOSFICHA", "TEGUSTA");
+                        textoAccionMeGustaAux = Html.GetText("PERFILBASERECURSOSFICHA", "MEGUSTA");
+                        isVotedPositive = true;
+                    }
+                }
+                else
+                {
+                    accionMeGusta = "operativaLoginEmergente.init();OcultarUpdateProgress();";
+                }
+
+                <li class="acc_megusta @(isVotedPositive?"active":"")">
+                    <a onclick="@accionMeGusta" onclickAux="@accionMeGustaAux" class="megusta iconizer" textoAux="@textoAccionMeGustaAux">
+                        @if (fichaRecurso.Votes.AllowNegativeVotes)
+                        {
+                            <span class="icono"></span>
+                        }
+                        @textoAccionMeGusta
+                    </a>                
+                    @if (fichaRecurso.Votes.NumPositiveVotes > 0)
+                    {
+                        <strong>(@fichaRecurso.Votes.NumPositiveVotes)</strong>
+                    }
+                </li>
+                if (fichaRecurso.Votes.AllowNegativeVotes)
+                {
+                    string accionNoMeGusta = jsNoMeGusta;
+                    string accionNoMeGustaAux = jsAnularVoto;
+                    string textoAccionNoMeGusta = Html.GetText("PERFILBASERECURSOSFICHA", "NOMEGUSTA");
+                    string textoAccionNoMeGustaAux = Html.GetText("PERFILBASERECURSOSFICHA", "NOTEGUSTA");
+                    bool isVotedNegative = false;
+
+                    if (!IdentidadActual.IsGuestUser)
+                    {
+                        if (fichaRecurso.Votes.IsVotedNegative)
+                        {
+                            accionNoMeGusta = jsAnularVoto;
+                            accionNoMeGustaAux = jsNoMeGusta;
+                            textoAccionNoMeGusta = Html.GetText("PERFILBASERECURSOSFICHA", "NOTEGUSTA");
+                            textoAccionNoMeGustaAux = Html.GetText("PERFILBASERECURSOSFICHA", "NOMEGUSTA");
+                            isVotedNegative = true;
+                        }
+                    }
+                    else
+                    {
+                        accionNoMeGusta = "operativaLoginEmergente.init();OcultarUpdateProgress();";
+                    }
+                    
+                    <li class="acc_nomegusta @(isVotedNegative?"active":"")">
+                        <a onclick="@accionNoMeGusta" onclickAux="@accionNoMeGustaAux" class="nomegusta iconizer" textoAux="@textoAccionNoMeGustaAux">
+                            <span class="icono"></span>
+                            @textoAccionNoMeGusta
+                        </a>
+                        @if (fichaRecurso.Votes.NumNegativeVotes > 0)
+                        {
+                            <strong>(@fichaRecurso.Votes.NumNegativeVotes)</strong>
+                        }
+                    </li>
+                }
+            }
+        }
+        @if(fichaRecurso.AllowComments)
+        {
+            <li class="acc_comentar">
+                <a href="@fichaRecurso.CompletCardLink#comments">@Html.GetText("PERFILBASERECURSOSFICHA", "COMENTAR")</a>
+                @if (fichaRecurso.NumComments > 0)
+                {
+                    <strong>(@fichaRecurso.NumComments)</strong>
+                }
+            </li>
+        }
+        @if (fichaRecurso.Actions != null && fichaRecurso.Actions.AddToMyPersonalSpace)
+        {
+            string accionAgregarAMiEspacio = "";
+            if (!IdentidadActual.IsGuestUser)
+            {
+                accionAgregarAMiEspacio = "DesplegarAccionMVC('" + fichaRecurso.ListActions.UrlLoadActionAddToPersonalSpace + "', this, 'despAccionRec_" + fichaRecurso.Key + "', 'AccionRecurso_AgregarABR');";
+            }
+            else
+            {
+                accionAgregarAMiEspacio = "operativaLoginEmergente.init();OcultarUpdateProgress();";
+            }
+            <li class="acc_guardar"><a onclick="@accionAgregarAMiEspacio">@Html.GetText("PERFILBASERECURSOSFICHA", "AGREGARABRPERSONAL")</a></li>
+        }
+        @if (fichaRecurso.Actions != null && fichaRecurso.Actions.Delete)
+        {
+            string accionDelete = "DesplegarAccionMVC('" + fichaRecurso.ListActions.UrlLoadActionDelete + "', this, 'despAccionRec_" + fichaRecurso.Key + "', '');";
+            <li class="acc_delete"><a onclick="@accionDelete">@Html.GetText("PERFILBASERECURSOSFICHA", "ELIMINAR")</a></li>
+        }
+    </ul>
+</div>
+<div style="display: none;" id ="despAccionRec_@fichaRecurso.Key">
+    <div style="display: none;" class="stateShowForm" id="panels">
+        <div class="loading" id="loading">
+            <p>@Html.GetText("CONTROLDESPLEGAR", "CARGANDO")</p>
+        </div>
+        <div id="menssages">
+            <div class="ok"></div>
+            <div class="ko"></div>
+        </div>
+        <div class="box form activeForm" id="action"></div>
+        <p class="cerrar"><a clickJS="CerrarPanelAccion('despAccionRec_@fichaRecurso.Key')" title="@Html.GetText("CONTROLDESPLEGAR", "CERRARFORM")">@Html.GetText("CONTROLDESPLEGAR", "CERRARX")</a></p>
+    </div>
+</div>

@@ -1,0 +1,191 @@
+﻿@model RecentActivity
+@*
+Descripción
+-----------------------------------------------
+Vista utilizada para mostrar la actividad reciente cuando el tipo de actividad reciente sea "Recurso". Esta vista es utilizada en la vista _ActividadReciente.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+// Obtengo cada actividad del bucle realizado en _ActividadReciente
+var actividad = (RecentActivityResourceItem)ViewData["actividad"];
+ResourceModel recurso = actividad.Resource;
+// Posible clase dependiendo del tipo de recurso (privado...)
+string privado = "";
+
+// Posible clase para vista preliminar del recurso
+string classMiniatura = "";
+
+// Formateo de fecha de publicación del recurso
+string fechaRecurso = "";
+// Obtener la comunidad actual
+CommunityModel Comunidad = Html.GetComunidad();
+// Nombre adicional para el tipo de recurso y ser usado a modo de clase
+string claseTipoRecurso = "";
+// Nº de comentarios recientes del recurso
+int numRecentComments = 0;
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista de Actividad reciente: Tipo Recurso --------------------
+*@
+
+
+@if (recurso != null)
+{
+
+    claseTipoRecurso = Html.ObtenerNombreClasePorTipoRecurso(recurso.TypeDocument);
+
+    @* Posible clase a asignar a un recurso (privado) *@
+    if (recurso.Private)
+    {
+        privado = " private";
+    }
+
+    @* Posible clase a asignar a un recurso en su vista preliminar (privado) *@
+    if (recurso.NameImage == "video")
+    {
+        classMiniatura = "recursoVideo";
+    }
+
+    fechaRecurso = recurso.PublishDate.ToString("dddd, MMMM. yyyy");
+    List<ResourceEventModel> enventos = ((RecentActivityResourceItem)actividad).Events;
+    ProfileModel publicador = recurso.Publisher;
+
+    @* Item Actividad reciente de tipo Recurso *@
+    <article class="resource @claseTipoRecurso @privado" id="resource_@recurso.Key">
+        <div class="wrap">
+            @* Controlar si el recurso tiene Votos o Certificación para ser mostrado *@
+            @if (enventos != null && enventos.Find(evento => evento.Type == ResourceEventModel.EventType.Voted || evento.Type == ResourceEventModel.EventType.Certified || evento.Type == ResourceEventModel.EventType.Commented) != null)
+            {                
+                @* Contenedor informativo de eventos relacionados con el recurso (Comentarios del recurso, ¿Recurso Certificado? , ¿Ha gustado? ...) *@                                                
+                @Html.PartialView("../Shared/ControlesMVC/_partial-views/_recent-activity-resource-comment-header", enventos)                
+            }
+
+            @* Contenedor central de info del recurso (Título del recurso, Tipo, Imagen Preview del recurso, Descripción del recurso ) *@
+            <div class="middle-wrap">
+                @* Título del recurso*@
+                <div class="title-wrap">
+                    @* Título del recurso *@
+                    <h2 class="resource-title">
+                        <a href="@recurso.CompletCardLink">@recurso.Title</a>
+                    </h2>
+                    @* Tipo de recurso -> Tenerlo en cuenta desde el viejo Front - Sin diseño dewenir
+                    <p class="resourceType @(recurso.TypeDocument == ResourceModel.DocumentType.Semantico?"semantico " + recurso.RdfType:recurso.NameImage) @privado"><span>tipo de documento</span><a href="@recurso.CompletCardLink">@recurso.RdfTypeName</a></p>
+                    *@
+                </div>
+
+                @* Autor y fecha del recurso *@
+            <div class="info-wrap">
+                @* Autor del recurso (Personal/Profesor) - Se ha quitado del viejo front el control de las fotografías del autor *@
+                <p class="autor">
+                    @if (publicador.TypeProfile == ProfileType.Personal || publicador.TypeProfile == ProfileType.Teacher)
+                    {
+                        <span>@Html.GetText("COMMON", "PUBLICADOR") </span>
+                        <a href="@publicador.UrlPerson">
+                            @publicador.NamePerson
+                        </a>
+                    }
+                    @* Autor del recurso (Profesional) - Se ha quitado del viejo front el control de las fotografías del autor *@
+                    else if (publicador.TypeProfile == ProfileType.ProfessionalPersonal)
+                    {
+                        <span>@Html.GetText("COMMON", "PUBLICADOR") </span>
+                        <a href="@publicador.UrlPerson">
+                            @publicador.NamePerson @ConstantesDeSeparacion.SEPARACION_CONCATENADOR @publicador.NameOrganization
+                        </a>
+                    }
+                    @* Autor del recurso (Profesional Corporativo) - Se ha quitado del viejo front el control de las fotografías del autor *@
+                    else if (publicador.TypeProfile == ProfileType.ProfessionalCorporate && !string.IsNullOrEmpty(publicador.NamePerson))
+                    {
+                        <span>@Html.GetText("COMMON", "PUBLICADOR") </span>
+                        <a href="@publicador.UrlOrganization">
+                            @publicador.NameOrganization
+                        </a>
+                    }
+                    @* Resto de autor del recurso - Se ha quitado del viejo front el control de las fotografías del autor *@
+                    else
+                    {
+                        <span>@Html.GetText("COMMON", "PUBLICADOR") </span>
+                        <a href="@publicador.UrlOrganization">
+                            <span>@publicador.NameOrganization</span>
+                        </a>
+                    }
+                    @* Información de dónde se ha publicado el recurso*@
+                    @if (!string.IsNullOrEmpty(actividad.UrlCommunity))
+                    {
+                        @* Mostrar esta información si se está en el metaProject (No mostrarlo si se está en la comunidad) *@
+                        if (Comunidad.MetaProyect == true)
+                        {
+                            <span class="where"> en <a href="@actividad.UrlCommunity" title="@actividad.NameCommunity">@Html.AcortarTexto(actividad.NameCommunity, 30)</a> </span>
+                        }
+                    }
+                </p>
+                @* Fecha del recurso *@
+                <p class="fecha">@recurso.PublishDate.ToString("dd/MM/yyyy")</p>
+                @* Acciones a realizar en el recurso *@
+                @*  Ocultar acciones de Actividad Reciente hasta implementación en Core - (MYG-81)
+                    @Html.PartialView("../Shared/ControlesMVC/_partial-views/_recent-activity-list-actions", recurso)
+                *@
+            </div>
+
+                <div class="content-wrap">
+                    @* Imagen preview del recurso  *@
+                    @if (!string.IsNullOrEmpty(recurso.UrlPreview))
+                    {
+                        <div class="image-wrap">
+                            <div class="image">
+                                <img alt="@recurso.Title"
+                                     src="@recurso.UrlPreview" />
+                            </div>
+                        </div>
+                    }
+                    <div class="description-wrap">
+                        @* Descripción del recurso *@
+                        <div class="desc">
+                            @Html.Raw(Html.AcortarDescripcionHtml(recurso.Description, 250))
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @* Contenedor del bloque social de un recurso *@
+            <div class="down-wrap">
+                @* Bloque social del recurso (Nº de visualizaciones, Nº de Likes, Opción de Seguir) *@
+                <div class="social">
+                    @* Visualización del recurso *@
+                    <div class="visualizacion-recurso">
+                        <span class="material-icons">visibility</span>
+                        <span class="number">@recurso.NumVisits</span>
+                    </div>
+                    @* Likes del recurso cargado desde una vista parcial *@
+                    @Html.PartialView("../Shared/ControlesMVC/_partial-views/_recent-activity-list-votes", recurso)
+                    @* Seguir/No seguir (Follow) al autor del recurso *@
+                    @Html.PartialView("../Shared/ControlesMVC/_partial-views/_recent-activity-list-follow", recurso.Publisher)
+                </div>
+
+                @* Lista de comentarios del recurso - Mostrar 1 comentario al menos si dispone *@
+                @if (enventos != null && enventos.Find(evento => evento.Type == ResourceEventModel.EventType.Commented) != null)
+                {
+                    <div class="comentario">
+                        @* Contenedor de comentarios + Bloque Nº de comentarios *@                    
+                        <div class="numero-comentarios">
+                            @{
+                                numRecentComments = enventos.FindAll(evento => evento.Type == ResourceEventModel.EventType.Commented).Count;
+                            }
+                            @Html.GetText("COMMON", "COMENTARIOS") (@recurso.NumComments)
+                        </div>
+                        @foreach (ResourceEventCommentModel eventoComentario in enventos.Where(evento => evento.Type == ResourceEventModel.EventType.Commented))
+                        {
+
+                            @* Obtención de cada comentario *@
+                            CommentModel comment = eventoComentario.Comment;
+                            @Html.PartialView("../Shared/ControlesMVC/_partial-views/_recent-activity-resource-comment", comment)
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </article>
+}

@@ -1,0 +1,73 @@
+﻿@model RecentActivity
+@*
+Descripción
+-----------------------------------------------
+Vista utilizada para mostrar la actividad reciente cuando el tipo de actividad reciente sea "Miembro". Esta vista es utilizada en la vista _ActividadReciente.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+// Obtengo cada actividad del bucle realizado en _ActividadReciente
+var actividad = (RecentActivityMemberItem)ViewData["actividad"];
+ProfileModel miembro = ((RecentActivityMemberItem)actividad).Profile;
+// Controlar si dispone o no de fotografía el usuario
+bool containsUrlFoto = true; 
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Vista de Actividad reciente: Tipo Miembro de la comunidad --------------------
+*@
+
+
+@if (miembro != null)
+{
+    string nombreMiembro = Html.ObtenerNombrePerfil(miembro);
+    string urlMiembro = Html.ObtenerUrlPerfil(miembro);
+    // Url de foto para cada usuario (Recién registrados, Admin...) para cargar su foto correctamente
+    string urlFoto = miembro.UrlFoto;
+    
+    @* Cargar fotografía del usuario / o Asignarle una de tipo Personal - Anónima *@
+    if (string.IsNullOrEmpty(urlFoto))
+    {
+        containsUrlFoto = false;
+        urlFoto = Html.ObtenerFotoAnonimaDePerfil(ProfileType.Personal);
+    }
+
+    @* Contenedor con la información del usuario *@
+    <article class="resource resource-grupo">
+        <div class="wrap">
+            <div class="user-miniatura middle-wrap">
+                <div class="imagen-usuario-wrap">
+                    <a href="@urlMiembro">
+                        <div class="imagen @( (containsUrlFoto == false) ? "sinImagen" : null) ">
+                            @if (containsUrlFoto == false)
+                            {
+                                <span class="material-icons">person</span>
+                            }
+                            else
+                            {                                
+                                <span style="background-image: url(@Html.GetBaseUrlContent()@urlFoto);"></span>
+                            }                            
+                        </div>
+                    </a>
+                </div>
+                <div class="nombre-usuario-wrap">
+                    <p class="nombre">@nombreMiembro se ha unido a <a href="@actividad.UrlCommunity">@actividad.NameCommunity</a></p>
+                    @*<p class="nombre-completo">@nombreMiembro</p>*@
+                </div>
+            </div>
+
+            @* Contenedor del bloque social de un recurso *@
+            <div class="down-wrap">
+                @* Bloque social del recurso (Nº de visualizaciones, Nº de Likes, Opción de Seguir) *@
+                <div class="social">
+                    @* Seguir/No seguir (Follow) al autor del recurso *@                    
+                    @Html.PartialView("../Shared/ControlesMVC/_partial-views/_recent-activity-list-follow", miembro)
+                </div>
+            </div>
+        </div>
+    </article>
+
+}

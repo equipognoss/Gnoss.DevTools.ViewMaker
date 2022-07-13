@@ -1,0 +1,35 @@
+﻿@model PersonalSpaceModel
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra el header de la lista de recursos. Contendría:
+- Mensajes y el número de estos
+- ComboBox para "Ordenar" (__resource-list-actions)
+- ComboBox para "Visualizar" (__resource-list-actions)
+- Panel con etiquetas con las búsquedas realizadas
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+// Nombre del tipo de búsqueda que se mostrará
+string nombrePestanyaActual = Model.PageTitle;
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Cabecera-Header de lista de recursos de "Espacio personal" --------------------
+*@
+
+@* Contenedor de la cabecera de resultados con recursos de la Comunidad *@
+<div class="col col-12 header-listado">
+    <div class="h1-container" id="">
+        <h1>@nombrePestanyaActual <span id="panNumResultados" class="numResultados"></span></h1>
+        
+    </div>
+
+    @* ComboBox disponibles para filtrado de resultados (Descargar, Ordenar, Visualizar) *@
+    @Html.PartialView("_partial-views/_list-header-actions")
+
+</div>

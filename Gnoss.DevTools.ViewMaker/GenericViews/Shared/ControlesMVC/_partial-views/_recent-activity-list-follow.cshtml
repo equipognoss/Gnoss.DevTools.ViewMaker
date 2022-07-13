@@ -1,0 +1,88 @@
+﻿@model ProfileModel
+
+
+@*
+Descripción
+-----------------------------------------------
+Vista para poder gestionar la acción de "Seguir" a un autor de un tipo de ActividadReciente de tipo "Recurso"
+Esta vista, se utiliza por ejemplo, en "_recent-activity-resource" que es donde se muestra una "Actividad reciente" que es de tipo "Recurso".
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+// Publicador del recurso
+ProfileModel publicador = Model;
+// Nombre que se mostrará para "Seguir" dependiendod el tipo de "Publicador"
+String nombrePublicador = "";
+Boolean permitirFollow = false;
+
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+
+// Funciones para seguir o no seguir a un publicador
+string funcion_seguir = "";
+// Icono seguir-no seguir
+string icono_seguir = "";
+// Título del botón para seguir o no seguir
+string titulo_seguir = "";
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Opciones para Seguir o ser Follower del autor de un Recurso (ActividadReciente) --------------------
+*@
+
+@* Obtener el nombre, organizacion o información del publicador para poder seguir *@
+@switch (publicador.TypeProfile)
+{
+    case ProfileType.Personal:
+        nombrePublicador = publicador.NamePerson;
+        break;
+    case ProfileType.Organization:
+        nombrePublicador = publicador.NamePerson;
+        break;
+    case ProfileType.ProfessionalCorporate:
+        // code block
+        nombrePublicador = publicador.NameOrganization;
+        break;
+    case ProfileType.ProfessionalPersonal:
+        // code block
+        nombrePublicador = publicador.NamePerson;
+        break;
+
+    case ProfileType.Teacher:
+        // code block
+        nombrePublicador = publicador.NamePerson;
+        break;
+    default:
+        // code block
+        nombrePublicador = "";
+        break;
+}
+
+@* Comprobar si es posible seguir al usuario *@
+    @if (Model.KeyPerson != publicador.KeyPerson) {
+        permitirFollow = true;
+@* Comprobar si se puede seguir o no seguir *@
+        if (publicador.Actions.FollowingProfile) {
+            funcion_seguir = "AccionPerfil_NoSeguir(this, '" + publicador.ListActions.UrlUnfollow + "')";
+            icono_seguir = "person_remove_alt_1";
+            titulo_seguir = "Dejar de seguir a ";
+        }
+        else {
+            funcion_seguir = "AccionPerfil_Seguir(this, '" + publicador.ListActions.UrlFollow + "')";
+            icono_seguir = "person_add_alt_1";
+            titulo_seguir = "Seguir a ";
+        }
+    }else {
+        permitirFollow = false;
+    }
+
+    @* Acción de seguir/no seguir al usuario *@
+    @if (permitirFollow)
+    {
+        <div class="seguir-usuario">
+            <span class="material-icons">@icono_seguir</span>
+            <span class="texto" onclick="@funcion_seguir">@titulo_seguir @nombrePublicador</span>
+        </div>
+    }

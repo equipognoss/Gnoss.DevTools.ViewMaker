@@ -1,0 +1,92 @@
+﻿@model EditProfileViewModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista que se utiliza para mostrar información del usuario para que pueda añadir los siguientes datos:
+- Descripción: Describete en pocas palabras
+- Tags asociadas al usuario
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+EditProfileViewModel.QuickCurriculum Curriculum = Model.Curriculum;
+// Contador para recorrer las etiquetas existentes
+int cont = 0;
+
+@* Identificadores de elementos HTML para lógica JS *@
+@* ID del input Descripción CV *@    
+string idDescription = "Curriculum_Description";
+string inputDescription = "Curriculum.Description";
+@* Descripción del curriculum del usuario *@
+string curriculumDescription = "";
+@* ID del input Tags del usuario *@     
+string idTags = "Curriculum_Tags";
+string inputTags= "Curriculum.Tags";
+@* Tags asociados al curriculum *@
+string curriculumTags = "";
+
+@* ID del contenedor donde estarán todos los Tags (lógica Js)*@
+string idTagsContainer = "tagsContainer";
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Editar sección Curriculum Rápido del usuario --------------------
+*@
+
+@* Comprobar posible valor nulo de Curriculum para Descripción y Tags *@
+@if (Curriculum != null) {
+    curriculumTags = Curriculum.Tags;
+    curriculumDescription = Curriculum.Description;
+}
+
+
+@* Sección describete en pocas palabras*@
+<div class="form-group mb-5 edit-descripcion">
+    <label class="control-label d-block" for="@idDescription">@Html.GetText("PERFILBASESUBIRRECURSO", "DESCRIPCION"):</label>
+    <textarea id="@idDescription" name="@inputDescription" placeholder="@Html.GetText("BIORAPIDA", "INFO")" class="cke ckeSimple form-control comentarios" cols="20" rows="1">@curriculumDescription</textarea>
+</div>
+
+
+@* Sección Añadir Etiquetas/Tags *@
+<div class="form-group mb-5 edit-etiquetas">
+    <div class="autocompletar-tags form-group">        
+        <label class="control-label d-block">@Html.GetText("CONTROLSUBIRRECRAPIDO", "ETIQUETAS")</label>
+        <div class="input-wrap form-sticky-button autocompletar" onclick="$('#txtTags').focus();">
+            <span class="icon material-icons">search</span>
+            @* Input de Tags *@
+            <input type="text"
+                   placeholder="Introduce una etiqueta y pulsa AÑADIR"
+                   onfocus="CrearAutocompletarTags(this, $('input#inpt_urlServicioAutocompletar').val(), $('input.inpt_proyID').val(), $('input.inpt_bool_esMyGnoss').val() == 'True',  $('input.inpt_bool_estaEnProyecto').val() == 'True', $('input.inpt_bool_esUsuarioInvitado').val() == 'True', $('input.inpt_identidadID').val());"                   
+                   class="txtAutocomplete form-control"
+                   id="txtTags"
+                   value="@curriculumTags"
+                   autocomplete="off" />
+
+            @* Botón de Añadir Etiqueta/Tag *@
+            <a id="anadir-tag" class="btn btn-grey uppercase">Añadir</a>
+
+            @* Campo oculto que almacenará los Tags *@
+            <input type="hidden" id="@idTags" name="@inputTags" value="" />
+        </div>
+        @* Tags añadidas por el usuario y cargados de backend *@
+        <span id="tagsContainer" class="contenedor tag-list mb-4">
+
+        </span>
+    </div>
+</div>
+
+<script type="text/javascript">
+    // Parámetros para operativaTagsEditable
+    (function ($) {
+        const pParamsTags = {
+        idTagsContainer : "@idTagsContainer",
+        idTagsInputHack: "@idTags",
+    };
+        // Gestión de operativa para funcionamiento de Edición de Tags
+        operativaTagsEditable.init(pParamsTags);
+    })();
+</script>

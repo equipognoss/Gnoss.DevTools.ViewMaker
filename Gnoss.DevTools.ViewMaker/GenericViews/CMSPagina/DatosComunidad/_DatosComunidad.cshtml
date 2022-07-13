@@ -1,0 +1,13 @@
+﻿@using Es.Riam.Gnoss.Web.MVC.Models;
+@model CMSComponentCommunityInfo
+@if(Model != null)
+{   
+    <div class="componente">
+        <div class="titulo">
+            <h3>
+                @Model.Title <a class="numeroItem01" href="@Model.ResourcesUrl"><span class="cantidad">@Model.ResourcesCount</span> <span class="literal">@Html.GetText("COMMON", "RECURSOS")</span></a>, <a class="numeroItem02" href="@Model.IdentitiesUrl"><span class="cantidad">@Model.IdentitiesCount</span> <span class="literal">@Html.GetText("COMMON", "PERSONASYORGANIZACIONES")</span></a>
+            </h3>
+        </div>
+    </div>
+}
+      

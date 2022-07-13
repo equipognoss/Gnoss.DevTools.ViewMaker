@@ -1,0 +1,128 @@
+﻿@model SemanticPropertyModel
+
+@{
+    string idGrupo = "";
+
+    if (Model.Element.IdGrupoLectura != null)
+    {
+        idGrupo = " id=\"" + Model.Element.IdGrupoLectura + "\"";
+    }
+
+    string claseGrupo = "";
+
+    if (Model.Element.ClaseGrupoLectura != null)
+    {
+        claseGrupo = " class=\"" + Model.Element.ClaseGrupoLectura + "\"";
+    }
+
+    string display = "";
+
+    if (Model.Hidden)
+    {
+        display = " style=\"display:none;\"";
+    }
+}
+
+@if (Model.Element.TipoGrupo != null)
+{
+    if (Model.Properties != null && Model.Properties.Count > 0 && Model.Properties[0].OntologyPropInfo != null && !Model.Properties[0].OntologyPropInfo.UniqueValue && (Model.Element.TipoGrupo.ToLower() == "li" || Model.Element.TipoGrupo.ToLower() == "titulo" || Model.Element.TipoGrupo.ToLower() == "subtitulo" || Model.Element.TipoGrupo.ToLower().StartsWith("h")))
+    {
+        string claseProOntoData = "";
+
+        if (Model.Properties[0].Element.Propiedad.EspecifPropiedad.ClaseCssPanel != null)
+        {
+            claseProOntoData = Model.Properties[0].Element.Propiedad.EspecifPropiedad.ClaseCssPanel;
+        }
+        else
+        {
+            claseProOntoData = "cont cont_" + Model.Properties[0].Element.Propiedad.NombreGeneracionClases;
+        }
+
+        claseGrupo = " class=\"" + claseProOntoData + "\"";
+    }
+
+    if (Model.Element.TipoGrupo == "subtitulo")
+    {
+        <h2 @Html.Raw(idGrupo) @Html.Raw(claseGrupo) @Html.Raw(display)>
+            @AddChildren()
+        </h2>
+    }
+    else if (Model.Element.TipoGrupo == "titulo")
+    {
+        <h1 @Html.Raw(idGrupo) @Html.Raw(claseGrupo) @Html.Raw(display)>
+            @AddChildren()
+        </h1>
+
+        if (Model.GroupInfo.IncludeGnossIcon)
+        {
+            string classIcon = "resourceType";
+
+            if (Model.GroupInfo.GnossIconIsPrivate)
+            {
+                classIcon += " privado";
+            }
+
+            classIcon += " " + Model.GroupInfo.GnossIconName;
+
+            <p class="@classIcon">
+                <span>tipo de documento</span>
+                @if (Model.GroupInfo.GnossIconIsPrivate)
+                {
+                    <span class="privado">documento privado</span>
+                }
+                <a>@Model.GroupInfo.GnossIconName</a>
+            </p>
+        }
+    }
+    else if (Model.Element.TipoGrupo == "dl")
+    {
+        <dl @Html.Raw(idGrupo) @Html.Raw(claseGrupo) @Html.Raw(display)>
+            @AddChildren()
+        </dl>
+    }
+    else
+    {
+        @Html.Raw("<" + Model.Element.TipoGrupo + idGrupo + claseGrupo + display + ">")
+        @AddChildren()
+        @Html.Raw("</" + Model.Element.TipoGrupo + ">")
+    }
+}
+else
+{
+    <div @Html.Raw(idGrupo) @Html.Raw(claseGrupo) @Html.Raw(display)>
+        @AddChildren()
+    </div>
+}
+
+
+@functions{
+    string AddChildren()
+    {
+        if (!string.IsNullOrEmpty(Model.GroupInfo.GroupName))
+        {
+            string claseNombreGrupo = "";
+
+            if (!string.IsNullOrEmpty(Model.GroupInfo.GroupNameClass))
+            {
+                claseNombreGrupo = " class=" + Model.GroupInfo.GroupNameClass;
+            }
+
+            if (!string.IsNullOrEmpty(Model.GroupInfo.GroupNameTag))
+            {
+                @Html.Raw("<" + Model.GroupInfo.GroupNameTag + claseNombreGrupo + ">" + Model.GroupInfo.GroupName + "</" + Model.GroupInfo.GroupNameTag + ">")
+            }
+            else
+            {
+                @Html.Raw("<h" + Model.Depth + claseNombreGrupo + ">" + Model.GroupInfo.GroupName + "</h" + Model.Depth + ">")
+            }
+
+            Model.Depth++;
+        }
+
+        foreach (SemanticPropertyModel semPropMod in Model.Properties)
+        {
+            @Html.PartialView("SemCms/_Propiedad", semPropMod)
+        }
+        return string.Empty;
+    }
+}

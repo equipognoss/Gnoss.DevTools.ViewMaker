@@ -1,0 +1,43 @@
+﻿@*
+Descripción
+----------------------------------------------------------------
+Vista parcial para cargar información relativa a "Canonical" e información SEO
+Esta vista se carga directamente desde la vista _Layout.cshtml
+
+Variables
+----------------------------------------------------------------
+*@
+
+@*
+----------------------------------------------------------------
+
+-------------------- Vista para información "Canonical / SEO" --------------------*@
+
+@if (!string.IsNullOrEmpty(Html.GetUrlCanonical()))
+{
+    <link rel="canonical" href="@Html.GetUrlCanonical()" />
+}
+@if (Html.GetCabecera() != null && Html.GetCabecera().MultiLingualLinks != null)
+{
+    if (Html.GetCabecera().MultiLingualLinks.Keys.Contains(Html.GetUtilIdiomas().LanguageCode))
+    {
+        <link rel="alternate" hreflang="@Html.GetUtilIdiomas().LanguageCode" href="@Html.GetCabecera().MultiLingualLinks[Html.GetUtilIdiomas().LanguageCode].Value" />
+    }
+    foreach (string language in Html.GetCabecera().MultiLingualLinks.Keys)
+    {
+        if (!language.Equals(Html.GetUtilIdiomas().LanguageCode))
+        {
+            if (Html.GetCabecera().MultiLingualLinks[language].Key)
+            {
+                <link rel="alternate" hreflang="@language" href="@Html.GetCabecera().MultiLingualLinks[language].Value" />
+            }
+        }
+    }
+}
+@if (Html.GetBusquedasXml() != null)
+{
+    foreach (string busqeda in Html.GetBusquedasXml())
+    {
+        <link rel="search" type="application/opensearchdescription+xml" href="@busqeda" />
+    }
+}

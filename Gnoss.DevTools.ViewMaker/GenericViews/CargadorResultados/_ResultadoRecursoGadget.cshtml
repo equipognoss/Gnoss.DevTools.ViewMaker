@@ -1,0 +1,95 @@
+﻿@model ResourceModel
+@{
+    string claseFicha = "resource";
+    string claseContenedor = "";
+    if (!string.IsNullOrEmpty(Model.UrlPreview))
+    {
+        claseFicha += " conImagenAsociada";
+        claseContenedor = "imagenAsociada";
+    }
+}
+<div typeof="sioc_t:Item" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:sioc_t="http://rdfs.org/sioc/types#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:sioc="http://rdfs.org/sioc/ns#" class="@claseFicha">
+    <div class="box description">
+        <div class="wrapDescription">
+            <div class="group title">
+                @{
+                    string classTitulo = "";
+                    if (Model.TypeDocument == ResourceModel.DocumentType.Semantico)
+                    {
+                        classTitulo = "semantico " + Model.RdfType;
+                    }
+                }
+
+                <h2 class="@classTitulo"><a href="@Model.CompletCardLink" property="dcterms:title" content="@Model.Title">@Model.Title</a></h2>
+                <div class="@claseContenedor">
+                    @if (!string.IsNullOrEmpty(Model.UrlPreview))
+                    {
+                        <p>
+                            <a href="@Model.CompletCardLink">
+                                <img width="120" title="@Model.Title" alt="@Model.Title" src="@Model.UrlPreview" />
+                            </a>
+                        </p>
+                    }
+                    <p class="resourceType @(Model.TypeDocument == ResourceModel.DocumentType.Semantico?"semantico " + Model.RdfType:Model.NameImage)"><span>tipo de documento</span><a href="@Model.CompletCardLink">@Model.RdfTypeName</a></p>
+                </div>
+                @if (Model.ViewSettings != null)
+                {
+                    if (!string.IsNullOrEmpty(Model.ViewSettings.InfoExtraContext))
+                    {
+                        <div class="group body">
+                            @Html.Raw(Model.ViewSettings.InfoExtraContext)
+                        </div>
+                    }
+                }
+                @if (Model.Actions != null && Model.Actions.UnLinkUp)
+                {
+                    <p class="btdesvincular">
+                        <a onclick="DesplegarPanelMVC('despAccionRec_@Model.Key');">Desvincular | x</a>
+                    </p>
+                }
+            </div>
+
+            @if (Model.TypeDocument == ResourceModel.DocumentType.Encuesta)
+            {
+                <div class="group content">
+                    <span>
+                        <div class="encuesta" id="encuesta_@Model.Key">
+                            @Html.PartialView("../FichaRecurso/_FichaEncuesta", Model)
+                        </div>
+                    </span>
+                </div>
+            }
+
+            @if (Model.Actions != null && Model.Actions.UnLinkUp)
+            {
+                <div style="display:none;" class="desvincular" id="despAccionRec_@Model.Key">
+                    <div style="display: none;" class="stateShowForm" id="panels">
+                        <div class="loading" id="loading">
+                            <p>Cargando formulario, un momento por favor</p>
+                        </div>
+                        <div id="menssages">
+                            <div class="ok"></div>
+                            <div class="ko"></div>
+                        </div>
+                        <div class="box form activeForm" id="action">
+                            <fieldset>
+                                <legend>¿Deseas desvincular del documento actual el recurso?</legend>
+                                <p>
+                                    @{
+                                        string funcionDesVincularAceptar = "AccionRecurso_DesVincular_Aceptar('" + Model.ListActions.UrlUnLinkResource + "','" + Model.ListActions.UrlLoadLinkedResources + "', '" + Context.Request.Query["docID"] + "', '" + Model.Key + "')";
+                                        string funcionDesVincularCancelar = "CerrarPanelAccion('despAccionRec_" + Model.Key + "')";
+                                    }
+                                    <input type="button" onclick="@funcionDesVincularAceptar" value="Sí" />
+                                    <input type="button" onclick="@funcionDesVincularCancelar" value="No" />
+                                </p>
+                            </fieldset>
+                        </div>
+                        <p class="cerrar">
+                            <a onclick="CerrarPanelAccion('despAccionRec_@Model.Key')" title="cerrar formulario">cerrar x</a>
+                        </p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

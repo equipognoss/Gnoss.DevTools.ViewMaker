@@ -1,0 +1,34 @@
+﻿@*
+    Descripción
+    -----------------------------------------------
+    Nueva vista que muestra el header de la lista de mensajes. Contendría:
+    - Mensajes y el número de estos
+    - ComboBox para "Ordenar" (__resource-list-actions)
+    - ComboBox para "Visualizar" (__resource-list-actions)
+    - Panel con etiquetas con las búsquedas realizadas
+
+
+    Variables
+    ----------------------------------------------------------------
+*@
+@{
+
+
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Cabecera-Header de lista de mensajes --------------------
+*@
+
+
+@* Contenedor de la cabecera de resultados con recursos de la Comunidad *@
+<div class="col col-12 header-listado">
+    <div class="h1-container" id="">
+        <h1>@Html.GetText("BANDEJAENTRADA", "MISMENSAJES") <span id="divNumResultadosBusqueda" class="numResultados"></span></h1>
+    </div>
+
+    @* ComboBox disponibles para filtrado de resultados (Descargar, Ordenar, Visualizar) *@
+    @Html.PartialView("_partial-views/_list-header-actions")
+
+</div>

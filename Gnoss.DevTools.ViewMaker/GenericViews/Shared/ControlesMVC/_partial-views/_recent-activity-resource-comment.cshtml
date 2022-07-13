@@ -1,0 +1,115 @@
+﻿@model CommentModel
+@*
+Descripción
+-----------------------------------------------
+
+Vista utilizada para el comentario que está relacionado con un recurso y que ha sido realizado por un determinado usuario.
+Esta vista se utiliza para ser mostrada (por ejemplo) en la vista Home de la comunidad, donde aparecerán todos los recursos de una determinada comunidad.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+string namePerson = Html.ObtenerNombrePerfil(Model.PublisherCard);
+string urlPerson = Html.ObtenerUrlPerfil(Model.PublisherCard);
+// Controlar si dispone o no de fotografía el usuario
+bool containsUrlFoto = true;
+// Url que contiene la url de la foto del publisher del comentario
+string urlFoto = "";
+// Nº máximo de caracteres permitidos en el comentario
+int maxNumCharacters = 200;
+
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista de Comentario de un recurso mostrado en la Home --------------------
+*@
+
+@* Cargar la foto del publicador o anónima *@
+@if (Model.PublisherCard.UrlFoto == null)
+{
+    containsUrlFoto = false;
+    urlFoto = Html.ObtenerFotoAnonimaDePerfil(Model.PublisherCard.TypeProfile);
+}
+else {
+    urlFoto = Model.PublisherCard.UrlFoto;
+}
+
+
+    @* Bloque comentario inner*@
+    <div class="bloque-comentario" id ="@Model.Key">
+        <div class="col-comentario">
+            <div class="comentario-header">
+                @* Usuario del comentario*@
+                <div class="user-miniatura">
+                    <div class="nombre-usuario-wrap">
+                        <a typeof="foaf:Person" href="@urlPerson">
+                            @* Nombre del autor del comentario *@
+                            <span class="nombre" property="foaf:name">@namePerson</span>
+                        </a>
+                    </div>
+                </div>
+                @* Contenedor fecha de publicación del comentario *@
+                <div class="fecha-publicacion">
+                    <span property="dcterms:created" content="@Model.PublishDate.ToString("yyyy/MM/dd HH:mm")">@Model.PublishDate.ToString("dd/MM/yyyy HH:mm")</span>
+                </div>
+            </div>
+            @* Cuerpo del comentario *@
+            <div class="comentario-body">
+                <div property="sioc:content" class="comentario-contenido">  
+                                  @if (Model.Title.Contains("<p ") || Model.Title.Contains("<p>") && Model.Title.Contains("</p>"))
+                    {
+                        if (Model.Title.Length > maxNumCharacters)
+                        {
+                            @Html.Raw(Html.TruncateString(Model.Title, maxNumCharacters));
+                        }
+                        else
+                        {
+                            @Html.Raw(Model.Title)
+                        }
+                    }
+                    else { 
+                        <p>
+                            @if (Model.Title.Length > maxNumCharacters)
+                            {
+                            @Html.Raw(Html.TruncateString(Model.Title, maxNumCharacters));
+                            }
+                            else
+                            {
+                            @Html.Raw(Model.Title)
+                            }
+                        </p>
+                    }
+                </div>
+            </div>
+        </div>
+        @* Imagen del autor del comentario *@
+        <div class="col-usuario">
+            <div class="user-miniatura">
+                <div class="imagen-usuario-wrap">
+                    <a href="@urlPerson">
+                        <div class="imagen @( (containsUrlFoto == false) ? "sinImagen" : null) ">                                
+                            @if (containsUrlFoto == false)
+                            {
+                            <span class="material-icons">person</span>
+                            }
+                            else {
+                                <span style="background-image: url(@Html.GetBaseUrlContent()@urlFoto)"></span>
+                            }  
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script lang="javascript" type="text/javascript">
+    $(document).ready(function () {
+        let fechamoment = "@Model.PublishDate.ToString("yyyy-MM-dd")" + "T" + "@Model.PublishDate.ToString("HH:mm:ss")" + "Z";
+        var fechaServer = moment(fechamoment);
+        var fechaMsj = fechaServer.tz(Intl.DateTimeFormat().resolvedOptions().timeZone).format('DD/MM/YYYY HH:mm');
+        $("#@Model.Key .fecha-publicacion span").text(fechaMsj);
+    });
+    </script>

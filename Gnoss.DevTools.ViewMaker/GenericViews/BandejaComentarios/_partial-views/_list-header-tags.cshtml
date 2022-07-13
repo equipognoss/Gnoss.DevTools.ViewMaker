@@ -1,0 +1,29 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista que muestra las TAGS que se han utilizado o relacionadas con la búsqueda de Recursos. Estará localizada debajo de las acciones (Ordenar) de comentarios.
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Tags usados para buscar recursos realizados por el "buscador" de recursos --------------------
+*@
+
+@* Panel con TAGS usados en las búsquedas *@
+<div class="etiquetas add-shadow" id="divFiltros" style="display: none;">
+    <div class="group filterSpace">                    
+            @* Borrado de filtros lo muestro mejor en "CargarFacetas.cshtml" del servicio "ServicioCargarFacetas". Será una flecha que da la sensación que elimina todos los filtros *@
+            <ul class="facetedSearch tags" id="panListadoFiltrosPulgarcito"><li style="display: none;"></li></ul>
+            
+        <input type="submit" style="display: none;" id="enviarFormCajaBusqueda" value="enviar" title="enviar" />
+    </div>
+</div>
+

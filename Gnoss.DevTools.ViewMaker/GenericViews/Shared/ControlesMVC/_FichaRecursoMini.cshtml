@@ -1,0 +1,143 @@
+﻿@model ResourceModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista que se utiliza para mostrar a modo de previsualización, el recurso en la sección de Vinculados o Gadgets de la zona derecha de la pantalla. Contendrá:
+- Título
+- Breve descripción del recurso que se está vinculado
+- Acción de desvincular recurso del recurso visualizado en la página "Ficha de Recurso"
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+// Nombre clase para el título. Para el nuevo diseño no parece que haga nada, pero lo añado.
+string classTitulo = "";
+// Nombre adicional para el tipo de recurso y ser usado a modo de clase
+string claseTipoRecurso = Html.ObtenerNombreClasePorTipoRecurso(Model.TypeDocument);
+@* Controlar si dispone de fotografía el FichaRecursoMini *@
+bool hasResourceImage = !string.IsNullOrEmpty(Model.UrlPreview);
+// Nº mínimo de caracteres que debe de tener la descripción para ser mostrada
+int minimunDescriptionCharacters = 20;
+@* Detectar si es un recurso privado *@
+string privado = "";
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Ficha Recurso Mini (Previsualización de Recurso Vinculado) --------------------
+*@
+
+@* Añadir clase por ser un tipo de documento especial. No parece que sirva para el nuevo diseño pero lo añado *@
+@if (Model.TypeDocument == ResourceModel.DocumentType.Semantico)
+{
+    classTitulo = "semantico " + Model.RdfType;
+}
+
+@* Controlar contenido e imagen del FichaRecursoMini *@
+@* Limpiar de <img e iframes> la descripción del recurso *@
+@{
+String descriptionFormatted = @Html.CleanHtmlFromMultimediaItems(Model.Description);
+// Eliinar posibles párrafos para que quede el texto limpio por completo
+descriptionFormatted = Html.CleanHtmlParagraphsStringHtml(descriptionFormatted);
+}
+
+@* Comprobar si es un recurso privado *@
+@if (Model.Private) {
+    privado = "private";
+}
+
+@* Inicio del recurso mini *@
+<article class="resource resource-grupo @claseTipoRecurso @privado" typeof="sioc_t:Item" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:sioc_t="http://rdfs.org/sioc/types#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:sioc="http://rdfs.org/sioc/ns#">
+    <div class="wrap">
+        <h3 class="title icono-recurso con-icono-before @classTitulo">
+            <a href="@Model.CompletCardLink" property="dcterms:title" content="@Model.Title">@Model.Title</a>
+        </h3>
+        
+        @* Breve descripción del recurso mini con imagen *@
+        @if (hasResourceImage && descriptionFormatted.Length > minimunDescriptionCharacters)
+        {
+            <div class="d-flex pt-2">           
+                @* Mostrar imagen si hay descripción de al menos 10 caracteres *@            
+                <div class="img-resumen-wrapper">
+                    <img class="img-resumen" 
+                        title="@Model.Title" 
+                        alt="@Model.Title"
+                        src="@Model.UrlPreview">
+                </div>
+            
+                @* Cuerpo del MiniRecurso *@
+                @if (!string.IsNullOrEmpty(descriptionFormatted))
+                {
+                    <div class="resumen">                                                
+                        @Html.Raw(Html.TruncateString(descriptionFormatted, 230))
+                    </div>
+                }
+            </div>
+        }
+        @* Sólo parece haber breve descripción *@
+        else if(descriptionFormatted.Length > minimunDescriptionCharacters)
+        {
+            <div class="resumen">            
+                @Html.Raw(Html.TruncateString(descriptionFormatted, 230))
+            </div>
+        }
+
+        @* Ver ajustes - Sin diseño dewenir *@
+        @if (Model.ViewSettings != null)
+        {
+            if (!string.IsNullOrEmpty(Model.ViewSettings.InfoExtraContext))
+            {
+                <div class="group body">                    
+                    @Html.Raw(Model.ViewSettings.InfoExtraContext)                    
+                </div>
+            }
+        }
+        @* Eliminado el tipo de documento *@
+        @* <p class="autor">@Model.TypeDocument</p> *@
+
+        @* Ver acciones - Sin diseño dewenir*@
+        @if (Model.Actions != null && Model.Actions.UnLinkUp)
+        {
+            @* Función desvincular aceptar*@
+            string funcionDesVincularAceptar = "AccionRecurso_DesVincular_Aceptar('" + new Uri($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}").AbsoluteUri + "/unlink-resource','" + Context.Request.Path.ToString() + "/load-linked-resources', '" + ViewContext.RouteData.Values["docID"] + "', '" + Model.Key + "')";
+
+            <a class="btn btn-outline-grey mt-2"
+               alt="Desvincular @Model.Title"
+               data-toggle="modal"
+               data-target="#modal-container"
+               title="Desvincular @Model.Title"
+               style="cursor: pointer"
+               onclick="AccionFichaPerfil('Desvincular', // Título del panel,
+                                               '@Html.GetText("COMMON", "SI")', // Título del botón primario (Sí)
+                                               '@Html.GetText("COMMON", "NO")', // Título del botón secundario (No)
+                                               '¿Deseas desvincular del documento actual el recurso @Model.Title ?', // Mensaje o pregunta de la acción a realizar por el usuario',
+                                               '@Model.Key',
+                                                function () {
+                                                     @funcionDesVincularAceptar;
+                                                },
+                                            '');
+                            ">
+                <span class="material-icons">
+                    link_off
+                </span>
+                Desvincular
+            </a>
+        }
+
+        @* Si se trata de una encuesta - Sin diseño dewenir *@
+        @if (Model.TypeDocument == ResourceModel.DocumentType.Encuesta)
+        {
+            <div class="group content">
+                <span>
+                    <div class="encuesta" id="encuesta_@Model.Key">
+                        @Html.PartialView("../FichaRecurso/_FichaEncuesta", Model)
+                    </div>
+                </span>
+            </div>
+        }
+    </div>
+</article>
+
+

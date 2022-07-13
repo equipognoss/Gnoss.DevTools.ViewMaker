@@ -1,0 +1,40 @@
+﻿@model CMSComponentCommunityList
+@if (Model != null)
+{
+    <div class="componente group mgCcomunidades">
+        <div class="titulo">
+            @if (string.IsNullOrEmpty(Model.Title))
+            {
+                <h2><span>Listado de usuarios</span></h2>
+            }
+            else
+            {
+                <h2><span>@Model.Title</span></h2>
+            }
+        </div>
+        <div class="contenido">
+
+            <div class="resource-list">
+                @foreach (CommunityModel comunidad in Model.Communities)
+                {
+                    <div class="resource">
+                        <div class="box description">
+                            <div class="group title">
+                                <h4>
+                                    <a title="@comunidad.Name" href="@comunidad.Url">@comunidad.Name</a>
+                                </h4>
+                                <div class="logoComunidad">
+                                    <a title="@comunidad.Name" href="@comunidad.Url">
+                                        <img src="@comunidad.Logo" alt="@comunidad.Name" title="@comunidad.Name" />
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+        </div>
+    </div>
+
+}

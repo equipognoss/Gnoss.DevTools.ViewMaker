@@ -1,0 +1,80 @@
+﻿@model CommunityModel
+@if (Model != null)
+{   
+    <div class="resource ">
+        <div class="box description">
+            <!-- Titulo del proyecto y tipo de proyecto (publico, privado... etc) -->
+            <div class="group title">
+                <h3>
+                    <a href="@Model.Url">@Model.Name</a>
+                </h3>
+                <div class="logoComunidad">
+                    <a href="@Model.Url">
+                    <img alt="@Model.Name" src="@Model.Logo" />
+                    </a>
+                </div>
+            </div>
+            <!-- Contenido de la descripción del proyecto -->
+            <div class="group content">
+                <span class="descripcionResumida">
+                    @Html.Raw(Model.Description)
+                </span>
+            </div>
+            <!-- Etiquetas y categorías del proyecto -->
+
+            <div class="group utils-2">
+                <p>
+                    @switch ((CommunityModel.TypeAccessProject)Model.AccessType)
+                    {
+                        case CommunityModel.TypeAccessProject.Private:
+                        @Html.Raw(Html.GetText("COMUNIDADES", "COMUNIDADPRIVADA"))
+                            break;
+                        case CommunityModel.TypeAccessProject.Public:
+                        @Html.Raw(Html.GetText("COMUNIDADES", "COMUNIDADPUBLICA"))
+                            break;
+                        case CommunityModel.TypeAccessProject.Reserved:
+                        @Html.Raw(Html.GetText("COMUNIDADES", "COMUNIDADRESERVADA"))
+                            break;
+                        case CommunityModel.TypeAccessProject.Restricted:
+                        @Html.Raw(Html.GetText("COMUNIDADES", "COMUNIDADRESTRINGIDA"))
+                            break;
+                    }. 
+                    <a href="@Model.Url/@Html.GetText("URLSEM", "PERSONASYORGANIZACIONES")/@Html.GetText("URLSEM", "PERSONAS")">@Model.NumberOfPerson @Html.GetText("COMMON", "PERSONAS")</a><span>, </span><a href="@Model.Url/@Html.GetText("URLSEM", "PERSONASYORGANIZACIONES")/@Html.GetText("URLSEM", "ORGANIZACIONES")">@Model.NumberOfOrganizations @Html.GetText("COMMON", "ORGANIZACIONES")</a><span> y </span><a href="@Model.Url/@Html.GetText("URLSEM", "RECURSOS")">@Model.NumberOfResources @Html.GetText("COMMON", "RECURSOS")</a>
+                </p>
+            </div>
+
+            @if( Model.Categories != null &&  Model.Categories.Count > 0)
+            {
+                <div class="group categorias">
+                    <p class="literal">@Html.GetText("LISTARECURSOS", "CATEGORIAS") </p>
+                    <ul id="listCat">
+                        @foreach(CategoryModel categoria in Model.Categories)
+                        {
+                        <li><a href="@Model.UrlSearch/@Html.GetText("URLSEM", "CATEGORIA")/@categoria.Name/@categoria.Key">@categoria.Name</a>@(categoria!=Model.Categories.Last()?",":"")</li>
+                        }
+                    </ul>
+                </div>
+            }
+            @if( Model.Tags != null &&  Model.Tags.Count > 0)
+            {
+            <div class="group etiquetas">
+                <p class="literal">@Html.GetText("LISTARECURSOS", "ETIQUETAS") </p>
+                <ul class="listTags">
+                    @foreach(string tag in Model.Tags)
+                    {
+                    <li><a href="@Model.UrlSearch/@Html.GetText("URLSEM", "TAG")/@tag">@tag</a>@(tag!=Model.Tags.Last()?",":"")</li>
+                    }
+                </ul>
+            </div>
+            }
+        </div>
+    </div>
+}
+
+
+
+
+
+
+
+

@@ -1,0 +1,78 @@
+﻿@model AutenticationModel
+
+@{    
+
+    CommunityModel Comunidad = Html.GetComunidad();
+    HeaderModel Cabecera = Html.GetCabecera();
+    UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+
+    string col01class = string.Empty;
+    if (!string.IsNullOrEmpty(Comunidad.ProjectLoginConfiguration))
+    {
+        Html.SetBodyClass("full operativaRegistro layout03 login");
+        col01class = " class=\"loginPersonalizado\" ";
+
+    }
+    else
+    {
+        if (Model.TypePage == AutenticationModel.TypeAutenticationPage.Login)
+        {
+            Html.SetBodyClass("layout04 full operativaRegistro login no-min-height-content");
+        }
+        else if (Model.TypePage == AutenticationModel.TypeAutenticationPage.Registro || Model.TypePage == AutenticationModel.TypeAutenticationPage.RegistroConRedesSociales)
+        {
+            Html.SetBodyClass("layout04 full operativaRegistro registro no-min-height-content");
+        }
+    }
+
+    Html.SetOcultarMenusComunidad(true);
+}
+
+<div class="row">
+    <div id="col01" class="col" @Html.Raw(col01class)>
+        <div class="form formtheme01 formularioRegistroUsuarios panel-centrado">
+            <!--<h2>-->
+                @if (Model.TypePage == AutenticationModel.TypeAutenticationPage.Login)
+                {
+                    if (Comunidad == null)
+                    {
+                        <h1>Inicia sesión en <strong>myGNOSS</strong></h1>
+                    }
+                    else { 
+                        <h1>Inicia sesión en <strong>@Comunidad.Name</strong></h1>
+                    }
+                }
+                else if (Model.TypePage == AutenticationModel.TypeAutenticationPage.Registro || Model.TypePage == AutenticationModel.TypeAutenticationPage.RegistroConRedesSociales)
+                {
+                   // <text>@Html.GetText("COMMON", "REGISTRO")</text>
+                }
+            <!--</h2>-->
+            <div>
+                <!--<div class="box box01">-->
+                @if (Model.TypePage == AutenticationModel.TypeAutenticationPage.Login)
+                {
+                    @Html.PartialView("_FormularioLogin");
+                }
+                else if (Model.TypePage == AutenticationModel.TypeAutenticationPage.Registro || Model.TypePage == AutenticationModel.TypeAutenticationPage.RegistroConRedesSociales)
+                {
+                    @Html.PartialView("_FormularioRegistro", Model);
+                }
+                else if (Model.TypePage == AutenticationModel.TypeAutenticationPage.InvitacionUsada)
+                {
+                    @Html.PartialView("_InvitacionUsada");
+                }
+                <!--</div>-->
+                @if (Model.TypePage != AutenticationModel.TypeAutenticationPage.InvitacionUsada && Model.TypePage != AutenticationModel.TypeAutenticationPage.RegistroConRedesSociales)
+                {
+                <!-- Eliminado Panel de "Registro" . EAD"-->            
+                }
+            </div>
+        </div>
+    </div> 
+</div>
+<div id="col02">
+    @if (!string.IsNullOrEmpty(Comunidad.ProjectLoginConfiguration))
+    {
+       @Html.Raw(Comunidad.ProjectLoginConfiguration)
+    }
+</div>

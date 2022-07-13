@@ -1,0 +1,133 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista modal que servirá para etiquetar un recurso. Se mostrará cuando en la ficha del recurso, se pulse sobre "Etiquetar".
+Para ahorrar código, esta vista modal se cargará en un modal "padre" que es el "__resourece-modal-container"
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+ResourceModel fichaRecurso = Model.Resource;
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+CommunityModel Comunidad = Html.GetComunidad();
+// Contador para recorrer las etiquetas existentes
+int cont = 0;
+// Construcción para realizar la llamada JS para agregar los Tags a un determinado recurso
+string funcionAgregarTagsAceptar = "AccionRecurso_AgregarTags_Aceptar('" + fichaRecurso.ListActions.UrlAddTags + "', '" + fichaRecurso.Key + "', $('#textBoxTagsNuevos_" + fichaRecurso.Key + "_Hack').val(), " + Model.AllowEditTags.ToString().ToLower() + ", '" + fichaRecurso.UrlSearch + "/" + Html.GetText("URLSEM", "TAG") + "')";
+// ID del input oculto donde se almacenarán los tags
+string txtHack = "textBoxTagsNuevos_" + fichaRecurso.Key + "_Hack";
+// Lista de tags separados por comas que se podrán editar y que vienen de backend al cargar el modal
+string tagsEditar = "";
+
+// ID del contenedor donde estarán todos los Tags (lógica Js)
+string idTagsContainer = "tagsContainer";
+
+
+
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Vista Modal para opción de Etiquetar un recurso --------------------
+*@
+
+
+@* Carga inicial de los Tags que vienen de backend: Cargar en el input oculto sólo aquellas Tags que pueden editarse (&&)  -> (||)*@
+@{ if (Model.AllowEditTags && fichaRecurso.Tags != null)
+    {
+        foreach (string etiqueta in fichaRecurso.Tags)
+        {
+            tagsEditar += etiqueta + ",";
+        }
+    }
+}
+
+
+
+<div class="modal-header">
+    @* Título del Modal *@
+    <p class="modal-title">
+        <span class="material-icons">label</span>@Html.GetText("PERFILBASERECURSOSFICHA", "AGREGARTAG")
+    </p>
+    @* Cierre del Modal *@
+    <span class="material-icons cerrar"
+          data-dismiss="modal"
+          aria-label="Close">close</span>
+</div>
+<div class="modal-body">
+    <div class="formulario-edicion">
+        @* Sección Añadir Etiquetas/Tags *@
+        <div class="form-group mb-5 edit-etiquetas">            
+            <div class="autocompletar-tags form-group">
+                <div class="input-wrap form-sticky-button autocompletar" onclick="$('#txtTags').focus();">
+                    @* Input de Tags *@
+                    <input type="text"
+                           placeholder="Introduce una etiqueta y pulsa AÑADIR"
+                           onfocus="CrearAutocompletarTags(this, $('input#inpt_urlServicioAutocompletar').val(), '@Comunidad.Key', $('input#inpt_bool_esMyGnoss').val(), $('input#inpt_bool_estaEnProyecto').val(), $('input#inpt_bool_esUsuarioInvitado').val(), '@IdentidadActual.KeyIdentity');"                           
+                           onload="pintarTagsInicio()"
+                           class="txtAutocomplete form-control"
+                           id="textBoxTagsNuevos_@fichaRecurso.Key"
+                           autocomplete="off" />
+
+                    @* Botón de Añadir Etiqueta/Tag *@
+                    <a id="anadir-tag" class="btn btn-grey uppercase">Añadir</a>
+
+                    @* Campo oculto que almacenará los Tags del recurso *@                    
+                    <input type="hidden" id="@txtHack" value="@tagsEditar" />
+                </div>
+                @* Tags añadidas por el usuario y cargados de backend *@
+                <span id="@idTagsContainer" class="contenedor tag-list mb-4">
+                        @if (fichaRecurso.Tags != null)
+                        {                            
+                            
+                            @* Recorrer las etiquetas existentes y pintarlas en la lista*@
+                            foreach (string etiqueta in fichaRecurso.Tags)
+                            {
+                                @* Detalles de la etiqueta *@
+                                <div class="tag @( (Model.AllowEditTags) ? "tagEditable" : null) " title="@etiqueta">
+                                    <div class="tag-wrap">
+                                        @* Posibilitar borrado de etiqueta si es propietario del recurso *@
+                                        <span class="tag-text">@etiqueta</span>
+                                        @* Comprobar si se permite eliminar/editar tags del recurso *@
+                                        @if (Model.AllowEditTags)
+                                        {
+                                            <span class="tag-remove material-icons">close</span>
+                                        }                                                                            
+                                    </div>
+                                </div>
+                                cont++;                            
+                            }                            
+                         }
+
+                </span>
+            </div>
+        </div>
+
+        @* Mensaje informativo del proceso *@
+        <div id="despAccionRec_@fichaRecurso.Key">
+            <div>
+                <div id="menssages">
+                    <div class="ok"></div>
+                    <div class="ko"></div>
+                </div>
+            </div>
+        </div>
+        <div class="form-actions">
+            @* Botón que guardará posibles cambios *@
+            <button onclick="@funcionAgregarTagsAceptar" class="btn btn-primary">@Html.GetText("COMMON", "ACEPTAR")</button>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    // Parámetros para operativaTagsEditable
+    (function ($) {
+        const pParamsTags = {
+        idTagsContainer : "@idTagsContainer",
+        idTagsInputHack: "@txtHack",
+    };
+        // Gestión de operativa para funcionamiento de Edición de Tags
+        operativaTagsEditable.init(pParamsTags);
+    })();
+</script>

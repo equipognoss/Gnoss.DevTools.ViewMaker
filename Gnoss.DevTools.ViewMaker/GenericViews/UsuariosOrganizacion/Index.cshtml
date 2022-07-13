@@ -1,0 +1,397 @@
+﻿@model AdministrarUsuariosOrganizacionViewModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista Index para administrar una organización. En concreto, en esta vista, se puede administrar lo siguiente: Usuarios, Grupos y Comunidades
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+CommunityModel Comunidad = Html.GetComunidad();
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+string urlAdministracion = Html.GetPerfil().Url + Html.GetText("URLSEM", "ADMINISTRACION") + "/";
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista índice para adminstrar organización: Usuarios, Grupos y Comunidades --------------------
+*@
+
+@{
+    Html.GetListaCSS().Add(Html.GetBaseUrlStatic() + "/cssNuevo/administracion.css?v=" + Html.GetVersion());
+    Html.SetBodyClass("layout02 comGnoss listado usuariosOrganizacion");    
+}
+
+
+<div class="row">
+    @if (Comunidad.Key != ProyectoAD.MetaProyecto)
+    {
+        @*Breadcrumb / Migas de pan en la ficha del recurso*@
+        <div class="col col-12 col-breadcrumb" id="breadcrumb">
+            <ul>
+                <li><a href="@Comunidad.Url"><strong>@Html.GetText("COMMON", "HOME")</strong></a></li>
+                <li>Administrar Comunidad</li>
+            </ul>
+        </div>
+    }
+    else
+    {
+        @*Breadcrumb / Migas de pan en la ficha del recurso*@
+        <div class="col col-12 col-breadcrumb" id="breadcrumb">
+            <ul>
+                @if (@Comunidad.Url != null)
+                {
+                    <li><a href="@Comunidad.Url"><strong>@Html.GetText("COMMON", "HOME")</strong></a></li>
+                }
+                else
+                {
+                    <li><strong>@Html.GetText("COMMON", "HOME")</strong></li>
+                }
+                <li>Administrar Comunidad</li>
+            </ul>
+        </div>
+    }
+</div>
+    @* Contenedor de datos para filtrado *@
+    <div id="contentUsuariosOrganizacion" class="row">
+    @* Cargar cada una de las vistas necesearias para visualizarse en Index () *@
+        @if (Model.PageType.Equals(AdministrarUsuariosOrganizacionViewModel.TipoPagina.Usuarios))
+        {
+            @Html.PartialView("_Usuarios", Model)
+        }
+        else if (Model.PageType.Equals(AdministrarUsuariosOrganizacionViewModel.TipoPagina.Comunidades))
+        {
+            @Html.PartialView("_Comunidades", Model)
+        }
+        else if (Model.PageType.Equals(AdministrarUsuariosOrganizacionViewModel.TipoPagina.Grupos))
+        {
+            @Html.PartialView("_Grupos", Model)
+        }
+    </div>
+
+
+    @* COMPORTAMIENTO JS *@
+    <script defer="defer" type="text/javascript">
+    EjecutarScriptsIniciales();   
+    @* Hace falta? *@
+    /*
+    var ContactosEscondidos = new Array();
+    function crearInvitado(ficha, nombre, identidad) {
+        if (ficha.className == "infoUsuario floatLeft") {
+            ficha = ficha.parentNode;
+        }
+        contenedor = document.getElementById('panContenedorInvitados');
+        contenedor.innerHTML = contenedor.innerHTML + '<span class="icoEliminar" style="margin-right:10px;">' + nombre + '<a style="cursor:pointer;" onclick="javascript:eliminarInvitado(\'' + ficha.id + '\',this,\'' + identidad + '\');"><img src="' + document.getElementById('txtBaseUrlHack').value + 'img/blank.gif" alt="eliminar"></a></span>'
+
+        ficha.style.display = 'none';
+        document.getElementById('txtHackInvitados').value = document.getElementById('txtHackInvitados').value + "&" + identidad;
+    }
+
+    function eliminarInvitado(fichaId, nombre, identidad) {
+        ficha = document.getElementById(fichaId);
+        ficha.style.display = 'block';
+
+        cadena = $('.filtroRapido input')[0].value;
+        if ($(ficha).find('h3 a')[0].innerHTML.toLowerCase().indexOf(cadena.toLowerCase()) < 0) {
+            ContactosEscondidos[ContactosEscondidos.length] = ficha;
+            ficha.style.display = 'none';
+        }
+
+        contenedor = document.getElementById('panContenedorInvitados');
+        contenedor.removeChild(nombre.parentNode);
+        document.getElementById('txtHackInvitados').value = document.getElementById('txtHackInvitados').value.replace('&' + identidad, '');
+    }
+
+    function agregarCorreo() {
+        txtCorreo = document.getElementById('txtCorreoAInvitar');
+        txtCorreosNoValidos = document.getElementById('txtCorreosNoValidosHack');
+        infoCorreo = document.getElementById('lblInfoCorreo');
+        if (!validarEmail(txtCorreo.value.replace(/^\s*|\s*$/g, ""))) {
+            infoCorreo.innerHTML = form.emailValido;
+            setTimeout('infoCorreo.innerHTML = \'\'', 3000);
+            return;
+        }
+        if (txtCorreosNoValidos.value.indexOf(txtCorreo.value.replace(/^\s*|\s*$/g, "") + ' ') >= 0) {
+            infoCorreo.innerHTML = invitaciones.correoPerteneceCom;
+            setTimeout('infoCorreo.innerHTML = \'\'', 3000);
+            return;
+        }
+
+        contenedor = document.getElementById('panContenedorInvitados');
+        contenedor.innerHTML = contenedor.innerHTML + '<span class="icoEliminar" style="margin-right:10px;">' + txtCorreo.value.replace(/^\s*|\s*$/g, "") + '<a style="cursor:pointer;" onclick="javascript:eliminarCorreo(\'' + txtCorreo.value.replace(/^\s*|\s*$/g, "") + '\',this);"><img src="' + document.getElementById('txtBaseUrlHack').value + 'img/blank.gif" alt="eliminar"></a></span>'
+
+        document.getElementById('txtHackInvitados').value = document.getElementById('txtHackInvitados').value + "&" + txtCorreo.value.replace(/^\s*|\s*$/g, "");
+
+        txtCorreo.value = '';
+        infoCorreo.innerHTML = '';
+    }
+    function eliminarCorreo(correo, nombre) {
+        txtCorreo = document.getElementById('txtCorreoAInvitar');
+
+        contenedor = document.getElementById('panContenedorInvitados');
+        contenedor.removeChild(nombre.parentNode);
+        document.getElementById('txtHackInvitados').value = document.getElementById('txtHackInvitados').value.replace('&' + correo, '');
+    }
+
+    function mostrarSelectorComentaristas() {
+        MostrarPopUpSelectorDeUsuarios(0);
+        //OcultarProcesando_selectorUsuariosComentaristas();
+    }
+
+    function mostrarSelectorVisibles() {
+        MostrarPopUpSelectorDeUsuarios(1);
+        //OcultarProcesando_selectorUsuariosVisibles();
+    }
+
+    /// <summary>
+    /// Muestra el panel pop-up y uno de las capas que contiene a demanda.
+    /// </summary>
+    function MostrarPopUpSelectorDeUsuarios(pCapa) {
+        //0 -> selector de Comentaristas
+        //1 -> selector de Permisos
+
+        if (pCapa == 0) {
+            document.getElementById('panSelectorComentaristas').style.display = 'block';
+            document.getElementById('panSelectorVisibles').style.display = 'none';
+        }
+        else if (pCapa == 1) {
+            document.getElementById('panSelectorComentaristas').style.display = 'none';
+            document.getElementById('panSelectorVisibles').style.display = 'block';
+        }
+        var $capa = $('#capaModal');
+        var $iframe = null;
+        var $mask = $capa.find('div.mascara').height($(document).height());
+        $capa.find('div.anyadirCategorias').css('top', ($('html').attr('scrollTop') || $('body').attr('scrollTop') || 0) + 'px')
+        $capa.fadeIn();
+        if ($.browser.msie && $.browser.version < 7) {
+            $iframe = $('<iframe></iframe>').css({
+                position: 'absolute',
+                top: 0,
+                left: '50%',
+                zIndex: parseInt($mask.css('zIndex')) - 1,
+                width: '1000px',
+                marginLeft: '-500px',
+                height: $mask.height(),
+                filter: 'mask()'
+            }).insertAfter($mask);
+        }
+        // una vez llamado deberian prepararse los eventos
+        $capa.find('a.icoEliminar').unbind('click').click(function () {
+            $capa.fadeOut();
+            if ($iframe) { $iframe.remove(); }
+        });
+        AjustarTopControl('capaModal');
+        return false;
+    }
+
+    function marcarTodosElementosSelProy(pListaGuids, pIdTxt, pIdSelector) {
+        var guids = new Array();
+        guids = pListaGuids.split('|');
+        var valor = $('#chkSeleccionarTodos').attr('checked');
+        for (i = 0; i < guids.length; i++) {
+            if (valor) {
+                if (!document.getElementById("chkIdentidad|" + guids[i]).checked) {
+                    document.getElementById("chkIdentidad|" + guids[i]).click();
+                }
+            }
+            else {
+                if (document.getElementById("chkIdentidad|" + guids[i]).checked) {
+                    document.getElementById("chkIdentidad|" + guids[i]).click();
+                }
+            }
+        }
+        $('#chkSeleccionarTodos').attr('checked', valor);
+    }
+
+    function marcarTodosElementosPerSelProy(pListaGuids, pIdTxt, pIdSelector) {
+        var guids = new Array();
+        guids = pListaGuids.split('|');
+
+        for (i = 0; i < guids.length; i++) {
+            if ((document.getElementById("chkIdentidad|" + guids[i]).disabled == 0) && (document.getElementById("chkIdentidad|" + guids[i]).checked == 0)) {
+                document.getElementById("chkIdentidad|" + guids[i]).click();
+            }
+            document.getElementById(pIdSelector + "_" + guids[i] + "Per").click();
+        }
+        document.getElementById("chkIdentidadPerTodos").checked = 1;
+    }
+
+    function marcarTodosElementosCorSelProy(pListaGuids, pIdTxt, pIdSelector) {
+        var guids = new Array();
+        guids = pListaGuids.split('|');
+
+        for (i = 0; i < guids.length; i++) {
+            if ((document.getElementById("chkIdentidad|" + guids[i]).disabled == 0) && (document.getElementById("chkIdentidad|" + guids[i]).checked == 0)) {
+                document.getElementById("chkIdentidad|" + guids[i]).click();
+            }
+            document.getElementById(pIdSelector + "_" + guids[i] + "Cor").click();
+        }
+        document.getElementById("chkIdentidadCorTodos").checked = 1;
+    }
+
+    var textoAnterior = '';
+    var timeoutContactos;
+
+    function filtrarContactos() {
+        if (($('#txtFiltrarMiembros').val().length >= 3) && (textoAnterior != $('#txtFiltrarMiembros').val())) {
+            if (timeoutContactos != null) {
+                clearTimeout(timeoutContactos);
+            }
+            timeoutContactos = setTimeout("filtrarContactosTimeout($('#txtFiltrarMiembros').val())", 500);
+        }
+        else if (($('#txtFiltrarMiembros').val().length < 3) && (textoAnterior != '')) {
+            if (timeoutContactos != null) {
+                clearTimeout(timeoutContactos);
+            }
+            timeoutContactos = setTimeout("filtrarContactosTimeout('')", 500);
+        }
+    }
+    function filtrarContactosTimeout(texto) {
+        if ($('#txtFiltrarMiembros').val() == texto) {
+            var arg = 'FiltrarMiembros&' + texto;
+            WebForm_DoCallback('__Page', arg, desbloquearTextos, '__Page', '', true);
+            MostrarUpdateProgress();
+            $("#txtFiltrarMiembros").attr('disabled', true);
+            if (texto.length >= 3) {
+                $('#txtFiltrarMiembros').addClass('activo');
+            }
+            else {
+                $('#txtFiltrarMiembros').removeClass('activo');
+            }
+            textoAnterior = texto;
+        }
+    }
+
+    var timeoutComunidades;
+
+    function filtrarComunidades() {
+        if (($('#txtFiltrarCom').val().length >= 3) && (textoAnterior != $('#txtFiltrarCom').val())) {
+            if (timeoutComunidades != null) {
+                clearTimeout(timeoutComunidades);
+            }
+            timeoutComunidades = setTimeout("filtrarComunidadesTimeout($('#txtFiltrarCom').val())", 500);
+        }
+        else if (($('#txtFiltrarCom').val().length < 3) && (textoAnterior != '')) {
+            if (timeoutComunidades != null) {
+                clearTimeout(timeoutComunidades);
+            }
+            timeoutComunidades = setTimeout("filtrarComunidadesTimeout('')", 500);
+        }
+    }
+    function filtrarComunidadesTimeout(texto) {
+        if ($('#txtFiltrarCom').val() == texto) {
+            var arg = 'FiltrarComunidades&' + texto;
+            WebForm_DoCallback('__Page', arg, desbloquearTextos, '__Page', '', true);
+            MostrarUpdateProgress();
+            $("#txtFiltrarCom").attr('disabled', true);
+            if (texto.length >= 3) {
+                $('#txtFiltrarCom').addClass('activo');
+            }
+            else {
+                $('#txtFiltrarCom').removeClass('activo');
+            }
+            textoAnterior = texto;
+        }
+    }
+
+    function desbloquearTextos(rValue) {
+        ReceiveServerData(rValue);
+        if ($('#txtFiltrarMiembros').length > 0) {
+            $('#txtFiltrarMiembros').attr('disabled', false);
+        }
+        if ($('#txtFiltrarCom').length > 0) {
+            $('#txtFiltrarCom').attr('disabled', false);
+        }
+    }
+    */
+
+    $(document).ready(function () {
+        /* No se utiliza?
+        if (typeof window.event == 'undefined') {
+            document.onkeypress = function (e) {
+                var test_var = e.target.nodeName.toUpperCase();
+                if (e.target.type) var test_type = e.target.type.toUpperCase();
+                if ((test_var == 'INPUT' && test_type == 'TEXT') || test_var == 'TEXTAREA') {
+                    return e.keyCode;
+                } else if (e.keyCode == 8) {
+                    e.preventDefault();
+                }
+            }
+        } else {
+            document.onkeydown = function () {
+                var test_var = event.srcElement.tagName.toUpperCase();
+                if (event.srcElement.type) var test_type = event.srcElement.type.toUpperCase();
+                if ((test_var == 'INPUT' && test_type == 'TEXT') || test_var == 'TEXTAREA') {
+                    return event.keyCode;
+                } else if (event.keyCode == 8) {
+                    event.returnValue = false;
+                }
+            }
+        }
+        */
+        /* No se utiliza?
+        page.on('keydown', '#txtFiltrarMiembros', function (event) {
+            if (event.which || event.keyCode) {
+                if ((event.which == 13) || (event.keyCode == 13)) {
+                    return false;
+                }
+                else {
+                    return true
+                }
+            };
+        });
+        page.on('click', 'input.encontrar[type="button"]', function (event) {
+            lastKey = event.key;
+            lastKeyTimestamp = event.timeStamp;
+            setTimeout(function (valorKey, timeStampKey) {
+                if (valorKey == lastKey && timeStampKey == lastKeyTimestamp && $('#txtFiltrarMiembros').val() != $('#txtFiltrarMiembros').attr('aux')) {
+                    //$('#txtFiltrarMiembros').blur();
+                    lastKey = '';
+                    Filtrar();
+                }
+            }, 400, event.key, event.timeStamp);
+        });
+        page.on('change', 'select#tipoFiltro', function () {
+            Filtrar();
+        });
+        */
+        /* No se utiliza ?
+        page.on('click', '#aOrdenAscendente', function () {
+            if (!$(this).hasClass('activo')) {
+                $(this).addClass('activo');
+                $('#aOrdenDescendente').removeClass('activo');
+                $('#ordenFiltros').val("ASC");
+                Filtrar();
+            }
+        });
+        page.on('click', '#aOrdenDescendente', function () {
+            if (!$(this).hasClass('activo')) {
+                $(this).addClass('activo');
+                $('#aOrdenAscendente').removeClass('activo');
+                $('#ordenFiltros').val("DESC");
+                Filtrar();
+            }
+        });
+        */
+               
+    });
+
+    /* No se utiliza?
+    function DelplegarCambiarRol(boton, key) {
+        DesplegarAccionConPanelIDMVC('panCambiarRol', boton, 'desplegable_' + key);
+
+        var tipoUsuario = $('.tipoUsuario', $('#' + key)).attr('rel');
+        var panelCambiarRol = $('#panCambiarRol', $('#desplegable_' + key));
+
+        panelCambiarRol.attr('id', 'panCambiarRol_' + key);
+
+        $('input[type=radio]', panelCambiarRol).attr('name', 'SelectorRolUsuario_' + key);
+        $('input[type=radio][rel=' + tipoUsuario + ']', panelCambiarRol).prop('checked', true)
+
+    }
+    */
+    </script>

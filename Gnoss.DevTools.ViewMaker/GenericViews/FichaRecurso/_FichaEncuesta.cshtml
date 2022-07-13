@@ -1,0 +1,111 @@
+﻿@model ResourceModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra el contenido u opciones disponibles de un recurso que es de tipo "Encuesta"
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+// Nº de votos que hay asociados a la encuesta
+int numVotos = 0;
+// Nombre que acompañará al nº de votos
+string numVotosString = "voto";
+// Función para votar en la encuesta
+string funcionAccionRecurso_Encuesta_Votar = "AccionRecurso_Encuesta_Votar('" + Model.CompletCardLink + "', '" + Model.Key + "')";
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista del contenido o cuerpo de un recurso que es de tipo "Encuesta" --------------------
+*@
+
+@* Conteo del número de votos de la encuesta *@
+@foreach (ResourceModel.PollModel.PollOptionsModel opcionEncuesta in Model.Poll.PollOptions)
+{
+    numVotos += opcionEncuesta.NumberOfVotes;
+}
+
+
+<div class="form-group">
+
+    @if (Model.Poll.Voted) { 
+        <p>Ya has participado con tu voto en la encuesta.</p>
+    }
+   
+    @* Pintado de cada opción de la encuesta *@
+    @foreach (ResourceModel.PollModel.PollOptionsModel opcionEncuesta in Model.Poll.PollOptions)
+    {
+        @* Porcentaje de respuestas *@
+        float porcentaje = 0;
+        if (opcionEncuesta.NumberOfVotes > 0)
+        {
+            porcentaje = (opcionEncuesta.NumberOfVotes * 100 / numVotos);
+            if (opcionEncuesta.NumberOfVotes > 1) { 
+                numVotosString += "s";                
+            }
+        }
+
+        <div class="@( (!Model.Poll.Voted) ? "themed primary mb-3 custom-control custom-radio" : "themed primary mb-3")"
+             style="@( (Model.Poll.Voted) ? "border: 1px solid #ccc; padding: 1rem;" : null)">             
+            @if ((!Html.GetIdentidadActual().IsGuestIdentity || !Html.GetIdentidadActual().IsGuestUser))
+            {
+                @if (!Model.Poll.Voted) { 
+                    <input type="radio"
+                        id="@opcionEncuesta.Key"
+                        name="respuestas"
+                        class="custom-control-input"
+                        value="@opcionEncuesta.NumberOfVotes" />
+                }
+
+                <label class="@( (!Model.Poll.Voted) ? "custom-control-label" : null)" for="@opcionEncuesta.Key">@opcionEncuesta.Name </label>
+                @* Mostrado del porcentaje de votos *@
+                @if (@porcentaje > 0) { 
+                    
+                    @if (Model.Poll.ViewPollResults){
+                        <div class="viewPollResults d-flex">                                                        
+                            <span class="material-icons-outlined text-muted" style="font-size:1.5rem">poll</span>
+                            <span class="ml-1"><text>@porcentaje% </text>de @numVotos @numVotosString.</span>                                                                              
+                        </div>                        
+                    }                    
+                }                
+            }
+        </div>
+    }
+</div>
+
+@* Botón para enviar voto de encuesta/login/registro si el usuario no está logeado*@
+<div class="form-actions">
+    
+    @if (Html.GetIdentidadActual().IsGuestIdentity){
+        @* Botón para enviar logearse *@
+    <button onclick="window.location.href='@Html.GetComunidad().Url/@Html.GetText("URLSEM", "LOGIN")'"
+            class="btn btn-primary"
+            style="color: var(--c-blanco)">
+        @Html.GetText("COMMON", "CONECTATEVOTAR")
+    </button>
+    }
+    else if (Html.GetIdentidadActual().IsGuestUser)
+    {
+        @* Botón para registrarse *@
+        <button onclick="window.location.href='@Html.GetComunidad().Url/@Html.GetText("URLSEM", "HAZTEMIEMBRO")'" 
+                class="btn btn-primary" 
+                style="color: var(--c-blanco)" >
+                @Html.GetText("COMMON", "HAZTEMIEMBROVOTAR")
+        </button>
+    }
+    else if (!Model.Poll.Voted){
+        @* Botón para enviar encuesta *@
+        <button
+            onclick="@funcionAccionRecurso_Encuesta_Votar"
+            class="btn btn-primary"
+            style="color: var(--c-blanco)">
+            Enviar voto                        
+        </button>   
+    }
+          
+</div>

@@ -1,0 +1,42 @@
+﻿@model Error404ViewModel
+@*
+Descripción
+-----------------------------------------------
+Vista que se muestra cuando no se ha encontrado una página o un recurso (url) en la comunidad. Texto informativo del tipo "Vaya, esta página no existe …"
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+
+
+}
+@*
+----------------------------------------------------------------
+-------------------- Vista de de página no encontrada en myGnoss  --------------------*@
+
+<div class="row">
+    <div class="col">
+        <div class="form panel-centrado">
+            <h1>Página no encontrada</h1>
+            @Html.Raw(Model.Error)
+        </div>
+    </div>
+    @if (Model.ResourcesList != null && Model.ResourcesList.Count > 0)
+    {        
+        <div class="col">
+            <div class="group resources grupoPaginado">
+                <div class="group-title">
+                    <h2>@Html.GetText("PERFILRECURSOSCOMPARTIDOSFICHA", "TEPUEDEINTERESAR")</h2>
+                </div>
+                <div class="resource-list">
+                    @foreach (ResourceModel recurso in Model.ResourcesList)
+                    {
+                        @Html.PartialView("../Shared/ControlesMVC/_FichaRecursoMini", recurso)
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>

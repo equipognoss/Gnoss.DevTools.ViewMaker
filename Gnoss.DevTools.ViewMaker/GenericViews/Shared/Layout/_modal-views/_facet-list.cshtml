@@ -1,0 +1,80 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista modal que muestra las facetas en un listado para desplegar o plegar las facetas y subfacetas.
+
+Variables
+----------------------------------------------------------------
+*@
+
+@{
+
+}
+
+
+@*
+----------------------------------------------------------------
+-------------------- Vista Modal mostrar las facetas en una Lista paginada --------------------
+*@
+
+<div id="modal-resultados-lista"
+     class="modal modal-top fade modal-resultados modal-resultados-lista"
+     tabindex="-1"
+     role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                @* Mostrar el título de filtro de facetas / Loading *@
+                <p class="modal-title">                    
+                    <span class="loading-modal-facet-title"></span>
+                </p>
+                <span class="material-icons cerrar"
+                      data-dismiss="modal"
+                      aria-label="Close">close</span>
+            </div>
+            <div class="modal-body">
+                <div class="buscador-coleccion">
+                    <form>
+                        @* Input para buscador de Facetas *@
+                        <div>
+                            <span class="buscar">
+                                <input type="text" value="" class="texto" />
+                                <span class="material-icons lupa">search</span>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+                @* Contenedor de resultados (facetas) y header de paginador*@
+                <div class="indice-lista no-letra facetas-wrap">
+                    @* Plegar / Desplegar resultados *@
+                    <div class="action-buttons-resultados">
+                        <ul class="no-list-style">
+                            <li class="js-plegar-facetas-modal">
+                                <span class="texto">Plegar</span>
+                                <span class="material-icons">expand_less</span>
+                            </li>
+                            <li class="js-desplegar-facetas-modal">
+                                <span class="texto">Desplegar</span>
+                                <span class="material-icons">expand_more</span>
+                            </li>
+                        </ul>
+                    </div>
+                                                               
+                    @* Listado de facetas *@
+                    <div class="resultados-wrap">
+                        <div class="box" id="" faceta="">
+                            @* Título de la faceta pulsada 
+                            <span class="faceta-title"></span>
+                            *@
+                            @* Listado de facetas en formato '+' y '-'*@
+                            <ul class="listadoFacetas">
+                                
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

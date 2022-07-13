@@ -1,0 +1,62 @@
+﻿@model EditProfileViewModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista que se utiliza para mostrar la provincia para que el usuario elija la deseada.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+string nameCampoProvincia = "";
+string provinciaPerfil = "";
+
+@* Identificadores HTML para lógica JS *@
+@* ID del input Provincia *@     
+string idRegion= "ProfilePersonal_Region";
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Editar datos personales del usuario (Nombre, Apellidos, Correo, Localidad, País, Fecha de Nacimiento...) --------------------
+*@
+
+@{
+    @* Asignación del nombre para la Provincia (name)*@
+    if (Model.ProfilePersonal != null)
+    {
+        provinciaPerfil = Model.ProfilePersonal.Region;
+        nameCampoProvincia = "ProfilePersonal.";
+    }
+    if (Model.ProfileOrganization != null)
+    {
+        provinciaPerfil = Model.ProfileOrganization.Region;
+        nameCampoProvincia = "ProfileOrganization.";
+    }
+    nameCampoProvincia += "Region";
+}
+
+@* Select / Input de la provincia *@
+<div class="form-group mb-5">    
+    <label class="control-label d-block" for="@nameCampoProvincia">Provincia</label>
+    @if (Model.RegionList != null && Model.RegionList.Count > 0)
+    {
+        <select id="@idRegion" name="@nameCampoProvincia" class="js-select2" data-select-search="true">
+            <option value="@Guid.Empty">Provincia</option>
+            @foreach (Guid provinciaID in Model.RegionList.Keys)
+            {
+                <option value="@provinciaID" @(provinciaID.ToString() == provinciaPerfil ? "selected=selected" : "" )>@Model.RegionList[provinciaID]</option>
+            }
+        </select>
+    }
+    else
+    {
+        //  INPUT de provincia en lugar de "Select"
+        <input type="text"
+               id="@idRegion"
+               value="@provinciaPerfil"
+               name="@nameCampoProvincia"
+               class="form-control not-outline" />
+    }
+</div>

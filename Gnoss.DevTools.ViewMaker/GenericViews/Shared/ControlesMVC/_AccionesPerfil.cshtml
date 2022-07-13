@@ -1,0 +1,380 @@
+﻿@model ProfileModel
+
+@*Descripción
+-----------------------------------------------
+Vista que muestra las opciones disponibles para realizar acciones una vez se ha realizado una búsqueda de un perfil.
+Son las diferentes acciones que se pueden hacer sobre un elemento resultado de tipo "Perfil".
+Los resultados son obtenidos desde el servicio "Resultados" pero este fichero se encuentra en el servicio WebCore.
+Ej: La busqueda de usuarios de una comundiad mostrará botones u opciones para hacer con cada resultado (No enviar newsletter, Bloquear)
+
+Variables
+----------------------------------------------
+*@
+@{
+
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista de opciones de acciones a realizar asociadas a resultados de tipo "Perfil" o "Usuario" --------------------*@
+
+@{
+    ProfileModel.ActionsModel Acciones = Model.Actions;    
+}
+
+<div class="group acciones noGridView">
+    <ul id="listaAcciones_@Model.Key" class="no-list-style">
+        @{
+            string nombre = Html.ObtenerNombreCompletoDeFichaIdentidad((ProfileModel)Model);
+        }
+        @if(Acciones.AddContactOrg)
+        {
+        <li>
+            @if (Acciones.StatusContactOrg == ProfileModel.ActionsModel.StatusContact.NoContact)
+            {
+                string idBotonAgregarOrg = Model.Key + "_AgregarContactoOrg";
+            
+            <a style="cursor: pointer" onclick="javascript:DesplegarPanelMVC('desplegable_@Model.Key');AccionFichaPerfil('@Html.GetText("PERSONAS", "AÑADIRCONTACTO", nombre)','@Model.Key',function(){CambiarNombreElemento('@idBotonAgregarOrg', '@Html.GetText("PERSONAS", "AÑADIRCONTACTOORG")@Html.GetText("PERSONAS", "PENDIENTE")');AgregarContactoOrg('@Html.GetUrlPagina()');}, '@Html.GetText("PERSONAS", "NOTIFICARCONTACTO", nombre);');" id="@idBotonAgregarOrg">Añadir contacto a organizacion</a>
+            }
+            else if (Acciones.StatusContactOrg == ProfileModel.ActionsModel.StatusContact.Contact)
+            {
+                string idBotonEliminarOrg = Model.Key + "_EliminarContacto";
+            
+            <a style="cursor: pointer" onclick="javascript:DesplegarPanelMVC('desplegable_@Model.Key');AccionFichaPerfil('@Html.GetText("PERSONAS", "ELIMINARCONTACTO", nombre)','@Model.Key',function(){CambiarNombreElemento('@idBotonEliminarOrg', '@Html.GetText("PERSONAS", "CONTACTOELIMINADO")');EliminarContactoOrg('@Html.GetUrlPagina()');}, '@Html.GetText("PERSONAS", "NOTIFICARELIMINARCONTACTO", nombre);');" id="@idBotonEliminarOrg">@Html.GetText("CONTACTOS", "ELIMINARCONTACTOORG")</a>
+            }
+            else
+            {
+                <text>@Html.GetText("PERSONAS", "AÑADIRCONTACTOORG")@Html.GetText("PERSONAS", "PENDIENTE")</text>
+            }
+
+@*            <a style="cursor: pointer" onclick="javascript:DesplegarPanelMVC('desplegable_@Model.Clave');AccionFichaPerfil('¿Quieres hacer contacto a Ricardo Alonso Maturana?','e74613a9-6715-4243-a5c0-1a66c3c0e987',function(){CambiarNombreElemento('e74613a9-6715-4243-a5c0-1a66c3c0e987_AgregarContacto', 'A&amp;#241;adir contacto  ..Pendiente de contestaci&amp;#243;n..');WebForm_DoCallback('__Page','FichaPerfil_AgregarContacto&amp;amp;e74613a9-6715-4243-a5c0-1a66c3c0e987',ReceiveServerData,'',null,false);}, 'Vamos a notificar a Ricardo Alonso Maturana que quieres añadirlo como contacto');" id="e74613a9-6715-4243-a5c0-1a66c3c0e987_AgregarContactoOrg">Añadir contacto a organizacion</a>*@
+
+
+        </li>
+        }
+        @* Añadir contacto - Quitar esta opción 25-01-2022
+        @if(Acciones.AddContact)
+        {
+    <li>
+        @if (Acciones.StatusContactProfile == ProfileModel.ActionsModel.StatusContact.NoContact)
+        {
+            string idBotonAgregar = Model.Key + "_AgregarContacto";
+            @*<a style="cursor: pointer" onclick="javascript:DesplegarPanelMVC('desplegable_@Model.Key');AccionFichaPerfil('@Html.GetText("PERSONAS", "AÑADIRCONTACTO", nombre)','@Model.Key',function(){CambiarNombreElemento('@idBotonAgregar', '@Html.GetText("PERSONAS", "ACCIONAÑADIRCONTACTO")@Html.GetText("PERSONAS", "PENDIENTE")');AgregarContacto('@Html.GetUrlPagina()');}, '@Html.GetText("PERSONAS", "NOTIFICARCONTACTO", nombre);');" id="@idBotonAgregar">@Html.GetText("PERSONAS", "ACCIONAÑADIRCONTACTO")</a>
+            <a id="@idBotonAgregar"
+               class="item-dropdown"
+               data-toggle="modal"
+               data-target="#modal-container"
+               onclick="AccionFichaPerfil('@Html.GetText("PERSONAS", "AÑADIRCONTACTO",nombre)',
+                                            '@Html.GetText("COMMON", "SI")',
+                                            '@Html.GetText("COMMON", "NO")',
+                                            '@Html.GetText("PERSONAS", "AÑADIRCONTACTO",nombre)',
+                                            '@Model.Key',
+                                            function () {
+                                                CambiarTextoAndEliminarAtributos('@idBotonAgregar', '@Html.GetText("PERSONAS", "ACCIONAÑADIRCONTACTO")@Html.GetText("PERSONAS", "PENDIENTE")', ['onclick','data-target','data-toggle']);
+                                                AgregarContacto('@Html.GetUrlPagina()');
+                                            },
+                                            '@Html.GetText("PERSONAS", "NOTIFICARCONTACTO", nombre)');
+                ">
+                <span class="material-icons">group_add</span>
+                <span>@Html.GetText("PERSONAS", "ACCIONAÑADIRCONTACTO")</span>
+            </a>
+        }
+        else if (Acciones.StatusContactProfile == ProfileModel.ActionsModel.StatusContact.Contact)
+        {
+            string idBotonEliminar = Model.Key + "_EliminarContacto";
+
+            @* <a style="cursor: pointer" onclick="javascript:DesplegarPanelMVC('desplegable_@Model.Key');AccionFichaPerfil('@Html.GetText("PERSONAS", "ELIMINARCONTACTO", nombre);','@Model.Key',function(){CambiarNombreElemento('@idBotonEliminar', '@Html.GetText("PERSONAS", "CONTACTOELIMINADO")');EliminarContacto('@Html.GetUrlPagina()');}, '@Html.GetText("PERSONAS", "NOTIFICARELIMINARCONTACTO", nombre);');" id="@idBotonEliminar">@Html.GetText("CONTACTOS", "ELIMINARCONTACTO")</a>
+
+            <a id="@idBotonEliminar"
+               class="item-dropdown"
+               data-toggle="modal"
+               data-target="#modal-container"
+               onclick="AccionFichaPerfil('@Html.GetText("PERSONAS", "ELIMINARCONTACTO", nombre)',
+                                                       '@Html.GetText("COMMON", "SI")',
+                                                       '@Html.GetText("COMMON", "NO")',
+                                                       '@Html.GetText("PERSONAS", "ELIMINARCONTACTO",nombre)',
+                                                       '@Model.Key',
+                                                        function () {
+                                                            CambiarTextoAndEliminarAtributos('@idBotonEliminar', '@Html.GetText("PERSONAS", "NOTIFICARELIMINARCONTACTO", nombre);', ['onclick','data - target','data - toggle']);
+                                                            EliminarContacto('@Html.GetUrlPagina()');
+                                                            
+                                                        },
+                                                    '');
+                                    ">
+                >
+            </a>
+            <span class="material-icons">group_remove</span>
+            <span>@Html.GetText("CONTACTOS", "ELIMINARCONTACTO")</span>
+        }
+        else
+        {
+            string idBotonPendiente = Model.Key + "_PendienteContestacion";
+            @*<text>@Html.GetText("PERSONAS", "ACCIONAÑADIRCONTACTO")@Html.GetText("PERSONAS", "PENDIENTE")</text>
+            <a 
+               id="@idBotonPendiente" 
+               class="item-dropdown">
+                <span class="material-icons">group</span>
+                <span>@Html.GetText("PERSONAS", "ACCIONAÑADIRCONTACTO")@Html.GetText("PERSONAS", "PENDIENTE")</span>
+            </a>                                    
+        }
+    </li>
+        }*@
+        @if(Acciones.SendMessage)
+        {
+        <li>
+            @*<a onclick="javascript:AccionEnviarMensajeMVC('@Html.GetUrlPagina()', '@Model.Key');">Enviar mensaje</a>*@
+            <a class="item-dropdown"
+                data-toggle="modal"
+                data-target="#modal-container"
+                onclick="AccionEnviarMensajeMVC('@Html.GetUrlPagina()',
+                                                '@Model.Key',
+                                                'Enviar mensaje'
+                                                );">
+                <span class="material-icons">send</span>
+                <span class="texto">Enviar mensaje</span>                
+            </a>
+        </li>
+        }
+        @if(Acciones.Follow)
+        {
+        <li id="liSeguir">
+            @if(Acciones.FollowingProfile)
+            {
+                //<a onclick="AccionPerfil_NoSeguir(this, '@Model.ListActions.UrlUnfollow')">@Html.GetText("COMMON", "NOSEGUIR")</a>
+                <a class="item-dropdown" onclick="AccionPerfil_NoSeguir(this, '@Model.ListActions.UrlUnfollow')">
+                    <span class="material-icons">person_remove_alt_1</span>
+                    <span class="texto">@Html.GetText("COMMON", "NOSEGUIR")</span>                                           
+                </a>                
+            }
+            else
+            {
+                //<a onclick="AccionPerfil_Seguir(this, '@Model.ListActions.UrlFollow')">@Html.GetText("COMMON", "SEGUIR")</a>
+                <a class="item-dropdown" onclick="AccionPerfil_Seguir(this, '@Model.ListActions.UrlFollow')">
+                    <span class="material-icons">person_add_alt_1</span>
+                    <span class="texto">@Html.GetText("COMMON", "SEGUIR")</span>   
+                </a>                                
+            }
+        </li>
+        }
+        @if(Acciones.ReportCorrection)
+        {
+            <li><a onclick="DesplegarPanelMVC('desplegable_@Model.Key');AccionFichaPerfil('EnviarMensajeDeCorreccionDeIdentidad','@Model.Key',function(){NotificarCorreccion('@Html.GetUrlPagina()');}, '')">@Html.GetText("PERSONAS", "ENVIARMENSAJECORRECCION")</a></li>
+        }
+        else if (Acciones.ReportDefinitiveCorrection)
+        {
+            <li><a onclick="DesplegarPanelMVC('desplegable_@Model.Key');AccionFichaPerfil('EnviarMensajeDeCorreccionDeIdentidadDefinitivo','@Model.Key',function(){NotificarCorreccionDefinitiva('@Html.GetUrlPagina()');}, '')">@Html.GetText("PERSONAS", "ENVIARMENSAJECORRECCION")</a></li>
+        }
+        @if (Acciones.ValidateCorrection)
+        { 
+            <li>
+                <a onclick="DesplegarPanelMVC('desplegable_@Model.Key');AccionFichaPerfil('Validar','@Model.Key',function(){ValidarCorreccion('@Html.GetUrlPagina()');}, '');">@Html.GetText("PERSONAS", "VALIDAR")</a>
+            </li>
+        }
+        @if (Acciones.DeletePerson)
+        { 
+            <li>
+                <a onclick="DesplegarPanelMVC('desplegable_@Model.Key');AccionFichaPerfil('@Html.GetText("PERSONAS", "PREGUNTAELIMINARPERSONA", nombre, Html.GetNombreProyectoEcosistema())','@Model.Key',function(){ValidarCorreccion('@Html.GetUrlPagina()');}, '');">@Html.GetText("PERSONAS", "ELIMINARPERSONA")</a>
+            </li>
+        }
+        @if (Html.GetIdentidadActual().IsProyectAdmin)
+        {
+            string idBotonBloquear = Model.Key + "_Bloquear";
+            string idBotonEnviarNewsletter = Model.Key + "_EnviarNewsletter";
+            string idBotonExpulsar = Model.Key + "_Expulsar";
+            string idBotonCambiarRol = Model.Key + "_CambiarRol";
+
+            // FALTA cambiar rol -> si es el único admin, dar un error al intentar cambiarse a usuario
+
+
+            // no enviar newsletter / enviar
+            if (Model.Actions.SendNewsletter || Model.Actions.NotSendNewsletter)
+            {
+    <li class="item-dropdown">
+        @if (Model.Actions.SendNewsletter)
+        {
+            <span class="material-icons">label</span>
+            <span id="@idBotonEnviarNewsletter"
+                  class="item-dropdown"
+                  data-toggle="modal"
+                  data-target="#modal-container"
+                  onclick="AccionFichaPerfil('@Html.GetText("COMADMIN", "ENVIAR")',
+                                               '@Html.GetText("COMMON", "SI")',
+                                               '@Html.GetText("COMMON", "NO")',
+                                               '@Html.GetText("COMADMIN", "CONFIRMACIONENVIARNEWSLETTER", nombre, Html.GetNombreProyectoEcosistema())',
+                                               '@Model.Key',
+                                                function () {
+                                                    CambiarTextoAndEliminarAtributos('@idBotonEnviarNewsletter', '@Html.GetText("COMADMIN", "RECIBENEWSLETTER")', ['onclick','data-target','data-toggle']);
+                                                    EnviarNewsletter('@Model.Url');
+                                                },
+                                            '');
+                            ">
+                @Html.GetText("COMADMIN", "ENVIAR")
+            </span>
+        }
+        @if (Model.Actions.NotSendNewsletter)
+        {
+            <span class="material-icons">label</span>
+            <span id="@idBotonEnviarNewsletter"
+                  class="item-dropdown"
+                  data-toggle="modal"
+                  data-target="#modal-container"
+                  onclick="AccionFichaPerfil('@Html.GetText("COMADMIN", "NOENVIAR")',
+                                               '@Html.GetText("COMMON", "SI")',
+                                               '@Html.GetText("COMMON", "NO")',
+                                               '@Html.GetText("COMADMIN", "CONFIRMACIONNOENVIARNEWSLETTER", nombre, Html.GetNombreProyectoEcosistema())',
+                                               '@Model.Key',
+                                                function () {
+                                                    CambiarTextoAndEliminarAtributos('@idBotonEnviarNewsletter', '@Html.GetText("COMADMIN", "NORECIBENEWSLETTER")', ['onclick','data-target','data-toggle']);
+                                                    NoEnviarNewsletter('@Model.Url');
+                                                },
+                                            '');
+                            ">
+                @Html.GetText("COMADMIN", "NOENVIAR")
+            </span>
+        }
+    </li>
+            }
+            // expulsar / ¿readmitir? --> si se expulsa al usuario, ponerle privado en el BASE
+            if (Model.Actions.ExpelMember || Model.Actions.ReadmitMember)
+            {
+    <li class="item-dropdown">
+        @if (Model.Actions.ExpelMember)
+        {
+            //<a onclick="DesplegarPanelMVC('desplegable_@Model.Key');AccionFichaPerfil('@Html.GetText("COMADMIN", "CONFIRMACIONEXPULSARUSUARIO", nombre, Html.GetNombreProyectoEcosistema())','@Model.Key',function(){CambiarNombreElemento('@idBotonExpulsar', accionesUsuarioAdminComunidad.miembroExpulsado);Expulsar('@Model.Url', '@Model.Key');}, '');" id="@idBotonExpulsar">@Html.GetText("COMADMIN", "EXPULSAR")</a>            
+            <span class="material-icons">label</span>
+            <span id="@idBotonExpulsar"
+                  class="item-dropdown"
+                  data-toggle="modal"
+                  data-target="#modal-container"
+                  onclick="Expulsar('@Model.Url',
+                                                '@Model.Key',
+                                                '@Html.GetText("COMADMIN", "EXPULSAR")',
+                                                '@Html.GetText("COMMON", "SI")',
+                                                '@Html.GetText("COMMON", "NO")',
+                                                '@Html.GetText("COMADMIN", "CONFIRMACIONEXPULSARUSUARIO", nombre, Html.GetNombreProyectoEcosistema())',
+                                                 function () {
+                                                    CambiarTextoAndEliminarAtributos('@idBotonExpulsar', accionesUsuarioAdminComunidad.miembroExpulsado, ['onclick','data-target','data-toggle']);
+                                                 },
+                                                )
+                              ">
+                @Html.GetText("COMADMIN", "EXPULSAR")
+            </span>
+
+
+        }
+        @if (Model.Actions.ReadmitMember)
+        {
+            @*<a onclick="DesplegarPanelMVC('desplegable_@Model.Key');AccionFichaPerfil('@Html.GetText("COMADMIN", "CONFIRMACIONREADMITIRUSUARIO", nombre, Html.GetNombreProyectoEcosistema())','@Model.Key',function(){CambiarNombreElemento('@idBotonExpulsar', '@Html.GetText("COMADMIN", "USUARIOREADMITIDO")');Readmitir('@Model.Url');}, '');" id="@idBotonExpulsar">@Html.GetText("COMADMIN", "READMITIR")</a>*@
+
+            <span class="material-icons">label</span>
+            <span id="@idBotonExpulsar"
+                  class="item-dropdown"
+                  data-toggle="modal"
+                  data-target="#modal-container"
+                  onclick="AccionFichaPerfil('@Html.GetText("COMADMIN", "READMITIR")',
+                                                           '@Html.GetText("COMMON", "SI")',
+                                                           '@Html.GetText("COMMON", "NO")',
+                                                           '@Html.GetText("COMADMIN", "CONFIRMACIONREADMITIRUSUARIO", nombre, Html.GetNombreProyectoEcosistema())',
+                                                           '@Model.Key',
+                                                            function () {
+                                                                CambiarTextoAndEliminarAtributos('@idBotonExpulsar','@Html.GetText("COMADMIN", "USUARIOREADMITIDO")', ['onclick','data-target','data-toggle']);
+                                                                Readmitir('@Model.Url');
+                                                            },
+                                                        '');
+                                        ">
+                @Html.GetText("COMADMIN", "READMITIR")
+            </span>
+        }
+    </li>
+            }
+            // bloquear / desbloquear 
+            if (Model.Actions.BlockUser || Model.Actions.UnblockUser)
+            {
+                <li class="item-dropdown">
+                    @if (Model.Actions.BlockUser)
+                    {                        
+                        <span class="material-icons">label</span>
+                        <span id="@idBotonBloquear"
+                              class="item-dropdown"
+                              data-toggle="modal"
+                              data-target="#modal-container"
+                              onclick="AccionFichaPerfil('@Html.GetText("COMADMIN", "BLOQUEAR")',
+                                                           '@Html.GetText("COMMON", "SI")',
+                                                           '@Html.GetText("COMMON", "NO")',
+                                                           '@Html.GetText("COMADMIN", "CONFIRMACIONBLOQUEARUSUARIO", nombre, Html.GetNombreProyectoEcosistema())',
+                                                           '@Model.Key',
+                                                            function () {
+                                                                CambiarTextoAndEliminarAtributos('@idBotonBloquear', '@Html.GetText("COMADMIN", "USUARIOBLOQUEADO")', ['onclick','data-target','data-toggle']);
+                                                                Bloquear('@Model.Url');
+                                                            },
+                                                        '');
+                                        ">
+                            @Html.GetText("COMADMIN", "BLOQUEAR")
+                        </span>
+                    }
+                    @if (Model.Actions.UnblockUser)
+                    {                        
+                        <span class="material-icons">label</span>
+                        <span id="@idBotonBloquear"
+                              class="item-dropdown"
+                              data-toggle="modal"
+                              data-target="#modal-container"
+                              onclick="AccionFichaPerfil('@Html.GetText("COMADMIN", "BLOQUEAR")',
+                                                           '@Html.GetText("COMMON", "SI")',
+                                                           '@Html.GetText("COMMON", "NO")',
+                                                           '@Html.GetText("COMADMIN", "CONFIRMACIONDESBLOQUEARUSUARIO", nombre, Html.GetNombreProyectoEcosistema())',
+                                                           '@Model.Key',
+                                                            function () {
+                                                                CambiarTextoAndEliminarAtributos('@idBotonBloquear', '@Html.GetText("COMADMIN", "USUARIODESBLOQUEADO")', ['onclick','data-target','data-toggle']);
+                                                                Desbloquear('@Model.Url');
+                                                            },
+                                                        '');
+                                        ">
+                            @Html.GetText("COMADMIN", "DESBLOQUEAR")
+                        </span>
+                    }
+                </li>
+            }
+
+            if (Model.Actions.ChangeRol)
+            {
+                <li class="item-dropdown">
+                    @*<a onclick="DesplegarPanelMVC('desplegable_@Model.Key');CambiarRol('@Model.Url', '@Model.Key', @((short)Model.Rol));" id="@idBotonCambiarRol">@Html.GetText("USUARIOS", "CAMBIARROL")</a>*@
+                    <span class="material-icons">label</span>
+                    <span id="@idBotonCambiarRol"
+                              class="item-dropdown"
+                              data-toggle="modal"                         
+                              data-target="#modal-container"
+                              onclick="CambiarRol('@Model.Key',
+                                                  '@((short)Model.Rol)',
+                                                  '@Model.Url'
+                                                  );
+                                        ">
+                            @Html.GetText("USUARIOS", "CAMBIARROL")
+                    </span>
+                </li>
+            }
+        }
+    </ul>
+</div>
+
+<div id="divAccionesSeguir"></div>
+  
+
+<div style="display: none;" id="desplegable_@Model.Key">
+    <div style="display: none;" class="stateShowForm" id="panels">
+        <div class="loading" id="loading">
+            <p>@Html.GetText("CONTROLDESPLEGAR", "CARGANDO")</p>
+        </div>
+        <div id="menssages">
+            <div class="ok"></div>
+            <div class="ko"></div>
+        </div>
+        <div class="box form activeForm" id="action">
+            <div id="@Model.Key"></div>
+        </div>
+        <div class="box form activeForm" id="aux_@Model.Key"></div>
+        <p class="cerrar"><a onclick="CerrarPanelAccion('desplegable_@Model.Key')" title="cerrar formulario">@Html.GetText("CONTROLDESPLEGAR", "CERRARX")</a></p>
+    </div>
+</div>

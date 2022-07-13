@@ -1,0 +1,289 @@
+﻿@model EditProfileViewModel
+@*
+Descripción
+-----------------------------------------------
+Vista que se utiliza para mostrar/editar los datos personales de un usuario con perfil personal (Usuario normal). En esta vista se puede editar la siguiente información:
+- Nombre
+- Apellidos
+- País de residencia
+- Idioma
+- Provincia
+- Sexo
+- Código Postal
+- Localidad
+- Fecha de nacimiento
+- Correo electrónico de contacto
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+EditProfileViewModel.ProfilePersonalViewModel Perfil = Model.ProfilePersonal;
+HeaderModel Cabecera = Html.GetCabecera();
+
+@* Identificadores de elementos HTML para lógica JS *@
+@* ID del input Nombre *@    
+string idName = "ProfilePersonal_Name";
+string inputName = "ProfilePersonal.Name";
+@* ID del input Apellido *@    
+string idLastName = "ProfilePersonal_LastName";
+string inputLastName = "ProfilePersonal.LastName";
+@* ID del input Email *@    
+string idEmail = "ProfilePersonal_Email";
+string inputEmail = "ProfilePersonal.Email";
+@* ID del input FechaNacimiento *@     
+string idBornDate = "ProfilePersonal_BornDate";
+string inputBornDate = "ProfilePersonal.BornDate";
+@* ID del input Pais *@     
+string idCountry= "ProfilePersonal_Country";
+string inputCountry = "ProfilePersonal.Country";
+@* ID del input Localidad *@     
+string idLocation = "ProfilePersonal_Location";
+string inputLocation = "ProfilePersonal.Location";
+@* ID del input CodigoPostal *@     
+string idPostalCode = "ProfilePersonal_PostalCode";
+string inputPostalCode = "ProfilePersonal.PostalCode";
+@* ID del input Lenguaje *@    
+string idLang = "ProfilePersonal_Lang";
+string inputLang = "ProfilePersonal.Lang";
+@* ID del input Sexo *@     
+string idSex = "ProfilePersonal_Sex";
+string inputSex= "ProfilePersonal.Sex";
+
+@* ID del input del Email del tutor *@     
+string idEmailTutor = "ProfilePersonal_EmailTutor";
+string inputEmailTutor = "ProfilePersonal.EmailTutor";
+@* Id del input para privacidad isSearched *@     
+string idIsSearched = "ProfilePersonal_IsSearched";
+string inputIsSearched = "ProfilePersonal.IsSearched";
+@* Id del input para privacidad isExternalSearched *@     
+string idIsExternalSearched = "ProfilePersonal_IsExternalSearched";
+string inputIsExternalSearched = "ProfilePersonal.IsExternalSearched";
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Editar datos personales del usuario (Nombre, Apellidos, Correo, Localidad, País, Fecha de Nacimiento...) --------------------
+*@
+
+@* Nombre *@
+<div class="form-group mb-5 edit-nombre">
+    <label class="control-label d-block" for="@idName">@Html.GetText("REGISTRO", "NOMBRE")</label>
+    <input placeholder="Introduce tu nombre"
+           type="text"
+           name="@inputName"
+           id="@idName"
+           value="@Perfil.Name"
+           class="form-control not-outline" />
+</div>
+@* Apellidos *@
+<div class="form-group mb-5 edit-apellidos">
+    <label class="control-label d-block" for="@idLastName">@Html.GetText("REGISTRO", "APELLIDOS")</label>
+    <input placeholder="Introduce tus apellidos"
+           type="text"
+           name="@inputLastName"
+           value="@Perfil.LastName"
+           id="@idLastName"
+           class="form-control not-outline" />
+</div>
+@* Correo electrónico - Email *@
+<div class="form-group mb-5 edit-correo">
+    <label class="control-label d-block" for="@idEmail">@Html.GetText("REGISTROUSUARIOORGANIZACION", "EMAIL")</label>
+    <input placeholder="Introduce tu correo electrónico"
+           type="text"
+           name="@inputEmail"
+           id="@idEmail"
+           value="@Perfil.Email"
+           class="form-control not-outline" />
+</div>
+
+@* Correo electrónico - Email tutor *@
+@if (Html.ComprobarPersonaEsMayorAnios(Html.GetPerfil().BornDate, 14) && !Html.ComprobarPersonaEsMayorAnios(Html.GetPerfil().BornDate, 18) )
+{
+<div class="form-group mb-5 edit-correo">
+    <label class="control-label d-block" for="@idEmailTutor">@Html.GetText("REGISTROUSUARIOORGANIZACION", "EMAILTUTOR")</label>
+    <input type="text" 
+           class="form-control not-outline" 
+           id="@idEmailTutor" 
+           value="@Perfil.EmailTutor" 
+           name="@inputEmailTutor" />
+</div>    
+}
+
+@* Correo electrónico - Email tutor: Mensaje de eliminar email de tutor *@
+@if (Html.ComprobarPersonaEsMayorAnios(Html.GetPerfil().BornDate, 18) && !string.IsNullOrEmpty(Perfil.EmailTutor))
+{
+    <p>Al ser mayor de edad puedes eliminar tu Email de Tutor.</p>    
+    <label class="control-label d-block" for="ProfilePersonal.EmailTutor">@Html.GetText("REGISTROUSUARIOORGANIZACION", "EMAILTUTOR")</label>
+    <input type="text" 
+           class="form-control not-outline" 
+           id="EmailTutor" 
+           value="@Perfil.EmailTutor" 
+           name="ProfilePersonal.EmailTutor" />
+}
+
+@* Fecha de nacimiento *@
+<div class="form-group mb-5">
+    <label class="control-label d-block" for="@idBornDate">@Html.GetText("REGISTRO", "FECHANACIMIENTO")</label>
+    <input 
+           type="text"
+           name="@inputBornDate"
+           id="@idBornDate"
+           value="@Perfil.BornDate"
+           style="padding: 20px;"
+           class="form-control not-outline datepicker" />
+</div>
+
+@* País de Residencia *@
+@if (Model.CountryList != null && Model.CountryList.Count > 0)
+{
+    <div class="form-group mb-5">
+        <label class="control-label d-block" for="@idCountry">@Html.GetText("PERFIL", "PAIS")</label>
+        <select id="@idCountry" name="@inputCountry" class="js-select2" data-select-search="true">
+            <option value="@Guid.Empty">@Html.GetText("REGISTRO", "SINESPECIFICAR")</option>
+            @foreach (Guid paisID in Model.CountryList.Keys)
+            {
+                <option value="@paisID" @(paisID == Perfil.Country ? "selected=selected" : "")>@Model.CountryList[paisID]</option>
+            }
+        </select>
+    </div>
+}
+
+@* Provincia *@
+@if (Model.CountryList != null && Model.CountryList.Count > 0)
+{
+    @Html.PartialView("_Provincia", Model)
+}
+
+@* Localidad *@
+<div class="form-group mb-5">
+    <label for="@idLocation"
+           class="control-label d-block">@Html.GetText("REGISTRO", "POBLACION")</label>
+    <div class="input-wrap">
+        <input placeholder=""
+               type="text"
+               name="@inputLocation"
+               id="@idLocation"
+               value="@Perfil.Location"
+               class="form-control not-outline" />
+    </div>
+</div>
+
+@* Código Postal *@
+<div class="form-group mb-5">
+    <label class="control-label d-block" for="@idPostalCode">@Html.GetText("REGISTRO", "CODIGOPOSTAL")</label>
+    <div class="input-wrap">
+        <input placeholder="Introduce tu código postal"
+            type="text"
+            id="@idPostalCode"
+            value="@Perfil.PostalCode"
+            name="@inputPostalCode"
+            class="form-control not-outline" />
+    </div>
+</div>
+
+@* Idioma *@
+<div class="form-group mb-5">
+    <label for="@idLang" class="control-label d-block">@Html.GetText("COMMON", "IDIOMA")</label>
+    <select id="@idLang"
+        name="@inputLang"
+        class="js-select2"
+        data-select-search="true">
+        @foreach (KeyValuePair<string, string> idioma in Cabecera.Languajes)
+        {
+            <option value="@idioma.Key" @(Perfil.Lang == idioma.Key ? "selected=selected" : "")>@Cabecera.Languajes[idioma.Key]</option>
+        }
+    </select>
+</div>
+
+@* Sexo *@
+<div class="form-group mb-5">
+    <label for="@idSex" class="control-label d-block">@Html.GetText("REGISTRO", "SEXO")</label>
+    <select id="@idSex" name="@inputSex" class="js-select2" data-select-search="true">
+        <option value=""></option>
+        <option value="H" @(Perfil.Sex == "H" ? "selected=selected" : "")>@Html.GetText("REGISTRO", "HOMBRE")</option>
+        <option value="M" @(Perfil.Sex == "M" ? "selected=selected" : "")>@Html.GetText("REGISTRO", "MUJER")</option>
+        </select>
+</div>
+
+@* Campos adicionales dependiendo del proyecto *@
+@if (Perfil.AdditionalFields != null && Perfil.AdditionalFields.Count > 0)
+{
+    <div id="panCamposConfigurablesProyecto">
+        @foreach (AdditionalFieldAutentication campoExtra in Perfil.AdditionalFields)
+        {
+            <div class="form-group mb-5">
+                <label for="@campoExtra.FieldName" class="control-label d-block" @(campoExtra.Required ? "required" : "")>@campoExtra.Title</label>            
+                @if (campoExtra.Options != null && campoExtra.Options.Count > 0)
+                {                    
+                    <select name="@campoExtra.FieldName" id="@campoExtra.FieldName" class="custom-select dato select @campoExtra.FieldName">
+                        <option value="@Guid.Empty">@Html.GetText("REGISTRO", "SINESPECIFICAR")</option>
+                        @foreach (Guid idCampo in campoExtra.Options.Keys)
+                        {
+                            bool selected = campoExtra.FieldValue == idCampo.ToString();
+                            <option @(selected ? "selected=selected" : "") value="@idCampo">@Html.ObtenerTextoDeIdioma(campoExtra.Options[idCampo])</option>
+                        }
+                    </select>
+                }
+                else
+                {
+                    string claseInput = "text medium";
+                    if (campoExtra.AutoCompleted)
+                    {
+                        claseInput += " txtBusqueda autocompletar " + campoExtra.FieldName;
+                    }
+                    <input type="text" class="form-control not-outline @claseInput" id="@campoExtra.FieldName" name="@campoExtra.FieldName" value="@(campoExtra.FieldValue != null ? campoExtra.FieldValue : "")"/>                    
+                    if (campoExtra.AutoCompleted)
+                    {
+                        string inputHack = campoExtra.FieldName + "hack";
+                        <input type="hidden" id="@inputHack" class="@inputHack" />
+                    }
+                 }
+            </div>            
+        }
+    </div>
+}
+
+@* Información Privacidad *@      
+@if (Perfil.IsSearched.HasValue || Perfil.IsExternalSearched.HasValue) { 
+
+    <div class="form-group mb-5">
+        <label for="" class="control-label d-block">
+            @Html.GetText("REGISTRO", "PORQUEPRIVACIDAD", Html.GetNombreProyectoEcosistema())
+        </label>
+        @* Información de porque hacer público mi perfil *@
+        <label class="control-label d-block">
+            <a class="link" data-toggle="collapse" href="#collapseDondeMostrarPerfil" role="button" aria-expanded="false" aria-controls="collapseDondeMostrarPerfil">
+                @Html.GetText("REGISTRO", "TITULOINFOVISIBILIDADPERFIL")
+            </a>
+        </label>
+
+        @* Primer Check para hacer publico el perfil de un usuario*@
+        @if (Perfil.IsSearched.HasValue)
+        {
+            <div class="custom-control custom-checkbox">
+                <input type="checkbox"
+                       class="custom-control-input" 
+                       @(Perfil.IsSearched.Value ? "checked=checked" : "") 
+                       id="@idIsSearched" 
+                       name="@inputIsSearched" />
+                <label for="@idIsSearched">@Html.GetText("REGISTRO", "LISTARPERFILCORTO", Html.GetNombreProyectoEcosistema())</label>
+            </div>
+        }
+        @* Segundo heck para hacer publico el perfil de un usuario*@
+        @if (Perfil.IsExternalSearched.HasValue)
+        {
+            <div class="custom-control custom-checkbox">
+                <input id="@idIsExternalSearched"
+                       class="custom-control-input" 
+                       type="checkbox" @(Perfil.IsExternalSearched.Value ? "checked=checked" : "") 
+                       name="@inputIsExternalSearched" />
+                <label for="@idIsExternalSearched">@Html.GetText("REGISTRO", "LISTARPERFILEXTERNOSCORTO")</label>
+            </div>
+        }
+
+        @* Panel Informativo de tipo Collapse de Donde mostrar el perfil *@
+        @Html.PartialView("../RegistroDatos/_partial-views/_public-profile-info")
+    </div>
+}

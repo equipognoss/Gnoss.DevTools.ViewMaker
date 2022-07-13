@@ -1,0 +1,60 @@
+﻿@model GroupEditViewModel
+@*
+Descripción
+-----------------------------------------------
+Vista en la que se puede crear o editar un grupo para una determinada comunidad.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+// Los participantes actuales (si se edita un grupo, se cargarán aquí los ids de los miembros de la comunidad)
+string participantes = string.Empty;
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista principal para la edición/creación de un grupo -------------------- *@
+
+@* Contenedor de la caja para la búsqueda*@
+<div id="panAgregarMiembros" class="autocompletar autocompletar-miembros form-group">
+    @* Contenedor para inputs de búsqueda*@
+    <div class="input-wrap form-sticky-button">
+        @* Input oculto *@
+        <input class="input-miembros form-control" name="txtBaseUrlHack_selectorUsuarios" type="text" value="http://comunidades.gnoss.net/" id="txtBaseUrlHack_selectorUsuarios" style="display:none;">
+        @* Input para buscar personas *@
+        <input type="text"
+            id="txtFiltro"
+            placeholder="Introduce una persona y/o grupo"
+            class="input-miembros form-control ac_input"
+            autocomplete="off" />
+            <span class="icon material-icons">search</span>
+            <a href="#" id="anadir-miembro" class="btn btn-grey uppercase">Añadir</a>        
+    </div>
+
+    @* Resultdos o selección de personas *@
+    <div class="editorLector tag-list mt-3">        
+        @* Contenedor para visualizar las personas seleccionadas desde el buscador*@
+        <div class="ususSeleccionados">
+            @if (Model.Participants != null && Model.Participants.Count > 0)
+            {                    
+                foreach (Guid perfil in Model.Participants.Keys)
+                {                    
+                    <div class="tag" title="@Model.Participants[perfil]">
+                        <div class="tag-wrap">
+                            <span class="tag-text">@Model.Participants[perfil]</span>
+                            <span class="tag-remove material-icons" onclick="EliminarUsuarioMiembroComunidad(this, '@perfil.ToString()');">close</span>
+                        </div>
+                        <input type="hidden" value="@perfil.ToString()" />
+                    </div>
+                    // Guardar los participantes si se está editando un grupo
+                    participantes += "&" + perfil.ToString();
+                }
+            }
+        </div>
+        @* Input Oculto para guardar las personas seleccionadas desde el buscador *@
+        <input id="txtHackInvitados" type="hidden" class="hackUsuSeleccionadoRec" value="@participantes" />
+    </div>
+</div>
+
+

@@ -1,0 +1,491 @@
+﻿@model MessageModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra el contenido íntegro de un mensaje/email de plataforma MyGnoss.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+    CommunityModel Comunidad = Html.GetComunidad();
+    UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+    UserProfileModel Perfil = Html.GetPerfil();
+    // Nombre de Mensajes para indicar en las migas de pan
+    string messagesNameBreadcrumb = @Html.GetText("URLSEM", "MENSAJES").First().ToString().ToUpper() + String.Join("", Html.GetText("URLSEM", "MENSAJES").Skip(1));
+    // Asunto del mensaje
+    string messageSubject = @Model.Subject;
+    // Tipo de bandeja de mensajes (Por defecto "recibidos")
+    string tipoBandeja = "recibidos";
+    // Url para volver hacia atrás
+    string urlVuelta = Perfil.Url + Html.GetText("URLSEM", "MENSAJES");
+    // Url para acceder al mensaje siguiente
+    string siguienteMensaje = "";
+    // Url para acceder al mensaje anterior
+    string anteriorMensaje = "";
+
+    // Información relativa al remitente del mensaje
+    string nombreRemitente = Html.ObtenerNombrePerfil(Model.Sender);
+    string urlRemitente = Html.ObtenerUrlPerfil(Model.Sender);
+    // Url imagen del usuario
+    string urlImagen = "";
+    // Mostrar por defecto una fotografía o no del remitente
+    bool hasImageProfile = true;
+    // Nº máximo de destinatarios a partir del cual se ocultarán los demás destinatarios del mensaje
+    int maxNumDestinators = 3;
+    // Contador de destinatarios para saber si hace falta incluir el arrow para ocultarlos cuando sean más de 3
+    int contDestinators = 0;
+    // Nº de destinatarios a mostrarse teniendo en cuenta el maxNumDestinators
+    int numDestinatorsAMostrar = maxNumDestinators;
+
+    // Url actual cargada al visualizar el mensaje
+    var url = @Context.Request.Path + @Context.Request.QueryString;
+
+}
+@*
+----------------------------------------------------------------
+-------------------- Vista del mensaje/email de plataforma MyGnoss --------------------
+*@
+
+@* Añadimos funcionalidad para mensajería (Eliminar mensaje) *@
+@{
+    Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/jsUnificar/MVC.Mensajes.js?v=" + Html.GetVersion());
+    Html.SetBodyClass("fichaMensaje usuarioConectado");
+}
+
+@{
+@* Controlar la bandeja de mensajes *@
+if (Model.Deleted)
+{
+    tipoBandeja = "eliminados";
+}
+else if (!Model.Received)
+{
+    tipoBandeja = "enviados";
+}
+
+if (url.Contains("&"))
+{
+    urlVuelta += "?" + url.Substring(url.IndexOf("&") + 1).Replace("|", "&");
+}
+else if (Context.Request.Headers.ContainsKey("Referer") && Context.Request.Headers["Referer"].ToString().Contains("&"))
+{
+    urlVuelta += Context.Request.Headers["Referer"].ToString().Substring(Context.Request.Headers["Referer"].ToString().IndexOf("&"));
+}
+else
+{
+    urlVuelta += "?" + tipoBandeja;
+}
+    @* Obtener la foto del remitente *@
+if (Model.Sender != null)
+{
+    urlImagen = Model.Sender.UrlFoto;
+    if (string.IsNullOrEmpty(urlImagen))
+    {
+        hasImageProfile = false;
+        urlImagen = Html.ObtenerFotoAnonimaDePerfil(ProfileType.ProfessionalPersonal);
+    }
+    urlImagen = Html.GetBaseUrlContent() + urlImagen;
+}
+else
+{
+    hasImageProfile = false;
+    urlImagen = Html.ObtenerFotoAnonimaDePerfil(ProfileType.ProfessionalPersonal);
+}
+}
+
+@* Tipo de mensaje -> Campo oculto *@
+<input type="hidden" value="@tipoBandeja" class="tipoBandeja" />
+
+<div class="row">
+
+    @* Volver a bandeja de mensajes
+    <div class="col col-12 col-breadcrumb d-flex" id="breadcrumb">        
+        <a id="linkVolver" class="d-flex" href="@urlVuelta">
+            <span class="material-icons mr-2">
+                arrow_back
+            </span>
+            <span>@Html.GetText("BANDEJAENTRADA", "volverlistado")</span>
+        </a>
+    </div> 
+   *@
+    <div class="col col-12 col-breadcrumb d-flex" id="breadcrumb">                
+    </div> 
+
+    @* Columna izquierda / central - Contenedor del mensaje *@
+    <div class="col col-12 col-xl-8 col-contenido izquierda">
+        @* Contenedor global del mensaje*@
+        <div class="col-mensaje">
+            <div class="wrapCol">
+                @* Contenedor del header del mensaje (Autor, Fecha, Asunto..) *@
+                <div class="header-mensaje mensaje-principal">
+                    @* Asunto *@
+                    <div class="h1-container">
+                        <h1>
+                            <a class="volver-mensajes" href="@urlVuelta">@Html.GetText("BANDEJAENTRADA", "TITULOMENSAJES")</a>
+                            <span>@messageSubject</span>
+                        </h1>
+                    </div>
+
+                    @* Acciones del mensaje *@
+                    <div class="acciones-mensaje">
+                        <div class="wrap">
+                            <ul class="acciones-recurso no-list-style">
+                                @* Responder *@
+                                <li>
+                                    <a href="@Model.Url.Replace("?mensaje", "?responder&mensaje")"
+                                       rel="nofollow"
+                                       title="@Html.GetText("CORREO", "RESPONDERMENSAJESINTEXTOMENSAJE")"
+                                       class="responder">
+                                        <span class="material-icons">reply</span>
+                                    </a>
+                                </li>
+                                @* Responder a todos *@
+                                <li>
+                                    <a href="@Model.Url.Replace("?mensaje", "?responderATodos&mensaje")"
+                                       rel="nofollow"
+                                       title="@Html.GetText("CORREO", "REENVIARMENSAJEATODOS")"
+                                       class="responder-todos">
+                                        <span class="material-icons">reply_all</span>
+                                    </a>
+                                </li>
+                                @* Reenviar *@
+                                <li>
+                                    <a href="@Model.Url.Replace("?mensaje", "?reenviar&mensaje")"
+                                       rel="nofollow"
+                                       title="@Html.GetText("CORREO", "REENVIARMENSAJESINTEXTOMENSAJE")"
+                                       class="reenviar">
+                                        <span class="material-icons">forward</span>
+                                    </a>
+                                </li>
+                                @* Borrar mensaje *@
+                                <li>
+                                    <a class="borrar"
+                                       href="javascript: void(0);"
+                                       data-toggle="modal"
+                                       data-target="#modal-container"
+                                       onclick="AccionFichaPerfil('Eliminar mensaje',
+                                        '@Html.GetText("COMMON", "SI")',
+                                        '@Html.GetText("COMMON", "NO")',
+                                        '¿Estás seguro de eliminar el mensaje seleccionado?',
+                                        '@Model.Key',
+                                        function () {
+                                            EliminarCorreoSeleccionado('@Model.Key');
+                                        },
+                                        '');
+                                    ">
+                                        <span class="material-icons">delete</span>
+                                    </a>
+                                </li>
+                                @* Imprimir *@
+                                <li>
+                                    <a href="javascript: void(0);"
+                                       rel="nofollow"
+                                       onclick="window.print();"
+                                       class="imprimir">
+                                        <span class="material-icons">print</span>
+                                    </a>
+                                </li>
+                                @* Acciones para móvil *@
+                                <li class="acciones-mensaje-movil">
+                                    <div class="dropdown">
+                                        <a href="javascript: void(0);" class="dropdown-toggle no-flecha" role="button" id="dropdownMasOpciones" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="material-icons">more_vert</span></a>
+                                        <div class="dropdown-menu basic-dropdown dropdown-menu-right" aria-labelledby="dropdownMasOpciones" style="position: absolute; transform: translate3d(26px, 21px, 0px); top: 0px; left: 0px; will-change: transform;">
+                                            <span class="material-icons cerrar-dropdown">close</span>
+                                            <ul class="no-list-style pt-4">
+                                                @* Responder móvil *@
+                                                <li>
+                                                    <a href="@Model.Url.Replace("?mensaje", "?responder&mensaje")"
+                                                       rel="nofollow"
+                                                       class="item-dropdown"
+                                                       title="@Html.GetText("CORREO", "RESPONDERMENSAJESINTEXTOMENSAJE")">
+                                                        <span class="material-icons">reply</span>
+                                                        <span>@Html.GetText("CORREO", "RESPONDERMENSAJESINTEXTOMENSAJE")</span>
+                                                    </a>
+                                                </li>
+                                                @* Responder a todos móvil *@
+                                                <li>
+                                                    <a href="@Model.Url.Replace("?mensaje", "?responderATodos&mensaje")"
+                                                       rel="nofollow"
+                                                       title="@Html.GetText("CORREO", "REENVIARMENSAJEATODOS")"
+                                                       class="item-dropdown">
+                                                        <span class="material-icons">reply_all</span>
+                                                        <span>@Html.GetText("CORREO", "REENVIARMENSAJEATODOS")</span>
+                                                    </a>
+                                                </li>
+                                                @* Reenviar móvil *@
+                                                <li>
+                                                    <a href="@Model.Url.Replace("?mensaje", "?reenviar&mensaje")"
+                                                       rel="nofollow"
+                                                       title="@Html.GetText("CORREO", "REENVIARMENSAJESINTEXTOMENSAJE")"
+                                                       class="item-dropdown">
+                                                        <span class="material-icons">forward</span>
+                                                        <span>@Html.GetText("CORREO", "REENVIARMENSAJESINTEXTOMENSAJE")</span>
+                                                    </a>
+                                                </li>
+                                                @* Eliminar mensaje móvil *@
+                                                <li>
+                                                    <a class="item-dropdown"
+                                                       href="javascript: void(0);"
+                                                       data-toggle="modal"
+                                                       data-target="#modal-container"
+                                                       onclick="AccionFichaPerfil('Eliminar mensaje',
+                                                        '@Html.GetText("COMMON", "SI")',
+                                                        '@Html.GetText("COMMON", "NO")',
+                                                        '¿Estás seguro de eliminar el mensaje seleccionado?',
+                                                        '@Model.Key',
+                                                        function () {
+                                                            EliminarCorreoSeleccionado('@Model.Key');
+                                                        },
+                                                        '');
+                                                    ">
+                                                        <span class="material-icons">delete</span>
+                                                        <span>@Html.GetText("COMMON", "ELIMINAR")</span>
+                                                    </a>
+                                                </li>
+                                                @* Imprimir *@
+                                                <li>
+                                                    <a href="javascript: void(0);"
+                                                       rel="nofollow"
+                                                       onclick="window.print();"
+                                                       class="item-dropdown">
+                                                        <span class="material-icons">print</span>
+                                                        <span>Imprimir</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>                    
+                    @* Movimiento de mensajes - Anterior - Siguiente *@
+                    <div class="anterior-siguiente">
+                        @* Mensaje Anterior *@
+                        @if (Model.PreviousMessageKey != Guid.Empty)
+                        {
+                            anteriorMensaje = url.Replace(Model.Key.ToString(), Model.PreviousMessageKey.ToString());
+                        }
+                        @* Mensaje Siguiente *@
+                        @if (Model.NextMessageKey != Guid.Empty)
+                        {
+                            siguienteMensaje = url.Replace(Model.Key.ToString(), Model.NextMessageKey.ToString());
+                        }
+                        @* Botones de navegación por mensajes *@
+                        <a href="@anteriorMensaje" class="anterior @( (String.IsNullOrEmpty(anteriorMensaje)) ? "disabled" : null)" title="@Html.GetText("PERFILBASESUBIR","ANTERIOR")">
+                            <span class="material-icons-outlined"> arrow_back_ios </span>
+                        </a>
+
+
+                        <a href="@siguienteMensaje" class="siguiente @( (String.IsNullOrEmpty(siguienteMensaje)) ? "disabled" : null)" title="@Html.GetText("PERFILBASESUBIR","SIGUIENTE")">
+                            <span class="material-icons-outlined"> arrow_forward_ios </span>
+                        </a>
+                    </div>
+                </div>
+
+                @* Datos del mensaje (Fecha, Remitente del mensaje y Destinatarios *@
+                <div class="datos-mensaje">
+                    @* Fecha de recepción*@
+                    <p class="fecha" id="@Model.Key">
+                        @Model.ShippingDate.ToString("dd/MM/yyyy") @Html.GetText("CORREO", "FECHAALAS") @Model.ShippingDate.ToString("HH:mm")
+                    </p>
+
+                    @* Detalles del remitente *@
+                    <div class="emisor-mensaje">
+                        <div class="wrap">
+                            <p class="label">@Html.GetText("CORREO", "DE")</p>
+                            @if (Model.Sender != null && !String.IsNullOrEmpty(@Model.Sender.NameOrganization))
+                            {
+                                <div class="lista-wrap">                                    
+                                    <a href="@urlRemitente"><span class="item-user">@nombreRemitente</span></a>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="lista-wrap">
+                                    <a href="@urlRemitente"><span class="item-user">@nombreRemitente</span></a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    @* Contenedor de destinatarios del mensaje *@
+                    <div class="destinatarios-mensaje">
+                        <div class="wrap">
+                            <p class="label">@Html.GetText("CORREO","PARA")</p>
+                            <div class="lista-wrap">                                
+                                <!-- Destinatarios del mensaje -->
+                                <div class="lista-destinatarios">
+                                    @foreach (GroupCardModel destinatarioGrupo in Model.ReceiversGroup)
+                                    {
+                                        if (string.IsNullOrEmpty(destinatarioGrupo.UrlGroup))
+                                        {
+                                            <span class="item-user">
+                                                @destinatarioGrupo.CompleteName
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <a href="@destinatarioGrupo.UrlGroup" title="@destinatarioGrupo.CompleteName">
+                                                <span class="item-user">@destinatarioGrupo.CompleteName</span>
+                                            </a>
+                                        }
+                                    }
+
+                                    @** Saber si hay que mostrar el total de los receivers o no*@
+                                    @if (maxNumDestinators > Model.Receivers.Count) {
+                                        numDestinatorsAMostrar = Model.Receivers.Count;
+                                    }
+
+                                    @for (contDestinators = 0; contDestinators < numDestinatorsAMostrar; contDestinators++)
+                                    {
+                                        ProfileModel destinatario = Model.Receivers[contDestinators];
+                                        string nombreDestinatario = Html.ObtenerNombrePerfil(destinatario);
+                                        string urlDestinatario = Html.ObtenerUrlPerfil(destinatario);
+                                        <a href="@urlDestinatario" title="@nombreDestinatario">
+                                            <span class="item-user">@nombreDestinatario</span></a>
+                                            if (contDestinators > maxNumDestinators)
+                                            {
+                                                break;
+                                            }
+                                    }
+                                </div>
+                                @* Destinatarios extra *@
+                                @if (contDestinators < Model.Receivers.Count)
+                                {
+                                    <span class="desplegar-destinatarios material-icons">arrow_drop_down</span>
+                                    <div class="lista-destinatarios extra">
+                                        @for (int i = contDestinators; i < Model.Receivers.Count; i++)
+                                        {
+                                            ProfileModel destinatario = Model.Receivers[i];
+                                            string nombreDestinatario = Html.ObtenerNombrePerfil(destinatario);
+                                            string urlDestinatario = Html.ObtenerUrlPerfil(destinatario);
+                                            <a href="@urlDestinatario" title="@nombreDestinatario"><span class="destinatario">@nombreDestinatario</span></a>
+                                        }
+                                    </div>
+                                }                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @* Contenido-Cuerpo del mensaje *@
+                <div class="contenido contenido-mensaje">
+                    <p class="">@Html.Raw(Model.Body)</p>
+                </div>
+
+                @* Acciones a realizar en el mensaje *@
+                <div class="acciones-mensaje">
+                    <div class="wrap">
+                        <ul class="acciones-recurso no-list-style">
+                            @* Responder *@
+                            <li>
+                                <a href="@Model.Url.Replace("?mensaje", "?responder&mensaje")"
+                                   rel="nofollow"
+                                   title="@Html.GetText("CORREO", "RESPONDERMENSAJESINTEXTOMENSAJE")"
+                                   class="btn btn-outline-grey responder">
+                                    <span class="material-icons">reply</span>
+                                    <span>@Html.GetText("CORREO", "RESPONDERMENSAJESINTEXTOMENSAJE")</span>
+                                </a>
+                            </li>
+                            @* Responder a todos *@
+                            <li>
+                                <a href="@Model.Url.Replace("?mensaje", "?responderATodos&mensaje")"
+                                   rel="nofollow"
+                                   title="@Html.GetText("CORREO", "REENVIARMENSAJEATODOS")"
+                                   class="btn btn-outline-grey responder-todos">
+                                    <span class="material-icons">reply_all</span>
+                                    <span>@Html.GetText("CORREO", "REENVIARMENSAJEATODOS")</span>
+                                </a>
+                            </li>
+                            @* Reenviar *@
+                            <li>
+                                <a href="@Model.Url.Replace("?mensaje", "?reenviar&mensaje")"
+                                   rel="nofollow"
+                                   title="Reenviar"
+                                   class="btn btn-outline-grey reenviar">
+                                    <span class="material-icons">forward</span>
+                                    <span>@Html.GetText("CORREO", "REENVIARMENSAJESINTEXTOMENSAJE")</span>
+                                </a>
+                            </li>
+                            @* Eliminar *@
+                            <li>
+                                <a class="btn btn-outline-grey deleteMessage"
+                                   data-toggle="modal"
+                                   data-target="#modal-container"
+                                   onclick="AccionFichaPerfil('Eliminar mensaje',
+                                    '@Html.GetText("COMMON", "SI")',
+                                    '@Html.GetText("COMMON", "NO")',
+                                    '¿Estás seguro de eliminar el mensaje seleccionado?',
+                                    '@Model.Key',
+                                    function () {
+                                        EliminarCorreoSeleccionado('@Model.Key');
+                                    },
+                                    '');
+                                ">
+                                    <span class="material-icons">delete</span>
+                                    <span>Eliminar</span>
+                                </a>
+                            </li>
+                            @* Más acciones *@
+                            <li>
+                                <div class="dropdown">
+                                    <a href="#"
+                                       class="dropdown-toggle btn btn-outline-grey no-flecha"
+                                       role="button"
+                                       id="dropdownMasOpciones"
+                                       data-toggle="dropdown"
+                                       aria-haspopup="true"
+                                       aria-expanded="false"><span class="material-icons">more_vert</span></a>
+                                    <div class="dropdown-menu dropdown-menu-right"
+                                         aria-labelledby="dropdownMasOpciones"
+                                         style="will-change: transform">
+                                        <ul class="no-list-style">
+                                            @* Imprimir *@
+                                            <li>
+                                                <a href="javascript: void(0);"
+                                                   rel="nofollow"
+                                                   onclick="window.print();"
+                                                   class="dropdown-item">Imprimir</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Contenedor de mensajes relacionados (contextos) *@
+    <div id="divContenedorContexto" class="col col-12 col-xl-4 col-contexto col-lateral derecha">
+        <div class="wrapCol relacionados-mensaje">
+            @* Título de sección contextos mensajes relacionados *@
+            <h2 class="section-title">@Html.GetText("MENSAJESRELACIONADOS", "MENSAJESRELACIONADOS")</h2>
+            @* Listado de mensajes relacionados (Contextos - Provienen de Servicio Resultados) *@
+            <div id="divContexto" class="resource-list">
+                
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script defer="defer" lang="javascript" type="text/javascript">
+    MontarContextoMensajes('@IdentidadActual.KeyUser', '@IdentidadActual.KeyIdentity', '@Model.Key', '@Html.GetUtilIdiomas().LanguageCode', '', 'divContexto');
+    @Html.Raw(Html.GetJSExtra());
+</script>
+
+<script lang="javascript" type="text/javascript">
+    $(document).ready(function () {
+        let fechamoment = "@Model.ShippingDate.ToString("yyyy-MM-dd")" + "T" + "@Model.ShippingDate.ToString("HH:mm:ss")" + "Z";
+        var fechaServer = moment(fechamoment);
+        var fechaMsj = fechaServer.tz(Intl.DateTimeFormat().resolvedOptions().timeZone).format('DD/MM/YYYY[ a las ]HH:mm');
+        $("#@Model.Key").text(fechaMsj);
+    });
+</script>
+

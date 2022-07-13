@@ -1,0 +1,55 @@
+﻿@using Microsoft.AspNetCore.Http;
+@{
+    ViewBag.Title = "Selecciona el proyecto";
+    Layout = "~/Areas/Gnoss.DevTools.ViewMaker/Views/_LayoutAskUrl.cshtml";
+    HttpContext httpContext = @ViewBag.Session;
+    httpContext.Response.Headers.Add("Cache-Control", "no-cache, no-store");
+    //Response.Headers.Add("Cache-Control", "no-cache, no-store");
+}
+
+<h2>Selecciona el proyecto</h2>
+
+
+@using (Html.BeginForm("SelectProyecto", "Home", FormMethod.Post))
+{
+    <div class="form-horizontal">
+        <div class="form-group">
+            <label for="proySelected" class="control-label col-md-2">Proyecto</label>
+            <div class="col-md-10">
+                <div class="textbox">
+                    <select id="proySelected" name="proySelected">
+                        <option value="">Selecciona un proyecto o crea uno nuevo</option>
+                        <option value="newProy">Nuevo</option>
+                        @foreach (string proy in ViewBag.Proyectos)
+                        {
+                            <option value="@proy">@proy</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="form-group" id="panNombreProy" style="display:none" >
+            <label for="newProy" class="control-label col-md-2">Nombre</label>
+            <div class="col-md-10">
+                <div class="textbox">
+                    <input type="text" id="newProy" name="newProy"  autocomplete="off"/>
+                </div>
+            </div>
+        </div>
+        @if (!string.IsNullOrEmpty(ViewBag.Error))
+        {
+            <div class="panel panel-danger">
+                <div class="panel-heading">Error</div>
+                <div class="panel-body">@ViewBag.Error</div>
+            </div>
+        }
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input name="submit" type="submit" value="Continuar" class="btn btn-default">
+            </div>
+        </div>
+    </div>
+}
+
+
+

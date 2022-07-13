@@ -1,0 +1,46 @@
+﻿@model GroupPageViewModel
+@*
+Descripción
+-----------------------------------------------
+Nueva vista que muestra todos los items en modo Lista después de haber realizado una búsqueda (o sin búsqueda activa). Los recursos se mostrarán en la parte central-derecha. Es donde se muestran los recursos los cuales podrán visualizarse en:
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Lista donde se mostrarán los los items o recursos del buscador --------------------
+*@
+
+@* Cargar posibles acciones para ser utilizadas en _list-community-item *@
+@{
+
+}   
+
+@* Contenedor de items *@
+<div id="panResultados" class="resource-list usuarios listView">
+    @* Inner del contenido de los items *@
+    <div class="resource-list-wrap">
+        @* Pinitra cada usuario perteneciente al grupo *@
+        @foreach (ProfileModel persona in Model.ListMembers)
+        {
+            @Html.PartialView("_FichaPerfilGrupo", persona)
+        }
+        @if (Model.ListMembers.Count == 0) { 
+            <h2>No hay datos para ser mostrados</h2>
+        }
+    </div>  
+    
+    @* Paginador de resultados *@
+    @if (Model.NumMembers > 10)
+    {
+        @Html.PartialView("../FichaGrupoComunidad/_Paginador", Model)
+    }
+</div>
+

@@ -1,0 +1,157 @@
+﻿@model SolicitudesGrupoViewModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra las solicitudes y las gestiones de solicitudes de acceso a grupos de la comunidad.
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+CommunityModel Comunidad = Html.GetComunidad();
+bool containsUrlFoto = true;
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista para visualizar la gestión de acceso a grupos de comunidades --------------------
+*@
+
+<div class="row">
+    @*Breadcrumb / Migas de pan en la ficha del recurso*@
+    <div class="col col-12 col-breadcrumb" id="breadcrumb">
+        <ul>
+            <li><a href="@Comunidad.Url"><strong>@Html.GetText("COMMON", "HOME")</strong></a></li>
+            <li>@Html.GetText("GRUPO", "GRUPOS")</li>
+        </ul>
+    </div>
+       
+    @* Panel derecho-central donde estará el contenido del "buscador"*@
+    <div class="col col-12 col-xl-12 col-contenido izquierda">
+        @* Div que envuelve todo el contenido central-derecho*@
+        <div class="wrapCol">
+            <div class="panel-grupos mb-5">
+            <h1>@Html.GetText("GRUPO", "GRUPOS")</h1>
+                <ul>
+                    @* Visualización de solicitudes de diferentes grupos *@
+                    @if(Model.GrupoFiltroID.Equals(Guid.Empty)){
+                        foreach(Guid grupoid in Model.Grupos.Keys){
+                            <li><a href="@Model.UrlPagina?grupoID=@grupoid">@Model.Grupos[grupoid]</a></li>			    
+                        }
+                    }
+                    else
+                    {	        
+		                <li><a href="@Model.UrlPagina">@Html.GetText("GRUPO", "VERTODOS")</a></li>		    
+                    }
+                </ul>
+            </div>
+
+
+            @* Header o cabecera donde aparecen los resultados o recursos de una comunidad *@
+            @Html.PartialView("_partial-views/_list-header", Model)
+
+            @* Listado de resultados (resource-list) donde aparecerán los recursos-items *@
+            <div id="panResultados" class="resource-list listView">                
+                <div class="resource-list listView">
+                    @foreach (SolicitudesGrupoViewModel.SolicitudModel solicitud in Model.ListaSolicitudes)
+                    {
+                        @*Controlar si se dispone de fotografía o no *@
+                        if (string.IsNullOrEmpty(solicitud.UrlFoto)) { 
+                            containsUrlFoto = false;
+                        }                        
+
+                        <article class="resource" id="@(solicitud.KeyIdentity + "_" + solicitud.KeyGroup)">
+                            <div class="wrap group">
+                                <div class="user-miniatura">
+                                    <div class="imagen-usuario-wrap">
+                                        <div class="imagen @( (containsUrlFoto == false) ? "sinImagen" : null) ">
+                                            @if (containsUrlFoto == false)
+                                            {
+                                                <span class="material-icons">person</span>
+                                            }
+                                            else { 
+                                                <span style="background-image: url(@Html.GetBaseUrlContent()/imagenes/@solicitud.UrlFoto);"></span>
+                                            }
+                                            
+                                        </div>                                       
+                                    </div>
+
+                                    <div class="nombre-usuario-wrap">
+                                        <p class="nombre">@solicitud.NameIdentity</p>
+                                        <p class="nombre-completo">@solicitud.NameGroup · @solicitud.Date.ToShortDateString()</p>
+                                    </div>
+                                    <div class="acciones-usuario-wrap">                                                                                        
+                                    @{ 
+                                        string funcionRechazarSolicitud = "RechazarSolicitud('" + @solicitud.KeyIdentity + "', '" + @solicitud.KeyGroup + "');";
+                                        string funcionAceptarSolicitud = "AceptarSolicitud('" + @solicitud.KeyIdentity + "', '" + @solicitud.KeyGroup + "');";
+                                    }
+                                        <button type="button" onclick="@funcionAceptarSolicitud" class="btn btn-outline-success"><span class="material-icons">check</span> @Html.GetText("COMMON", "ACEPTAR")</button>                                                    
+                                        <button type="button" onclick="@funcionRechazarSolicitud" class="btn btn-outline-danger"><span class="material-icons">close</span> @Html.GetText("COMMON", "RECHAZAR")</button>                                            
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                     }
+                </div>
+                @* Paginador de resultados *@
+                @Html.PartialView("_partial-views/_pagination", Model)                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    // Aceptar la solicitud de acceso al grupo al pulsar en "Aceptar"
+    function AceptarSolicitud(identidadid, grupoid) {
+        // Construcción de la solicitud
+        const solicitud = $('#' + identidadid + '_' + grupoid);
+        // Mostrar loading
+        MostrarUpdateProgress();
+        // Construir el objeto para la petición
+        const dataPost = {
+            IdentidadID: identidadid,
+            GrupoID: grupoid
+        }
+
+        // Realizar petición para aceptar la solicitud de acceso al grupo
+        GnossPeticionAjax('@Model.UrlAccept', dataPost, true).done(function (data) {
+            mostrarNotificacion('success', "@Html.GetText("GRUPO", "SOLICITUDACEPTADAOK")")
+            // Eliminar el item ya que se ha procedido a rechazar la solicitud
+            $(solicitud).remove();
+        }).fail(function (data) {            
+            mostrarNotificacion('error', "@Html.GetText("GRUPO", "SOLICITUDACEPTADAERROR")");
+        }).always(function () {
+            OcultarUpdateProgress();
+        });
+    }
+
+    // Rechazar la solicitud de acceso al grupo al pulsar en "Rechazar"
+    function RechazarSolicitud(identidadid, grupoid) {
+        // Construcción de la solicitud
+        const solicitud = $('#' + identidadid + '_' + grupoid);
+        // Mostrar loading
+        MostrarUpdateProgress();
+
+        // Construir objeto para petición
+        const dataPost = {
+            IdentidadID: identidadid,
+            GrupoID: grupoid
+        }
+
+        // Realizar petición de rechazar solicitud
+        GnossPeticionAjax('@Model.UrlReject', dataPost, true).done(function (data) {
+            mostrarNotificacion('success', "@Html.GetText("GRUPO", "SOLICITUDRECHAZADAOK")")
+            // Eliminar el item ya que se ha procedido a rechazar la solicitud
+            $(solicitud).remove();
+        }).fail(function (data) {
+            mostrarNotificacion('error', "@Html.GetText("GRUPO", "SOLICITUDRECHAZADAERROR")");
+        }).always(function () {
+            OcultarUpdateProgress();
+        });
+    }
+
+</script>

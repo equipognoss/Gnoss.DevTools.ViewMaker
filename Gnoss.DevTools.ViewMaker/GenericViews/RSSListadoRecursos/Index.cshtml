@@ -1,0 +1,239 @@
+﻿@model RSSListadoRecursosViewModel
+@{
+    Html.SetBodyClass("layout04 full listadoComunidad  comGnoss");
+}
+
+<div id="col01">
+    <form autocomplete="off">
+        <div class="fieldset" id="divCambiarFuenteContenedor" style="padding-left:60px; padding-bottom: 10px">
+            <div id="divCambiarFuente" style="background: lavender; padding: 20px; padding-bottom: 0px;">
+                <fieldset>
+                    <p>
+                        Filtrar fuentes
+                    </p>
+                    <p>
+                        <select style="width:400px;" id="ddlFuentesDisponibles" name="ddlFuentesDisponibles">
+                            @foreach (Guid fuenteID in Model.ListaFuentesRSS.Keys)
+                            {
+                                <option value="@fuenteID">@Model.ListaFuentesRSS[fuenteID]</option>
+                            }
+                        </select>
+                        <input type="checkbox" id="checkCompletos" name="checkCompletos">
+                        Mostrar sólo los completos
+                        <em class="help">@Model.NumResultados Entradas pendientes</em>
+                    </p>
+                </fieldset>
+            </div>
+        </div>
+        <div id="contenedorDivBotones" style="padding-left:60px">
+            <div id="divBotones">
+                <fieldset>
+                    <p>
+                        <input type="checkbox" id="checkTodos" name="checkTodos">
+                        <label for="checkTodos"> Seleccionar todos</label>
+                        <input type="hidden" name="txtHackRecursosSeleccionados" id="txtHackRecursosSeleccionados">
+                        <input type="hidden" name="txtHackSeleccionadosIncompletos" id="txtHackSeleccionadosIncompletos">
+
+                        <input type="button" name="btnEliminar" id="btnEliminar" value="Eliminar" style="float:right">
+                        <input type="button" name="btnPublicar" id="btnPublicar" value="Publicar" style="float:right; margin-right:20px">
+                    </p>
+
+                    <div id="panels" class="stateShowForm">
+                        <div id="action" class="box form activeForm">
+                            <fieldset style="display:none" id="actionEliminar">
+                                <legend>¿Deseas eliminar los recursos seleccionados?</legend>
+                                <p>
+                                    <input type="button" value="Sí" id="btnSiEliminar" name="btnSiEliminar">
+                                    <input type="button" value="No" onclick="OcultarPanelesAcciones();" id="btnNoEliminar" name="btnNoEliminar">
+                                </p>
+                            </fieldset>
+                            <fieldset style="display:none" id="actionPublicar">
+                                <legend>¿Deseas publicar los recursos seleccionados?</legend>
+                                <p id="panAdvertencia">Algunos de los recursos seleccionados estan incompletos y no se publicarán</p>
+                                <p>
+                                    <input type="button" value="Sí" id="btnSiPublicar" name="btnSiPublicar">
+                                    <input type="button" value="No" onclick="OcultarPanelesAcciones();" id="btnNoPublicar" name="btnNoPublicar">
+                                </p>
+                            </fieldset>
+                        </div>
+                        <div id="loading" class="loading">
+                            <p>Un momento por favor...</p>
+                        </div>
+                        <div id="menssages">
+                            <div style="display: block;" id="mensajeOK" class="ok">OK</div>
+                            <div style="display: block;" id="mensajeKO" class="ko">KO</div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+
+        <div id="divResultadosConedor">
+            @Html.PartialView("_ResultadosRecursosRSS", Model)
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#ddlFuentesDisponibles').change(function () {
+            filtrar(1);
+        });
+        $('#checkCompletos').click(function () {
+            filtrar(1);
+        });
+        $('#NavegadorPaginas a').click(function () {
+            filtrar($(this).attr('aux'));
+        });
+        $('#checkTodos').click(function () {
+            $('#divResultadosListado input[type=checkbox].checkbox').prop('checked', $('#checkTodos').is(':checked'));
+            OcultarPanelesAcciones();
+        });
+        $('#divResultadosListado input[type=checkbox].checkbox').click(function () {
+            var numItemsChecked = $('#divResultadosListado input[type=checkbox].checkbox:checked').length;
+            var numItems = $('#divResultadosListado input[type=checkbox].checkbox').length;
+            $('#checkTodos').prop('checked', numItemsChecked == numItems);
+            OcultarPanelesAcciones();
+        });
+        
+        $('#btnEliminar').click(function () {
+            RecogerChecks();
+            MostrarEliminar();
+        });
+        $('#btnPublicar').click(function () {
+            RecogerChecks();
+            MostrarPublicar();
+        });
+        $('#actionEliminar #btnNoEliminar').click(function () {
+            OcultarPanelesAcciones();
+        });
+        $('#actionPublicar #btnNoPublicar').click(function () {
+            OcultarPanelesAcciones();
+        });
+        $('#actionEliminar #btnSiEliminar').click(function () {
+            Borrar();
+			$('#checkTodos').prop('checked', false);
+        });
+        $('#actionPublicar #btnSiPublicar').click(function () {
+            Publicar();
+			$('#checkTodos').prop('checked', false);
+        });
+    });
+
+    function Borrar() {
+        MostrarUpdateProgress();
+
+        var dataPost = {
+            Fuente: $('#ddlFuentesDisponibles').val(),
+            SoloCompletos: $('#checkCompletos').is(':checked'),
+            RecursosID: $("#txtHackRecursosSeleccionados").val()
+        };
+
+        GnossPeticionAjax(
+            document.location.href + '/delete',
+            dataPost,
+            true
+        ).done(function (response) {
+            $('#divResultadosConedor').html(response);
+            OcultarPanelesAcciones();
+        }).fail(function (response) {
+        }).always(function (response) {
+            OcultarUpdateProgress();
+        });
+    }
+
+    function Publicar() {
+        MostrarUpdateProgress();
+
+        var dataPost = {
+            Fuente: $('#ddlFuentesDisponibles').val(),
+            SoloCompletos: $('#checkCompletos').is(':checked'),
+            RecursosID: $("#txtHackRecursosSeleccionados").val()
+        };
+
+        GnossPeticionAjax(
+            document.location.href + '/publish',
+            dataPost,
+            true
+        ).done(function (response) {
+            $('#divResultadosConedor').html(response);
+            OcultarPanelesAcciones();
+        }).fail(function (response) {
+        }).always(function (response) {
+            OcultarUpdateProgress();
+        });
+    }
+
+    function filtrar(numPage) {
+        MostrarUpdateProgress();
+
+        var dataPost = {
+            NumPagina: numPage,
+            Fuente: $('#ddlFuentesDisponibles').val(),
+            SoloCompletos: $('#checkCompletos').is(':checked')
+        };
+
+        GnossPeticionAjax(
+            document.location.href + '/filter',
+            dataPost,
+            true
+        ).done(function (response) {
+            $('#divResultadosConedor').html(response);
+        }).fail(function (response) {
+        }).always(function (response) {
+            OcultarUpdateProgress();
+        });
+    }
+
+    function RecogerChecks() {
+        $("#txtHackSeleccionadosIncompletos").val('');
+        $("#txtHackRecursosSeleccionados").val('');
+        $('#divResultadosListado input[type=checkbox].checkbox:checked').each(function () {
+            if (!$(this).closest('#divResourceInt').hasClass('fuenteSeleccionada')) {
+                $("#txtHackSeleccionadosIncompletos").val('true');
+            }
+            var id = this.id.substring(this.id.lastIndexOf('_') + 1, this.id.length);
+            $("#txtHackRecursosSeleccionados").val($("#txtHackRecursosSeleccionados").val() + id + ',');
+        });
+    }
+
+    function MostrarEliminar() {
+        OcultarPanelesAcciones(true);
+        if ($("#txtHackRecursosSeleccionados").val() != "") {
+            document.getElementById('panels').style.display = 'block';
+            document.getElementById('action').style.display = 'block';
+            document.getElementById('actionEliminar').style.display = 'block';
+        }
+    }
+
+    function MostrarPublicar() {
+        OcultarPanelesAcciones(false);
+        if ($("#txtHackRecursosSeleccionados").val() != "") {
+            if ($("#txtHackSeleccionadosIncompletos").val() != "") {
+                $('#panAdvertencia').show();
+            }
+            document.getElementById('panels').style.display = 'block';
+            document.getElementById('action').style.display = 'block';
+            document.getElementById('actionPublicar').style.display = 'block';
+        }
+    }
+
+    function OcultarPanelesAcciones() {
+        document.getElementById('panels').style.display = '';
+        document.getElementById('action').style.display = '';
+        document.getElementById('actionEliminar').style.display = 'none';
+        document.getElementById('actionPublicar').style.display = 'none';
+        document.getElementById('loading').style.display = '';
+        document.getElementById('menssages').style.display = '';
+        document.getElementById('mensajeOK').style.display = 'none';
+        document.getElementById('mensajeKO').style.display = 'none';
+        $('#panAdvertencia').hide();
+    }
+</script>
+<style>
+    #divResource #listCat a,
+    #divResource #listTags a{
+        cursor: default; 
+        text-decoration: none;
+    }
+</style>

@@ -1,0 +1,17 @@
+﻿@model CMSComponentRecentActivity
+@if (Model != null)
+{
+    if (Model.RecentActivity.NumPage > 1)
+    {
+        @Html.PartialView("ControlesMVC/_ActividadReciente", Model.RecentActivity)
+    }
+    else if (Model.RecentActivity.RecentActivityItems.Count > 0)
+    {
+    <div class="resource-list social-events-list">
+        <p class="tituloComponente">@Model.Title</p>
+        <div class="resource-list social-events-list widthTabs">
+             @Html.PartialView("ControlesMVC/_ActividadReciente", Model.RecentActivity)
+        </div>
+    </div> 
+    }
+}

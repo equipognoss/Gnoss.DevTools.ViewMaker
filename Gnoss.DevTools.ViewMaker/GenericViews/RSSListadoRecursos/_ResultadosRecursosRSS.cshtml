@@ -1,0 +1,162 @@
+﻿@model RSSListadoRecursosViewModel
+    <div class="listadoRecursos" id="divResultados">
+        <div class="resource-list listadoFuentesRSS" id="divResultadosListado">
+            @foreach (RSSListadoRecursosViewModel.FichaRecursoRSS fichaRecurso in Model.ListaRecursos)
+            {
+                @Html.PartialView("_FichaRecursoRSS", fichaRecurso)
+            }
+        </div>
+        @{
+            //Paginador
+            int numTotal = Model.NumResultados;
+            int numResultadosPagina = 10;
+            int PaginaActual = Model.NumPage;
+
+            int NUM_PAG_INICIO = 3;
+            int NUM_PAG_PROX_CENTRO = 2;
+            int NUM_PAG_FIN = 3;
+
+            int numPaginas = (int)Math.Ceiling((double)numTotal / (double)numResultadosPagina);
+
+            <input type="hidden" value="1" id="numPagina" />
+            if (numPaginas > 1)
+            {
+                <div id="NavegadorPaginas" class="paginadorResultados">
+                    <div class="pag" id="NavegadorPaginas_Pag">
+                        @if (PaginaActual == 1)
+                        {
+                            <span class="deshabilitado primeraPagina">@Html.GetText("COMMON", "PAGANTERIOR")</span>
+                        }
+                        else
+                        {
+                            <a aux="@Html.Raw((PaginaActual - 1).ToString())" class="indiceNavegacion filtro primeraPagina">@Html.GetText("COMMON", "PAGANTERIOR")</a>
+                        }
+
+                        @{
+                            //INICIO
+                            for (int i = 1; i <= NUM_PAG_INICIO; i++)
+                            {
+                                if (i > numPaginas) //Hemos excedio el número máximo de páginas, así que dejamos de pintar.
+                                {
+                                    break;
+                                }
+
+                                if (i == PaginaActual)
+                                {
+                                    <span class="actual indiceNavegacion">@i </span>
+                                }
+                                else
+                                {
+                                    <a aux="@i" class="indiceNavegacion filtro">@i </a>
+                                }
+                            }
+
+                            if (numPaginas > NUM_PAG_INICIO) //Continuamos si ha más páginas que las que ya hemos pintado
+                            {
+                                int inicioRango = PaginaActual - NUM_PAG_PROX_CENTRO;
+                                int finRango = PaginaActual + NUM_PAG_PROX_CENTRO;
+
+                                if (PaginaActual < (NUM_PAG_INICIO + NUM_PAG_PROX_CENTRO + 1))
+                                {
+                                    inicioRango = NUM_PAG_INICIO + 1;
+                                    if (PaginaActual <= NUM_PAG_INICIO) //En el rango de las primeras
+                                    {
+                                        finRango = PaginaActual + NUM_PAG_INICIO + NUM_PAG_PROX_CENTRO - 1;
+                                    }
+                                    else
+                                    {
+                                        finRango = NUM_PAG_INICIO + (2 * NUM_PAG_PROX_CENTRO) + 1; //Ultimo número de la serie.
+                                    }
+                                }
+                                else if (PaginaActual > (numPaginas - NUM_PAG_FIN - NUM_PAG_PROX_CENTRO))
+                                {
+                                    finRango = numPaginas - NUM_PAG_FIN;
+                                    if (PaginaActual > numPaginas - NUM_PAG_FIN) //En el rango de las últimas
+                                    {
+                                        inicioRango = PaginaActual - NUM_PAG_FIN - NUM_PAG_PROX_CENTRO + 1;//finRango - (pNumPaginas - PaginaActual + 1);
+                                    }
+                                    else
+                                    {
+                                        inicioRango = numPaginas - (NUM_PAG_FIN + (2 * NUM_PAG_PROX_CENTRO)); //Ultimo número de la serie empezando atrás.
+                                    }
+
+                                    //Avanzamos el inicio de la zona final para que no agrege páginas ya pintadas
+                                    while (inicioRango <= NUM_PAG_INICIO)
+                                    {
+                                        inicioRango++;
+                                    }
+                                }
+
+                                if (inicioRango > (NUM_PAG_INICIO + 1))
+                                {
+                                    <span class="separador">...</span>
+                                }
+
+
+                                for (int i = inicioRango; i <= finRango; i++)
+                                {
+                                    if (i > numPaginas) //Hemos excedio el número máximo de páginas, así que dejamos de pintar.
+                                    {
+                                        break;
+                                    }
+
+                                    if (i == PaginaActual)
+                                    {
+                                        <span class="actual indiceNavegacion">@i </span>
+                                    }
+                                    else
+                                    {
+                                        <a aux="@i" class="indiceNavegacion filtro">@i </a>
+                                    }
+                                }
+
+                                if (finRango < numPaginas)
+                                {
+                                    //Continuamos si ha más páginas que las que ya hemos pintado
+                                    inicioRango = numPaginas - NUM_PAG_FIN + 1;
+
+                                    if ((inicioRango - 1) > finRango)
+                                    {
+                                        <span class="separador">...</span>
+                                    }
+
+                                    //Avanzamos el inicio de la zona final para que no agrege páginas ya pintadas
+                                    while (inicioRango <= finRango)
+                                    {
+                                        inicioRango++;
+                                    }
+
+                                    finRango = numPaginas;
+
+                                    for (int i = inicioRango; i <= finRango; i++)
+                                    {
+                                        if (i > numPaginas) //Hemos excedio el número máximo de páginas, así que dejamos de pintar.
+                                        {
+                                            break;
+                                        }
+
+                                        if (i == PaginaActual)
+                                        {
+                                            <span class="actual indiceNavegacion">@i </span>
+                                        }
+                                        else
+                                        {
+                                            <a aux="@i" class="indiceNavegacion filtro">@i </a>
+                                        }
+                                    }
+                                }
+                            }
+                            if (PaginaActual == numPaginas)
+                            {
+                                <span class="deshabilitado ultimaPagina">@Html.GetText("COMMON", "PAGSIGUIENTE")</span>
+                            }
+                            else
+                            {
+                                <a aux="@Html.Raw((PaginaActual).ToString())" class="indiceNavegacion filtro ultimaPagina">@Html.GetText("COMMON", "PAGSIGUIENTE")</a>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>

@@ -1,0 +1,338 @@
+﻿@model SolicitarComunidadViewModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra un pequeño formulario para solicitar la creación de una comunidad a Gnoss
+
+Variables
+----------------------------------------------------------------*@
+@{ 
+CommunityModel Comunidad = Html.GetComunidad();
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista de Solicitud de comunidad --------------------
+*@
+
+
+@{
+    Html.SetBodyClass("layout03 comGnoss");
+    //Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/ckeditor.js?v=" + Html.GetVersion());
+    //Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/adapters/jquery.js?v=" + Html.GetVersion());
+}
+
+
+<div class="row">
+    @* Breadcrumb / Migas de pan en la ficha del recurso *@
+    <div class="col col-12 col-breadcrumb" id="breadcrumb">
+        <ul>
+            <li><a href="@Comunidad.Url"><strong>@Html.GetText("COMMON", "HOME")</strong></a></li>
+            <li>@Html.GetText("SOLICITARCOMUNIDAD", "TITULILLO")</li>
+        </ul>
+    </div>
+
+    <div class="col col-12 col-xl-12 col-contenido derecha">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="header-contenido">
+                        <div class="h1-container">
+                            <h1>@Html.GetText("SOLICITARCOMUNIDAD", "TITULILLO")</h1>
+                        </div>
+                    </div>
+                    <p>@Html.GetText("SOLICITARCOMUNIDAD", "INFO", Html.GetNombreProyectoEcosistema())</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xl-12">
+                    @* Nombre *@
+                    <div class="form-group mb-5">
+                        <label class="control-label d-block" for="">@Html.GetText("SOLICITARCOMUNIDAD", "NOMBRE")</label>
+                        <input placeholder="@Html.GetText("SOLICITARCOMUNIDAD", "NOMBRE")"
+                               type="text"
+                               name=""
+                               id="txtNombreComunidad"
+                               value=""
+                               class="form-control not-outline" />
+                    </div>
+                    @* Nombre Corto *@
+                    <div class="form-group mb-5">
+                        <label class="control-label d-block" for="">@Html.GetText("SOLICITARCOMUNIDAD", "NOMBRECORTO")</label>
+                        <input placeholder="@Html.GetText("SOLICITARCOMUNIDAD", "NOMBRECORTO")"
+                               type="text"
+                               name=""
+                               id="txtNombreCortoComunidad"
+                               value=""
+                               class="form-control not-outline" />
+                    </div>
+                    @* Descripción *@
+                    <div class="form-group mb-5">
+                        <label class="control-label d-block" for="">@Html.GetText("SOLICITARCOMUNIDAD", "DESCRIPCION")</label>
+                        <textarea class="cke mensajes text big ckeSimple" id="txtDescripcionComunidad" cols="20" rows="2"></textarea>
+
+                    </div>
+
+                    @* Tipo de comunidad *@
+                    <div class="form-group mb-5">
+                        <label class="control-label d-block" for="">@Html.GetText("SOLICITARCOMUNIDAD", "TIPO")</label>
+                        <select id="cmbAcceso" name="" class="js-select2 form-control" data-select-search="true">
+                            <option value="0" selected="selected">@Html.GetText("COMADMIN", "PUBLICO")</option>
+                            <option value="1">@Html.GetText("COMADMIN", "PRIVADO")</option>
+                            <option value="2">@Html.GetText("COMADMIN", "RESTRINGIDO")</option>
+                            @if (Model.ComunidadesPrivadasAdministraUsuario.Count > 0)
+                            {
+                                <option value="3">@Html.GetText("COMADMIN", "RESERVADO")</option>
+                            }
+                        </select>
+                    </div>
+                    
+                    @if (Model.ComunidadesPrivadasAdministraUsuario.Count > 0)
+                    {
+                        <div class="form-group mb-5">
+                            <div id="panComunidadPadre" style="display: none">
+                                <label class="control-label d-block" for="">@Html.GetText("SOLICITARCOMUNIDAD", "COMUNIDADPADRE")</label>
+                                <select id="cmbComunidadPadre" class="js-select2 form-control" data-select-search="true">
+                                    <option value="@Guid.Empty">@Html.GetText("COMMON", "MISCOMUNIDADES")</option>
+                                    @foreach (Guid comunidadID in Model.ComunidadesPrivadasAdministraUsuario.Keys)
+                                    {
+                                        <option value="@comunidadID">@Model.ComunidadesPrivadasAdministraUsuario[comunidadID]</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Descripción pública  -->
+                    <div id="panParrafoAcceso0" style="display: block;">
+                        <p>
+                            <strong>
+                                @Html.GetText("COMADMIN", "CABECERAPUBLICA")
+                            </strong>
+                        </p>
+                        <ul class="AdminComunidades">
+                            <li>
+                                @Html.Raw(Html.GetText("COMADMIN", "PUBLICA1", Html.GetNombreProyectoEcosistema()))
+                            </li>
+                            <li>
+                                @Html.Raw(Html.GetText("COMADMIN", "PUBLICA2", Html.GetNombreProyectoEcosistema()))
+                            </li>
+                            <li>
+                                @Html.Raw(Html.GetText("COMADMIN", "PUBLICA3", Html.GetNombreProyectoEcosistema()))
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Descripción privada  -->
+                    <div style="display: none" id="panParrafoAcceso1">
+                        <p>
+                            <strong>
+                                @Html.GetText("COMADMIN", "CABECERAPRIVADA")
+                            </strong>
+                        </p>
+                        <ul class="AdminComunidades">
+                            <li>
+                                @Html.Raw(Html.GetText("COMADMIN", "PRIVADA1"))
+                            </li>
+                            <li>
+                                @Html.Raw(Html.GetText("COMADMIN", "PRIVADA2", Html.GetNombreProyectoEcosistema()))
+                            </li>
+                            <li>
+                                @Html.Raw(Html.GetText("COMADMIN", "PRIVADA3", Html.GetNombreProyectoEcosistema()))
+                            </li>
+                        </ul>
+                    </div>
+
+
+                    <!-- Descripción restringida  -->
+                    <div style="display: none" id="panParrafoAcceso2">
+                        <p>
+                            <strong>
+                                @Html.GetText("COMADMIN", "CABECERARESTINGIDA")
+                            </strong>
+                        </p>
+                        <ul class="AdminComunidades">
+                            <li>
+                                @Html.Raw(Html.GetText("COMADMIN", "RESTINGIDA1", Html.GetNombreProyectoEcosistema()))
+                            </li>
+                            <li>
+                                @Html.Raw(Html.GetText("COMADMIN", "RESTINGIDA2", Html.GetNombreProyectoEcosistema()))
+                            </li>
+                            <li>
+                                @Html.Raw(Html.GetText("COMADMIN", "RESTINGIDA3", Html.GetNombreProyectoEcosistema()))
+                            </li>
+                        </ul>
+                    </div>
+
+
+                    @if (Model.ComunidadesPrivadasAdministraUsuario.Count > 0)
+                    {
+                        <!-- Descripción reservada  -->
+                        <div style="display: none" id="panParrafoAcceso3">
+                            <p>
+                                <strong>
+                                    @Html.GetText("COMADMIN", "CABECERARESERVADA")
+                                </strong>
+                            </p>
+                            <ul class="AdminComunidades">
+                                <li>
+                                    @Html.Raw(Html.GetText("COMADMIN", "RESERVADA1"))
+                                </li>
+                                <li>
+                                    @Html.Raw(Html.GetText("COMADMIN", "RESERVADA2", Html.GetNombreProyectoEcosistema()))
+                                </li>
+                                <li>
+                                    @Html.Raw(Html.GetText("COMADMIN", "RESERVADA3", Html.GetNombreProyectoEcosistema()))
+                                </li>
+                                <li>
+                                    @Html.Raw(Html.GetText("COMADMIN", "RESERVADA4"))
+                                </li>
+                            </ul>
+                        </div>
+                    }
+
+                    <p class="box"><label><strong>Nota</strong>: El tipo de la comunidad sólo podrá modificarse mediante petición por correo electrónico a <a href="mailo:"></a>.</label></p>
+                    <div class="ko" id="panError">
+                        <p>
+                            <span id="lblCamposIncompletos"></span>
+                        </p>
+                    </div>
+                    <p>
+                        <input id="lbEnviarSolicitud" type="button" value="@Html.GetText("SOLICITARCOMUNIDAD", "ENVIARSOLICITUD")" class="submit principal btn btn-primary" />
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $('#txtNombreComunidad').keydown(function (event) {
+                    if (event.which || event.keyCode) {
+                        if ((event.which == 13) || (event.keyCode == 13)) {
+                            return false;
+                        }
+                    }
+                });
+
+                $('#txtNombreCortoComunidad').keydown(function (event) {
+                    if (event.which || event.keyCode) {
+                        if ((event.which == 13) || (event.keyCode == 13)) {
+                            return false;
+                        }
+                    }
+                });
+
+                $('#cmbAcceso').change(function () {
+                    cambiarDescTipoAcceso();
+                });
+
+                $('#lbEnviarSolicitud').click(function () {
+                    validarCampos();
+                });
+
+                cambiarDescTipoAcceso();
+            });
+
+            function validarCampos() {
+                var nombreCom = $('#txtNombreComunidad').val();
+                var nombreCorto = $('#txtNombreCortoComunidad').val();
+                var descripcion = $('#txtDescripcionComunidad').val();
+
+                var error = '';
+                var RegExPatternnombreCom = /<|>$/;
+
+                if (nombreCorto == '' || nombreCom == '' || descripcion == '') {
+                    error = form.campossolicitudcomunidadincompletos;
+                }
+                else if (nombreCom.match(RegExPatternnombreCom)) {
+                    error = form.nombrecomunidadincorrecto;
+                }
+                else if (!validarNombreCortoComunidad(nombreCorto)) {
+                    error = form.nombrecortocomunidadincorrecto;
+                }
+
+                if (error != '') {
+                    pintarError(error, true);
+                }
+                else {
+                    MostrarUpdateProgress();
+                    var tipoComunidad = $('#cmbAcceso').val();
+                    var comunidadPadre = '@Guid.Empty';
+                    if ($('#cmbComunidadPadre').length > 0) {
+                        comunidadPadre = $('#cmbComunidadPadre').val();
+                    }
+                    var args = nombreCom + '|' + nombreCorto + '|' + descripcion + '|' + tipoComunidad + '|' + comunidadPadre;
+                    //WebForm_DoCallback('__Page', 'EnviarForm|' + args, ReceiveServerData, "", null, false);
+                    var respuesta = '';
+                    var dataPost = {
+                        Name: nombreCom,
+                        ShortName: nombreCorto,
+                        Description: Encoder.htmlEncode(descripcion.replace(/\n/g, '')),
+                        Type: tipoComunidad,
+                        CommunityParent: comunidadPadre,
+                    }
+
+                    @{
+                        string urlPost = $"{Html.GetUrlPagina()}/send";
+                        if (Model.AceptacionAutomaticaDeComunidad)
+                        {
+                            urlPost += "?automaticAccept=true";
+                        }
+                     }
+
+                    GnossPeticionAjax(
+                        '@urlPost',
+                        dataPost,
+                        true
+                    ).done(function (data) {
+                        pintarError(data, false);
+                    }).fail(function (data) {
+                        pintarError(data, true);
+                    }).always(function () {
+                        OcultarUpdateProgress();
+                    })
+                }
+            }
+
+            function pintarError(mensaje, esError) {
+                $('#lblCamposIncompletos').html(mensaje);
+                $('#panError').css('display', 'block');
+                if (esError) {
+                    $('#panError').attr('class', 'ko')
+                }
+                else {
+                    $('#panError').attr('class', 'ok')
+                }
+            }
+
+            function cambiarDescTipoAcceso() {
+                $('#panParrafoAcceso0').hide();
+                $('#panParrafoAcceso1').hide();
+                $('#panParrafoAcceso2').hide();
+                $('#panParrafoAcceso3').hide();
+                $('#panComunidadPadre').hide();
+
+                switch ($('#cmbAcceso').val()) {
+                    case '0':
+                        $('#panParrafoAcceso0').show();
+                        break;
+                    case '1':
+                        $('#panParrafoAcceso1').show();
+                        break;
+                    case '2':
+                        $('#panParrafoAcceso2').show();
+                        break;
+                    case '3':
+                        $('#panParrafoAcceso3').show();
+                        $('#panComunidadPadre').show();
+                        break;
+                }
+            }
+    </script>

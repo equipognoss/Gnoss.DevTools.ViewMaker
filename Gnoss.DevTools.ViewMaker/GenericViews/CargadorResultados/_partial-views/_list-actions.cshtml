@@ -1,0 +1,266 @@
+﻿@model ResourceModel
+
+@*
+@*
+Descripción
+-----------------------------------------------
+Vista del menú que contiene las acciones que se pueden realizar en la ficha de un recurso:
+- PDF
+- Editar
+- Enviar
+- Etiquetar
+- Categorizar
+- Versionar
+- Historial
+- Bloquear comentarios
+- Vincular
+- Certificar
+- Compartir
+- Eliminar
+
+Estas acciones se listarán en el propio listado de resultados. Incluirá el contenedor modal "modal-container" donde se cargará la vista de forma dinámica.
+
+Plantillas - Archivos de dewenir
+----------------------------------------------------------------
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+ResourceModel fichaRecurso = Model;
+ResourceModel.ActionsModel acciones = fichaRecurso.Actions;
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Menú de acciones del recurso visibles desde el Listado de recursos --------------------
+*@
+
+
+
+        <div class="acciones-recurso-listado">
+            <div class="dropdown">
+                <a id="op_MoreActions" href="#" class="dropdown-toggle" role="button" id="dropdownMasOpciones" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="material-icons">more_vert</span>
+                </a>
+                <div class="dropdown-menu basic-dropdown dropdown-icons dropdown-menu-right" aria-labelledby="dropdownMasOpciones" style="">
+                    <p class="dropdown-title">Acciones</p>
+                    <ul class="no-list-style">
+
+                        @* Opción Añadir a mi espacio personal 
+                        @if (acciones.AddToMyPersonalSpace)
+                        {
+                            string textoLinkMiEsp = Html.GetText("PERFILBASERECURSOSFICHA", "AGREGARABRPERSONAL");
+                            if (fichaRecurso.TypeDocument == ResourceModel.DocumentType.Pregunta)
+                            {
+                                textoLinkMiEsp = Html.GetText("PERFILBASERECURSOSFICHA", "AGREGARAPREGUNTASPERSONAL");
+                            }
+                            else if (fichaRecurso.TypeDocument == ResourceModel.DocumentType.Debate)
+                            {
+                                textoLinkMiEsp = Html.GetText("PERFILBASERECURSOSFICHA", "AGREGARADEBATESPERSONAL");
+                            }
+                            textoLinkMiEsp += Es.Riam.Util.UtilCadenas.ObtenerTextoDeIdioma(Model.PersonalSpace, Html.GetUtilIdiomas().LanguageCode, null);
+                            <li>
+                                <a id="op_AddtoMyPersonalSpace" onclick="DeployActionInModalPanel('@fichaRecurso.ListActions.UrlLoadActionAddToPersonalSpace', this, 'modal-dinamic-content', '');"
+                                   class="item-dropdown" data-toggle="modal" data-target="#modal-container">
+                                    <span class="material-icons">create_new_folder</span>
+                                    <span class="texto">@textoLinkMiEsp</span>
+                                </a>
+                            </li>
+                        }*@
+
+                        @* Opción Etiquetar un Recurso *@
+                        @if (acciones.AddTags)
+                        {
+                            <li>
+                                <a id="op_AddTags" onclick="DeployActionInModalPanel('@fichaRecurso.ListActions.UrlLoadActionAddTags', this, 'modal-dinamic-content', '');"
+                                   class="item-dropdown" data-toggle="modal" data-target="#modal-container">
+                                    <span class="material-icons">label</span>
+                                    <span class="texto">@Html.GetText("PERFILBASERECURSOSFICHA", "AGREGARTAGS")</span>
+                                </a>
+                            </li>
+                        }
+
+                        @* Opción Enviar Link del Recurso *@
+                        @if (acciones.SendLink)
+                        {
+                            <li>
+                                <a onclick="DeployActionInModalPanel('@fichaRecurso.ListActions.UrlLoadActionSendLink', this, 'modal-dinamic-content', '');"
+                                   class="item-dropdown" data-toggle="modal" data-target="#modal-container">
+                                    <span class="material-icons">send</span>
+                                    <span class="texto">@Html.GetText("ENVIOENLACE", "ENVIARENLACE")</span>
+                                </a>
+                            </li>
+                        }
+
+                        @* Opción Etiquetar un Recurso *@
+                        @if (acciones.AddTags)
+                        {
+                            <li>
+                                <a id="op_AddTags" onclick="DeployActionInModalPanel('@fichaRecurso.ListActions.UrlLoadActionAddTags', this, 'modal-dinamic-content', '');"
+                                   class="item-dropdown" data-toggle="modal" data-target="#modal-container">
+                                    <span class="material-icons">label</span>
+                                    <span class="texto">@Html.GetText("PERFILBASERECURSOSFICHA", "AGREGARTAGS")</span>
+                                </a>
+                            </li>
+                        }
+                        @* Opción Categorizar un Recurso *@
+
+                        @if (acciones.AddCategories)
+                        {
+                            string textoLinkAgCat = Html.GetText("PERFILBASERECURSOSFICHA", "AGREGARCATEGORIA");
+                            if (fichaRecurso.TypeDocument == ResourceModel.DocumentType.Pregunta)
+                            {
+                                textoLinkAgCat = Html.GetText("PERFILBASERECURSOSFICHA", "AGREGARPREGUNTAACATEGORIA");
+                            }
+                            else if (fichaRecurso.TypeDocument == ResourceModel.DocumentType.Encuesta)
+                            {
+                                textoLinkAgCat = Html.GetText("PERFILBASERECURSOSFICHA", "AGREGARENCUESTAACATEGORIA");
+                            }
+                            else if (fichaRecurso.TypeDocument == ResourceModel.DocumentType.Debate)
+                            {
+                                textoLinkAgCat = Html.GetText("PERFILBASERECURSOSFICHA", "AGREGARDEBATEACATEGORIA");
+                            }
+                            <li>
+                                <a id="op_AddCategories" onclick="DeployActionInModalPanel('@fichaRecurso.ListActions.UrlLoadActionAddCategories', this, 'modal-dinamic-content', '');"
+                                   class="item-dropdown" data-toggle="modal" data-target="#modal-container">
+                                    <span class="material-icons">folder</span>
+                                    <span class="texto">@textoLinkAgCat</span>
+                                </a>
+                            </li>
+                        }
+
+                        @* Opción Crear versión de un recurso *@
+                        @if (acciones.CreateVersion)
+                        {
+                            <li>
+                                @if (fichaRecurso.TypeDocument != ResourceModel.DocumentType.Semantico)
+                                {
+                                    <a id="op_AddCreateVersion" class="item-dropdown" href="#">
+                                        <span class="material-icons">file_copy</span>
+                                        <span class="texto">@Html.GetText("PERFILBASERECURSOSFICHA", "CREARVERSION")</span>
+                                    </a>
+                                }
+                                else
+                                {
+                                    string accionEnlace = "CrearVersionDocSem('" + Html.GetUrlPagina() + "', '" + fichaRecurso.Key + "')";
+                                    <a id="op_AddCreateVersion" class="item-dropdown" onclick="@accionEnlace">
+                                        <span class="material-icons">file_copy</span>
+                                        <span class="texto">@Html.GetText("PERFILBASERECURSOSFICHA", "CREARVERSION")</span>
+                                    </a>
+                                }
+                            </li>
+                        }
+
+                        @* Opción Ver historial de un recurso *@
+                        @if (acciones.ViewHistory)
+                        {
+                            <li>
+                                <a id="op_ViewHistory" onclick="DeployActionInModalPanel('@fichaRecurso.ListActions.UrlLoadActionHistory', this, 'modal-dinamic-content', '');"
+                                   class="item-dropdown" data-toggle="modal" data-target="#modal-container">
+                                    <span class="material-icons">dns</span>
+                                    <span class="texto">@Html.GetText("PERFILBASERECURSOSFICHA", "HISTORIAL")</span>
+                                </a>
+                            </li>
+                        }
+
+                        @* Opción Bloquear o no comentarios en un recurso *@
+                        @if (acciones.BlockComments)
+                        {
+                            string textoEnlace = "";
+                            string textoLinkBloqCom = Html.GetText("PERFILBASERECURSOSFICHA", "BLOQUEARCOMENTARIOS");
+                            string textoLinkDesBloqCom = Html.GetText("PERFILBASERECURSOSFICHA", "DESBLOQUEARCOMENTARIOS");
+
+                            if (fichaRecurso.AllowComments)
+                            {
+                                textoEnlace = textoLinkBloqCom;
+                            }
+                            else
+                            {
+                                textoEnlace = textoLinkDesBloqCom;
+                            }
+                            <li>
+                                <a id="op_BlockComments" onclick="DeployActionInModalPanel('@fichaRecurso.ListActions.UrlLoadActionLockComments', this, 'modal-dinamic-content', '');"
+                                   class="item-dropdown" data-toggle="modal" data-target="#modal-container">
+                                    <span class="material-icons">speaker_notes_off</span>
+                                    <span class="texto">@textoEnlace</span>
+                                </a>
+                            </li>
+                        }
+
+                        @* Opción Vincular recurso *@
+                        @if (acciones.LinkUp)
+                        {
+                            <li>
+                                <a id="op_LinkUp" onclick="DeployActionInModalPanel('@fichaRecurso.ListActions.UrlLoadActionLinkResource', this, 'modal-dinamic-content', '');"
+                                   class="item-dropdown" data-toggle="modal" data-target="#modal-container">
+                                    <span class="material-icons">attach_file</span>
+                                    <span class="texto">@Html.GetText("VINCULACIONDOCUMENTACION", "VINCDOC")</span>
+                                </a>
+                            </li>
+                        }
+                        @* Opción Certificar recurso *@
+                        @if (acciones.Certify)
+                        {
+                            <li>
+                                <a id="op_Certify" onclick="DeployActionInModalPanel('@fichaRecurso.ListActions.UrlLoadActionCertify', this, 'modal-dinamic-content', '');"
+                                   class="item-dropdown" data-toggle="modal" data-target="#modal-container">
+                                    <span class="material-icons">verified_user</span>
+                                    <span class="texto">@Html.GetText("PERFILBASERECURSOSFICHA", "CERTIFICAR")</span>
+                                </a>
+                            </li>
+                        }
+
+                        @* Opción Compartir recurso entre comunidades*@
+                        @if (acciones.Share)
+                        {
+                            <li>
+                                <a id="op_Share" onclick="DeployActionInModalPanel('@fichaRecurso.ListActions.UrlLoadActionShare', this, 'modal-dinamic-content', '');"
+                                   class="item-dropdown" data-toggle="modal" data-target="#modal-container">
+                                    <span class="material-icons">share</span>
+                                    <span class="texto">@Html.GetText("PERFILBASERECURSOSFICHA", "COMPARTIR")</span>
+                                </a>
+                            </li>
+                        }
+
+                        @* Opción Enviar Newsletter*@
+                        @if (acciones.SendNewsletter)
+                        {
+                            <li>
+                                <a id="op_SendNewsletter" onclick="DeployActionInModalPanel('@fichaRecurso.ListActions.UrlLoadActionSendNewsletter', this, 'modal-dinamic-content', '');"
+                                   class="item-dropdown" data-toggle="modal" data-target="#modal-container">
+                                    <span class="material-icons">email</span>
+                                    <span class="texto">@Html.GetText("PERFILBASERECURSOSFICHA", "ENVIARCORREOTODOSUSUARIO")</span>
+                                </a>
+                            </li>
+                        }
+
+                        @* Opción Enviar Newsletter a grupos*@
+
+                        @if (acciones.SendNewsletterGroups)
+                        {
+                            <li>
+                                <a id="op_SendNewsletterGroups" onclick="DeployActionInModalPanel('@fichaRecurso.ListActions.UrlLoadActionSendNewsletterGroups', this, 'modal-dinamic-content', '');"
+                                   class="item-dropdown" data-toggle="modal" data-target="#modal-container">
+                                    <span class="material-icons">mark_email_read</span>
+                                    <span class="texto">@Html.GetText("PERFILBASERECURSOSFICHA", "ENVIARCORREOGRUPO")</span>
+                                </a>
+                            </li>
+                        }
+
+                        @* Opción Borrar recurso *@
+                        @if (acciones.Delete)
+                        {
+                            <li>
+                                <a id="op_Delete" onclick="DeployActionInModalPanel('@fichaRecurso.ListActions.UrlLoadActionDelete', this, 'modal-dinamic-content', '');"
+                                   class="item-dropdown" data-toggle="modal" data-target="#modal-container">
+                                    <span class="material-icons">delete</span>
+                                    <span class="texto">@Html.GetText("PERFILBASERECURSOSFICHA", "ELIMINAR")</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>

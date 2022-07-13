@@ -1,0 +1,82 @@
+﻿@model UsersSelectorModel
+@*
+Descripción
+-----------------------------------------------
+Vista parcial que se utiliza para mostrar un buscador de personas y listar la selección de un determinado usuario en un pequeño panel dentro de esta vista. Este buscador es utilizado para (por ejemplo) seleccionar o buscar personas para que puedan compartir o editara un recurso.
+La vista se usa directamente en la vista _ModificarRecurso
+
+
+Variables
+----------------------------------------------
+*@
+@{
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista para la búsqueda de usuarios y para el mostrado de estos una vez seleccionados --------------------*@
+
+@{
+    string idsSelecc = "";
+    foreach (Guid perfilID in Model.SelectedProfilesList.Keys)
+    {
+        idsSelecc += perfilID + ",";
+    }
+    foreach (Guid grupoID in Model.SelectedGroupsList.Keys)
+    {
+        idsSelecc += "g_" + grupoID + ",";
+    }
+}
+
+
+@* Contenedor de la caja para la búsqueda*@
+<div class="form-group mb-4 pl-5 divSelectorUsuRec">
+    @* Contenedor para inputs de búsqueda*@    
+        @* Input oculto *@
+        <input name="txtBaseUrlHack_selectorUsuarios" type="text" value="http://comunidades.gnoss.net/" id="txtBaseUrlHack_selectorUsuarios" style="display:none;">
+        @* Input para buscar personas *@
+        <div class="input-wrap">
+            <input type="text"
+                   placeholder="Introduce una persona y/o grupo"
+                   class="form-control filtroFaceta filtroFacetaSelectUsuRec ac_input"
+                   autocomplete="off" />
+        </div>    
+
+    @* Resultdos o selección de personas *@
+    <div class="editorLector tag-list mb-4 mt-3">
+        @* Input Oculto para guardar las personas seleccionadas desde el buscador *@
+        <input type="hidden" class="hackUsuSeleccionadoRec" value="@idsSelecc" />
+
+        @* Contenedor para visualizar las personas seleccioandas desde el buscador*@
+        <div class="ususSeleccionados">
+            
+                @foreach (Guid perfilID in Model.SelectedProfilesList.Keys)
+                {
+                    //@Model.SelectedProfilesList[perfilID]<a class="remove" onclick="EliminarUsuarioSelecUsu(this, '@perfilID');">@Html.GetText("COMMON", "ELIMINAR")</a>
+            
+                        <div class="tag" title="@Model.SelectedProfilesList[perfilID]">
+                            <div class="tag-wrap">
+                                <span class="tag-text">@Model.SelectedProfilesList[perfilID]</span>
+                                <span class="tag-remove material-icons" onclick="EliminarUsuarioSelecUsu(this, '@perfilID');">close</span>
+                            </div>
+                            <input type="hidden" value="@Model.SelectedProfilesList[perfilID]" />
+                        </div>
+            
+                }
+                @foreach (Guid grupoID in Model.SelectedGroupsList.Keys)
+                {
+                    //@Model.SelectedGroupsList[grupoID]<a class="remove" onclick="EliminarUsuarioSelecUsu(this, 'g_@grupoID');">@Html.GetText("COMMON", "ELIMINAR")</a>
+            
+                        <div class="tag" title="@Model.SelectedGroupsList[grupoID]">
+                            <div class="tag-wrap">
+                                <span class="tag-text">@Model.SelectedGroupsList[grupoID]</span>
+                                <span class="tag-remove material-icons" onclick="EliminarUsuarioSelecUsu(this, 'g_@grupoID');">close</span>
+                            </div>
+                            <input type="hidden" value="@Model.SelectedGroupsList[grupoID]" />
+                        </div>            
+                }
+            
+        </div>
+    </div>
+</div>

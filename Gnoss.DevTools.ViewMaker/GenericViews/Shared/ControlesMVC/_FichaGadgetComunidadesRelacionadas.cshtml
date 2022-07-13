@@ -1,0 +1,76 @@
+﻿@model GadgetModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista nueva que contiene una lista de las comunidades relacionadas. Anteriormente esta vista estaba incluida en FichaGadget, pero por requerimientos se saca fuera
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista para mostrar Comunidades relacionadas --------------------
+*@
+
+@* Tipo de vista si el Gadget es para 'Comunidades Relacionadas' *@
+@if (Model is GadgetCommunitiesListModel)
+{
+    GadgetCommunitiesListModel gadgetComunidad = (GadgetCommunitiesListModel)Model;
+
+    if (gadgetComunidad.Communities != null || gadgetComunidad.Communities.Count > 0)
+    {       
+        @* Controlar listado de comunidades relacionadas *@
+        if (gadgetComunidad.Communities.Count > 0) {
+            <div id="@Model.Key" class="group resources comunidades mt-3 wrapCol">                
+                <h2 class="section-title">@Model.Title</h2>                
+                @* Listado de comunidades - Pintado de cada comunidad *@
+                <div class="resource-list mb-3 grupo-personas">
+                    <div class="resource-list usuarios con-borde">
+                        @* Cada comunity item *@
+                        @foreach (CommunityModel comunidad in gadgetComunidad.Communities)
+                        {
+                            // Controlar si no hay logo de la comunidad > Material Design Icons
+                            bool containsUrlFoto = true;
+                            if (comunidad.Logo.ToString().Contains("anonimo_peque"))
+                            {
+                                containsUrlFoto = false;
+                            }
+
+                            <article class="resource resource-grupo">
+                                <div class="user-miniatura" style="align-items:center">
+                                    <div class="imagen-usuario-wrap">
+                                        <a href="@comunidad.Url">
+                                            <div class="imagen @( !containsUrlFoto ? "sinImagen" : null) ">
+                                                @if (containsUrlFoto == false)
+                                                {
+                                                    <span class="material-icons">groups</span>
+                                                }
+                                                else
+                                                {
+                                                    <span style="background-image: url(@comunidad.Logo);"></span>
+                                                }
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="nombre-usuario-wrap">
+                                        <a href="@comunidad.Url">
+                                            <p class="nombre">@comunidad.Name</p>
+                                            @*<p class="nombre-completo">@comunidad.Description</p>*@
+                                        </a>
+                                    </div>
+                                </div>
+                            </article>                
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+}
+

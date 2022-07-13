@@ -1,0 +1,45 @@
+﻿@model FacetedModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista contenedora que albergará cada una de las facetas disponibles para realizar búsqueda de recursos. Esta vista se encuentra dentro del servicio "Servicio Facetas".
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Contenedor de Facetas --------------------
+*@
+<div class="facetedSearch" id="facetedSearch">    
+    @if (Model.FacetList != null)
+    {
+        foreach (FacetModel faceta in Model.FacetList)
+        {
+            @Html.PartialView("_Faceta", faceta)
+        }
+        
+    <div style="display:none" id="panelFiltros">
+        @foreach (FacetItemModel filtro in Model.FilterList)
+        {
+            <li class="@filtro.Name.Substring(filtro.Name.IndexOf("=") + 1)">
+                @filtro.Tittle
+                <a rel="nofollow" class="remove faceta" name="@filtro.Name" href="@filtro.Filter">eliminar</a>
+            </li>
+        }
+        @* Opción/Botón para limpiar todos los filtros actuales *@
+		@if (@Model.FilterList.Count > 0){
+		    <li class="borrarFiltros-wrap">
+			    <a style="cursor:pointer" class="limpiarfiltros borrarFiltros">@Html.GetText("COMBUSQUEDAAVANZADA", "LIMPIARFILTROS")</a>
+            </li>
+        }  
+    </div>
+    }
+</div>

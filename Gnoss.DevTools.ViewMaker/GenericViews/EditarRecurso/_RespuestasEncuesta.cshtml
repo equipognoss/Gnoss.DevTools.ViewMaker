@@ -1,0 +1,113 @@
+﻿@model PollAnswersModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista parcial que se utiliza para mostrar las opciones de añadir, eliminar y mover hacia arriba o hacia abajo una posible respuesta que esté asociada con un tipo de recurso de tipo "Encuesta".
+
+Variables
+----------------------------------------------
+*@
+@{
+// Nº de respuestas que tendrá una encuesta
+int count = 0;
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista para de respuestas de un recurso de tipo Encuesta --------------------*@
+
+
+@{
+    while (Model.Answers.Count < 2)
+    {
+        Model.Answers.Add("");
+    }
+
+    count = 1;
+    string displayEliminar = "";
+
+    @* Mostrar el botón de "Eliminar respuesta" sólo si hay más de 3*@
+    if (Model.Answers.Count < 3)
+    {
+        displayEliminar = "style=\"display:none;\"";
+    }
+}
+
+
+
+
+@* Sección respuestas para una encuesta *@
+<div class="form-group mb-5 edit-respuestas-edicion">
+    @* Panel contenedor de las respuestas *@
+    <div id="panRespuestasSup">
+        @* Título del panel respuestas *@
+        <div class="form-group mb-4 edit-respuestas-encuestas-edicion">
+            <label class="control-label d-block mb-3">Opciones de respuesta</label>
+        </div>
+    
+    @* Contenedor de las respuestas *@
+    <div id="panRespuestas">
+            @*Recorrido de las posibles respuestas para la encuesta*@
+    @foreach (string respuesta in Model.Answers)
+    {
+        string idFild = "panRespuesta" + count;
+        string textoOpc = Html.GetText("DAFO", "OPCION") + " " + count;
+
+        string displayUp = "";
+        string displayDown = "";
+        string claseAdicional = "";
+
+        if (count == 1)
+        {
+            displayUp = "style=\"display:none;\"";
+            claseAdicional = "disabled";
+        }
+
+        if (count == Model.Answers.Count)
+        {
+            displayDown = "style=\"display:none;\"";
+            claseAdicional = "disabled";
+        }
+
+        // Pintar cada respuesta
+            @* Opción 1 (Cada una de las opciones a añadir a la encuesta) *@
+        <div class="form-group encuestas" id="@idFild">
+            @* Label de la respuesta *@
+            <label class="control-label d-block">@textoOpc</label>
+            @* Contenedor de Label + Input de respuesta + botones mover encuesta*@
+            <div class="form-group form-inline">
+                @* Input para añadir una respuesta*@
+                <input type="text" class="form-control opcion respuestaEncuesta" value="@respuesta" aria-describedby="@(@idFild)_help" placeholder="Introduce una opción de respuesta" style="flex: 1 0 auto;"> 
+               
+                @* Botón para subir*@
+                @*<a class="btn btn-grey ml-2 btn-sm respuestaUp" @Html.Raw(displayUp) onclick="UpRespuestaEncuesta(this)">
+                    <span class="material-icons p-0">expand_less</span>
+                </a>
+                *@
+                <a class="btn btn-outline-grey ml-1 respuestaUp @claseAdicional" onclick="UpRespuestaEncuesta(this)" ><span class="material-icons p-0">arrow_drop_up</span></a>
+
+                @* Botón para bajar*@
+                @*<a class="btn btn-grey ml-2 btn-sm respuestaDown" @Html.Raw(displayDown) onclick="DownRespuestaEncuesta(this)">
+                    <span class="material-icons p-0">expand_more</span>
+                </a>*@
+                <a class="btn btn-outline-grey ml-1 respuestaDown @claseAdicional"  onclick="DownRespuestaEncuesta(this)"><span class="material-icons p-0">arrow_drop_down</span></a>
+
+                @* Botón para eliminar opción *@            
+                @*<input type="button" class="btn btn-danger ml-2 respuestaDelete submit" value="@Html.GetText("COMMON", "ELIMINAR")" @Html.Raw(displayEliminar) onclick="EliminarRespuestaEncuesta(this)" />*@
+                <a class="btn btn-outline-grey ml-1 respuestaDelete submit @claseAdicional" onclick="EliminarRespuestaEncuesta(this)"><span class="material-icons p-0">delete</span></a>
+            </div>
+            @* Ayuda explicativa de Opción 1*@
+            <small class="form-text text-muted">Introduce una opción para la respuesta</small>      
+        </div>
+
+        @* Respuesta pintada*@
+        count++;
+    }
+    </div>
+
+    @* Botón para añadir una opción más a la encuesta *@
+    <input type="button" class="submit btn btn-grey uppercase" id="lbAgnadir" onclick="AgregarRespuestaEncuesta()" value="@Html.GetText("PERFILBASERECURSOEDITAR", "AÑADIRRESPUESTA")">    
+  </div>
+</div>

@@ -1,0 +1,88 @@
+﻿@*
+    Descripción
+    -----------------------------------------------
+    Vista modal que se utiliza para mostrar opciones para aceptar las cookies en caso de que el usuario no haya establecido aun el ACEPTAR o DENEGAR las cookies.
+    Se utiliza o se muestra en la vista Layout.cshtml
+
+    Variables
+    ----------------------------------------------------------------
+*@
+@{
+    // Información de aviso de cookies para mostrar o no el panel
+    string avisoCookies = Html.GetCookiesWarning();
+
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Vista Modal que muestra la política de cookies de la empresa --------------------
+
+
+    @* Mostrar o no el aviso de cookies *@
+@if (!string.IsNullOrEmpty(avisoCookies))
+{
+    <div id="aviso-cookies">
+        <div class="contenido">
+            @* Contenedor informativo de gestión de Cookies *@
+            <div class="box aviso">
+                <p class="titulo">Uso de cookies</p>
+                <p>
+                    GNOSS usa cookies, propias y de terceros, con finalidad principalmente
+                    técnica y necesaria para prestación de nuestros servicios y mostrarles
+                    contenido relevante. Más información en nuestra política de cookies.
+                </p>
+                <p>
+                    ACEPTA para confirmar que has leído la información y aceptado su
+                    instalación. Puedes modificar la configuración de tu navegador.
+                </p>
+            </div>
+            @* Panel donde se mostrará posible error al guardar cookie*@
+            <div id="modal-accept-coookie-wrapper" class="mt-2">
+
+            </div>
+            @* Botonera de gestión de cookies *@
+            <div class="actionButtons">
+                <input type="submit"
+                       id="aceptarCookies"
+                       title="Aceptar"
+                       value="Aceptar"
+                       class="btn btn-primary principal submit uppercase" />
+                <input type="submit"
+                       id="modificarcookie"
+                       title="Modificar"
+                       value="Modificar configuración"
+                       class="btn btn-link"
+                       onclick="MostrarConfiguracion()" />
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    function MostrarConfiguracion() {
+        var selected = $("#modificarcookie").val();
+        $("#divAvisoCookie").hide();
+        $('#modalAvisoCookies').show();
+    }
+
+    function mostrarErrorGuardado(data) {
+        if (data) {
+            $('#formaceptcookies').after('<div class="error general">' + data + '</div>');
+        } else {
+            $('#formaceptcookies').after('<div class="error general">Ha habido errores en el guardado</div>');
+        }
+    }
+
+    function guardarAceptarCookies() {
+        AceptarTodo();
+    }
+    $(document).ready(function () {
+        // Get the modal
+        /*('#myBtn').click(function () {
+            $('#myModal').show();
+        });*/
+
+        /*$('#myBtn').trigger("click");
+        alert("hola");*/
+    });
+</script>

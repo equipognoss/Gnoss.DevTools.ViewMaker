@@ -1,0 +1,82 @@
+﻿@model ProfilePageViewModel
+
+@{
+    List<GroupCardModel> Grupos = Model.ProfileGroups;
+    
+    UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+    
+    string nombreCompleto = Model.Profile.NamePerson;
+
+    if (Model.Profile.TypeProfile == ProfileType.Personal || Model.Profile.TypeProfile == ProfileType.Teacher)
+    {
+        nombreCompleto = Model.Profile.NamePerson;
+    }
+    else if (Model.Profile.TypeProfile == ProfileType.ProfessionalPersonal)
+    {
+        nombreCompleto = Model.Profile.NamePerson + " " + ConstantesDeSeparacion.SEPARACION_CONCATENADOR + " " + Model.Profile.NameOrganization;
+    }
+    else if (Model.Profile.TypeProfile == ProfileType.ProfessionalCorporate && !string.IsNullOrEmpty(Model.Profile.NamePerson))
+    {
+        nombreCompleto = Model.Profile.NameOrganization + " (" + Model.Profile.NamePerson + ")";
+    }
+    else
+    {
+        nombreCompleto = Model.Profile.NameOrganization;
+    }
+}
+<h2>@Html.GetText("GRUPO", "GRUPOS") @Html.GetText("COMMON", "DE") @nombreCompleto</h2>
+
+@foreach (GroupCardModel fichaGrupo in Grupos)
+{
+    <div style="height: auto;" class="resource">
+        <div class="box description">
+            <div class="group title">
+                <h3><a href="@fichaGrupo.UrlGroup">@fichaGrupo.Name</a></h3>
+                <p class="resourceType conImagenPerfil">
+                    <a href="@fichaGrupo.UrlGroup">
+                        <img src="@Html.GetBaseUrlStatic()/img/iconos/grupos/grupo.gif" alt="@fichaGrupo.Name" />
+                    </a>
+                </p>
+            </div>
+            <div class="group acciones">
+                @if (fichaGrupo.AllowSendMessage || fichaGrupo.AllowLeaveGroup)
+                { 
+                    <ul id="listaAcciones_@fichaGrupo.Clave">
+                        @if (fichaGrupo.AllowSendMessage)
+                        {
+                            <li>
+                                <a onclick="javascript:AccionEnviarMensajeGrupoMVC('@fichaGrupo.Clave');" style="cursor: pointer">@Html.GetText("PERSONAS", "ENVIARMENSAJE")</a>
+                            </li>
+                        }
+                        @if (fichaGrupo.AllowLeaveGroup)
+                        {
+                            <li>
+                                <a onclick="javascript:$(this).hide();$(this).next().show();" style="cursor: pointer">@Html.GetText("GRUPO", "ABANDONARGRUPO")</a>
+                                <span style="display:none">@Html.GetText("GRUPO", "CONFIRMACIONABANDONARGRUPO")<a class="submit principal" onclick="javascript:EliminarIdentidadDeGrupo('@fichaGrupo.Clave', '@IdentidadActual.KeyIdentity');">@Html.GetText("COMMON", "SI")</a><a class="submit principal" onclick="javascript:$(this).parent().hide();$(this).parent().prev().show();">" + @Html.GetText("COMMON", "NO") + "</a></span>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+            @if (fichaGrupo.AllowSendMessage || fichaGrupo.AllowLeaveGroup)
+            {
+                <div style="display:none;" id="desplegable_@fichaGrupo.Clave">
+                    <div style="display: none;" class="stateShowForm" id="panels">
+                        <div class="loading" id="loading">
+                            <p>Cargando formulario, un momento por favor</p>
+                        </div>
+                        <div id="menssages">
+                            <div class="ok"></div>
+                            <div class="ko"></div>
+                        </div>
+                        <div class="box form activeForm" id="action">
+                            <div id="@fichaGrupo.Clave"></div>
+                        </div>
+@*                        <div class="box form activeForm" id="aux_13b58a20-f603-4c13-893a-9d51ffea4dce"></div>*@
+                        <p class="cerrar"><a onclick="CerrarPanelAccion('desplegable_@fichaGrupo.Clave')" title="cerrar formulario">cerrar x</a></p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}

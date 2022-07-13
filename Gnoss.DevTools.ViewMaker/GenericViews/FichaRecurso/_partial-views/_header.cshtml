@@ -1,0 +1,101 @@
+﻿@model ResourceViewModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista que contiene la cabecera o header de un recurso en su correspondiente ficha. Se muestra en él:
+- Nombre del recurso
+- Imagen del autor del recurso (Desde _FichaPublicador )
+- Nombre del autor del recurso (Desde _FichaPublicador )
+- Nombre completo del autor del recurso (Desde _FichaPublicador )
+- Fecha del recurso (Desde _FichaPublicador )
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+ResourceModel FichaDocumento = Model.Resource;
+// Guardar el tipo de recurso para gestionarlo en el título
+string privado = "";
+    
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Header o título del Recurso --------------------
+*@
+
+@* Control del tipo de recurso (Privado, público...)*@
+@{    
+    if (FichaDocumento.Private)
+    {
+        privado = "privado";
+    }
+}
+
+
+<div class="header-resource">
+    <div class="title-wrap">
+        @* Título del recurso*@
+        <h1 class="title" property="dcterms:title" content="@FichaDocumento.Title">
+            @if (string.IsNullOrEmpty(FichaDocumento.UrlDocument))
+            {
+                @FichaDocumento.Title
+            }
+            else
+            {
+                string claseEnviarAccGogAnac = "";
+                if (FichaDocumento.TypeDocument == ResourceModel.DocumentType.Imagen || FichaDocumento.TypeDocument == Es.Riam.Gnoss.Web.MVC.Models.ResourceModel.DocumentType.FicheroServidor)
+                {
+                    claseEnviarAccGogAnac = "class=\"linkDescargaFichero\"";
+                }
+                if (FichaDocumento.OpenInNewWindow)
+                {
+                    <a target="_blank" title="@FichaDocumento.Title" href="@FichaDocumento.UrlDocument" @Html.Raw(claseEnviarAccGogAnac)>@FichaDocumento.Title</a>
+                }
+                else
+                {
+                    <a href="@FichaDocumento.UrlDocument" @Html.Raw(claseEnviarAccGogAnac)>@FichaDocumento.Title</a>
+                }
+            }
+        </h1>
+        
+        @* Lo ocultamos para ponerlo en _FichaPublicador
+            Añadir información del tipo de Recurso (Recurso privado)
+        <p class="resourceType @(FichaDocumento.TypeDocument == ResourceModel.DocumentType.Semantico ? "semantico " + FichaDocumento.RdfType : FichaDocumento.NameImage)  @privado">
+            <span>tipo de documento</span>
+            @if (FichaDocumento.Private)
+            {
+                <span class="privado">documento privado</span>
+            }
+            @if (string.IsNullOrEmpty(FichaDocumento.UrlDocument))
+            {
+                <a>@FichaDocumento.RdfTypeName</a>
+            }
+            else
+            {
+                string claseEnviarAccGogAnac = "";
+                if (FichaDocumento.TypeDocument == ResourceModel.DocumentType.Imagen || FichaDocumento.TypeDocument == Es.Riam.Gnoss.Web.MVC.Models.ResourceModel.DocumentType.FicheroServidor)
+                {
+                    claseEnviarAccGogAnac = "class=\"linkDescargaFichero\"";
+                }
+
+                if (FichaDocumento.OpenInNewWindow)
+                {
+                    <a target="_blank" href="@FichaDocumento.UrlDocument" @Html.Raw(claseEnviarAccGogAnac)>@FichaDocumento.RdfTypeName</a>
+                }
+                else
+                {
+                    <a href="@FichaDocumento.UrlDocument" @Html.Raw(claseEnviarAccGogAnac)>@FichaDocumento.RdfTypeName</a>
+                }
+            }
+        </p>*@
+    </div>
+
+        @* Mostrar información del Publisher/Autor del Recurso *@
+        @if (Model.Resource.Publisher != null)
+        {                
+            @Html.PartialView("_FichaPublicador", FichaDocumento)
+        }         
+</div>
+

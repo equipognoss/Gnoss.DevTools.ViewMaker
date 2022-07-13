@@ -1,0 +1,23 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista donde se podrá añadir código CSS personalizado por cualquier persona que necesite un diseño adicional que sobreescribirá a los añadidos por defecto. Por defecto estará vacío.
+Esta vista se carga desde _HojasdeEstilo.cshtml
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+CommunityModel Comunidad = Html.GetComunidad();
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista parcial para código CSS personalizados --------------------
+*@
+
+
+@if (Comunidad != null && Comunidad.VersionCSS.HasValue)
+{    
+    <link media="screen" type="text/css" rel="stylesheet" href="@Html.GetBaseUrlPersonalizacion()/community.css?v=@Comunidad.VersionCSS" />    
+}

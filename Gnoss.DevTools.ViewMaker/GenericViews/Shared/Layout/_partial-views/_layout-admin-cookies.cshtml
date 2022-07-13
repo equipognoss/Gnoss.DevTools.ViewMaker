@@ -1,0 +1,80 @@
+﻿@*
+Descripción
+----------------------------------------------------------------
+Vista parcial donde se gestiona la creación o eliminación de cookies cuando se carga el Layout.
+Se utilizan para ayudar al Layout a contener información relacionada a la administración de cookies.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+CommunityModel Comunidad = Html.GetComunidad();
+} 
+@*
+----------------------------------------------------------------
+
+-------------------- Gestión / Administración de cookies --------------------*@
+@{
+    if (Comunidad != null) {
+        try
+        {
+            DateTime? envioCookie = Context.Session.Get<DateTime>("EnvioCookie");
+            //Actualizo la cookie del usuario para que no caduque
+            if (Context.Request.Method.Equals("GET") && !envioCookie.HasValue && !Html.GetIdentidadActual().IsGuestUser)
+            {
+                Context.Session.Set("EnvioCookie", DateTime.Now);
+                string urlServicioLogin = @Html.GetUrlServicioLogin();
+                string query = string.Format("?usuarioID={0}&dominio={1}/", Html.GetIdentidadActual().KeyUser, Html.GetBaseUrl());
+
+                if (new Uri($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}").Scheme.Equals("http"))
+                {
+                    //Elimino la sesión del resto de dominios en los que había entrado el usuario
+                    //para que cuando entre en ellos soliciten la cookie al servicio de login
+                    if (urlServicioLogin.StartsWith("https://"))
+                    {
+                        //Hago una petición con http porque si no no te desconecta de los dominios que no tienen https.
+                        urlServicioLogin = urlServicioLogin.Replace("https://", "http://");
+                    }
+
+                    string nuevoEnvio = "";
+                    if (Context.Session.Keys.Contains("CrearCookieEnServicioLogin"))
+                    {
+                        nuevoEnvio = "&nuevoEnvio=true";
+                    }
+
+                    <iframe style="WIDTH:1px;HEIGHT:1px; display:none;" frameBorder="0" src="@string.Format(" {0} /eliminarcookie.aspx{1}{2}", urlServicioLogin, query, nuevoEnvio)"></iframe>
+                    ////Registro el evento y lanzo la accion del proyecto
+                    //ProyectoCL proyectoCL = new ProyectoCL();
+                    //Dictionary<TipoProyectoEventoAccion, string>
+                    //listaEventos = proyectoCL.ObtenerEventosAccionProyectoPorProyectoID(ProyectoSeleccionado.Clave, ((GnossWebPage)Page).EsBot);
+                    //proyectoCL.Dispose();
+                    //if (listaEventos != null && listaEventos.Count > 0)
+                    //{
+                    //    //comprobación existencia evento login
+                    //    if (listaEventos.ContainsKey(TipoProyectoEventoAccion.Login) && (!((GnossWebPage)Page).OmitirProyectoEventoAccionLogin))
+                    //    {
+                    //        StringBuilder sbEventos = new StringBuilder();
+                    //        sbEventos.AppendLine(listaEventos[TipoProyectoEventoAccion.Login]);
+                    //        this.Page.ClientScript.RegisterStartupScript(this.GetType(), "EventoLogin", sbEventos.ToString(), true);
+                    //    }
+                    //}
+                }
+                if (Context.Session.Keys.Contains("CrearCookieEnServicioLogin") && Context.Session.Keys.Contains("Usuario"))
+                {
+                    //Envío la cookie del usuario
+                    Es.Riam.Gnoss.Util.Seguridad.GnossIdentity usuario = (Context.Session.Get<Es.Riam.Gnoss.Util.Seguridad.GnossIdentity>("Usuario"));
+
+                    query = "usuarioID=" + usuario.UsuarioID + "&loginUsuario=" + usuario.Login + "&idioma=" + usuario.Idioma + "&personaID=" + usuario.PersonaID + "&nombreCorto=" + usuario.Login;
+                    query += "&token=" + @Html.GetTokenLoginUsuario();
+
+                    <iframe style="WIDTH:1px;HEIGHT:1px; display:none;" frameBorder="0" src="@string.Format(" {0} /crearCookie.aspx?{1}", urlServicioLogin, query)"></iframe>
+
+                    Context.Session.Remove("CrearCookieEnServicioLogin");
+                }
+            }
+        }catch (Exception ex)
+        {
+            @Html.GetLoggingService().GuardarLogErrorView(ex);
+        }
+    }
+}

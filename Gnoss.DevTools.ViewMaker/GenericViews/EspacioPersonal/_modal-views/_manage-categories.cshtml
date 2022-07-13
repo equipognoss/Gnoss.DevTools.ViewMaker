@@ -1,0 +1,43 @@
+﻿@model AdminCatEspacioPersonalModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista modal que servirá para poder gestionar las categorias en el espacio personal de un usuario. Esta vista se lanza cuando se pulsa sobre "Administrar categorías".
+
+Variables
+----------------------------------------------------------------
+*@
+
+@*
+----------------------------------------------------------------
+-------------------- Vista Modal para administrar las categorías del espacio personal de un usuario --------------------
+*@
+
+
+@* Panel para bloquear/Desbloquear comentarios *@
+<div class="modal-header">
+    <p class="modal-title">
+        @* Bloquear o Desbloquear comentarios: Título Modal *@
+        <span class="material-icons">folder_open</span>
+        @Html.GetText("COMADMIN", "ADMINCATEGORIAS")
+    </p>
+    @* Cerrar el modal *@
+    <span class="material-icons cerrar" data-dismiss="modal" aria-label="Close">close</span>
+</div>
+@* Cuerpo o contenido del modal *@
+<div class="modal-body">
+    <div class="formulario-edicion">
+        @* Vista parcial Categorías mostrada desde _AdminTesauro *@
+        <div id="adminTesauro">
+            @* Vistas parciales - modales que se cargarán en el propio modal dependiendo la opción sobre la que se haga click *@
+            @Html.PartialView("../AdminCatEspacioPersonal/_AdminTesauro", Model)
+        </div>
+    </div>
+</div>
+
+<script>
+    modalCategorizarRecursos.init();
+    @* Inicializar los SELECT js-select ya que son creadod dinámicamente *@
+    $('.js-select2').select2();
+</script>

@@ -1,0 +1,151 @@
+﻿@model ConfigurationModel
+@using Microsoft.AspNetCore.Http;
+@using Gnoss.DevTools.ViewMaker.Areas.Gnoss.DevTools.ViewMaker.Model;
+@{
+    ViewBag.Title = "Configuraciones";
+    Layout = "~/Areas/Gnoss.DevTools.ViewMaker/Views/_LayoutAskUrl.cshtml";
+    HttpContext httpContext = @ViewBag.Session;
+
+    httpContext.Response.Headers.Add("Cache-Control", "no-cache, no-store");
+    //Response.Headers.Add("Cache-Control", "no-cache, no-store");
+
+    ConfigurationModel modelAux = @ViewBag.Configuracion;
+
+    
+
+    ViewBag.BodyClass = "configuracion";
+
+    
+}
+
+<h2>Configuraciones</h2>
+<hr />
+
+@using (Html.BeginForm("SaveConfiguration", "Configuration", FormMethod.Post, new { id = "configurationForm", @autocomplete = "off" }))
+{
+<div class="form-horizontal">
+    <h3>Configuración general</h3>
+    <div class="form-group general row">
+        <label for="urlApiIntegracionEntornos" class="control-label col-md-2">API de Integracion de Entornos</label>
+        <div class="col-md-10">
+            <div class="textbox">
+                @Html.TextBox("urlApiIntegracionEntornos", modelAux.urlApiIntegracionEntornos)
+
+            </div>
+        </div>
+    </div>
+    <div class="form-group general row">
+        <label class="control-label col-md-2">Datos de acceso de usuario root GitLab</label>
+        <div class="col-md-5">
+            <div class="textbox">
+                @Html.TextBox("usuarioRootRepositorio.user", modelAux.usuarioRootRepositorio.user, new { @placeholder = "login" })
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="textbox">
+                @Html.Password("usuarioRootRepositorio.password", modelAux.usuarioRootRepositorio.password, new { @placeholder = "password" })
+            </div>
+        </div>
+    </div>
+    <div class="form-group general row">
+        <label class="control-label col-md-2">Datos del servidor FTP para la subida de vistas y estilos</label>
+        <div class="col-md-5">
+            <div class="textbox">
+                @Html.TextBox("serverFtpUpload.server", modelAux.serverFtpUpload.server, new { @placeholder = "server" })
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="textbox">
+                @Html.TextBox("serverFtpUpload.port", modelAux.serverFtpUpload.port, new { @placeholder = "port" })
+            </div>
+        </div>
+    </div>
+
+    @if (modelAux.autorizacion.Count > 0)
+    {
+        int count = 0;
+        <h3>Configurar autorizaciones</h3>
+        foreach (ConfigurationModel.AutorizationModel autorization in modelAux.autorizacion)
+        {
+            <div class="form-group row">
+                <label class="control-label col-md-4"><span class="fa fa-trash@(autorization.url.Equals("default") ? " disabled" : "")" title="Eliminar"></span>@autorization.url</label>
+                @Html.Hidden($"autorizacion[{count}].url", autorization.url)
+                <div class="col-md-4">
+                    <div class="textbox">
+                        @Html.TextBox($"autorizacion[{count}].user", autorization.user, new { @placeholder = "user" })
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="textbox">
+                        @Html.Password($"autorizacion[{count}].password", autorization.password, new { @placeholder = "password" })
+                    </div>
+                </div>
+            </div>
+            count++;
+        }
+    }
+
+     @Html.Partial("/Areas/Gnoss.DevTools.ViewMaker/Views/Configuration/_Proyectos.cshtml")
+
+    <div class="form-group save row">
+        <div class="col-md-10">
+            <button name="submit" type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+    </div>
+</div>
+    <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationModalLabel">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="upload">
+                        Los cambios se subirán a la comundad por FTP. ¿Estas seguro?<br />
+                        Introduce los datos del administrador para poder subir los cambios.<br />
+                        <div class="form-horizontal">
+                            <div class="form-group row">
+                                <label for="userFTP" class="control-label col-md-6">Nombre de usuario</label>
+                                <div class="col-md-6">
+                                    <div class="textbox">
+                                        @Html.TextBox("userFTP", "", new { @placeholder = "Nombre de usuario" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="passwordFTP" class="control-label col-md-6">Password</label>
+                                <div class="col-md-6">
+                                    <div class="textbox">
+                                        @Html.Password("passwordFTP", "", new { @placeholder = "Password" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="download">
+                        Descargaremos los archivos del servidor y los fusionaremos con tus cambios.
+                        <br />
+                        Puede que tengas que resolver confiltos manualmente si varios usuarios habeis modificado los mismos ficheros.
+                    </div>
+                    <div class="changeBranch">
+                        Descargaremos los archivos de la última rama del servidor.
+                    </div>
+                    <div class="form-group row panCambios">
+                        <label>Cambios en el repositorio local</label>
+                        <div class="col-md-12 cambios"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+

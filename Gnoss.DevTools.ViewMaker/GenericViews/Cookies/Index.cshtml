@@ -1,0 +1,126 @@
+﻿
+@{
+    List<PersonalizacionCategoriaCookieModel> ListaCategoriasCookies = ViewBag.ListaCategoriaCookie;
+}
+<div class="row">
+    <div class="col-12">
+        <div class="content">
+            <div id="modificar-cookies" style="">
+                <h1>Sobre las cookies de este sitio web</h1>
+                <div class="cookies-content">
+                    <p>Las cookies utilizadas en este sitio web están categorizadas, a continuación podrá leer sobre cada categoría y así habilitar o bloquear algunas o todas las respectivas cookies. Cuando se deshabilitan categorías que previamente estaban habilitadas, todas las cookies asignadas a esa categoría serán eliminadas de su navegador web. Podrá ver una lista de cookies asignadas a cada categoría e información detallada al respecto en la declaración de cookies.</p>
+                    <button id="checkAll" class="btn btn-primary" style="margin-bottom: 50px;">Permitir todas las cookies</button>
+                    <div class="setting-options">
+                        @foreach (PersonalizacionCategoriaCookieModel categoriaCookie in ListaCategoriasCookies)
+                        {
+                            <div class="setting-option">
+                                @switch (categoriaCookie.Estado)
+                                {
+                                    case 0:
+                                        <div class="switch">
+                                            <input type="checkbox" class="cookieAceptada" id="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()" value="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()" style="border: 0px; padding: 0px; margin-top: 0px;" />
+                                            <label for="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()">@categoriaCookie.CategoriaCookie.Nombre</label>
+                                        </div>
+                                        break;
+                                    case 1:
+                                        <div class="switch">
+                                            <input type="checkbox" class="cookieAceptada" id="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()" value="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()" checked style="border: 0px; padding: 0px; margin-top: 0px;" />
+                                            <label for="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()">@categoriaCookie.CategoriaCookie.Nombre.ToLower()</label>
+                                        </div>
+                                        break;
+                                    case 2:
+                                        <div class="switch">
+                                            <input type="checkbox" class="cookieAceptada" id="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()" value="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()" style="border: 0px; padding: 0px; margin-top: 0px;" />
+                                            <label for="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()">@categoriaCookie.CategoriaCookie.Nombre.ToLower()</label>
+                                        </div>
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                <div class="details">
+                                    <p class="title">@categoriaCookie.CategoriaCookie.Nombre</p>
+                                    <p>@categoriaCookie.CategoriaCookie.Descripcion</p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="cookies-actions">
+                    <input type="submit" id="guardar" title="Guardar configuración" value="Guardar configuración" class="btn btn-primary" />
+                </div>
+                <p id="cambios" style="margin-top: 10px;"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    /**
+     * Las cookies técnicas estan checkeadas obligatoriamente y no se
+     * pueden deshablitar */
+    function AceptarCookieTecnica() {
+        $("#tecnica").prop("checked", true);
+        $("#tecnica").prop("disabled", true);
+    }
+
+    /**
+     * Vincula el evento al botón aceptar todo */
+    function EngancharComportamientoAceptarTodo() {
+        $("#checkAll").click(AceptarTodo);
+    }
+
+    /** Vincula el evento al botón para guardar */
+    function EngancharComportamientoGuardar() {
+        $("#guardar").click(Guardar);
+    }
+
+    /** Acepta todas las cookies y las guarda */
+    function AceptarTodo() {
+        $('.cookieAceptada').prop("checked", true);
+        Guardar();
+    }
+
+    /** Guarda el estado de la personalización de las cookies */
+    function Guardar() {
+        let cm = document.getElementById('cambios');
+        cm.innerHTML = ""
+        var fecha = new Date();
+        fecha.setTime(fecha.getTime() + 365 * 24 * 60 * 60 * 1000);
+
+        $('.cookieAceptada').each(function (indice, elemento) {
+            if ($(elemento).prop("checked")) {
+                document.cookie = $(elemento).val() + "=yes; expires=" + fecha.toUTCString();
+            }
+        });
+
+        $('.cookieAceptada').each(function (indice, elemento) {
+            if (!$(elemento).prop("checked")) {
+                document.cookie = $(elemento).val() + "=no; expires=" + fecha.toUTCString();
+            }
+        });
+
+        modal = document.getElementById("myModal");
+        var that = this;
+        MostrarUpdateProgress();
+        GnossPeticionAjax(
+            document.location.origin + '/aceptar-cookies',
+            null,
+            true
+        ).fail(function (data) {
+            mostrarErrorGuardado(data);
+        }).done(function () {
+            $('#phAvisoCookie').hide();
+        }).always(function () {
+            OcultarUpdateProgress();
+        });
+
+        cm.innerHTML = "Se han modificado las cookies del sitio web.";
+    }
+
+    /** Cuando la página se ha terminado de cargar se vinculan los eventos a los botones */
+    $(document).ready(function () {
+        AceptarCookieTecnica();
+        EngancharComportamientoAceptarTodo();
+        EngancharComportamientoGuardar();
+    });
+</script>

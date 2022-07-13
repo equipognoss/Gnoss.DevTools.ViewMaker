@@ -1,0 +1,341 @@
+﻿@model MessageModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra el contenido para poder enviar un mensaje a una persona dentro de una comunidad.
+Se accede a esta vista desde 'https://<dominio>/identidad/<identidad>/mensajes?nuevo'
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+UserProfileModel Perfil = Html.GetPerfil();
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+CommunityModel Comunidad = Html.GetComunidad();
+
+// Url para redirigir/cancelar simplemente la edición del perfil del usuario
+string urlVuelta = Perfil.Url + Html.GetText("URLSEM", "MENSAJES");
+// Nombre de clase del body para editar perfil del usuario
+string bodyClass = "edicionRecurso nuevoMensaje usuarioConectado comunidad page-modal no-clonarMenuUsuario";
+
+Dictionary<Guid, string> destinatarios = new Dictionary<Guid, string>();
+// Url actual (como se ha accedido, enviar a todos, responder, reenviar...)
+string url = "&" + Context.Request.QueryString.ToString().Replace("?", "");
+// Valores por si se quiere responder, reenviar...
+bool responder = false;
+bool responderTodos = false;
+bool reenviar = false;
+// Asunto del mensaje
+string asunto = "";
+
+@* Variables para logica JS*@
+// Id donde se escribirá el destinatario del mensaje
+string idTxtDestinatario = "txtDestinatario";
+// Id oculto para almacenar los destinatarios del mensaje
+string idTxtDestinatario_Hack = "txtDestinatario_Hack";
+// Id donde se escribirá el destinatario del mensaje desde perfil Organización
+string idTxtDestinatarioOrg = "txtDestinatarioOrg";
+// Id oculto para almacenar los destinatarios del mensaje desde perfil Organización
+string idTxtDestinatarioOrg_Hack = "txtDestinatarioOrg_Hack";
+// Id del panel de destinatarios No Organización
+string idPanelDestinatariosNoOrg = "panelDestinatariosNoOrg";
+// Id del panel de destinatarios No Organización
+string idPanelDestinatariosOrg = "panelDestinatariosOrg";
+// Input de RadioButton de tipo de cuenta para envio de mensaje
+string inputCuentaUsuario = "CuentaUsuario";
+
+// Id del asunto del mensaje a enviar
+string idTxtAsunto = "txtAsunto";
+// Id del cuerpo del mensaje a enviar
+string idTxtMensaje = "txtMensaje";
+// ID del panel de errores/ok *@
+string idDivPanelInfo = "divPanelInfo";
+// ID del botón para enviar mensaje *@
+string idBtnSendMessage = "btnSendMessage";
+// Id del radioButton perfil personal
+string idRbEnviarComoUsuario = "rbEnviarComoUsuario";
+// Id del radioButton perfil organización
+string idRbEnviarComoOrg = "rbEnviarComoOrg";
+
+@* Url a la que enviar el mensaje *@
+string urlSendMessage = $"{@Html.GetUrlPagina()}/sendMessage";
+@* Contenido del mensaje en caso de que tenga cuerpo el mensaje *@
+string cuerpo = "";        
+}
+@*
+----------------------------------------------------------------
+-------------------- Vista de creación/Envío de un mensaje --------------------
+*@
+
+@{
+    Html.SetBodyClass(bodyClass);
+    // Añadimos funcionalidad para operativaMensajeria
+    Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/jsUnificar/MVC.Mensajes.js?v=" + Html.GetVersion());
+    //Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/ckeditor.js?v=" + Html.GetVersion());
+    //Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/adapters/jquery.js?v=" + Html.GetVersion());
+}
+
+
+@* Configuración de URL en caso de cancelar y salir del envío de mensaje *@
+@if (Context.Request.Headers.ContainsKey("Referer") && Context.Request.Headers["Referer"].ToString().Contains("?") && Context.Request.Headers["Referer"].ToString().Contains(urlVuelta))
+{    
+    urlVuelta += Context.Request.Headers["Referer"].ToString().Substring(Context.Request.Headers["Referer"].ToString().IndexOf("?"));
+}
+
+@* Recoger si se desea responder, responder a todos o reenviar dependiendo de la url *@
+@{
+    if (url.Contains("&responderATodos"))
+    {
+        responderTodos = true;
+    }
+    else if(url.Contains("&responder"))
+    {
+        responder = true;
+    }
+    else if (url.Contains("&reenviar"))
+    {
+        reenviar = true;
+    }
+}
+
+@* Recoger destinatarios (Si se ha accedido vía responder o responderTodos, reenviar) *@
+@{
+    if (Model != null)
+    {
+        if (responder || responderTodos)
+        {
+            if (Model.Sender.Key != IdentidadActual.KeyIdentity)
+            {
+                destinatarios.Add(Model.Sender.Key, Html.ObtenerNombrePerfil(Model.Sender));
+            }
+        }
+        if (responderTodos)
+        {
+            foreach (ProfileModel destinatario in Model.Receivers)
+            {
+                if (destinatario.Key != IdentidadActual.KeyIdentity && destinatario.Key != Model.Sender.Key)
+                {
+                    destinatarios.Add(destinatario.Key, Html.ObtenerNombrePerfil(destinatario));
+                }
+            }
+            foreach (GroupCardModel destinatarioGrupo in Model.ReceiversGroup)
+            {
+                destinatarios.Add(destinatarioGrupo.Clave, destinatarioGrupo.CompleteName);
+            }
+        }
+    }
+
+    @* Recoger el posible asunto del email (Si se ha accedido vía responder, responderTodos, reenviar) *@
+    if (Model != null)
+    {
+        asunto = Model.Subject;
+        if (responder || responderTodos)
+        {
+            asunto = "RE: " + asunto;
+        }
+        else if (reenviar)
+        {
+            asunto = "Fwd: " + asunto;
+        }
+    }
+}
+
+@* Contenedor de visualización de creado del email *@
+<div class="row">
+    <div class="col col-12 header-tipo-modal texto-blanco">
+        <div class="container">
+            <div class="modal-header">
+                <p class="modal-title">
+                    <span class="material-icons">mode_edit</span>@Html.GetText("CORREO", "ESCRIBIRNUEVO")
+                </p>
+                <a href="@urlVuelta" class="cerrar texto-blanco">
+                    <span class="material-icons">close</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    @* Contenedor de Envio de mensaje *@
+    <div class="col col-12 col-edicion">
+        <div class="wrapCol container">
+            @* Inicio formulario para envío de mensaje *@                
+            <form id="preventLeavingFormWithoutSaving" class="formulario-edicion background-blanco">
+                @* Opción enviar mensaje como Organización o no *@
+                @if (IdentidadActual.IsOrgAdmin)
+                {   
+                    <div class="form-group mb-4">
+                        <label class="control-label d-block mb-3">Enviar mensaje como: </label>
+                        @* RadioButton de envío mensaje desde Perfil Personal | Organización*@
+                        <div class="form-row">
+                            <div class="custom-control themed little custom-radio mr-3">
+                                <input id="@idRbEnviarComoUsuario" type="radio" class="custom-control-input" name="@inputCuentaUsuario" checked="checked">
+                                <label for="@idRbEnviarComoUsuario" class="custom-control-label">@Html.GetText("BANDEJAENTRADA", "ENVIARCOMOUSU") @Perfil.CompleteProfileName</label>
+                            </div>
+                            <div class="custom-control themed little custom-radio">
+                                <input id="@idRbEnviarComoOrg" type="radio" class="custom-control-input" name="@inputCuentaUsuario">
+                                <label for="@idRbEnviarComoOrg" class="custom-control-label">@Html.GetText("BANDEJAENTRADA", "ENVIARCOMOORG") @Perfil.NameOrg</label>
+                            </div>
+                        </div>                    
+                    </div>                    
+                }
+
+                @* Añadir destinatarios al email (No ORG) *@
+                <div id="@idPanelDestinatariosNoOrg" class="form-group mb-5 edit-etiquetas">
+                    <div class="autocompletar-tags form-group">
+                        <label class="control-label d-block">@Html.GetText("CORREO", "PARA")</label>
+                        <div class="input-wrap form-sticky-button autocompletar">
+                            <span class="icon material-icons">search</span>
+                            @* Input de Destinatario *@
+                            <input type="text"
+                                   placeholder="@Html.GetText("CORREO", "PARA")"
+                                   onfocus=""
+                                   class="txtAutocomplete form-control"
+                                   id="@idTxtDestinatario"                                   
+                                   autocomplete="off" />
+
+                            @* Botón de Añadir Etiqueta/Tag *@
+                            <a id="anadir-tag" class="btn btn-grey uppercase">Añadir</a>
+
+                            @* Campo oculto que almacenará los destinatarios *@
+                            <input type="hidden" id="@idTxtDestinatario_Hack" value="@string.Join(", ",destinatarios.Select(x=>$"{x.Value.ToLower()}|||{x.Key}"))," />
+                        </div>
+                        @* Contactos añadidos por el usuario para enviar el mensaje *@
+                        <span id="tagsContainer" class="contenedor tag-list mb-4">
+                            @* Añadir los tags de los destinatarios si se ha accedido vía respdonder, responder a todos, reenviar *@
+                            @* Recorrer las etiquetas existentes y pintarlas en la lista*@
+                            @foreach (var destinatario in destinatarios)
+                            {
+                                @* Detalles de la etiqueta *@
+                                <div class="tag" title="@string.Join("|||", destinatario.Value.ToLower(), destinatario.Key)">
+                                    <div class="tag-wrap">
+                                        @* Posibilitar borrado de etiqueta si es propietario del recurso *@
+                                        <span class="tag-text" title="@destinatario.Value">@destinatario.Value</span>
+                                            @* Comprobar si se permite eliminar/editar tags del recurso *@                                            
+                                        <span class="tag-remove material-icons">close</span>                                                                                                                       
+                                    </div>
+                                </div>                                                                
+                            }                                                         
+                        </span>
+                    </div>
+                </div>
+
+                @if (IdentidadActual.IsOrgAdmin){
+                    @* Añadir destinatarios al email (Perfil ORG) *@
+                    <div id="@idPanelDestinatariosOrg" class="form-group mb-5 edit-etiquetas d-none">
+                        <div class="autocompletar-tags form-group">
+                            <label class="control-label d-block">@Html.GetText("CORREO", "PARA")</label>
+                            <div class="input-wrap form-sticky-button autocompletar">
+                                <span class="icon material-icons">search</span>
+                                @* Input de Destinatario *@
+                                <input type="text"
+                                       placeholder="@Html.GetText("CORREO", "PARA")"
+                                       onfocus=""
+                                       class="txtAutocomplete form-control"
+                                       id="@idTxtDestinatarioOrg"
+                                       value=""
+                                       autocomplete="off" />
+
+                                @* Botón de Añadir Etiqueta/Tag *@
+                                <a id="anadir-tag" class="btn btn-grey uppercase">Añadir</a>
+
+                                @* Campo oculto que almacenará los destinatarios *@
+                                <input type="hidden" id="@idTxtDestinatarioOrg_Hack" value="@string.Join(", ",destinatarios.Select(x=>$"{x.Value.ToLower()}|||{x.Key}"))," />
+                            </div>
+                            @* Contactos añadidos por el usuario para enviar el mensaje *@
+                            <span id="tagsContainer" class="contenedor tag-list mb-4">
+                                @* Añadir los tags de los destinatarios si se ha accedido vía respdonder, responder a todos, reenviar *@                                                                                                                        
+                                    @* Recorrer las etiquetas existentes y pintarlas en la lista*@
+                                    @foreach (var destinatario in destinatarios)
+                                    {
+                                        @* Detalles de la etiqueta *@
+                                        <div class="tag" title="@string.Join("|||", destinatario.Value.ToLower(), destinatario.Key)">
+                                            <div class="tag-wrap">
+                                                @* Posibilitar borrado de etiqueta si es propietario del recurso *@
+                                                <span class="tag-text" title="@destinatario.Value">@destinatario.Value</span>
+                                                @* Comprobar si se permite eliminar/editar tags del recurso *@                                            
+                                                <span class="tag-remove material-icons">close</span>                                                                                                                       
+                                            </div>
+                                        </div>                                                                
+                                    }                                                            
+                            </span>
+                        </div>
+                    </div>   
+                }               
+
+                @* Asunto del mensaje *@
+                <div class="form-group mb-5 edit-titulo">
+                    <label class="control-label d-block">@Html.GetText("CORREO", "ASUNTO")</label>
+                    <input placeholder="@Html.GetText("CORREO", "ASUNTO")"
+                           type="text"
+                           name=""
+                           id="@idTxtAsunto"
+                           class="form-control not-outline"
+                           value="@asunto" />
+                </div>
+
+                <div class="form-group mb-5 edit-descripcion">
+                    <label class="control-label d-block">@Html.GetText("CORREO", "ESCRIBIRNUEVO")</label>
+                    @* Controlar el cuerpo del mensaje -> Reenviar *@
+                    @if (Model != null)
+                    {
+                        cuerpo = "<p>&nbsp;</p><strong>" + Html.GetText("CORREO", "MENSAJEORIGINAL") + " " + Html.ObtenerNombrePerfil(Model.Sender) + ": </strong>" + Model.Body;
+                    }
+                    
+                    <textarea id="@idTxtMensaje"
+                              class="cke ckeSimple mensajes form-control"
+                              cols="20"
+                              rows="6">@cuerpo</textarea>
+                </div>
+
+                @* Mensajes OK/Error en el envío del mensaje *@
+                <div id="@idDivPanelInfo" style="display: none" class="alert alert-danger alert-success mb-5" role="alert"></div>
+
+                @* Botones de Enviar / Cancelar Mensaje *@                
+                <a id="@idBtnSendMessage" class="btn btn-primary uppercase btn-round">
+                    <span class="material-icons">send</span>
+                    <span>@Html.GetText("COMMON", "ENVIAR")</span>
+                </a>
+                <a class="btn btn-link uppercase" href="@urlVuelta">@Html.GetText("COMMON", "CANCELAR")</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    // Parámetros para operativaEnvioMensajesGnoss
+    (function ($) {
+        const pParamsEdicionMensaje = {
+            views: {
+                idTxtDestinatario: "@idTxtDestinatario",
+                idTxtDestinatario_Hack: "@idTxtDestinatario_Hack",
+                idTxtDestinatarioOrg: "@idTxtDestinatarioOrg ",
+                idTxtDestinatarioOrg_Hack: "@idTxtDestinatarioOrg_Hack",
+                idPanelDestinatariosNoOrg: "@idPanelDestinatariosNoOrg",
+                idPanelDestinatariosOrg: "@idPanelDestinatariosOrg",
+                idTxtAsunto: "@idTxtAsunto",
+                idTxtMensaje: "@idTxtMensaje",
+                idDivPanelInfo: "@idDivPanelInfo",
+                idBtnSendMessage: "@idBtnSendMessage",
+                urlSendMessage: "@urlSendMessage",
+                inputCuentaUsuario: "@inputCuentaUsuario",
+                idRbEnviarComoUsuario: "@idRbEnviarComoUsuario",
+                idRbEnviarComoOrg: "@idRbEnviarComoOrg",
+            },
+            autocomplete: {
+                identidad: "@IdentidadActual.KeyIdentity.ToString()",
+                identidadOrg: "@IdentidadActual.KeyIdentityOrg.ToString()",
+            }
+    };
+
+        const pParamsTags = {
+            idTagsContainer: "tagsContainer",
+            idTagsInputHack: "txtDestinatario_Hack",
+        }
+
+        // Gestión de operativa para funcionamiento de EditarPerfilUsuario
+        operativaEnvioMensajesGnoss.init(pParamsEdicionMensaje);
+
+        // Gestión de operativa para funcionamiento de Edición de Tags
+        operativaTagsEditable.init(pParamsTags);
+    })();
+</script>

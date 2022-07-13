@@ -1,0 +1,21 @@
+﻿@using Es.Riam.Gnoss.Web.MVC.Models;
+@model CMSComponentRecommendedUsers
+@if (Model != null)
+{   
+    <div class="componente cp0401">
+        <div class="titulo">
+            @if (string.IsNullOrEmpty(Model.Title))
+            {
+                <h2><span>Usuarios afines</span></h2>
+            }
+            else
+            {
+                <h2><span>@Model.Title</span></h2>
+            }
+        </div>
+        <div class="contenido">
+            @Html.PartialView("ControlesMVC/_UsuariosRecomendados", Model.RecomendedUsers)
+        </div>
+    </div>
+   
+}

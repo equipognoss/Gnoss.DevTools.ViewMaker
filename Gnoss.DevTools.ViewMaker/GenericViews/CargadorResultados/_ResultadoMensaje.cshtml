@@ -1,0 +1,237 @@
+﻿@model MessageModel
+@*Descripción
+-----------------------------------------------
+Vista que muestra la información de un mensaje a modo de resultado en la sección de mensajería de Gnoss.
+
+Variables
+----------------------------------------------
+*@
+@{
+// Formateo de la fecha de recepción del mensaje
+string fecha = "";
+
+// Nombre del remitente del mensaje                        
+string nombreRemitente = "";
+// Url del remitente del mensaje
+string urlRemitente = "";
+// Indica si el mensaje ha sido enviado por el usuario (si el usuario es remitente)
+bool sentByUser = false;
+// Contador de destinatarios para saber cuantos pintar/ocultar
+int contadorDestinatarios = 0;
+// Nº de destinatarios máximos a pintar de tipo Grupo
+int maxDestinatariosGroupPintar = 2;
+// Lista donde se almacenarán los grupos que no se pintan por defecto para ser pintados en la sección "oculta"
+List<GroupCardModel> listGroupCardModelHidden = new List<GroupCardModel>();
+// Nº de destinatarios máximos a pintar de tipo Profile
+int maxDestinatariosProfilePintar = 2;
+// Lista donde se almacenarán los perfiles que no se pintan por defecto para ser pintados en la sección "oculta"
+List<ProfileModel> listProfileModelHidden = new List<ProfileModel>();
+                       
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista para mostrar cada mensaje (Mensajería myGNOSS) en la lista de resultados --------------------*@
+
+@if (Model != null) {
+    // Fecha formateada de recepción del mensaje
+    fecha = Model.ShippingDate.ToString("dd/MM/yy") + " " + Model.ShippingDate.ToString("HH:mm");
+    sentByUser = Model.Sent;
+
+    @* Controlar datos del remitente del mensaje *@
+    if (Model.Sender != null) {
+        nombreRemitente = Html.ObtenerNombrePerfil(Model.Sender);
+        urlRemitente = Html.ObtenerUrlPerfil(Model.Sender);
+    }
+
+    @* Contenedor del mensaje *@
+    <article class="resource mensaje @(!Model.Readed?"no-leido":"")">
+        <div class="wrap">
+            <div class="check-wrapper">
+                @* Input para selección del mensaje*@
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input ListaMensajesCheckBox" id="chk_@Model.Key" />
+                    <label class="custom-control-label" for="chk_@Model.Key"></label>              
+                </div>
+            </div>
+            
+            @* Título / Asunto del mensaje *@
+            <h2>            
+                 <a title="@Model.Subject" href="@Model.Url">@Model.Subject</a>
+            </h2>
+
+            @* Autor y fecha del mensaje *@
+            <div class="info-wrap">
+                @* Autor/Receptor del mensaje *@  
+                @if (!sentByUser)
+                {
+                    <p class="autor">                        
+                        <span class="mr-1">@Html.GetText("CORREO", "DE"):</span><a href="@urlRemitente">@nombreRemitente</a>
+                    </p>
+                }
+                else {
+                    @* El mensaje ha sido enviado por el usuario: Cargar los destinatarios *@
+                    <div class="autor destinatario">
+                        <span class="mr-1">@Html.GetText("CORREO", "PARA"):</span>
+                        @foreach (GroupCardModel destinatarioGrupo in Model.ReceiversGroup)
+                        {
+                            @* Pintar si no se han pintado el nº máximo *@
+                            if (contadorDestinatarios < maxDestinatariosGroupPintar)
+                            {
+                                if (string.IsNullOrEmpty(destinatarioGrupo.UrlGroup))
+                                {
+                                @destinatarioGrupo.CompleteName
+                                }
+                                else
+                                {
+                                <a class="mr-2" title="@destinatarioGrupo.CompleteName" href="@destinatarioGrupo.UrlGroup">@destinatarioGrupo.CompleteName</a>
+                                }
+                                contadorDestinatarios += 1;
+                            }                            
+                            else { 
+                                @* Guardar el grupo en una lista para pintarlo en la sección "Oculta" *@
+                                listGroupCardModelHidden.Add(destinatarioGrupo);
+                            }
+                        }
+                        @{contadorDestinatarios = 0;}
+
+                        @foreach(ProfileModel destinatario in Model.Receivers)
+                        {
+                            @* Pintar si no se han pintado el nº máximo de Perfiles de destinatarios *@
+                            if (contadorDestinatarios < maxDestinatariosProfilePintar)
+                            {
+                                string nombreDestinatario = Html.ObtenerNombrePerfil(destinatario);
+                                string urlDestinatario = Html.ObtenerUrlPerfil(destinatario);
+                                <a class="mr-2" title="@nombreDestinatario" href="@urlDestinatario">@nombreDestinatario</a>
+                            }
+                            else {
+                                @* Guardar el grupo en una lista para pintarlo en la sección "Oculta" *@
+                                listProfileModelHidden.Add(destinatario);
+                            }
+                        }
+                        @if (listGroupCardModelHidden.Count > 0 || listProfileModelHidden.Count > 0) {
+                            @* Desplegar más destinatarios (Si hay más de 3) *@                                                        
+                            <span data-toggle="collapse"
+                                data-target="#js-lista-destinatarios-extra-@Model.Key"
+                                aria-expanded="false"
+                                aria-controls="js-lista-destinatarios-extra-@Model.Key"                                
+                                class="desplegar-destinatarios material-icons collapsed"
+                                style="cursor:pointer">arrow_drop_down</span>                            
+                            @* Destinatarios extra *@
+                            <div id="js-lista-destinatarios-extra-@Model.Key" class="lista-destinatarios extra collapse">
+                                @* Pintar los grupos en sección oculta *@
+                                @foreach (GroupCardModel grupo in listGroupCardModelHidden)
+                                {
+                                    if (string.IsNullOrEmpty(grupo.UrlGroup))
+                                    {
+                                        @grupo.CompleteName
+                                    }
+                                    else
+                                    {
+                                        <a class="mr-2" title="@grupo.CompleteName" href="@grupo.UrlGroup">@grupo.CompleteName</a>
+                                    }
+                                }
+                                @* Pintar los perfiles en sección oculta *@
+                                @foreach(ProfileModel perfil in listProfileModelHidden)
+                                {                                    
+                                    string nombreDestinatario = Html.ObtenerNombrePerfil(perfil);
+                                    string urlDestinatario = Html.ObtenerUrlPerfil(perfil);
+                                    <a class="mr-2" title="@nombreDestinatario" href="@urlDestinatario">@nombreDestinatario</a>                                                                       
+                                }                                
+                            </div>
+                        }                        
+                    </div>                
+                }
+                
+                @* Fecha del mensaje *@
+                <p class="fecha" id="@Model.Key">@fecha</p>
+
+                @* Acciones a realizar con/el mensaje*@
+                <div class="acciones-recurso-listado">
+                    <div class="dropdown">
+                        <a href="#"
+                           class="dropdown-toggle"
+                           role="button"
+                           data-toggle="dropdown"
+                           aria-haspopup="true"
+                           aria-expanded="false">
+                            <span class="material-icons">more_vert</span>
+                        </a>
+                        @* Acciones a realizar con el mensaje *@
+                        <div class="dropdown-menu basic-dropdown dropdown-icons dropdown-menu-right">
+                            <ul class="no-list-style">
+                                @if (Model.Received)
+                                {
+                                    @* Acción responder *@
+                                    <li>
+                                        <a class="item-dropdown"
+                                           href="@Model.Url.Replace("?mensaje", "?responder&mensaje")"
+                                           title="@Html.GetText("CORREO", "RESPONDERMENSAJESINTEXTOMENSAJE")">
+                                            <span class="material-icons">reply</span>
+                                            <span>@Html.GetText("CORREO", "RESPONDERMENSAJESINTEXTOMENSAJE")</span>
+                                        </a>
+                                    </li>
+
+                                }
+                                @* Acción reenviar *@
+                                <li>
+                                    <a class="item-dropdown"
+                                       href="@Model.Url.Replace("?mensaje", "?reenviar&mensaje")"
+                                       title="@Html.GetText("CORREO", "REENVIARMENSAJESINTEXTOMENSAJE")">
+                                        <span class="material-icons">forward</span>
+                                        <span>@Html.GetText("CORREO", "REENVIARMENSAJESINTEXTOMENSAJE")</span>
+                                    </a>
+                                </li>
+                                @* Acción responder a todos *@
+                                <li>
+                                    <a class="item-dropdown"
+                                        href="@Model.Url.Replace("?mensaje", "?responderATodos&mensaje")"
+                                        title="@Html.GetText("CORREO", "REENVIARMENSAJEATODOS")">
+                                        <span class="material-icons">reply_all</span>
+                                        <span>@Html.GetText("CORREO", "REENVIARMENSAJEATODOS")</span>
+                                    </a>
+                                </li>
+                                @* Acción eliminar *@
+                                <li>
+                                    <a 
+                                       class="item-dropdown deleteMessage"
+                                       data-toggle="modal"
+                                       data-target="#modal-container"
+                                       onclick="AccionFichaPerfil('Eliminar mensaje',
+                                                           '@Html.GetText("COMMON", "SI")',
+                                                           '@Html.GetText("COMMON", "NO")',
+                                                           '¿Estás seguro de eliminar el mensaje seleccionado?',
+                                                           '@Model.Key',
+                                                            function () {                                                            
+                                                                EliminarCorreoSeleccionado('@Model.Key');
+                                                            },
+                                                        '');
+                                        ">
+                                        <span class="material-icons">delete</span>
+                                        <span>Eliminar</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* Vista preliminar descripción del mensaje *@
+            <div class="desc descripcionResumida">
+                <p>                    
+                    @Html.Raw(@Html.CleanHtmlFromMultimediaItems(Model.Body))
+                </p>
+            </div>
+        </div>
+    </article>
+                                                
+}
+<script lang="javascript" type="text/javascript">
+    $(document).ready(function () {
+        let fechamoment = "@Model.ShippingDate.ToString("yyyy-MM-dd")" + "T" + "@Model.ShippingDate.ToString("HH:mm:ss")" + "Z";
+        var fechaServer = moment(fechamoment);
+        var fechaMsj = fechaServer.tz(Intl.DateTimeFormat().resolvedOptions().timeZone).format('DD/MM/YY HH:mm');
+        $("#@Model.Key").text(fechaMsj);
+    });
+</script>

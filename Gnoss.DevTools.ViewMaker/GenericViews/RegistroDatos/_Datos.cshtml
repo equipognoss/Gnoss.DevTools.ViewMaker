@@ -1,0 +1,329 @@
+﻿@model RegisterDataViewModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista que contiene el la información para que el usuario rellene una vez ha conseguido hacer el registro inicial. Se puede considerar el paso número 2 (aunque en la URL corresponde con /1).
+En este paso de registro, se puede introducir la siguiente información.
+
+- Nombre (disable)
+- Apellidos (disable)
+- Localidad
+- Foto del usuario
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+CommunityModel Comunidad = Html.GetComunidad();
+// URL de la foto por defecto (anónimo)
+string urlFoto = Html.GetBaseUrlStatic() + "/img/iconos/Personas/anonimo_grande.png";
+}
+@*
+    ----------------------------------------------------------------
+    -------------------- Formulario de datos del usuario (Nombre, Apellidos, País...). Paso 2 --------------------
+*@
+
+@* Formulario de Registro para este paso *@
+<form method="post" id="formDatosRegistro">
+    @* Nombre *@
+    <div class="form-group mb-3">
+        <label for="" class="control-label d-block">Nombre</label>
+        <input placeholder=""
+               type="text"
+               value="@Model.Name"
+               name="txtNombre"
+               id="txtNombre"
+               disabled
+               class="form-control not-outline" />
+    </div>
+    @* Apellidos *@
+    <div class="form-group mb-3">
+        <label for="" class="control-label d-block">@Html.GetText("INVITACIONES", "APELLIDOS")</label>
+        <input placeholder=""
+               type="text"
+               value="@Model.LastName"
+               name="txtApellidos"
+               id="txtApellidos"
+               disabled
+               class="form-control not-outline" />
+    </div>
+
+    @* Localidad: Opcional *@
+    @if (Model.AskLocation)
+    {
+        <div class="form-group mb-3">
+            <label id="lblPoblacion" for="" class="control-label d-block">Localidad</label>
+            <input placeholder="Introduce tu localidad"
+                   type="text"
+                   name="txtPoblacion"
+                   id="txtPoblacion"
+                   class="form-control not-outline"
+                   @Html.Raw((!string.IsNullOrEmpty(Model.Location) ? "disabled value=\"" + Model.Location + "\"" : "")) />
+        </div>
+    }
+
+    @* País: Opcional *@
+    @if (Model.AskCountry)
+    {
+        <div class="form-group mb-3">
+            <label for="" class="control-label d-block">Pais</label>
+            <select id="ddlPais"
+                    name="ddlPais"
+                    class="js-select2"
+                    data-select-search="true">
+                <option value="@Guid.Empty">@Html.GetText("REGISTRO", "SINESPECIFICAR")</option>
+                @{
+                    Guid paisSeleccionadoID = Model.CountryDefaultID;
+                    if (Model.CountryID != Guid.Empty)
+                    {
+                        paisSeleccionadoID = Model.CountryID;
+                    }
+                }
+                @* Rellenado de option del País*@
+                @foreach (Guid paisID in Model.CountryList.Keys)
+                {
+                    <option value="@paisID" @Html.Raw((paisSeleccionadoID == paisID ? "selected=\"selected\"" : ""))>@Model.CountryList[paisID]</option>
+                }
+            </select>
+        </div>
+    }
+
+    @* Región/Provincia: Opcional *@
+    @if (Model.AskRegion)
+    {
+        <div class="form-group mb-3">
+            <label id="lblProvincia" for="ddlProvincia" class="control-label d-block">@Html.GetText("REGISTRO", "PROVINCIASIMPLE")</label>
+            @{bool visibleSelect = false;}
+            @if (Model.CountryID != null && Model.CountryID != Guid.Empty && Model.CountryList[Model.CountryID].Equals("España"))
+            {
+                visibleSelect = true;
+            }
+
+            <select id="ddlProvincia" name="ddlProvincia" class="js-select2" data-select-search="true" @(visibleSelect ? "style=display:block" : "style=display:none")>
+                @foreach (Guid idRegion in Model.RegionList.Keys)
+                {
+                    <option @(Model.RegionID != null && Model.RegionID.Equals(idRegion) ? "selected" : "") value="@idRegion">@Model.RegionList[idRegion]</option>
+                }
+            </select>
+            @* Input oculto de selección de provincia *@
+            <input type="text" class="form-control not-outline" id="txtProvincia" name="txtProvincia" @(visibleSelect ? "style=display:none" : "style=display:block") value="@(!string.IsNullOrEmpty(Model.Region) ? Model.Region : "")" />
+        </div>
+    }
+
+    @* Sexo/Género del usuario *@
+    @if (Model.AskGender)
+    {
+        <div class="form-group mb-3">
+            <label id="lblSexo"
+                   for="ddlSexo"
+                   class="control-label d-block">@Html.GetText("REGISTRO", "SEXO")</label>
+                <select id="ddlSexo" class="form-control" name="ddlSexo"
+                        @if (Model.Gender == "H" || Model.Gender == "M") { <text> disabled="disabled" </text> }>
+                    <option value="0">@Html.GetText("REGISTRO", "SINESPECIFICAR")</option>
+                    <option @(Model.Gender != null && Model.Gender.Equals("H") ? "selected" : "") value="H">@Html.GetText("REGISTRO", "HOMBRE")</option>
+                    <option @(Model.Gender != null && Model.Gender.Equals("M") ? "selected" : "") value="M">@Html.GetText("REGISTRO", "MUJER")</option>
+                </select>
+            </div>
+        }
+
+
+        @* Campos extra para solicitar al usuario *@
+    @if (Model.AdditionalFields != null && Model.AdditionalFields.Count > 0)
+    {
+        <div id="panCamposConfigurablesProyecto">
+            @foreach (AdditionalFieldAutentication campoExtra in Model.AdditionalFields)
+            {
+                @* Contenedor del campo adicional del formulario*@
+                <div class="form-group">
+                    <label class="control-label d-block" for="@campoExtra.FieldName" @(campoExtra.Required ? "class=datoObligatorio" : "")>@campoExtra.Title</label>
+                    @if (campoExtra.Options != null && campoExtra.Options.Count > 0)
+                    {
+                        <select name="@campoExtra.FieldName" id="@campoExtra.FieldName" class="form-control dato select medium @campoExtra.FieldName">
+                            <option value="@Guid.Empty">@Html.GetText("REGISTRO", "SINESPECIFICAR")</option>
+                            @foreach (Guid idCampo in campoExtra.Options.Keys)
+                            {
+                                <option @(campoExtra.FieldValue == idCampo.ToString() ? "selected" : "") value="@idCampo">@campoExtra.Options[idCampo]</option>
+                            }
+                        </select>
+                    }
+                    else
+                    {
+                        string claseInput = "text medium";
+                        if (campoExtra.AutoCompleted)
+                        {
+                            claseInput += " txtBusqueda autocompletar " + campoExtra.FieldValue;
+                        }
+                        <input type="text" class="@claseInput form-control not-outline" id="@campoExtra.FieldName" name="@campoExtra.FieldName" value="@campoExtra.FieldValue" />
+                        if (campoExtra.AutoCompleted)
+                        {
+                            string inputHack = campoExtra.FieldName + "hack";
+                            <input type="hidden" id="@inputHack" class="@inputHack" />
+                        }
+                    }
+                </div>
+            }
+        </div>
+    }
+
+    @* Subir imagen del usuario *@
+    <div class="form-group mb-5">
+        <label for="" class="control-label d-block">@Html.GetText("PERFIL", "FOTOPERFIL")</label>
+        <div class="image-uploader js-image-uploader">
+            <div class="image-uploader__drop-area">
+                <div class="image-uploader__preview" style="display: block; border:1px solid #ccc; position: relative">
+                    @* Image Preview - Por defecto mostrar "Anónimo"*@
+                    @{
+                        if (!string.IsNullOrEmpty(Model.Foto))
+                        {
+                            urlFoto = Html.GetBaseUrlContent() + "/" + Model.Foto;
+                        }
+                    }
+                    <img class="image-uploader__img d-block" alt="Imagen Usuario" src="@urlFoto" />
+                </div>
+                @*Descripción de la acción*@
+                <div class="image-uploader__instructions">
+                    <div class="image-uploader__icon">
+                        <span class="material-icons">backup</span>
+                    </div>
+                    <div class="image-uploader__info">
+                        <p>
+                            <strong>
+                                @Html.GetText("COMMON", "ARRASTRA_Y_SUELTA")
+                            </strong>
+                        </p>
+                        <p>@Html.GetText("COMMON", "IMAGENES_FORMATO_JPG_PNG")</p>
+                        <p>@Html.GetText("COMMON", "PESO_MAXIMO_250KB")</p>
+                    </div>
+                </div>
+            </div>
+            <div class="image-uploader__error">
+                <p class="ko"></p>
+            </div>
+        </div>
+        <input type="file" class="image-uploader__input" accept="image/*" />
+    </div>
+
+    @* Donde mostrar el perfil *@
+    @* Ocultar compartir perfil en Gnoss - (MYG-86)
+    @if (Model.IsSearched != null || Model.IsExternalSearched != null) {
+    <div class="form-group mb-5">
+        <label for="" class="control-label d-block">
+            @Html.GetText("REGISTRO", "PORQUEPRIVACIDAD", Html.GetNombreProyectoEcosistema())
+        </label>
+        @* Información de porque hacer público mi perfil
+        <label class="control-label d-block">
+            <a class="link" data-toggle="collapse" href="#collapseDondeMostrarPerfil" role="button" aria-expanded="false" aria-controls="collapseDondeMostrarPerfil">
+                @Html.GetText("REGISTRO", "TITULOINFOVISIBILIDADPERFIL")
+            </a>
+        </label>
+
+        @* Primer Check para hacer publico el perfil de un usuario
+        @if (Model.IsSearched != null)
+        {
+            <div class="custom-control custom-checkbox">
+                <input type="checkbox"
+                       class="custom-control-input"
+                       name="chkListarPerfil"
+                       id="chkListarPerfil"
+                       @if (Model.IsSearched.Value) { <text> checked="checked" </text> } />
+                <label for="chkListarPerfil" class="custom-control-label">@Html.GetText("REGISTRO", "LISTARPERFILCORTO", Html.GetNombreProyectoEcosistema())</label>
+
+            </div>
+        }
+        @* Primer Check para hacer publico el perfil de un usuario
+        @if (Model.IsExternalSearched != null)
+        {
+            <div class="custom-control custom-checkbox">
+                <input class="custom-control-input"
+                       type="checkbox"
+                       name="chkListarPerfilExterno"
+                       id="chkListarPerfilExterno"
+                       @if (Model.IsExternalSearched.Value) { <text> checked="checked" </text> } />
+                <label class="custom-control-label" for="chkListarPerfilExterno">@Html.GetText("REGISTRO", "LISTARPERFILEXTERNOSCORTO")</label>
+            </div>
+        }
+
+        @* Panel Informativo de tipo Collapse de Donde mostrar el perfil
+        @Html.PartialView("_partial-views/_public-profile-info")
+    </div>
+    }
+    @*
+
+    @* Posibles mensajes de error en proceso de registro *@
+    <div id="divContenedorError">
+    </div>
+
+
+    @* Botón de acción del Formulario *@
+    <div class="actionButtons">
+        @* Campos ocultos para el registro del usuario *@
+        <input type="hidden" name="paginaOriginal" value="@Model.ReferrerPage" />
+        <input type="hidden" name="paginaDatos" value="true" />
+        <input type="hidden" name="tienePaginaDatosRegistro" value="@Model.TabData.ToString().ToLower()" />
+
+        <div class="mb-3">
+            <input id="submit"
+                   type="submit"
+                   value="GUARDAR Y SIGUIENTE"
+                   class="btn btn-primary principal submit uppercase"
+                   onclick="if (ComprobarDatos()) { return false; }" />
+        </div>
+        @*<div> CORE-2974
+            <span>¿Ya eres usuario de GNOSS?</span>
+            <a class="link"               
+               href="@Comunidad.Url/@Html.GetText("URLSEM", "LOGIN")">Iniciar seción</a>
+        </div>
+        *@
+    </div>
+</form>
+
+<script>
+    // Función para comprobar los datos introducidos en el registro
+    function ComprobarDatos() {
+        var error = "";
+
+        @if (Model.CountryList != null && Model.CountryList.Count > 0)
+        {
+            if (string.IsNullOrEmpty(Model.Location))
+            {
+                <text>error += AgregarErrorReg(error, ValidarPoblacionOrg('txtPoblacion', 'lblPoblacion'));</text>
+            }
+            <text>error += AgregarErrorReg(error, ValidarPais('ddlPais', 'lblPais'));</text>
+        }
+
+        error += RecogerDatosExtra();
+
+        if (error.length > 0) {
+            if (error.length > 0) {
+                crearError(error, '#divContenedorError', false);
+            }
+            else {
+                $('#divContenedorError').html('');
+            }
+            return true;
+        } else {
+            $('#divContenedorError').html('');
+            return false;
+        }
+    }
+
+    // Recoger posibles errores en los campos extra del proceso de registro
+    function RecogerDatosExtra() {
+        var error = '';
+        $('#panCamposConfigurablesProyecto label[title=\'campo obligatorio\']').each(function () {
+            var label = $(this);
+            var campo = $(this).next();
+            if (campo.is('select')) {
+                error += AgregarErrorReg(error, ValidarCampoSelectObligatorio(campo, label));
+            }
+            else {
+                error += AgregarErrorReg(error, ValidarCampoObligatorio(campo, label));
+            }
+        });
+        return error;
+    }
+
+</script>
+
+

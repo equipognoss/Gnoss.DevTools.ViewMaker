@@ -1,0 +1,684 @@
+﻿@model AutenticationModel
+
+@{
+CommunityModel Comunidad = Html.GetComunidad();
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+string NombreProyectoEcosistema = Html.GetNombreProyectoEcosistema();
+}
+
+@*
+Descripción
+-----------------------------------------------
+Vista que contiene el formulario para realizar el registro de un usuario en la aplicación. 
+El proceso de registro puede llegar a constar de 4 pasos. Este formulario forma parte del paso primero o inicial donde se piden datos como:
+- Nombre
+- Apellidos
+- Correo electrónico
+- Nombre de usuario
+- Contraseña
+- Fecha de nacimiento
+- Cargo (opcional)
+- Sexo (opcional)
+- Campos adicionales por comunidad (opcional)
+- Localización (opcional)
+- Región (opcional)
+- País (opcional)
+
+La url para realizar un registro que disponga de los 4 pasos es: http://depuracion.net/comunidad/gnoss-developers-community/hazte-miembro
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+//Id del input oculto que almacenará la fecha de nacimiento
+string idTxtFechaNac = "txtFechaNac";
+//Id del select para elegir el día de fecha de nacimiento (puede estar oculto dependiendo de la comunidad) 
+string idTxtFechaNacDia = "txtFechaNacDia";
+//Id del select para elegir el mes de fecha de nacimiento (puede estar oculto dependiendo de la comunidad) 
+string idTxtFechaNacMes = "txtFechaNacMes";
+//Id del select para elegir el mes de fecha de nacimiento (puede estar oculto dependiendo de la comunidad) 
+string idTxtFechaNacAnio = "txtFechaNacAnio";
+//Id del input donde se guardará el nombre del usuario para el registro
+string idTxtNombre = "txtNombre";
+// Nombre que tendrá el input del txtNombre para comprobar campo Registro;
+string nombreCampoTxtNombre = "Nombre";
+// Id del input para los apellidos del usuario
+string idTxtApellidos = "txtApellidos";
+// Nombre que tendrá el input del txtApellidos para comprobar campo Registro;
+string nombreCampoTxtApellidos = "Apellidos";
+// Id del input que guardará el cargo del usuario (puede estar oculto dependiendo de la comunidad)
+string idTxtCargo = "txtCargo";
+// Nombre que tendrá la label del txtCargo para ValidarCampoNoVacio
+string lblCargo = "lblCargo";
+// Id del input que guardará el email del usuario
+string idTxtEmail = "txtEmail";
+// Id del input para guardar el nombre del usuario (no se utilizaría pero lo añado por si finalmente se usa)
+string idTxtNombreUsuario = "txtNombreUsuario";
+// Id del input que guardará el email del tutor (puede estar oculto dependiendo de la comunidad)
+// Este componente parece que desaparecería. No obstante, lo dejo por si acaso. (Actualmente sin uso)
+string idTxtEmailTutor = "txtEmailTutor";
+// Id del input que guardará la contraseña del usuario
+string idTxtContrasenya = "txtContrasenya";
+// Nombre para usar en ComprobarCampoRegistroMVC (comprobación de contraseña)
+string nombreCampoTxtContrasenya = "Contra1";
+// Id del input que guardará el objeto captcha
+string idCaptcha = "captcha";
+// Id del select para selección de país (puede estra oculto dependiendo de la comunidad)
+string idDdlPais = "ddlPais";
+// Id del input oculto que guardará el valor de la provincia seleccionada
+string idTxtProvincia = "txtProvincia";
+
+// Configuraciones para DatePicker (fecha de nacimiento) --PENDIENTE
+                    
+
+// Urls necesarias
+string currentURL = @Html.GetUrlPagina();
+string title = @Html.GetText("LOGIN", "CREARCUENTA");
+
+
+}
+@*
+----------------------------------------------------------------
+-------------------- Vista del Formulario de Registro --------------------
+*@
+
+@* Controlar el título dependiendo del tipo de registro *@
+@* Registro de usuario seleccionando un perfil -> A través de invitación *@
+@if (!IdentidadActual.IsGuestUser && Html.GetSoloIdentidadPersonal().HasValue && !Html.GetSoloIdentidadPersonal().Value && Html.GetPerfilesAceptarinvitacion() != null && Html.GetPerfilesAceptarinvitacion().Count > 0)
+{
+    title = @Html.GetText("COMINICIOLOGIN", "HAZTEMIEMBROPARTICIPA");
+}
+
+
+
+    @* Título del Formulario *@
+    <h1>@title</h1>
+    <div class="box box01">
+        @* Formulario para el registro del usuario *@
+        <form method="post" id="formPaginaRegistro">
+            @* Campos ocultos del formulario *@
+            <input type="hidden" id="txtGruposRed" name="txtGruposRed" value="@Model.NetGroups" />
+            <input type="hidden" id="txtTokenRed" name="txtTokenRed" value="@Model.NetToken" />
+
+            @* Registro Usuario invitado *@
+            @if (IdentidadActual.IsGuestUser) {            
+                @* Información del Paso actual del registro *@
+                <div class="step-progress-wrap mb-5">
+                    <ul class="step-progress">
+                        <li class="step-progress__circle done active">
+                            <span class="step-progress__text current">@Html.GetText("REGISTRO", "DATOSUSUARIO")</span>
+                        </li>
+                        <li class="step-progress__bar"></li>
+                        <li class="step-progress__circle">
+                            <span class="step-progress__text">@Html.GetText("REGISTRO", "CREAPERFIL")</span>
+                        </li>
+                        <li class="step-progress__bar"></li>
+                        <li class="step-progress__circle">
+                            <span class="step-progress__text">@Html.GetText("REGISTRO", "PREFERENCIAS")</span>
+                        </li>
+                        <li class="step-progress__bar"></li>
+                        <li class="step-progress__circle">
+                            <span class="step-progress__text">@Html.GetText("REGISTRO", "CONECTATE")</span>
+                        </li>
+                    </ul>
+                </div>
+
+                @* Nombre *@
+                <div class="form-group mb-3">
+                    <label id="lblNombre"
+                           for="@idTxtNombre"
+                           class="control-label d-block">@Html.GetText("REGISTRO", "NOMBRESIN*")</label>
+                    <input type="text"
+                           class="form-control not-outline" 
+                           id="@idTxtNombre" name="@idTxtNombre" 
+                           value="@Model.Name" placeholder="@Html.GetText("REGISTRO", "NOMBRESIN*")" />
+                </div>
+                @* Apellidos *@
+                <div class="form-group mb-3">
+                    <label id="lblApellidos"
+                           for="@idTxtApellidos"
+                           class="control-label d-block">@Html.GetText("INVITACIONES", "APELLIDOS")</label>
+                    <input placeholder="@Html.GetText("COMMON", "INTRODUCE_APELLIDOS")"
+                           type="text"
+                           name="@idTxtApellidos"
+                           id="@idTxtApellidos"
+                           value="@Model.LastName"
+                           class="form-control not-outline" />
+                </div>
+                @* Email *@
+                <div class="form-group mb-3">
+                    <label id="lblEmail"
+                           for="@idTxtEmail"
+                           class="control-label d-block">@Html.GetText("REGISTRO", "EMAIL")</label>
+                    <input placeholder="@Html.GetText("REGISTRO", "EMAIL")"
+                           type="email"
+                           name="@idTxtEmail"
+                           id="@idTxtEmail"
+                           value="@Model.Email"
+                           @((Model.TypePage == AutenticationModel.TypeAutenticationPage.RegistroConRedesSociales && !string.IsNullOrEmpty(Model.Email)) ? "disabled" : "")
+                           class="form-control not-outline" />
+                </div>
+
+                @* Nombre del usuario - Ocultado, no se utiliza *@
+                @* <div class="form-group mb-3">
+                    <label id="lblNombreUsuario"
+                           for="@idTxtNombreUsuario"
+                           class="control-label d-block">@Html.GetText("REGISTRO", "LOGINUSUARIO")</label>
+                    <input placeholder=""
+                           type="text"
+                           name="@idTxtNombreUsuario"
+                           id="@idTxtNombreUsuario"
+                           value="@Model.LoginUsuario"                       
+                           class="form-control not-outline" />
+                </div>*@
+
+                @* Control mensajes de error por email *@
+                @* Email Repetido *@
+                if (Model.Errors != null && Model.Errors.Contains("emailrepetido")) 
+                {
+                    <div id="divKoEmail" class="alert alert-primary" role="alert">
+                        @Html.GetText("AGREGARDATOSCONTACTOS", "EMAILEXISTENTE")
+                    </div>
+                }
+                @* Caracteres del usuario *@
+                if (Model.Errors != null && Model.Errors.Contains("caracteresusuario"))
+                { 
+                    <div id="divKoEmail" class="alert alert-primary" role="alert">
+                        @Html.GetText("REGISTRO", "ERRORCARACTERES")
+                    </div>
+                }
+                @* El usuario ya existe *@
+                if (Model.Errors != null && Model.Errors.Contains("yaexisteusuario"))
+                { 
+                    <div id="divKoEmail" class="alert alert-primary" role="alert">
+                        @Html.GetText("REGISTRO", "ERRORLOGINREPETIDO")
+                    </div>
+                }
+
+                @* Contraseña *@
+                if (Model.TypePage != AutenticationModel.TypeAutenticationPage.RegistroConRedesSociales)
+                {
+                    <div class="form-group mb-3">
+                        <label id="lblContrasenya"
+                               for="@idTxtContrasenya"
+                               class="control-label d-block">@Html.GetText("REGISTRO", "CONTRASENYA")</label>
+                        <input placeholder="@Html.GetText("REGISTRO", "CONTRASENYA")"
+                               type="password"
+                               name="@idTxtContrasenya"
+                               id="@idTxtContrasenya"
+                               class="form-control not-outline" />
+                        <small class="helper">@Html.GetText("REGISTRO", "INFOPASSWORD")</small>
+                    </div>
+                }
+
+                @* Posición del usuario *@
+                if (Model.AskPosition) 
+                { 
+                    <div class="form-group mb-3">
+                        <label id="@lblCargo"
+                               for="@idTxtCargo"
+                               class="control-label d-block">@Html.GetText("ACEPTARINVITACION", "CARGOORGANIZACION")</label>
+                        <input placeholder=""
+                               type="text"
+                               name="@idTxtCargo"
+                               id="@idTxtCargo"
+                               class="form-control not-outline" />                    
+                    </div>
+                }
+
+            @* Controlar intentos del usuario - Captcha *@
+            if (IdentidadActual.IsGuestUser && !string.IsNullOrEmpty(@Html.GetTokenLoginUsuario()) && IdentidadActual.NumberOfLoginAttemptsIP >= 2)
+            {
+                string srcCaptcha = @Html.GetUrlServicioLogin() + "/LoginCaptcha.aspx?token=" + System.Net.WebUtility.UrlEncode(@Html.GetTokenLoginUsuario());
+                    <div class="form-group mb-3">
+                        <label class="control-label d-block">
+                            <img id="imgCaptchaLogin" src="@srcCaptcha" />
+                        </label>
+                        <input name="@idCaptcha" 
+                               type="captcha"
+                               id="@idCaptcha"
+                               class="form-control not-outline" 
+                               onkeydown="if(event.which || event.keyCode){if ((event.which == 13) || (event.keyCode == 13)) {Entrar(); return false;}}" />
+                    </div>
+                }
+
+                @* Fecha de nacimiento *@
+                if (Model.AskBornDate) { 
+                    <div class="form-group mb-3">
+                        <label id="lblFechaNac" class="control-label d-block">@Html.GetText("REGISTRO", "FECHANACIMIENTOSIN*")</label>
+                            @{
+                                int diaFecha = 0;
+                                int mesFecha = 0;
+                                int anioFecha = 0;
+                                if (!string.IsNullOrEmpty(Model.BornDate))
+                                {
+                                    string[] fecha = Model.BornDate.Split('/');
+                                    diaFecha = int.Parse(fecha[0]);
+                                    mesFecha = int.Parse(fecha[1]);
+                                    anioFecha = int.Parse(fecha[2]);
+                                }
+                            }
+                        @* Contenedor de los Select para Fecha Nacimiento*@
+                        <div class="form-inline">                   
+                            @* Select Día Nacimiento *@
+                            <select id="@idTxtFechaNacDia" class="form-control mr-2">
+                                <option value="0">Día</option>
+                                @for (int dia = 1; dia <= 31; dia++)
+                                {
+                                    <option value="@dia" @(dia == diaFecha ? "selected" : "")>@dia</option>
+                                }
+                            </select>
+                             @* Select Mes Nacimiento *@
+                            <select id="@idTxtFechaNacMes" class="form-control mr-2">
+                                <option value="0">Mes</option>
+                                @for (int mes = 1; mes <= 12; mes++)
+                                {
+                                    <option value="@mes" @(mes == mesFecha ? "selected" : "")>@mes</option>
+                                }
+                            </select>
+                            @* Select Año Nacimiento*@
+                            <select id="@idTxtFechaNacAnio" class="form-control mr-2">
+                                <option value="0">Año</option>
+                                @for (int anio = (DateTime.Now.Year - Model.MinAgeRegistre); anio >= (DateTime.Now.Year - 90); anio--)
+                                {
+                                <option value="@anio" @(anio == anioFecha ? "selected" : "")>@anio</option>
+                                }
+                            </select>
+                            @* Datos ocultos de fecha de nacimiento *@
+                            <input type="hidden" id="@idTxtFechaNac" name="@idTxtFechaNac" value="@Model.BornDate" />
+                        </div>
+                    </div>
+                }
+
+                @* Pais del usuario *@
+                if (Model.AskCountry) {             
+                    <div class="form-group mb-3">
+                        <label id="lblPais" class="control-label d-block">@Html.GetText("REGISTRO", "PAISSIMPLE")</label>                
+                        <select id="@idDdlPais" name="@idDdlPais" class="js-select2" data-select-search="true">
+                            <option value="@Guid.Empty">@Html.GetText("REGISTRO", "SINESPECIFICAR")</option>
+                            @foreach (Guid idPais in Model.CountryList.Keys)
+                            {
+                                <option value="@idPais" @(Model.CountryID != null && idPais.Equals(Model.CountryID) ? "selected" : "")>@Model.CountryList[idPais]</option>
+                            }
+                        </select>
+                    </div>
+                }
+
+                @* Región / Provincia *@
+                if (Model.AskRegion) { 
+                    <div class="form-group mb-3">
+                        <label id="lblProvincia" for="@idTxtProvincia" class="control-label d-block">@Html.GetText("REGISTRO", "PROVINCIASIMPLE")</label>                
+                        @{bool visibleSelect = false;}
+                        @if (Model.CountryID != null && Model.CountryID != Guid.Empty && Model.CountryList[Model.CountryID].Equals("España"))
+                        {
+                            visibleSelect = true;
+                        }
+                 
+                        <select id="ddlProvincia" name="ddlProvincia" class="js-select2" data-select-search="true" @(visibleSelect ? "style=display:block" : "style=display:none")>
+                        @foreach (Guid idRegion in Model.RegionList.Keys)
+                        {
+                            <option @(Model.RegionID != null && Model.RegionID.Equals(idRegion) ? "selected" : "") value="@idRegion">@Model.RegionList[idRegion]</option>
+                        }
+                        </select>                
+                        @* Input oculto de selección de provincia *@
+                        <input type="text" class="form-control not-outline" id="@idTxtProvincia" name="@idTxtProvincia" @(visibleSelect ? "style=display:none" : "style=display:block") value="@(!string.IsNullOrEmpty(Model.Region) ? Model.Region : "")" />
+                    </div>            
+                }
+
+                @* Localización - Municipio *@
+                if (Model.AskLocation) { 
+                    <div class="form-group mb-3">
+                        <label id="lblLocalidad"
+                               for="txtLocalidad"
+                               class="control-label d-block"></label>
+                        <input placeholder=""
+                               type="text"
+                               name="txtLocalidad"
+                               id="txtLocalidad"
+                               class="form-control not-outline" />                    
+                    </div>
+                }
+
+                @* Sexo/Género del usuario *@
+                if (Model.AskGender) {
+                    <div class="form-group mb-3">
+                        <label id="lblSexo"
+                               for="ddlSexo"
+                               class="control-label d-block">@Html.GetText("REGISTRO", "SEXO")</label>
+                        <select id="ddlSexo" class="form-control" name="ddlSexo">
+                                    <option value="0">@Html.GetText("REGISTRO", "SINESPECIFICAR")</option>
+                                    <option @(Model.Gender != null && Model.Gender.Equals("H") ? "selected" : "") value="H">@Html.GetText("REGISTRO", "HOMBRE")</option>
+                                    <option @(Model.Gender != null && Model.Gender.Equals("M") ? "selected" : "") value="M">@Html.GetText("REGISTRO", "MUJER")</option>
+                        </select>                    
+                    </div>                
+                }
+
+                @* Campos extra para solicitar al usuario *@
+                if (Model.AdditionalFields != null && Model.AdditionalFields.Count > 0)
+                {
+                    <div id="panCamposConfigurablesProyecto">
+                        @foreach (AdditionalFieldAutentication campoExtra in Model.AdditionalFields)
+                        {   
+                            @* Contenedor del campo adicional del formulario*@ 
+                            <div class="form-group">
+                            <label class="control-label d-block" for="@campoExtra.FieldName" @(campoExtra.Required ? "class=datoObligatorio" : "")>@campoExtra.Title</label>
+                            @if (campoExtra.Options != null && campoExtra.Options.Count > 0)
+                            {
+                                <select name="@campoExtra.FieldName" id="@campoExtra.FieldName" class="form-control dato select medium @campoExtra.FieldName">
+                                    <option value="@Guid.Empty">@Html.GetText("REGISTRO", "SINESPECIFICAR")</option>
+                                    @foreach (Guid idCampo in campoExtra.Options.Keys)
+                                    {
+                                        <option @(campoExtra.FieldValue == idCampo.ToString() ? "selected" : "") value="@idCampo">@campoExtra.Options[idCampo]</option>
+                                    }
+                                </select>
+                            }
+                            else
+                            {
+                                string claseInput = "text medium";
+                                if (campoExtra.AutoCompleted)
+                                {
+                                    claseInput += " txtBusqueda autocompletar " + campoExtra.FieldValue;
+                                }
+                                <input type="text" class="@claseInput form-control not-outline" id="@campoExtra.FieldName" name="@campoExtra.FieldName" value="@campoExtra.FieldValue" />
+                                if (campoExtra.AutoCompleted)
+                                {
+                                    string inputHack = campoExtra.FieldName + "hack";
+                                    <input type="hidden" id="@inputHack" class="@inputHack" />
+                                }
+                            }
+                           </div>
+                        }
+                    </div>
+                 }
+
+                @* Posibles mensajes de error del Registro *@
+                <div id="divKodatosUsuario">
+                @{
+                    bool mastrarDivError = (Model.Errors != null && Model.Errors.Count > 0 && (Model.Errors.Contains("camposVacios") || Model.Errors.Contains("formatoNombre") || Model.Errors.Contains("formatoApellidos") || Model.Errors.Contains("formatoEmail") || Model.Errors.Contains("formatoPassword")));
+                }
+                    <div class="ko alert alert-primary" role="alert" style="@(mastrarDivError ? "display:block" : "")">
+                        @if (Model.Errors != null && Model.Errors.Count > 0)
+                        {
+                            foreach (string error in Model.Errors)
+                            {
+                                if (error == "camposVacios")
+                                {
+                                    <p>@Html.GetText("REGISTRO", "ERRORCAMPOSVACIOS")</p>
+                                }
+                                if (error == "formatoNombre")
+                                {
+                                <p>@Html.GetText("REGISTRO", "ERRORFORMATONOMBRE")</p>
+                                }
+                                if (error == "formatoApellidos")
+                                {
+                                <p>@Html.GetText("REGISTRO", "ERRORFORMATOAPELLIDOS")</p>
+                                }
+                                if (error == "formatoEmail")
+                                {
+                                <p>@Html.GetText("REGISTRO", "ERRORFORMATOEMAIL")</p>
+                                }
+                                if (error == "formatoPassword")
+                                {
+                                <p>@Html.GetText("REGISTRO", "ERRORFORMATOPASS")</p>
+                                }
+                            }
+                         }
+                    </div>
+                </div>
+            }            
+            @* Registro de usuario seleccionando un perfil -> A través de invitación *@
+            @if (!IdentidadActual.IsGuestUser && Html.GetSoloIdentidadPersonal().HasValue && !Html.GetSoloIdentidadPersonal().Value && Html.GetPerfilesAceptarinvitacion() != null && Html.GetPerfilesAceptarinvitacion().Count > 0)
+            {                
+                <div id="panSelectorPerfiles" class="form-group mb-3">                                        
+                    <label for="selectorPerfilAceptarInvitacion" id="lblSelectorPerfiles" class="datoObligatorio control-label d-block">@Html.GetText("REGISTRO", "SELECTORPERFILACEPTARINVITACION")</label>
+                    <select id="selectorPerfilAceptarInvitacion" class="form-control mr-2">
+                        @foreach (ProfileModel perfil in Html.GetPerfilesAceptarinvitacion())
+                        {
+                            <option value="@perfil.Key">@perfil.NamePerson</option>
+                        }
+                    </select>                    
+                </div>
+            }
+
+            @* Panel para validar fecha de nacimiento - Validar *@            
+            <div id="condicionesUso" class="form-group custom-checkbox mb-4">                                    
+                <input type="hidden" id="clausulasSelecc" name="clausulasSelecc" />                
+                    @{
+                        if (!Model.AskBornDate && IdentidadActual.IsGuestUser)
+                        {
+                            @* Cláusula de mayor de edad*@
+                            <div class="custom-control custom-checkbox" id="liClausulaMayorEdad">                                                                                                            
+                                <input id="cbMayorEdad" type="checkbox" name="cbMayorEdad" class="custom-control-input">                            
+                                <label class="custom-control-label" for="cbMayorEdad" id="lblMayorEdad">@Html.GetText("REGISTRO", "SOYMAYOREDAD")</label>
+                            </div>                         
+                        }
+                        @* Pintar cada una de las posibles cláusulas *@
+                        foreach (Guid clausula in Model.Clauses.Keys)
+                        {
+                            string classCheck = "";
+                            if (Model.Clauses[clausula].Value)
+                            {
+                                classCheck = "optional";
+                            }   
+                            @* Contenedor para cada una de las cláusulas posibles*@
+                                <div class="custom-control custom-checkbox">
+                        
+                                <input type="checkbox" class="@classCheck custom-control-input" id="@clausula" />
+                                @{
+                                    string textoClausula = Model.Clauses[clausula].Key;
+                                    @*si es obligatoria y contiene una de las dos máscaras*@
+                                    if (!Model.Clauses[clausula].Value && (Model.Clauses[clausula].Key.Contains(ManageRegisterClausesViewModel.MascaraCondicionesUso) || Model.Clauses[clausula].Key.Contains(ManageRegisterClausesViewModel.MascaraPoliticaPrivacidad)))
+                                    {
+                                        textoClausula = Html.GetText("COMADMINCLAUSULASREGISTRO", "HELEIDOYACEPTO");
+                                        if (Model.Clauses[clausula].Key.Contains(ManageRegisterClausesViewModel.MascaraCondicionesUso))
+                                        {
+                                            string condicionesUso = Html.GetText("COMADMINCLAUSULASREGISTRO", "TEXTODEFECTOCCONDICIONESUSOCOM");
+                                            string jsCondiciones = "<a onclick=\"MostrarPanelExtra();$('#condicionesUsoCom').parent().children().each(function(){ var div = $(this); div.hide(); });$('#condicionesUsoCom').show(); return false; \">" + condicionesUso + "</a>";
+
+                                            textoClausula += jsCondiciones;
+                                        }
+                                        if (Model.Clauses[clausula].Key.Contains(ManageRegisterClausesViewModel.MascaraCondicionesUso) && Model.Clauses[clausula].Key.Contains(ManageRegisterClausesViewModel.MascaraPoliticaPrivacidad))
+                                        {
+                                            textoClausula += " " + Html.GetText("COMMON", "Y");
+                                        }
+                                        if (Model.Clauses[clausula].Key.Contains(ManageRegisterClausesViewModel.MascaraPoliticaPrivacidad))
+                                        {
+                                            string politicaPriv = Html.GetText("COMADMINCLAUSULASREGISTRO", "TEXTODEFECTOCPOLITICAPRIVACIDADCOM");
+                                            // Mostrar condiciones de privacidad mediante Modal
+                                            //string jsCondiciones = "<a onclick=\"MostrarPanelExtra();$('#clausulasTextoCom').parent().children().each(function(){ var div = $(this); div.hide(); });$('#clausulasTextoCom').show(); return false; \">" + politicaPriv + "</a>";
+                                            string jsCondiciones = "<a class=\"link font-weight-bold \" style=\"cursor:pointer\" data-target=\"#modal-politica-privacidad\" data-toggle=\"modal\" >" + politicaPriv + "</a>";                                    
+                                            textoClausula += jsCondiciones;
+                                        }
+                                        textoClausula += " " + Html.GetText("COMMON", "DE") + " " + Comunidad.ShortName;
+                                    }
+                                    <label for="@clausula" class="custom-control-label">@Html.Raw(textoClausula)</label>
+                                } 
+                            </div>                       
+                        }
+                    }
+                                    
+                <div style="display: none;" id="despleReg">
+                    <div style="display: block;" class="stateShowForm" id="panels">
+                        <div class="box form activeForm" id="action">
+                            @foreach (string condicion in Model.Terms.Keys)
+                            {
+                                <div id="@condicion">
+                                    <div>
+                                        <fieldset>
+                                            <legend><span>@Model.Terms[condicion].Key</span></legend>
+                                            @Html.Raw(Model.Terms[condicion].Value)
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <p class="cerrar">
+                            <a onclick="CerrarPanelAccion('despleReg')" title="@Html.GetText("CONTROLDESPLEGAR", "CERRARFORM")">@Html.GetText("CONTROLDESPLEGAR", "CERRARX")</a>
+                        </p>
+                    </div>
+                </div>
+                <div id="divKoCondicionesUso">
+                    <div class="ko alert" role="alert">
+                    </div>
+                </div>                
+            </div>
+
+            @* Panel adicional de Captcha *@
+            @if (IdentidadActual.IsGuestUser && !string.IsNullOrEmpty(Model.ImageCaptcha))
+            {
+                <p>
+                    <span>@Html.GetText("REGISTRO", "NOBOT")</span>
+                    <img src="@Model.ImageCaptcha" />
+                    <input type="text" name="captcha" />
+                </p>
+                if (Model.Errors != null && (Model.Errors.Contains("errorCaptcha") || Model.Errors.Contains("errorCaptchaNumIntentos")))
+                {
+                    <div class="ko">
+                        @if (Model.Errors.Contains("errorCaptcha"))
+                        {
+                            <p>@Html.GetText("REGISTRO", "ERRORCAPTCHA")</p>
+                        }
+                        @if (Model.Errors.Contains("errorCaptchaNumIntentos"))
+                        {
+                            <p>@Html.GetText("REGISTRO", "ERRORCAPTCHANUMINTENTOS")</p>
+                        }
+                    </div>
+                }
+            }    
+            @* Botón de unirse/registrarse *@
+                <div class="fieldset actionButtons fieldset03 actionButtons mb-3">
+                    @{
+                        string funcionRegistrar = "";
+                        if (IdentidadActual.IsGuestUser)
+                        {
+                            funcionRegistrar = "if(ComprobarDatosRegistro('" + Model.MinAgeRegistre + "')) {return false;}";
+                        }
+                        else
+                        {
+                            funcionRegistrar = "if(ComprobarDatosRegistroLogeado()) {return false;}";
+                        }
+                    }
+                    @* Campos ocultos para registro de usuario *@
+                    <input type="hidden" value="@Html.GetUrlOrigen()" name="urlOrigen" />
+                    <input type="hidden" value="@Model.SecurityID" name="txtSeguridad" />
+
+                    @if (!IdentidadActual.IsGuestUser && Html.GetSoloIdentidadPersonal().HasValue && !Html.GetSoloIdentidadPersonal().Value && Html.GetPerfilesAceptarinvitacion() != null && Html.GetPerfilesAceptarinvitacion().Count > 0)
+                    {
+                        <a class="principal submit activo btn btn-primary" name="SelectorPerfilInvitacion" onclick="$(this).next().val($('#selectorPerfilAceptarInvitacion option:selected').val());$(this).next().click()"><span>@Html.GetText("REGISTRO", "BOTONACEPTARINVITACIONPERFIL")</span></a>
+                        <input class="activo btn btn-primary principal submit uppercase" type="submit" name="SelectorPerfilInvitacion" value="" style="display: none;" />
+                    }
+                    else
+                    {
+                        string textoBoton = Html.GetText("REGISTRO", "REGISTRARSE").ToUpper();
+                        if (Model.InvitationRegistre)
+                        {
+                            textoBoton = Html.GetText("ACEPTARINVITACION", "ACEPTARINVITACION").ToUpper();
+                        }
+                        else if (!IdentidadActual.IsGuestUser)
+                        {
+                            textoBoton = Html.GetText("COMUNIDADES", "HAZTEMIEMBRO").ToUpper();
+                        }
+                        <input type="submit" value="@textoBoton" class="principal submit btn btn-primary principal submit uppercase mb-3" id="btnCrearCuenta" onclick="@funcionRegistrar" />
+                    }
+                    @if (IdentidadActual.IsGuestUser)
+                    {                                                                        
+                        <div>
+                            @Html.GetText("REGISTRO", "YAERESUSUARIOGNOSS", NombreProyectoEcosistema) <a class="link" id="link_iniciar-sesion" href="@Comunidad.Url/@Html.GetText("URLSEM", "LOGIN")"> @Html.GetText("COMMON", "INICIARSESION")</a>                        
+                        </div>                         
+                    }                                            
+                </div>
+
+    </form>
+        
+    </div>
+    @* Ocultar de momento el panel para registro a través de redes sociales
+    <div class="panel-centrado-separator"></div>
+    <div class="box box02">
+        <fieldset id="fsPrefieresRedesSociales">
+            <p>O bien,</p>
+            <ul class="lista-redes-sociales lista-redes-sociales--registro no-list-style">
+                <li class="twitter">
+                    <a href="http://serviciospruebas.gnoss.net/login/logintwitter.aspx?token=%252btM2RDGm6hGfWlvP767TUpAjhjRmuzn9nxFyhMo%252bBRQ%253d&amp;proyectoID=e01d50a3-73e0-4707-a6c9-10e0ca7dd165&amp;urlOrigen="
+                       title="Twitter">
+                        <i class="fab fa-twitter"></i>
+                        <span>Regístrate con Twitter</span>
+                    </a>
+                </li>
+                <li class="facebook">
+                    <a href="http://serviciospruebas.gnoss.net/login/loginfacebook.aspx?token=%252btM2RDGm6hGfWlvP767TUpAjhjRmuzn9nxFyhMo%252bBRQ%253d&amp;proyectoID=e01d50a3-73e0-4707-a6c9-10e0ca7dd165&amp;urlOrigen="
+                       title="Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                        <span>Regístrate con Facebook</span>
+                    </a>
+                </li>
+                <li class="google">
+                    <a href="#" title="google">
+                        <i class="google-icon"></i>
+                        <span>Regístrate con Google</span>
+                    </a>
+                </li>
+            </ul>
+        </fieldset>
+    </div>
+    *@
+
+
+@* Funciones JAVASCRIPT para comportamiento *@
+    @if (IdentidadActual.IsGuestUser)
+    {
+<script type="text/javascript">
+                $(document).ready(function () {
+                    @Html.PartialView("ControlesMVC/_AutoCompletarCampoExtra", Model.AdditionalFields);
+                });
+                function RecogerDatosExtra() {
+                    var error = '';                    
+                    $(`#@idTxtFechaNac`).val($(`#@idTxtFechaNacDia`).val() + '/' + $(`#@idTxtFechaNacMes`).val() + '/' + $(`#@idTxtFechaNacAnio`).val());
+                    $('#panCamposConfigurablesProyecto label[title=\'campo obligatorio\']').each(function () {
+                        var label = $(this);
+                        var campo = $(this).next();
+                        if (campo.is('select')) {
+                            error += AgregarErrorReg(error, ValidarCampoSelectObligatorio(campo, label));
+                        }
+                        else {
+                            error += AgregarErrorReg(error, ValidarCampoObligatorio(campo, label));
+                        }
+                    });
+                    return error;
+                }
+</script>
+    }
+
+<script type="text/javascript">
+    // Parámetros para GestionarRegistroUsuario
+    (function ($) {
+        const pParamsGestionarRegistroUsuario = {
+            idTxtFechaNac: "@idTxtFechaNac",
+            idTxtFechaNacDia: "@idTxtFechaNacDia",
+            idTxtFechaNacMes: "@idTxtFechaNacMes",
+            idTxtFechaNacAnio: "@idTxtFechaNacAnio",
+            idTxtNombre: "@idTxtNombre",
+            nombreCampoTxtNombre: "@nombreCampoTxtNombre",
+            idTxtApellidos: "@idTxtApellidos",
+            nombreCampoTxtApellidos: "@nombreCampoTxtApellidos",
+            idTxtCargo: "@idTxtCargo",
+            lblCargo: "@lblCargo",
+            idTxtEmail: "@idTxtEmail",
+            idTxtNombreUsuario: "@idTxtNombreUsuario",
+            idTxtEmailTutor: "@idTxtEmailTutor",
+            idTxtContrasenya: "@idTxtContrasenya",
+            nombreCampoTxtContrasenya: "@nombreCampoTxtContrasenya",
+            idCaptcha: "@idCaptcha",
+            idDdlPais: "@idDdlPais",
+            mensajePersonalizado: '@Html.GetText("REGISTRO", "EMAILREPE", NombreProyectoEcosistema, Html.GetText("URLSEM", "OLVIDEPASSWORD") + "/' + $('#' + paginaID + '_txtCorreoE').val() + '")',
+            currentUrl: '@currentURL',
+            datepickerConfigOptions: {
+                yearRange: "@(DateTime.Now.Year - 90):@(DateTime.Now.Year - Model.MinAgeRegistre)",
+                maxDate: "@DateTime.Today.AddYears(-Model.MinAgeRegistre).ToString("dd/MM/yyyy")",
+            },
+    };
+        // Gestión de operativa para cambio de contraseña
+        operativaRegistroUsuarioPaso1.init(pParamsGestionarRegistroUsuario);
+    })();
+</script>
+
+

@@ -1,0 +1,82 @@
+﻿@model PersonalSpaceModel
+@*
+Descripción
+-----------------------------------------------
+Vista contenedora que contiene cada una de las Facetas que se utilizarán para poder hacer filtros de los resultados obtenidos de espacio de recursos.
+Esta vista se situará en la zona izquierda de la pantalla. Básicamente son filtros disponibles para los resultados de recursos del usuario.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+@* Información de recursos del usuario en su espacio *@
+string numResult = Model.TotalNumberResults + Html.GetText("PERFILBASE", "RECURSOS_PEQUE");
+string mbutilizados = Model.UsedMegaBytes + "MB";
+string mblibres = Model.FreeMegaBytes + "MB";
+var percentageFreeSpaceUsage = (Model.UsedMegaBytes * 100) / Model.FreeMegaBytes;
+
+@* Facetas que serán mostradas *@
+string htmlFacetas = Model.SearchViewModel.HTMLFaceted;
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Contenedor de las facetas para buscar recursos en "espacio de recursos" de Mygnoss por Facetas --------------------
+*@
+
+@* Convertir valor a entero para pintar el gráfico *@
+@if (percentageFreeSpaceUsage < 1)
+{
+    percentageFreeSpaceUsage = 1;
+}
+else {
+    percentageFreeSpaceUsage = Convert.ToInt32(percentageFreeSpaceUsage);
+}
+
+<div class="wrapCol">
+    @* Espacio de uso de documentos del usuario *@
+    <div class="background-gris grupo-espacio">
+        <a data-toggle="collapse" href="#mis-recursos-espacio" role="button" aria-expanded="true" aria-controls="mis-recursos-espacio">
+            <h2 class="section-title">
+                @Html.GetText("COMMON", "MIESPACIOPERSONAL")
+            </h2>
+        </a>
+        <div class="collapse show" id="mis-recursos-espacio">
+            <div class="pb-3 pt-3">
+                <div id="donutChart" class="donut-size" data-percent="@percentageFreeSpaceUsage">
+                    <div class="pie-wrapper">
+                        <span class="label">
+                            <span class="utility">
+                                <span class="num">0</span>
+                                <span>% @Html.GetText("PERFILBASE", "UTILIZADO").ToLower()</span>
+                            </span>
+                            <span class="total">@mblibres @Html.GetText("PERFILBASE", "DISPONIBLES2")</span>
+                        </span>
+                        <div class="pie">
+                            <div class="left-side half-circle"></div>
+                            <div class="right-side half-circle"></div>
+                        </div>
+                        <div class="shadow"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Cabecera de Filtros de Facetas *@
+    <div class="header-facetas">
+        <p>@Html.GetText("COMADMINFACETAS", "FILTROS")</p>
+        <a href="javascript: void(0);" class="cerrar">
+            <span class="material-icons">close</span>
+        </a>
+    </div>
+    <form method="post" id="formPanFacetas" action="@(new Uri($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}").AbsoluteUri)">
+        <fieldset style="display: block">
+            <div id="panFacetas" class="facetas-wrap custom-css-scroll">
+                @Html.Raw(htmlFacetas)
+            </div>
+            <input type="submit" style="display: none;" id="enviarFormPanFacetas" value="enviar" title="enviar" />
+        </fieldset>
+    </form>
+</div>

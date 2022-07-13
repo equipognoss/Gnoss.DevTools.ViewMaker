@@ -1,0 +1,208 @@
+﻿@model CreateResourceModel
+@*
+Descripción
+-----------------------------------------------
+Vista parcial que se utiliza en la página principal cuando se desea crear un nuevo recurso. (Ej: Crear un nuevo recurso de tipo "Nota").
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+bool recursosGnossNoDisponibles = (!Model.FileAvailable && !Model.DocumentReferenceAvailable && !Model.LinkAvailable && !Model.BrightcoveVideoAvailable && !Model.TOPVideoAvailable && !Model.NoteAvailable && !Model.WikiAvailable);
+CommunityModel Comunidad = Html.GetComunidad();
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Subvista para la creación de un recurso nuevo -------------------- *@
+
+@* Contenedor de tipos de recurso a visualizar *@
+<div class="wrapCol container">
+    <form class="formulario-edicion background-blanco">
+        <div class="col col-12 col-contenido">
+            <div class="wrapCol">
+                <div class="header-contenido">
+                    @* Título de la página actual *@
+                    <div class="h1-container">
+                        <h1>@Html.GetText("PERFILBASESUBIR", "TITULO")</h1>
+                    </div>
+                </div>
+                @* Párrafo de la página actual *@
+                <p>@Html.GetText("PERFILBASESUBIR", "SELECCIONARECURSO")</p>
+                <div class="resource-list usuarios listView">
+                    <div class="resource-list-wrap">
+                        @* Tipo de recurso a crear*@
+                        @if (Model.NoteAvailable)
+                        {
+                            <article class="resource">
+                                <div class="wrap">
+                                    <div class="user-miniatura">
+                                        <div class="imagen-usuario-wrap">
+                                            <div class="imagen">
+                                                <span class="material-icons texto-primario"
+                                                      style="font-size: 3rem">note_add</span>
+                                            </div>
+                                        </div>
+                                        <div class="nombre-usuario-wrap">
+                                            <p class="nombre">@Html.GetText("PERFILBASESUBIR", "NOTA")</p>
+                                        </div>
+                                        <div class="acciones-usuario-wrap">
+                                            <ul class="no-list-style">
+                                                <li id="linkNota">
+                                                    <a class="btn btn-outline-grey">
+                                                        <span class="material-icons">create</span>
+                                                        <span>Crear</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        }
+                        @if (Model.FileAvailable)
+                        {
+                            <article class="resource">
+                                <div class="wrap">
+                                    <div class="user-miniatura">
+                                        <div class="imagen-usuario-wrap">
+                                            <div class="imagen">
+                                                <span class="material-icons texto-primario"
+                                                      style="font-size: 3rem">description</span>
+                                            </div>
+                                        </div>
+                                        <div class="nombre-usuario-wrap">
+                                            <p class="nombre">@Html.GetText("PERFILBASESUBIR", "NUEVOARCHIVO", "50")</p>
+                                        </div>
+                                        <div class="acciones-usuario-wrap">
+                                            <ul class="no-list-style">
+                                                <li>
+                                                    <a class="btn btn-outline-grey"
+                                                       data-toggle="modal"
+                                                       data-target="#modal-add-resource-file">
+                                                        <span class="material-icons">create</span>
+                                                        <span>Crear</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        }
+
+                        @if (Model.LinkAvailable)
+                        {
+                            <article class="resource">
+                                <div class="wrap">
+                                    <div class="user-miniatura">
+                                        <div class="imagen-usuario-wrap">
+                                            <div class="imagen">
+                                                <span class="material-icons texto-primario"
+                                                      style="font-size: 3rem">link</span>
+                                            </div>
+                                        </div>
+                                        <div class="nombre-usuario-wrap">
+                                            <p class="nombre">@Html.GetText("PERFILBASESUBIR", "DIRECCIONURL")</p>
+                                        </div>
+                                        <div class="acciones-usuario-wrap">
+                                            <ul class="no-list-style">
+                                                <li>
+                                                    <a class="btn btn-outline-grey"
+                                                       data-toggle="modal"
+                                                       data-target="#modal-add-resource-url">
+                                                        <span class="material-icons">create</span>
+                                                        <span>Crear</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        }
+                        @if (Model.SemanticResourceAvailable)
+                        {
+                            foreach (string nombreOnto in Model.OntologyNameUrls.Keys)
+                            {
+                                if (!string.IsNullOrEmpty(Model.OntologyNameUrls[nombreOnto].Value))
+                                {
+                                    string textoNombreOnto = nombreOnto + ": ";
+                                    <article class="resource">
+                                        <div class="wrap">
+                                            <div class="user-miniatura">
+                                                <div class="imagen-usuario-wrap">
+                                                    <div class="imagen">
+                                                        <span class="material-icons texto-primario"
+                                                              style="font-size: 3rem">integration_instructions</span>
+                                                    </div>
+                                                </div>
+                                                <div class="nombre-usuario-wrap">
+                                                    <p class="nombre">@textoNombreOnto</p>
+                                                </div>
+                                                <div class="acciones-usuario-wrap">
+                                                    <ul class="no-list-style">
+                                                        <li>
+                                                            <a class="btn btn-outline-grey" href="@Model.OntologyNameUrls[nombreOnto].Key">
+                                                                <span class="material-icons">create</span>
+                                                                <span>@Html.GetText("CREARDOCUMENTO", "SOLOUNO")</span>
+                                                            </a>
+                                                            <a class="btn btn-outline-grey" href="@Model.OntologyNameUrls[nombreOnto].Value">
+                                                                <span class="material-icons">create</span>
+                                                                <span>@Html.GetText("CREARDOCUMENTO", "VARIOSALAVEZ")</span>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </article>
+                                }
+                                else
+                                {
+                                    <article class="resource">
+                                        <div class="wrap">
+                                            <div class="user-miniatura">
+                                                <div class="imagen-usuario-wrap">
+                                                    <div class="imagen">
+                                                        <span class="material-icons texto-primario"
+                                                              style="font-size: 3rem">integration_instructions</span>
+                                                    </div>
+                                                </div>
+                                                <div class="nombre-usuario-wrap">
+                                                    <p class="nombre">@nombreOnto</p>
+                                                </div>
+                                                <div class="acciones-usuario-wrap">
+                                                    <ul class="no-list-style">
+                                                        <li>
+                                                            <a class="btn btn-outline-grey" href="@Model.OntologyNameUrls[nombreOnto].Key">
+                                                                <span class="material-icons">create</span>
+                                                                <span>Crear</span>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </article>
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<script>
+    /**
+     * Llamada a acción para inicializar la opción de crear el recurso de tipo Nota al pulsar sobre "Nueva Nota o artículo"
+     *
+     */
+    $(document).ready(function () {
+        InicializarSubirRecursoExt("@Comunidad.Url/@Html.GetText("URLSEM", "SUBIRRECURSO")");
+    });
+</script>

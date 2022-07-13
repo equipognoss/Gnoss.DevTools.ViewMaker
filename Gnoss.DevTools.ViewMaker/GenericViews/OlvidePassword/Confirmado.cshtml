@@ -1,0 +1,38 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista que muestra un pequeño formulario para solicitar el cambio de contraseña mediante la introducción del email.
+El sistema enviará un email al correo indicado por el usuario
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+string urlInicio = Html.GetComunidad().Url;
+}
+@*
+----------------------------------------------------------------
+-------------------- Vista informativa de que la solicitud para cambiar la contraseña ha sido realizada con éxito --------------------
+*@
+
+@{
+    Html.SetBodyClass("layout03 myGnoss");
+}
+
+@{    
+    @*Controlar la URL de link para la home del usuario *@
+    if (Html.GetComunidad().Key.Equals(ProyectoAD.MetaProyecto))
+    {
+        urlInicio = Html.GetPerfil().Url + Html.GetText("URLSEM", "HOME");
+    }
+}
+
+<div class="row">
+    <div class="col">
+        <div class="panel-centrado">
+            <h1>@Html.GetText("CONFIRMACIONCAMBIOPASSWORD", "TITULOSOLICITADO")</h1>
+            <p>@Html.GetText("CONFIRMACIONCAMBIOPASSWORD", "MENSAJESOLICITADO")</p>
+            <p><a href="@urlInicio">@Html.GetText("CAMBIARPASSWORD", "IRINICIO")</a></p>
+        </div>
+    </div>
+</div>

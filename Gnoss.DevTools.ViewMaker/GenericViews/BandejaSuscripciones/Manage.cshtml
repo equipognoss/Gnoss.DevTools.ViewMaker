@@ -1,0 +1,123 @@
+﻿@model ManageSuscriptionsViewModel
+
+@{
+    Html.SetBodyClass("layout02  listadoMyGnoss  ");
+
+    UserProfileModel Perfil = Html.GetPerfil();
+}
+
+<div id="col01">
+    <div class="mgHerramientas">
+        @Html.PartialView("../Shared/ControlesMVC/_Novedades", "Suscriptions")
+    </div>
+</div>
+<div id="col02">
+    <h2>@Html.GetText("SUSCRIPCIONES", "ADMINISTRARSUSCRIPCIONES")</h2>
+    @if (Model.Communities.Count > 0)
+    {
+        <h2><a onclick="$('#panComunidades').toggle()">@Html.GetText("SUSCRIPCIONES", "SUSCRIPCIONESACOM")</a></h2>
+        <div id="panComunidades" class="resource-list listView">
+            @foreach (CommunityModel comunidad in Model.Communities.Values)
+            { 
+                <div class="resource">
+                    <div class="box description">
+                        <div class="group title">
+                            <h3>
+                                <a href="@comunidad.Url">@comunidad.Name</a>
+                            </h3>
+                            <div class="logoComunidad">
+                                <a href="@comunidad.Url">
+                                    <img alt="@comunidad.Name" src="@comunidad.Logo" />
+                                </a>
+                            </div>
+                        </div>
+                        <div class="group content">
+                            <span class="descripcionResumida">@Html.Raw(comunidad.Description)</span>
+                        </div>
+                    </div>
+                    <div class="group acciones noGridView">
+                        <p>Acciones </p>
+                        <ul>
+                            <li><a href="@comunidad.Url/@Html.GetText("URLSEM", "ADMINISTRARSUSCRIPCIONCOMUNIDAD")">@Html.GetText("SUSCRIPCIONES", "EDITARSUSCRIPCION")</a></li>
+                        </ul>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    @if (Model.Profiles.Count > 0)
+    {
+        <h2><a onclick="$('#panPersonas').toggle()">@Html.GetText("SUSCRIPCIONES", "SUSCRIPCIONESAPER")</a></h2>
+        <div id="panPersonas" class="resource-list listView">
+            @foreach (ProfileModel perfil in Model.Profiles.Values)
+            {
+                string nombrePerfil = Html.ObtenerNombrePerfil(perfil);
+                string urlPerfil = Html.ObtenerUrlPerfil(perfil);
+                
+                <div class="resource" style="height: auto;">
+                    <div class="box description">
+                        <div class="group title">
+                            <h2><a href="@urlPerfil">@nombrePerfil</a></h2>
+                            <p class="resourceType persona conImagenPerfil">
+                                <a href="@urlPerfil">
+                                    @{
+                                        string urlFoto = perfil.UrlFoto;
+                                        if(string.IsNullOrEmpty(urlFoto))
+                                        {
+                                            urlFoto = "imagenes/personas/anonimo_peque.png";
+                                            if(!string.IsNullOrEmpty(perfil.UrlOrganization))
+                                            {
+                                                urlFoto = "imagenes/organizaciones/anonimo_peque.png";
+                                            }
+                                        }    
+                                    }
+                                    <img alt="@nombrePerfil" src="@Html.GetBaseUrlContent()/@urlFoto" />
+                                </a>
+                            </p>
+                        </div>
+                        <div class="group content">
+                            <span class="descripcionResumida">
+                                <p></p>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="group acciones noGridView">
+                        <p>Acciones </p>
+                        <ul>
+                            <li><a href="@Perfil.Url@Html.GetText("URLSEM", "ADMINISTRARSUSCRIPCIONIDENTIDAD")@urlPerfil.Substring(urlPerfil.LastIndexOf("/"))">@Html.GetText("SUSCRIPCIONES", "EDITARSUSCRIPCION")</a></li>
+                        </ul>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    @if (Model.Organizations.Count > 0)
+    {
+        <h2><a onclick="$('#panOrganizaciones').toggle()">Suscripciones a organizaciones</a></h2>
+        <div id="panOrganizaciones" class="resource-list listView">
+            @foreach (ProfileModel perfil in Model.Organizations.Values)
+            {
+                string nombrePerfil = Html.ObtenerNombrePerfil(perfil);
+                string urlPerfil = Html.ObtenerUrlPerfil(perfil);
+                
+                <div class="resource" style="height: auto;">
+                    <div class="box description">
+                        <div class="group title">
+                            <h2><a href="@urlPerfil">@nombrePerfil</a></h2>
+                            <p class="resourceType organizacion conImagenPerfil">
+                                <a href="@urlPerfil">
+                                    <img alt="@nombrePerfil" src="@ViewBag.BaseUrlContent/@perfil.UrlFoto" />
+                                </a>
+                            </p>
+                        </div>
+                        <div class="group content">
+                            <span class="descripcionResumida">
+                                <p></p>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

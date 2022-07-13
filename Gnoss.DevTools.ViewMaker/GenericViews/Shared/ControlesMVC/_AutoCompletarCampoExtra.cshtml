@@ -1,0 +1,45 @@
+﻿@model List<AdditionalFieldAutentication>
+@{ 
+    CommunityModel Comunidad = Html.GetComunidad();
+    Guid proyectoID = Comunidad.Key;
+    @* TODO Fernando: Cambiar por la propiedad MetaProyect de la version 1000 *@
+    if (Comunidad.Key.Equals(ProyectoAD.MetaProyecto) && @Html.GetProyectoConexion().HasValue)
+    {
+        proyectoID = @Html.GetProyectoConexion().Value;
+    }
+
+    foreach (AdditionalFieldAutentication campoExtra in Model)
+    {
+        if (campoExtra.Options == null || campoExtra.Options.Count == 0)
+        { 
+            <text>
+            $('#@campoExtra.FieldName').keydown(function (event) {
+                if (event.which || event.keyCode) { 
+                    if ((event.which == 13) || (event.keyCode == 13)) { 
+                        return false; 
+                    }
+                }
+            });
+            </text>
+            if (campoExtra.AutoCompleted != null && campoExtra.AutoCompleted)
+            {
+                string inputHack = campoExtra.FieldName + "hack";
+                <text>
+                $('#@campoExtra.FieldName').change(function (event) {
+                    if ($('#@campoExtra.FieldName').val() == $('#@campoExtra.FieldName').attr('aux')) { 
+                        $('#@inputHack').val($('#@inputHack').attr('aux')) 
+                    } 
+                    else { 
+                        $('#@inputHack').val(''); 
+                        $('#@campoExtra.FieldName').val('');
+                        $('#@campoExtra.FieldName').focus();
+                    }
+                });
+                $('#@campoExtra.FieldName').focus(function (event) {
+                    PrepararAutocompletar('@campoExtra.FieldName', '@campoExtra.DependencyFields', '@proyectoID');
+                });
+                </text>
+            }
+        }
+    }
+}

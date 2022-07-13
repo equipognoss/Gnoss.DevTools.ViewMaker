@@ -1,0 +1,86 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+	  <RazorCompileOnPublish>false</RazorCompileOnPublish>
+	  <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
+	  <RunAnalyzersDuringLiveAnalysis>True</RunAnalyzersDuringLiveAnalysis>
+
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+    <ItemGroup>
+		<RuntimeHostConfigurationOption Include="rutaBase" Value="$(ProjectDir)" />
+	    
+    </ItemGroup>
+	
+  <ItemGroup>
+    <Compile Remove="GenericViews\Administracion\**" />
+    <Compile Remove="Pages\**" />
+    <Content Remove="GenericViews\Administracion\**" />     
+    <Content Remove="Pages\**" />     
+    <EmbeddedResource Remove="GenericViews\Administracion\**" />
+    <EmbeddedResource Remove="Pages\**" />
+    <None Remove="GenericViews\Administracion\**" />
+    <None Remove="Pages\**" />    
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Areas\Gnoss.DevTools.ViewMaker\Extensions\ProyectoAD.cs" />
+    <Compile Remove="GenericViews\CMSPagina\GrupoComponentes\ControladorCMS.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="wwwroot\css\GnossTestView.css" />
+    <Content Remove="wwwroot\js\bootstrap-checkbox.js" />
+    <Content Remove="wwwroot\js\GnossTestView.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Views\_ViewStart.cshtml" />
+    <None Include="wwwroot\js\bootstrap-checkbox.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LibGit2Sharp" Version="0.26.2" />
+    <PackageReference Include="LibGit2Sharp.NativeBinaries" Version="2.0.306" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.6" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Reference Include="Es.Riam.Gnoss.Recursos">
+      <HintPath>Areas\GnossTestView\Libraries\Es.Riam.Gnoss.Recursos.dll</HintPath>
+    </Reference>
+    <Reference Include="Es.Riam.Gnoss.Web.MVC.Models">
+      <HintPath>Areas\GnossTestView\Libraries\Es.Riam.Gnoss.Web.MVC.Models.dll</HintPath>
+    </Reference>
+    <Reference Include="Es.Riam.Semantica">
+      <HintPath>Areas\GnossTestView\Libraries\Es.Riam.Semantica.dll</HintPath>
+    </Reference>
+    <Reference Include="Es.Riam.Util">
+      <HintPath>Areas\Gnoss.DevTools.ViewMaker\Libraries\Es.Riam.Util.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc">
+      <HintPath>Areas\GnossTestView\Libraries\System.Web.Mvc.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="GenericViews\CargadorResultados\CargarResultados.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

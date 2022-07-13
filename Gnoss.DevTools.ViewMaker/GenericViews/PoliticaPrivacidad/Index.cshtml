@@ -1,0 +1,44 @@
+﻿@model string
+
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra la política de privacidad de la web. Esta página se visualiza en una página "sola" aunque existe también un modal
+la cual se muestra haciendo click desde el footer/pie.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+string titulo = Html.GetText("POLITICAPRIVACIDAD", "TITULO");
+string descripcion = "";
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Página de Política de Privacidad  --------------------
+*@
+
+@* Controlar el título que tendrá la página *@
+@{
+
+    if (string.IsNullOrEmpty(Model))
+    {
+        descripcion = Html.GetText("POLITICAPRIVACIDAD", "INFO");
+    }
+    else
+    {
+        descripcion = Model;
+    }
+}
+
+<div class="row">
+    <div class="col mt-5">
+        <h1>@titulo</h1>
+        <div class="box">
+            @Html.Raw(descripcion)
+        </div>
+    </div>
+</div>

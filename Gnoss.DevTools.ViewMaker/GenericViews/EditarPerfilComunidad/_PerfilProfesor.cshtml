@@ -1,0 +1,110 @@
+﻿@model EditProfileViewModel
+
+@{
+    EditProfileViewModel.ProfileTeacherViewModel Perfil = Model.ProfileTeacher;
+}
+
+<form method="post" action = "@Model.UrlActionSaveProfile">
+    <div class="box" id="editarPerfil">
+        <div>
+            <div class="fieldset01 edicionPerfil">
+                <fieldset class="labels">
+                    <legend>@Html.GetText("PERFIL", "DATOSPERSONALES")</legend>
+                    <div id="divErrorProfe">
+                    </div>
+                    <p>
+                        <label>
+                            <span>@Html.GetText("PERFIL", "EMAILCONTACTO")</span>
+                        </label>
+                        <input type="text" id="Email" value="@Perfil.Email" name="ProfileTeacher.Email" />
+                    </p>
+                    <p>
+                        <label>
+                            <span>@Html.GetText("REGISTRO", "AREAESTUDIOS")</span>
+                        </label>
+                        <input type="text" id="Departamento" value="@Perfil.Departament" name="ProfileTeacher.Departament" />
+                    </p>
+                    <p>
+                        <label>
+                            <span>@Html.GetText("REGISTRO", "CENTROESTUDIOS")</span>
+                        </label>
+                        <input type="text" id="Centro" value="@Perfil.StudiesCentre" name="ProfileTeacher.StudiesCentre" />
+                    </p>
+
+                    <div class="fieldset actionButtons">
+                        <fieldset>
+                            <p>
+                                <input type="button" value="@Html.GetText("PERFIL", "GUARDAR")" onclick="EnviarFormularioEdicionProfesor()" class="submit principal" />
+                            </p>
+                        </fieldset>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script type="text/javascript">
+    function validarPerfilProfesor() {
+        var $dP = $('#divErrorProfe');
+        var error = '';
+
+        if ((document.getElementById('Email').value == '')
+        || (document.getElementById('Centro').value == '')
+        || (document.getElementById('Departamento').value == '')
+        ) {
+            error += '<li>' + form.camposVacios + '</li>';
+        }
+
+        //Validar email
+        if (!validarEmail($('#Email').val())) {
+            error += '<li>' + form.emailValido + '</li>';
+        }
+        if (error.length > 0) {
+            crearError('<ul>' + error + '</ul>', '#divErrorProfe');
+            return false;
+        }
+        else { return true; }
+    }
+
+    function EnviarFormularioEdicionProfesor() {
+        if (validarPerfilProfesor()) {
+            MostrarUpdateProgress();
+
+            var dataPost = new FormData();
+            dataPost.append('peticionAJAX', true);
+            $("#editarPerfil").find(':input').each(function () {
+                dataPost.append($(this).attr('name'), $(this).val());
+            });
+            ////Ocultamos los errrores
+            //$('#divKodatosUsuario .ko').remove();
+            //$('#lblMailRepetido.contenedorError .ko').remove();
+            //$('#divKoCaptcha.contenedorError').hide();
+            //$('#divKoCaptcha.contenedorError p').hide();
+
+
+            GnossPeticionAjax('@Model.UrlActionSaveProfile', dataPost, true)
+                .done(function (data) {
+                    $('#divErrorProfe').html('<div class=\"ok\">' + data + '</div>');
+                })
+                .fail(function (data) {
+                    var errores = data.split('||');
+                    var error = "";
+                    for (i = 0; i < errores.length; i++) {
+                        if (errores[i].indexOf("&&") != -1) {
+                            var claveError = errores[i].split('&&')[0];
+                            var mensajeError = errores[i].split('&&')[1];
+                            error += '<li>' + mensajeError + '</li>';
+                        }
+                    }
+                    $('#divErrorProfe').html('');
+                    crearError('<ul>' + error + '</ul>', '#divErrorProfe');
+                })
+                .always(function () {
+                    OcultarUpdateProgress();
+                });
+        }
+        return false;
+    }
+
+</script>

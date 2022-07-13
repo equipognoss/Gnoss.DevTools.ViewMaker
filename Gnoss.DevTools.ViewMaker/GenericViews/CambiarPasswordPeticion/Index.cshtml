@@ -1,0 +1,148 @@
+﻿@model CambiarPasswordPeticionViewModel
+@{
+    Html.SetBodyClass("layout03 myGnoss");
+}
+
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra un pequeño formulario en el cual se solicita información para que se pueda reestablecer de nuevo la contraseña del usuario. Este cambio se produce porque el usuario ha seleccionado "Olvidé la contraseña". El usuario accederá aquí a través de un enlace enviado a su correo electrónico.
+Esta es la información solicitada al usuario:
+- Nombre de usuario o dirección de correo electrónico
+- Contraseña
+- Confirmar Contraseña
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+// Id del input para indicar el login o correo electrónico
+string idTxtLogin = "txtLogin";
+// Id del input para indicar la nueva contraseña
+string idTxtPasswordNueva = "txtNueva";
+// Id del input para confirmar la nueva contraseña
+string idTxtPasswordConfirmar = "txtConfirmarNueva";
+
+// Id del botón para realizar la petición de cambio de contraseña
+string idBtnCambiarPassword = "btnCambiarPassword";
+
+// Id del botón para rechazar la petición de cambio de contraseña
+string idBtnRechazarPeticionCambiarPassword = "btnRechazarPeticion";
+
+// Id panel de errores a modo informativo
+string idPanelErroresInformativo = "divErroresAceptar";
+string idBloqMayInfoPanel = "bloqMayInfoPanel";
+string idPanelCambioPassword = "panCambioPassword";
+
+// Mensajes de error preconfigurados
+string errorMsgNoUsuario = @Html.GetText("CONFIRMACIONCAMBIOPASSWORD", "NOUSUARIO");
+string errorMsgNoPassword = @Html.GetText("CONFIRMACIONCAMBIOPASSWORD", "NOPASSWORD");
+string errorPasswordNoIguales = @Html.GetText("CONFIRMACIONCAMBIOPASSWORD", "PASSWORDNOIGUALES");
+string okRejectPasswordMessage = @Html.Translate("La petición de cambio de contraseña ha sido rechazada");
+string okPasswordCambiado = @Html.GetText("CONFIRMACIONCAMBIOPASSWORD", "EXITO");
+
+}
+@*
+----------------------------------------------------------------
+-------------------- Vista para cambiar la contraseña vía petición recibida por email --------------------
+*@
+
+
+<div class="row">
+    @* Contenedor del formulario para la solicitud de petición de cambio de contraseña*@
+    <div class="col">
+        <div class="form panel-centrado">
+            <h1>@Html.GetText("NUEVOPASSWORD", "TITULO")</h1>
+            <div class="fieldset fieldset01">
+                <fieldset>
+                    <div class="fieldsetContent">
+                        @* Panel que englobará los inputs y botones para cambiar la contraseña *@
+                        <div id="panCambioPassword">
+                            <div class="form-group">
+                                @* Label + Input para dirección o login de quien está haciendo la petición de cambio de contraseña *@
+                                <label for="@idTxtLogin" class="control-label">@Html.GetText("SOLICITARCAMBIOPASSWORD", "NOMBREUSU")</label>
+                                <input type="text"
+                                       id="@idTxtLogin"
+                                       class="form-control"
+                                       required />
+
+                            </div>
+                            <div class="form-group">
+                                @* Label + Input para la contraseña que establecerá *@
+                                <label for="@idTxtPasswordNueva" class="control-label">@Html.GetText("SOLICITARCAMBIOPASSWORD", "CONTRASEÑA")</label>
+                                <input type="password"
+                                       id="@idTxtPasswordNueva"
+                                       class="form-control"
+                                       required />
+                            </div>
+                            <div class="form-group">
+                                @* Label + Input para la confirmar la nueva contraseña *@
+                                <label for="@idTxtPasswordConfirmar" class="control-label">@Html.GetText("SOLICITARCAMBIOPASSWORD", "CONFIRMARCONTRASEÑA")</label>
+                                <input type="password"
+                                       id="@idTxtPasswordConfirmar"
+                                       class="form-control"
+                                       required />
+                            </div>
+                        </div>
+                        
+                        @* Panel de error o aviso de Mayúsculas activadas *@
+                        <div id="@idBloqMayInfoPanel" style="display: none;" class="alert alert-warning" role="alert">
+                            Bloq Mayús activado
+                        </div>
+
+                        @* Panel de errores informativos *@
+                        <div id="@idPanelErroresInformativo" style="display: none;" class="alert alert-danger" role="alert">
+
+                        </div>
+
+                    </div>
+                </fieldset>
+            </div>
+
+            <div class="fieldset actionButtons fieldset03 actionButtons">
+                <fieldset>
+                    <div class="fieldsetContent">
+                        <input class="principal submit btn btn-primary"
+                               type="button"
+                               id="@idBtnCambiarPassword"
+                               value="@Html.GetText("CAMBIARPASSWORD", "ACEPTAR")" />
+                    </div>
+                </fieldset>
+            </div>
+            @* Botón para cancelar la solicitud de cambio de contraseña*@
+            <div class="actionRegister">
+                <p>@Html.GetText("SOLICITARCAMBIOPASSWORD", "PREGUNTARARA")</p>
+                <p><a href="#" id="@idBtnRechazarPeticionCambiarPassword">@Html.GetText("SOLICITARCAMBIOPASSWORD", "RECHAZARPETICION")</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    (function ($) {
+        // Parámetros para operativaPeticionCambiarContrasenia
+        const pParams = {
+            idTxtLogin: "@idTxtLogin",
+            idTxtPasswordNueva: "@idTxtPasswordNueva",
+            idTxtPasswordConfirmar: "@idTxtPasswordConfirmar",
+            idBtnCambiarPassword: "@idBtnCambiarPassword",
+            idBtnRechazarPeticionCambiarPassword: "@idBtnRechazarPeticionCambiarPassword",
+            idPanelErroresInformativo: "@idPanelErroresInformativo",
+            errorMsgNoUsuario: "@errorMsgNoUsuario",
+            errorMsgNoPassword: "@errorMsgNoPassword",
+            errorPasswordNoIguales: "@errorPasswordNoIguales",
+            okPasswordCambiado: "@okPasswordCambiado",
+            okRejectPasswordMessage: "@okRejectPasswordMessage",
+            idBloqMayInfoPanel: "@idBloqMayInfoPanel",
+            urlPasswordRequest: "@Model.UrlAceptar",
+            urlRejectPasswordRequest: "@Model.UrlRechazar",
+            idPanelCambioPassword: "@idPanelCambioPassword",
+        };
+        // Gestión de operativa para petición de cambio de contraseña
+        operativaPeticionCambiarContrasenia.init(pParams);
+    })();
+
+</script>

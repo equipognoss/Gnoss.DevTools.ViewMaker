@@ -1,0 +1,158 @@
+﻿@model ResourceViewModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista que se utiliza para mostrar la lista de Tesauro para poder compartirla con otras categorías.
+Esta vista parcial se utilizará dentro del modal "_share" para poder marcar comunidades en las que se desea compartir un determinado recurso.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+ResourceModel fichaRecurso = Model.Resource;
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+CommunityModel Comunidad = Html.GetComunidad();
+
+
+// Función a ejecutar cuando se decida cambiar un recurso a compartir
+string funcionAccionRecurso_Compartir_Cambiar = "AccionRecurso_Compartir_Cambiar('" + fichaRecurso.ListActions.UrlLoadActionShareChange + "', '" + fichaRecurso.Key + "', '" + IdentidadActual.KeyPerson + "', $('input#inpt_urlServicioAutocompletar').val())";
+// Función para ajustar la privacidad de un recurso (si se tienen permisos)
+string functionAjustarPrivacidadRecurso = "AccionRecurso_Compartir_AjustarPrivacidadRecurso('" + fichaRecurso.Key + "', this);";
+// Función para Agregar el recurso seleccionado
+string funcionAccionRecurso_Compartir_Agregar = "AccionRecurso_Compartir_Agregar('" + fichaRecurso.Key + "')";
+// Función para "Aceptar" el recurso seleccionado para compartir en la comunidad
+string funcionAccionRecurso_Compartir_Aceptar = "AccionRecurso_Compartir_Aceptar('" + fichaRecurso.ListActions.UrlShare + "', '" + fichaRecurso.Key + "', '" + fichaRecurso.CompletCardLink + "')";
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista parcial para mostrar las comunidades en las que compartir un recurso  --------------------
+*@
+
+@* Título y Selector de comunidades donde compartir el recurso *@
+@if (Model.ResourceBases.Count > 0)
+{
+    @* Comunidades donde compartir el recurso *@
+    <div class="form-group mb-3">
+        <label class="control-label" for="ddlCompartir">@Html.GetText("CONTROLESDOCUMENTACION", "COMPARTIREN")</label>
+        <select class="form-control js-select2" id="ddlCompartir" onchange="@funcionAccionRecurso_Compartir_Cambiar" style="width:100%">
+            @foreach (Guid baseRecursosID in Model.ResourceBases.Keys)
+            {
+                <option value="@baseRecursosID" rel="@Model.ResourceBases[baseRecursosID].Value">@Model.ResourceBases[baseRecursosID].Key</option>
+            }
+        </select>
+    </div>
+    
+    @* Lista de categorías de la comunidad -> TesauroÁrbol *@
+    <div id="panCategoriasTesauroArbol">
+        @Html.PartialView("../FichaRecurso/_FichaCategoriaTesauroArbol", Model)
+    </div>
+    
+    @*Controlar si el usuario es o no editor o la comunidad es privada, reservada...*@
+    if (Model.IsDocumentEditor && (Comunidad.AccessType == CommunityModel.TypeAccessProject.Private || Comunidad.AccessType == CommunityModel.TypeAccessProject.Reserved))
+    {
+        @*Mostrar panel EditoresLectores*@                
+        <div id="panEditoresLectores">
+            <div id="panEditores">
+                <div class="form-group mb-4 edit-permisos-edicion">
+                    <div id="panAgregarEditoresRec">
+                    @* Título de la sección *@
+                        <div class="form-group mb-4 edit-permisos-edicion">
+                            <label class="control-label d-block mb-3">@Html.GetText("PERFILBASERECURSOEDITAR", "INICIOEDITORES")</label>
+                        </div>
+                        @* Opción: Permisos solo yo *@  
+                        <div class="custom-control themed little custom-radio">                                            
+                            <input type="radio" 
+                                   checked="checked"
+                                   class="custom-control-input" 
+                                   id="rbEditoresYo" 
+                                   name="editores" 
+                                   onclick="AjustarPrivacidadRecurso(this);" />
+                            <label for="rbEditoresYo" class="custom-control-label">@Html.GetText("PERFILBASERECURSOEDITAR", "SOLOYO")</label>                                            
+                        </div>
+                        @* Opción: Permisos Otros grupos específicos (Buscador) *@  
+                        <div class="custom-control themed little custom-radio">                                            
+                            <input type="radio" 
+                                   class="custom-control-input"
+                                   id="rbEditoresOtros"
+                                   name="editores"
+                                   onclick="AjustarPrivacidadRecurso(this);" />
+                            <label for="rbEditoresOtros" class="custom-control-label">@Html.GetText("PERFILBASERECURSOEDITAR", "PERSONASESPECIFICAS")</label>                                            
+                        </div>
+                        <div id="divContEditores">
+                            @* Visualizar buscador de personas *@                            
+                            <div id="divContDespEdit" class="oculto">
+                                <div class="form-group mb-4 pl-5 divSelectorUsuRec">
+                                    @* Caja donde estarán los usuarios con permisos *@
+                                    <input type="hidden" id="txtHackEditores_@fichaRecurso.Key" />
+                                </div>
+                                @* Input de búsqueda de personas *@
+                                <div class="input-wrap position-static">
+                                    <input type="text" autocomplete="off" class="filtroFaceta ac_input form-control filtroFacetaSelectUsuRec" id="txtEditores_@fichaRecurso.Key" />
+                                </div>
+                                <div id="panContenedorEditores" class="panContenedoresEditores tag-list mb-4 mt-3"></div>
+                            </div>                           
+                        </div>                       
+                    </div>
+                </div>
+            </div>
+        </div>       
+    }
+
+    @* Botón para agregar a "BR"*@               
+    <div class="form-actions">
+        <input type="button" class="btn btn-primary" value="@Html.GetText("AGREGA_A_BR", "AGREGA_A_BR")" onclick="@funcionAccionRecurso_Compartir_Agregar" />
+    </div>
+}
+
+@* Panel de confirmación indicando donde se agregarán las comunidades seleccionadas" *@
+<div id="panContenedorBRAgregadas" style="display: none">
+    <fieldset>
+        <label>@Html.GetText("ANYADIRGNOSS", "SE_GUARDARA_EN")</label>
+        <div>
+            <ul class="icoEliminar"></ul>
+        </div>
+    </fieldset>
+
+    @* Botón Aceptar para confirmar lo elegido por el usuario*@
+    <div class="form-actions">
+        <input type="button" class="btn btn-primary" onclick="@funcionAccionRecurso_Compartir_Aceptar" value="@Html.GetText("COMMON", "ACEPTAR")" />
+    </div>
+</div>
+
+
+            
+<script type="text/javascript">
+@* Autocompletar para búsqueda de EditoresLectores *@
+    AccionRecurso_Compartir_GenerarAutocompletar('@fichaRecurso.Key', '@IdentidadActual.KeyPerson', $('input#inpt_urlServicioAutocompletar').val());
+
+    function AjustarPrivacidadRecurso(pRbSelecc) {
+        if (pRbSelecc.id == 'rbEditoresYo') {
+            document.getElementById('divContDespEdit').className = 'oculto';
+        }
+        else if (pRbSelecc.id == 'rbEditoresOtros') {
+            document.getElementById('divContDespEdit').className = '';
+        }
+        else if (pRbSelecc.id == 'rbLectoresComunidad' || pRbSelecc.id == 'rbAbierto') {
+            $('#spanCompartirPrivado').css('display', 'none');
+            $('#spanCompartirPublico').css('display', '');
+
+            document.getElementById('divContDespLect').className = 'oculto';
+        }
+        else if (pRbSelecc.id == 'rbLectoresEditores') {
+            $('#spanCompartirPrivado').css('display', '');
+            $('#spanCompartirPublico').css('display', 'none');
+
+            document.getElementById('divContDespLect').className = 'oculto';
+        }
+        else if (pRbSelecc.id == 'rbLectoresEspecificos') {
+            $('#spanCompartirPrivado').css('display', '');
+            $('#spanCompartirPublico').css('display', 'none');
+
+            document.getElementById('divContDespLect').className = '';
+        }
+    }
+</script>
+
+

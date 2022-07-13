@@ -1,0 +1,195 @@
+﻿@model SendInvitationOrgViewModel
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra un formulario para envío de invitación a organización.
+Este proceso envía un email a la dirección introducida permitiendo incluir un texto.
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+    // Obtener el nombre clave de la identidad para poder construir el envío de invitación correctamente
+    UserProfileModel perfil = Html.GetPerfil();
+    string nombreIdentidadClave = Html.ExtractValueInStringFromStartAndEnd(perfil.Url, "/identidad/", "/");
+
+    // Identificadores para lógica JS
+    // Id del input para buscar contactos
+    string idTxtFiltro_invite_community = "txtFiltro_invite_community_invite_organization";
+    // Id del input para escribir el email de los usuarios a los que enviar la invitación
+    string idTxtCorreoAInvitar_invite_organization = "txtCorreoAInvitar_invite_organization";
+    // Id del botón para añadir un email a destinatarios de la invitación
+    string idButtonLitAniadirCorreo_invite_organization = "litAniadirCorreo_invite_organization";
+    // ID del textarea donde se mostrará el mensaje opcional a mandar
+    string idTxtNotas= "txtNotas";
+
+    //Id del input vacío donde se añadirán los invitados para enviar el email.
+    string idTxtHackInvitados_invite_organization = "txtHackInvitados_invite_organization";
+
+    // Id de Contenedor general de destinatarios
+    string idPanContenedorInvitados_invite_organization = "panContenedorInvitados_invite_organization";
+    // Id de Contenedor donde irán los items seleccionados
+    string idListaDestinatarios_invite_organization = "lista-destinatarios_invite_organization";
+    // Id de Contenedor informativo de "No destinatarios"
+    string idNoDestinatarios_invite_organization = "no-destinatarios_invite_organization";
+    // Id del botón para enviar las invitaciones
+    string idBtnEnviarInvitaciones_invite_organization = "btnEnviarInvitaciones_invite_organization";
+
+    // Panel donde se mostrarán los mensajes de error o OK
+    string idPanelInfoInvitationSent_invite_organization = "panelInfoInvitationSent_invite_organization";
+    // Etiqueta que indica si hay o no destinatarios seleccionados para enviar la invitación
+    string idLblInfoCorreo_invite_organization = "lblInfoCorreo_invite_organization";
+    // Url a la que habrá que mandar la petición para invitar a comunidad
+    string urlSendInvitation_invite_organization = $"{@Html.GetBaseUrl()}/identidad/{nombreIdentidadClave}/{Html.GetText("URLSEM", "INVITARAORG")}/save-changes";   //$"{@Html.GetComunidad().Url}/{@Html.GetText("URLSEM", "INVITARAORG")}/save-changes";
+
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Vista Modal para Enviar a amigos a la comunidad --------------------
+*@
+
+
+            @* Título del modal *@
+            <div class="modal-header">
+                <p class="modal-title">
+                    <span class="material-icons">send</span>Invitar a organización
+                </p>
+                <span class="material-icons cerrar"
+                      data-dismiss="modal"
+                      aria-label="Close">close</span>
+            </div>
+            <div class="modal-body">
+                <div class="formulario-edicion formulario-enviar">
+
+                    <div class="form-group mb-1">
+                        <div id="panDesplegableDestinatarios">
+                            @* Quitar Tabs ya que solo habrá una opción -> Invitar vía email
+                                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                    @* Mostrar Tabs de "Destinatarios" dependiendo del tipo de comunidad
+                                    @if (Comunidad.AccessType == CommunityModel.TypeAccessProject.Public || Comunidad.AccessType == CommunityModel.TypeAccessProject.Restricted)
+                                    {
+                                        <li class="nav-item">
+                                            <a class="nav-link active"
+                                               id="botonCorreos_invite_community"
+                                               data-toggle="tab"
+                                               href="#cuentas-correo_invite_community"
+                                               role="tab"
+                                               aria-controls="cuentas-correo_invite_community"
+                                               aria-selected="false">@Html.GetText("INVITACIONES", "INVITARAEXTERNOS")</a>
+                                        </li>
+                                    }
+                                    <li class="nav-item">
+                                        <a class="nav-link"
+                                           id="botonContactos_invite_community"
+                                           data-toggle="tab"
+                                           href="#miembros_invite_community"
+                                           role="tab"
+                                           aria-controls="miembros_invite_community"
+                                           aria-selected="true">@Html.GetText("INVITACIONES", "INVITARAUSUARIOS")</a>
+                                    </li>
+                                </ul>
+                            *@
+
+                            <div class="tab-content">
+                                @* Panel para introducir correos DE MIS CONTACTOS
+                                    <div class="tab-pane fade active show"
+                                         id="miembros_invite_community"
+                                         role="tabpanel"
+                                         aria-labelledby="miembros-tab_invite_community">
+                                        <div class="filtroRapido">
+                                            <input type="text"
+                                                   placeholder=""
+                                                   onkeydown="if(event.which || event.keyCode){if ((event.which == 13) || (event.keyCode == 13)) {return false;}}"
+                                                   id="@idTxtFiltro_invite_community"
+                                                   class="form-control ac_input"
+                                                   autocomplete="off" />
+                                            <span class="icon material-icons">search</span>
+                                        </div>
+                                    </div>
+                                *@
+
+                                @* Panel para introducir correos a enviar el recurso
+                                    <div class="tab-pane fade"
+                                         id="cuentas-correo_invite_community"
+                                         role="tabpanel"
+                                         aria-labelledby="cuentas-correo-tab_invite_community">*@
+                                <div class="autocompletar autocompletar-tags form-group">
+                                    <div class="input-wrap form-sticky-button">
+                                        <input type="text"
+                                               placeholder="Introduce los correos separados por comas y haz clic en añadir"
+                                               id="@idTxtCorreoAInvitar_invite_organization"
+                                               class="form-control"
+                                               autocomplete="off" />
+                                        <a id="@idButtonLitAniadirCorreo_invite_organization"
+                                           class="btn btn-primary uppercase">Añadir</a>
+                                    </div>
+                                </div>
+                                @*</div>*@
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Panel informativo de Destinatarios/No Destinatarios *@
+                    <div id="@idPanContenedorInvitados_invite_organization" class="mb-4 @idPanContenedorInvitados_invite_organization">
+                        @* Panel No Destinatarios *@
+                        <span id="@idNoDestinatarios_invite_organization" class="@idNoDestinatarios_invite_organization texto-gris-claro mb-3">Ningún destinatario añadido...</span>
+                        @* Panel con Destinatarios ELEGIDOS PARA ENVIAR *@
+                        <span class="tag-list @idListaDestinatarios_invite_organization" id="@idListaDestinatarios_invite_organization">
+                        </span>
+                    </div>
+
+                    
+                    <div class="form-group mb-5 edit-descripcion">
+                        <label class="control-label d-block">@Html.GetText("COMMON", "TITULONOTAPERS")</label>                    
+                        @* Controlar el cuerpo del mensaje -> Reenviar *@
+                        <textarea id="@idTxtNotas"
+                            class="cke ckeSimple mensajes form-control"
+                            cols="20"
+                            rows="6">@Model.Message
+                        </textarea>                       
+                    </div>
+                    
+
+                    @* Mensaje de error de detección de emails a enviar*@
+                    <div style="display: none" id="@idPanelInfoInvitationSent_invite_organization">
+                        <p>
+                            <label id="@idLblInfoCorreo_invite_organization"></label>
+                        </p>
+                    </div>
+
+                    @* Input que guardará los correos/contactos seleccionados*@
+                    <input type="hidden" id="@idTxtHackInvitados_invite_organization" />
+
+                    @* Panel para aceptar/enviar email *@
+                    <div class="form-actions">
+                        <a id="@idBtnEnviarInvitaciones_invite_organization" class="btn btn-primary">@Html.GetText("INVITACIONES", "ENVIARINVITACIONES")</a>
+                    </div>
+                </div>
+            </div>
+
+<script type="text/javascript">
+    // Gestión de operativa de enviar invitaciones de una comunidad
+    (function ($) {
+        const pParamsInviteOrganization = {
+            idTxtFiltro: "@idTxtFiltro_invite_community",
+            idTxtCorreoAInvitar: "@idTxtCorreoAInvitar_invite_organization",
+            idButtonLitAniadirCorreo: "@idButtonLitAniadirCorreo_invite_organization",
+            idTxtHackInvitados: "@idTxtHackInvitados_invite_organization",
+            idPanContenedorInvitados: "@idPanContenedorInvitados_invite_organization",
+            idListaDestinatarios: "@idListaDestinatarios_invite_organization",
+            idNoDestinatarios: "@idNoDestinatarios_invite_organization",
+            idBtnEnviarInvitaciones: "@idBtnEnviarInvitaciones_invite_organization",
+            idPanelInfoInvitationSent: "@idPanelInfoInvitationSent_invite_organization",
+            idLblInfoCorreo: "@idLblInfoCorreo_invite_organization",
+            urlSend: "@urlSendInvitation_invite_organization",
+            idTxtNotas: "@idTxtNotas"
+        };        
+        operativaEnviarResource_Link_Community_Invitation.init(pParamsInviteOrganization);
+    })();
+</script>
+
+
+
+

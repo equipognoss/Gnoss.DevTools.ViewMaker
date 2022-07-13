@@ -1,0 +1,73 @@
+﻿@model string
+
+@{    
+    bool esBandejaOrg = ViewContext.RouteData.Values["organizacion"] != null && ViewContext.RouteData.Values["organizacion"].ToString() == "true";
+    UserProfileModel Perfil = Html.GetPerfil();
+    UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+}
+<div class="group mgNovedades">
+    <div class="head-group">
+        <p class="title"><strong>@Html.GetText("COMMON", "NOVEDADES")</strong></p>
+    </div>
+    <div class="body-group">
+        <ul class="listado">
+            <li class="t01 @(Model == "Home"?"activa":"")">
+                <a href="@Perfil.Url@("home")"><span class="icono"></span>@Html.GetText("COMMON", "HOME")</a>
+            </li>
+            <li class="t02 @(Model == "Messages" && !esBandejaOrg?"activa":"")">
+                <a href="@Perfil.Url@Html.GetText("URLSEM", "MENSAJES")">
+                    <span class="icono"></span>@Html.GetText("MENU", "MENSAJES") 
+                    <span style="display: none;" id="infoNumMensajesNovedades" class="nuevos"></span>
+                    <span style="display: none;" class="pendientes" id="infoNumMensajesSinLeerNovedades"></span>
+                </a>
+            </li>
+            <li class="t03 @(Model == "Comments"?"activa":"")">
+                <a href="@Perfil.Url@Html.GetText("URLSEM", "COMENTARIOS")">
+                    <span class="icono"></span>@Html.GetText("MENU", "COMENTARIOS")  
+                    <span style="display: none;" id="infoNumComentariosNovedades" class="nuevos"></span>
+                    <span style="display: none;" class="pendientes" id="infoNumComentariosSinLeerNovedades"></span>
+                </a>
+            </li>
+            <li class="t04 @(Model == "Invitations" && !esBandejaOrg?"activa":"")">
+                <a href="@Perfil.Url@Html.GetText("URLSEM", "INVITACIONES")">
+                    <span class="icono"></span>@Html.GetText("MENU", "INVITACIONES")  
+                    <span style="display: none;" id="infoNumInvitacionesNovedades" class="nuevos"></span>
+                    <span style="display: none;" class="pendientes" id="infoNumInvitacionesSinLeerNovedades"></span>
+                </a>
+            </li>
+            <li class="t05 @(Model == "Suscriptions"?"activa":"")">
+                <a href="@Perfil.Url@Html.GetText("URLSEM", "SUSCRIPCIONES")">
+                    <span class="icono"></span>@Html.GetText("MENU", "SUSCRIPCIONES")  
+                    <span style="display: none;" id="infoNumSuscriopcionesNovedades" class="nuevos"></span>
+                    <span style="display: none;" class="pendientes" id="infoNumSuscripcionesSinLeerNovedades"></span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+@if(IdentidadActual.IsOrgAdmin)
+{
+<div class="group mgNovedades">
+    <div class="head-group">
+        <h4>Novedades de la organización</h4>
+    </div>
+    <div class="body-group">
+        <ul class="listado">
+            <li class="t02 @(Model == "Messages" && esBandejaOrg?"activa":"")">
+                <a href="@Perfil.Url@Html.GetText("URLSEM", "MENSAJESORG")">
+                    <span class="icono"></span>@Html.GetText("MENU", "MENSAJES")  
+                    <span style="display: none;" id="infoNumMensajesNovedadesOrg" class="nuevos"></span>
+                    <span style="display: none;" class="pendientes" id="infoNumMensajesSinLeerNovedadesOrg"></span>
+                </a>
+            </li>
+            <li class="t04 @(Model == "Invitations" && esBandejaOrg?"activa":"")">
+                <a href="@Perfil.Url@Html.GetText("URLSEM", "INVITACIONESORG")">
+                    <span class="icono"></span>@Html.GetText("MENU", "INVITACIONES")   
+                    <span style="display: none;" id="infoNumInvitacionesNovedadesOrg" class="nuevos"></span>
+                    <span style="display: none;" class="pendientes" id="infoNumInvitacionesSinLeerNovedadesOrg"></span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+}

@@ -1,0 +1,103 @@
+﻿@model GroupPageViewModel
+@*
+Descripción
+-----------------------------------------------
+Nueva vista que muestra las acciones disponibles a realizar para el buscador. Estas se muestran en la cabecera del listado, correspondiente con el fichero "_list-header". Estas acciones serán:
+- ComboBox para "Descargar"
+- ComboBox para "Ordenar"
+- ComboBox para "Visualizar"
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+GroupCardModel grupo = Model.Group;
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Cabecera-Header de lista de recursos dentro de una comunidad --------------------
+*@
+
+@* Listado de acciones para hacer con resultados *@
+<div class="acciones-listado">
+    <div class="wrap">    
+        @*Botón de acciones *@
+        <div id="fichaGrupoComunidadActions" class="dropdown">
+            <a id="buscador" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                <span class="material-icons">settings</span>
+                <span class="texto">@Html.GetText("COMMON", "ACCIONES")</span>
+            </a>
+            <div class="dropdown-menu basic-dropdown dropdown-icons dropdown-menu-right" style="will-change: transform;">
+                @* Asignar a grupo *@
+                @if (Model.Actions.AsignarAGrupo)
+                {
+                    @* Abrir modal para add identidad al grupo *@
+                    <a class="item-dropdown"
+                       data-toggle="modal" data-target="#add-identity-group">
+                        <span class="material-icons">person_add</span>
+                        <span class="texto">@Html.GetText("GRUPO", "ASIGNARMIEMBRO")</span>
+                    </a>
+                }
+                @* Abandonar a grupo *@
+                @if (Model.Actions.LeaveGroup)
+                {
+                    <a class="item-dropdown"
+                       onclick="javascript:AbandonarGrupo();">
+                        <span class="material-icons">logout</span>
+                        <span class="texto">@Html.GetText("GRUPO", "ABANDONARGRUPO")</span>
+                    </a>
+                }
+                @* Solicitar acceso a grupo *@
+                @if (Model.Actions.RequestAccess)
+                {
+                    <a class="item-dropdown"
+                       onclick="javascript:SolicitarPertenecerGrupo(this);">
+                        <span class="material-icons">login</span>
+                        <span class="texto">@Html.GetText("GRUPO", "PERTENECERGRUPO")</span>
+                    </a>
+                }
+                @* Enviar mensaje a grupo *@
+                @if (grupo.AllowSendMessage)
+                {
+                    <a class="item-dropdown"
+                       data-toggle="modal"
+                       data-target="#modal-container"
+                       onclick="javascript:EnviarMensajeMiembrosGrupo('@grupo.Clave');">
+                        <span class="material-icons">mail_outline</span>
+                        <span class="texto">@Html.GetText("GRUPO", "ENVIARMENSAJE")</span>
+                    </a>
+                }
+                @if (Model.Actions.Edit)
+                {
+                    <a class="item-dropdown"
+                       href="@Model.UrlEditGroup">
+                        <span class="material-icons">edit</span>
+                        <span class="texto">@Html.GetText("GRUPO", "EDITAR")</span>
+                    </a>
+                }
+                @if (Model.Actions.Delete)
+                {
+                    <a id="btnEliminarGrupo" 
+                       class="item-dropdown"
+                       data-toggle="modal"
+                       data-target="#modal-container"
+                       onclick="AccionFichaPerfil('@Html.GetText("COMMON","ELIMINAR")',
+                                                       '@Html.GetText("COMMON", "SI")',
+                                                       '@Html.GetText("COMMON", "NO")',
+                                                       '¿Estás seguro de eliminar el grupo @grupo.CompleteName?',
+                                                       '@grupo.Clave',
+                                                        function () {
+                                                             EliminarGrupo()
+                                                        },
+                                                    '');
+                                    ">                        
+                        <span class="material-icons">delete</span>
+                        <span class="texto">@Html.GetText("GRUPO", "ELIMINAR")</span>
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>

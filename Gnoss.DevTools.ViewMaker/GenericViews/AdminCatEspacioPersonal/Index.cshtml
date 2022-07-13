@@ -1,0 +1,337 @@
+﻿@model AdminCatEspacioPersonalModel
+
+@{
+    Html.SetBodyClass("layout03 ");
+    Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/jsUnificar/MVC.EditarRecurso.js?v=" + Html.GetVersion());
+    
+    string urlPagina = Html.GetUrlPagina();
+}
+
+
+<div id="col02" style="width:730px">        
+    <div class="textBox tituloComunidad">            
+        <h2><span>@Html.GetText("COMADMINCATEGORIAS", "ARBOLCATEGORIAS")</span></h2>
+        
+        <div id="updBotonera" class="messagetools listToolBar box" >
+            <div id="adminComCate"class="toolbar">
+                <ul class="floatLeft">
+                    <li>
+                        <input id="lbMostarCreacionCategoria" class="submit" type="button" value="@Html.GetText("COMADMINCATEGORIAS", "CREARNUEVA")"/>
+                    </li>
+                    <li>
+                        <input id="lbMostarCambiarNombreCategoria" class="submit" type="button" value="@Html.GetText("COMADMINCATEGORIAS", "CAMBIARNOMBRE")"/>
+                    </li>
+                    <li>
+                        <input id="lbMostarMoverCategoria" class="submit" type="button" value="@Html.GetText("COMADMINCATEGORIAS", "MOVER")"/>
+                    </li>
+                    <li>
+                        <input id="lbMostarOrdenarCategoria" class="submit" type="button" value="@Html.GetText("COMADMINCATEGORIAS", "ORDENAR")"/>
+                    </li>
+                    <li>
+                        <input id="lbMostarEliminacionCategoria" class="submit" type="button" value="@Html.GetText("COMADMINCATEGORIAS", "ELIMINAR")"/>
+                    </li>
+                </ul>
+                <div id="panBuscar" style="text-align:right">
+                    <span class="filtroRapido floatRight">
+                        <p>
+                            @Html.GetText("COMMON", "BUSCAR") 
+                            <input type="text" id="filtroRapido" onkeyup="if(this.value.indexOf('|')>-1){this.value=this.value.replace(/\\|/g,'')}" />
+                        </p>
+                    </span>
+                </div>                    
+            </div>
+        </div>
+        <div id="panAccionesTes">
+            @Html.PartialView("_AdminTesauro", Model)
+        </div>
+        <div class="fieldset actionButtons box" >
+            <fieldset>
+                <p>
+                    <label class="boton btAzul floatRight">
+                        <a id="lbGuardarInf" class="submit principal">@Html.GetText("COMADMINCATEGORIAS", "GUARDAR")</a>
+                    </label>  
+                    <label class="boton btAzul floatRight">
+                        <a id="lbVolver" class="submit principal" href="@Model.BackUrl">@Html.GetText("PERFILBASERECURSOEDITAR", "VOLVER")</a>
+                    </label>
+                </p>
+            </fieldset>
+        </div>
+        <div id="divMensOK"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    urlPaginaActual = '@urlPagina';
+
+    $(function () {
+        $('#lbMostarCreacionCategoria').click(DesplegarCrearTesauro);
+        $('#lbMostarCambiarNombreCategoria').click(DesplegarCambiarNombreTesauro);
+        $('#lbMostarMoverCategoria').click(DesplegarMoverTesauro);
+        $('#lbMostarOrdenarCategoria').click(DesplegarOrdenarTesauro);
+        $('#lbMostarEliminacionCategoria').click(DesplegarEliminarTesauro);
+        $('#lbGuardarInf').click(GuardarTesauroAdminEspPers);
+        $(document.body).attr('onBeforeUnload', 'return ComprobarCambiosAdminEspPers();');
+        InicializarAccionesAdminEspPers();
+    });
+
+    function InicializarAccionesAdminEspPers() {
+        $('#filtroRapido').on('keyup', function () {
+            FiltarCatAdminCatEspPersonal(this.value);
+        });
+
+        $('#lbCrearCategoria').click(CrearCategoriaAdminEspPers);
+        $('#lbCambiarNombreCategoria').click(RenombrarCategoriaAdminEspPers);
+        $('#lbMoverCategoria').click(MoverCategoriasAdminEspPers);
+        $('#lbOrdenarCategoria').click(OrdenarCategoriasAdminEspPers);
+        $('#lbMoverTodoTrasEliminarCategoria').click(EliminarCategoriasAdminEspPers);
+    }
+
+    function EliminarCategoriasAdminEspPers() {
+        $('#divlblError').html('');
+        if (!ComprobarSoloCatSelectAdminCatEspPersonal(true)) {
+            return;
+        }
+
+        if ($('#cmbMoverATrasEliminar')[0].selectedIndex < 1) {
+            return;
+        }
+
+        var arg = {};
+        arg.EditAction = 7;
+
+        if ($('#cmbMoverElementosTrasBorrar').length > 0 && $('#cmbMoverElementosTrasBorrar').val() == 'HUERFANOS') {
+            arg.EditAction = 8;
+        }
+
+        arg.SelectedCategory = $('#cmbMoverATrasEliminar').val();
+        arg.SelectedCategories = $('#txtHackCatTesSel').val();
+
+        EnviarAccionAdminEspPers(arg);
+    }
+
+    function OrdenarCategoriasAdminEspPers() {
+        $('#divlblError').html('');
+        if (!ComprobarSoloCatSelectAdminCatEspPersonal(true)) {
+            return;
+        }
+
+        if ($('#cmbCategoriasOrdenar')[0].selectedIndex < 0) {
+            return;
+        }
+
+        var arg = {};
+        arg.EditAction = 5;
+        arg.SelectedCategory = $('#cmbCategoriasOrdenar').val();
+        arg.SelectedCategories = $('#txtHackCatTesSel').val();
+
+        EnviarAccionAdminEspPers(arg);
+    }
+
+    function MoverCategoriasAdminEspPers() {
+        $('#divlblError').html('');
+        if (!ComprobarSoloCatSelectAdminCatEspPersonal(true)) {
+            return;
+        }
+
+        if ($('#cmbCategoriasMover')[0].selectedIndex < 0) {
+            return;
+        }
+
+        var arg = {};
+        arg.EditAction = 3;
+        arg.SelectedCategory = $('#cmbCategoriasMover').val();
+        arg.SelectedCategories = $('#txtHackCatTesSel').val();
+
+        EnviarAccionAdminEspPers(arg);
+    }
+
+    function RenombrarCategoriaAdminEspPers() {
+        $('#divlblError').html('');
+        if (!ComprobarSoloCatSelectAdminCatEspPersonal(false)) {
+            return;
+        }
+
+        var arg = {};
+        arg.EditAction = 1;
+        arg.SelectedCategory = $('#txtHackCatTesSel').val().split(',')[0];
+        arg.NewCategoryName = $('#txtNuevoNombre').val();
+
+        EnviarAccionAdminEspPers(arg);
+    }
+
+    function CrearCategoriaAdminEspPers() {
+        $('#divlblError').html('');
+        var arg = {};
+        arg.EditAction = 0;
+        arg.SelectedCategory = $('#cmbCrearCategoriaEn').val();
+        arg.NewCategoryName = $('#txtNombreCatPadreCreacion').val();
+
+        EnviarAccionAdminEspPers(arg);
+    }
+
+    function EnviarAccionAdminEspPers(arg) {
+        arg.ActionsBackUp = $('#txtAccionesTesauroHack').val();
+        $('#divMensOK').html('');
+        MostrarUpdateProgress();
+
+        GnossPeticionAjax(urlPaginaActual + '/editthesaurus', arg, true).done(function (data) {
+            $('#filtroRapido').val('');
+            $('#panAccionesTes').html(data);
+
+            if (arg.EditAction == 2) {
+                $('#PanParaSelectorCategorias input[type=checkbox]').prop('disabled', 'disabled');
+                $('#panMoverCategoria').show();
+            }
+            else if (arg.EditAction == 4) {
+                $('#PanParaSelectorCategorias input[type=checkbox]').prop('disabled', 'disabled');
+                $('#panOrdenarCategoria').show();
+            }
+            else if (arg.EditAction == 6 && $('#txtHackCatTesSel').val() != '') {
+                $('#PanParaSelectorCategorias input[type=checkbox]').prop('disabled', 'disabled');
+                $('#panEliminarCategoria').show();
+            }
+            else {
+                $('#panCambiarNombreCategoria').hide();
+                $('#panCrearCategoria').hide();
+                $('#panEliminarCategoria').hide();
+                $('#panMoverCategoria').hide();
+                $('#panOrdenarCategoria').hide();
+            }
+
+            if (arg.EditAction == 9) {
+                $('#divMensOK').html('<div class="ok"><p>' + textoRecursos.guardadoOK + '</p></div>');
+            }
+
+            InicializarAccionesAdminEspPers();
+        }).fail(function (data) {
+            CrearErrorAdminCatEspPersonal(data);
+        }).always(function () {
+            OcultarUpdateProgress();
+            $('.actionButtons').show();
+        });
+    }
+
+    function GuardarTesauroAdminEspPers() {
+        $('#divlblError').html('');
+        var arg = {};
+        arg.EditAction = 9;
+        $('.actionButtons').hide();
+
+        EnviarAccionAdminEspPers(arg);
+    }
+
+    function ComprobarCambiosAdminEspPers() {
+        if ($('#txtAccionesTesauroHack').val() != '') {
+            return form.perderdatosbio;
+        }
+    }
+
+    function CrearErrorAdminCatEspPersonal(error) {
+        $('#divlblError').html('<div class="ko" style="display:block"><p>' + error + '</p></div>');
+    }
+
+    function FiltarCatAdminCatEspPersonal(valor) {
+        $('#txtHackCatTesSel').val('');
+        $('#PanParaSelectorCategorias input[type=checkbox]').prop('checked', '');
+
+        valor = valor.toLocaleLowerCase();
+
+        if (valor == '') {
+            $('#rbArbol').trigger('click');
+            $('.divTesLista div').show();
+        }
+        else {
+            $('#rbLista').trigger('click');
+            $('#PanParaSelectorCategorias .divTesLista span label').each(function () {
+                if ($(this).text().toLocaleLowerCase().indexOf(valor) != -1) {
+                    $(this).parent().parent().show();
+                }
+                else {
+                    $(this).parent().parent().hide();
+                }
+            });
+        }
+    }
+
+    function ComprobarSoloCatSelectAdminCatEspPersonal(permitirVarias) {
+        $('#divlblError').html('');
+        var catsSelect = $('#txtHackCatTesSel').val().split(',');
+        if (!permitirVarias && catsSelect.length > 2) {
+            CrearErrorAdminCatEspPersonal(textoRecursos.soloUnaCat);
+            return false;
+        }
+        else if (catsSelect.length == 0 || (catsSelect.length == 1 && catsSelect[0] == '')) {
+            CrearErrorAdminCatEspPersonal(textoRecursos.almenosunaCat);
+            return false;
+        }
+
+        return true;
+    }
+
+    function DesplegarCrearTesauro() {
+        document.getElementById('txtHackAccionActual').value = 'CrearCategoria';
+        $('#panOrdenarCategoria').slideUp();
+        $('#panMoverCategoria').slideUp();
+        $('#panCrearCategoria').slideDown();
+        $('#panEliminarCategoria').slideUp();
+        $('#panCambiarNombreCategoria').slideUp();
+    }
+
+    function DesplegarCambiarNombreTesauro() {
+        if (!ComprobarSoloCatSelectAdminCatEspPersonal(false)) {
+            return;
+        }
+
+        var idCatSelect = $('#txtHackCatTesSel').val().split(',')[0];
+        var nombreCatSelect = $('.divTesLista span.' + idCatSelect + ' label').text();
+        $('#lblNombreAntiguoCat').text(nombreCatSelect);
+        $('#txtNuevoNombre').val(nombreCatSelect);
+
+        $('#panOrdenarCategoria').slideUp();
+        $('#panMoverCategoria').slideUp();
+        $('#panCrearCategoria').slideUp();
+        $('#panEliminarCategoria').slideUp();
+        $('#panCambiarNombreCategoria').slideDown();
+    }
+
+    function DesplegarMoverTesauro() {
+        if (!ComprobarSoloCatSelectAdminCatEspPersonal(true)) {
+            return;
+        }
+
+        $('#divlblError').html('');
+        var arg = {};
+        arg.EditAction = 2;
+        arg.SelectedCategories = $('#txtHackCatTesSel').val();
+
+        EnviarAccionAdminEspPers(arg);
+    }
+
+    function DesplegarOrdenarTesauro() {
+        if (!ComprobarSoloCatSelectAdminCatEspPersonal(true)) {
+            return;
+        }
+
+        $('#divlblError').html('');
+        var arg = {};
+        arg.EditAction = 4;
+        arg.SelectedCategories = $('#txtHackCatTesSel').val();
+
+        EnviarAccionAdminEspPers(arg);
+    }
+
+
+
+    function DesplegarEliminarTesauro() {
+        if (!ComprobarSoloCatSelectAdminCatEspPersonal(true)) {
+            return;
+        }
+
+        $('#divlblError').html('');
+        var arg = {};
+        arg.EditAction = 6;
+        arg.SelectedCategories = $('#txtHackCatTesSel').val();
+
+        EnviarAccionAdminEspPers(arg);
+    }
+</script>

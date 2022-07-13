@@ -1,0 +1,25 @@
+﻿@using Es.Riam.Gnoss.Web.MVC.Models;
+@model CMSComponentHTML
+
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra el componente de HTML Libre en una página CMS.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+}
+@*
+----------------------------------------------------------------
+-------------------- Vista CMS del componente de HTML Libre en una página CMS. --------------------*@
+
+@if(Model != null)
+{   
+    <div>        
+        @Html.Raw(Model.HTML)
+    </div> 
+}
+      

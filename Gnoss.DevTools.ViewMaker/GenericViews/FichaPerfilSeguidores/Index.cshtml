@@ -1,0 +1,102 @@
+﻿@model ProfilePageFollowersViewModel
+
+@{
+    string titulo = "";
+    string operativa = "";
+    
+    if (Model.PageType == ProfilePageFollowersViewModel.ProfilePageType.Followed)
+    {
+        titulo = Html.GetText("PERFIL", "SIGUIENDO");
+        operativa = "operativa-mi-perfil-siguiendo";
+    }
+    else
+    {
+        titulo = Html.GetText("PERFIL", "SEGUIDORES");
+        operativa = "operativa-mi-perfil-seguidores";
+    }
+    
+    Html.SetBodyClass("layout02  comGnoss " + operativa);
+    
+	UserProfileModel perfil = Html.GetPerfil();
+    CommunityModel comunidad = Html.GetComunidad();
+}
+<div id="col01">
+    <div class="myusercard vertical">
+        <div class="box content">
+            <div class="group image">
+                <div id="foto">
+                    <fieldset class="foto">
+                        <div style="margin-top: 5px" class="claseImagenHack">								
+							@{
+								string urlFoto = "";
+								if (string.IsNullOrEmpty(perfil.Foto))
+								{
+									if (perfil.TypeProfile == ProfileType.ProfessionalCorporate)
+									{
+										urlFoto = "/" + Es.Riam.Util.UtilArchivos.ContentImagenes + "/" + Es.Riam.Util.UtilArchivos.ContentImagenesOrganizaciones + "/" + "anonimo_grande.png";
+									}
+									else
+									{
+										urlFoto = "/" + Es.Riam.Util.UtilArchivos.ContentImagenes + "/" + Es.Riam.Util.UtilArchivos.ContentImagenesPersonas + "/" + "anonimo_grande.png";
+									}
+								}
+								else
+								{
+									urlFoto = perfil.Foto.Replace("_peque", "_grande");;
+								}
+							}
+                            
+							<img style="width: 220px;" alt="@Html.GetText("PERFIL", "MIFOTODEPERFIL")" src="@Html.GetBaseUrlContent()@urlFoto"  id="imgPerfil" />
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+			<div class="group title">
+				<h2>@perfil.CompleteProfileName</h2>
+			</div>
+            <div class="group actividad">
+                @{
+                    string url = comunidad.Url + "/";
+                    if(comunidad.MetaProyect)
+                    {
+                        url = perfil.Url;
+                    }
+                }
+			    <p>Actividad en la comunidad</p>
+			    <ul>
+				    <li class="opSiguiendo" id="liSiguiendo"><a href="@url@Html.GetText("URLSEM", "MIPERFILSIGUIENDO")" id="hlSiguiendo"><span>@Model.NumProfileFollowed.ToString()</span> Siguiendo</a></li>
+					<li class="opSeguidores"><a href="@url@Html.GetText("URLSEM", "MIPERFILSEGUIDORES")" id="hlSeguidores"><span>@Model.NumProfileFollowers.ToString()</span> Seguidores</a></li>
+			    </ul>			
+		    </div>
+        </div>
+    </div>
+	<div class="box botonesPerfil" id="panBotonesPerfil">
+		<a class="submit principal" href="@url@Html.GetText("URLSEM", "MIPERFIL")" id="hlAreaPrivada">@Html.GetText("PERFIL", "EDITARPERFILIC")</a>
+	</div>
+</div>
+<div id="col02">
+    <div class="componente cp0401">
+        <div class="titulo">
+            <h2><span>@titulo</span></h2>
+        </div>
+        <div class="contenido">
+            <div class="resource-list">
+                @if (Model.PageType == ProfilePageFollowersViewModel.ProfilePageType.Followed)
+                {
+                    ViewData["DeleteAtUnFollow"] = true;
+                    foreach (ProfileModel ficha in Model.ProfileFollowed)
+                    {
+                        @Html.PartialView("ControlesMVC/_FichaPerfilMini", ficha)
+                    }
+                }
+                else
+                {
+                    foreach (ProfileModel ficha in Model.ProfileFollowers)
+                    { 
+                        @Html.PartialView("ControlesMVC/_FichaPerfilMini", ficha)
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>

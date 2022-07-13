@@ -1,0 +1,136 @@
+﻿@model ResourceModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista que la descripción o cuerpo de un recurso. Básicamente contendrá el texto del recurso.
+
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista del contenido o cuerpo de un recurso. --------------------
+*@
+
+@* Previsualización del recurso ( Recurso Multimedia: Foto, Video (youtube...) *@
+@if (!string.IsNullOrEmpty(Model.UrlPreview))
+{   
+    if (Model.NameImage == "video" || Model.NameImage == "audio")
+    {
+        @* Tener en cuenta recursos antiguos sin https de tipo "Vídeo", "Vimeo", "embed" *@
+        if(Model.UrlPreview.StartsWith("//www.youtube") || Model.UrlPreview.StartsWith("//player.vimeo.com/") || Model.UrlPreview.StartsWith("http://tedxtalks.ted.com")){
+            Model.UrlPreview = Model.UrlPreview.Replace("http","https");
+        }
+
+        if (Model.UrlPreview.StartsWith("//www.youtube"))
+        {
+            <iframe width="100%" height="468" src="@Model.UrlPreview" frameborder="0" allowfullscreen="true"></iframe>
+        }
+        else if (Model.UrlPreview.StartsWith("//player.vimeo.com/"))
+        {
+            <iframe frameborder="0" width="100%" height="326" style="z-index:0" src="@Model.UrlPreview" allowfullscreen="true"></iframe>
+        }
+        else if (Model.UrlPreview.StartsWith("https://embed.ted.com") || Model.UrlPreview.StartsWith("http://tedxtalks.ted.com"))
+        {
+            <iframe src="@Model.UrlPreview" width="100%" height="321" frameborder="0" scrolling="no"></iframe>
+        }
+        else if (Model.UrlPreview.StartsWith("Brightcove:"))
+        {
+
+        }
+        else if (Model.UrlPreview.StartsWith("TOP:"))
+        {
+            if (Model.UrlPreview.StartsWith("TOP:OK:"))
+            {
+                Html.GetListaJS().Add("http://ineverycrea.player-top.prisasd.com/psdmedia/media/simple/js/SimpleMediaPlayer.min.js");
+                <script type="text/javascript">
+                    (function() {
+                        var params = {
+                        "dev": false,
+                        "id_cuenta": "ineverycreaespana",
+                        "id_player": "246",
+                        "id_media": "@Model.UrlPreview.Split(':')[2]",
+                        "media_type": "video",
+                        "id_container": "container_video_@Model.UrlPreview.Split(':')[2]",
+                        "overwriteWidth": document.body.clientWidth,
+                        "overwriteHeight": document.body.clientHeight
+                    };
+                    var mediaTopEmbed = new psd.media.TopEmbed(params);
+                    })();
+                </script>
+                <div id="container_video_@Model.UrlPreview.Split(':')[2]"></div>
+            }
+            else if (Model.UrlPreview.Equals("TOP:Error"))
+            {
+                <img height="336" src="@Html.GetBaseUrlStatic()/img/brightcove_error.jpg" />
+            }
+            else if (Model.UrlPreview.Equals("TOP:Pendiente"))
+            {
+                if (Model.NameImage == "audio")
+                {
+                    <img height="336" src="@Html.GetBaseUrlStatic()/img/brightcove_audio_espera.jpg" />
+                }
+                else
+                {
+                    <img height="336" src="@Html.GetBaseUrlStatic()/img/brightcove_espera.jpg" />
+                }
+            }
+        }
+    }else if (Model.NameImage == "presentacion" && Model.OpenInNewWindow)
+    {
+        <iframe frameborder="0" width="100%" height="450px" allowfullscreen="" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" scrolling="no" marginheight="0" marginwidth="0" src="@Model.UrlPreview"> </iframe>
+    }
+    else if (Model.NameImage == "imagen" || Model.NameImage == "hipervinculo")
+    {
+        <a href="@Model.UrlDocument" >
+        <img src="@Model.UrlPreview" alt="@Model.Title"/>
+        </a>
+    }
+    else if (Model.NameImage == "digital" && !string.IsNullOrEmpty(Model.UrlDocument) && Model.UrlDocument.Contains("VisualizarFlash.aspx"))
+    {            
+        <object width="100%" height="450px" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000">
+            <param name="movie" value="@Model.UrlPreview"/>
+            <embed  width="100%" height="450px" src="@Model.UrlPreview" pluginspage="http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash"/>
+        </object>
+    }
+}
+
+@* Mostrar el contenido del recurso*@
+<div property="dcterms:content">
+    @if (Model.NameImage == "encuesta")
+    {
+        <div class="encuesta" id="encuesta_@Model.Key">
+            @Html.PartialView("_FichaEncuesta", Model)
+        </div>
+    }
+    else if (Model.NameImage == "newsletter" && Model.Description == "")
+    {
+        <iframe id="iframeNewsletter" class="newsletter" src="@Html.GetBaseUrl()/objetonewsletter.aspx?docid=@Model.Key&temp=false" style="display:none" width="837" onload="newsletterLoad(this)"></iframe>
+        <script type="text/javascript">
+            function newsletterLoad(iframe) {
+                $(iframe).show();
+                try {
+                    if (!window.opera && document.all && document.getElementById) {
+                        iframe.height = iframe.contentWindow.document.body.scrollHeight;
+                    } else if (document.getElementById) {
+                        iframe.height = iframe.contentDocument.body.scrollHeight + 'px';
+                    }
+                }
+                catch (error) {
+                    iframe.height = 600;
+                }
+            }
+        </script>
+    }
+    else
+    {
+        @Html.Raw(Model.Description)
+    }
+</div>

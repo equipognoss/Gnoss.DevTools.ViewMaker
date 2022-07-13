@@ -1,0 +1,51 @@
+﻿@model AdminCatEspacioPersonalModel
+@*
+Descripción
+-----------------------------------------------
+Vista parcial de "Crear categoría" que se carga dentro del modal de "Editar categorias" del perfil del usuario
+
+Variables
+----------------------------------------------------------------
+*@
+
+
+@*
+----------------------------------------------------------------
+-------------------- Vista parcial dentro del modal del Espacio de Recursos --------------------
+*@
+
+@* Sección para crear una nueva categoría *@
+<div id="seccion-nueva" class="seccion">
+    <div class="titulo-seccion mb-4">
+        <span class="material-icons-outlined">create_new_folder</span>
+        <span class="pl-2">Nueva</span>
+    </div>
+    <div class="form">
+        @* Lista donde se desea crear la categoría *@
+        <div class="form-group mb-4">
+            <label class="control-label d-block">@Html.GetText("COMADMINCATEGORIAS", "CREAREN")</label>
+            <select style="width: 100%" id="cmbCrearCategoriaEn"
+                    class="js-select2" 
+                    data-placeholder="Selecciona categoría padre" 
+                    data-select-search="true">                
+                @foreach (Guid categoriaID in Model.ParentCategoriesForCreateNewsCategories.Keys)
+                {
+                    <option value="@categoriaID.ToString()">@Model.ParentCategoriesForCreateNewsCategories[categoriaID]</option>
+                }
+            </select>
+        </div>
+         @* Input para dar nombre a la nueva categoría *@
+        <div class="form-group mb-5">
+            <label class="control-label d-block">@Html.GetText("COMADMINCATEGORIAS", "NOMBRE")</label>
+            <input placeholder="Introduce el nombre de la categoría" 
+                   type="text" 
+                   id="txtNombreCatPadreCreacion" 
+                   class="form-control not-outline">
+        </div>
+    </div>
+    @* Acción de guardar/cancelar la nueva categoría creada *@
+    <div class="acciones">
+        <a id="guardar-nueva" class="btn btn-primary text-uppercase guardar">@Html.GetText("COMADMINCATEGORIAS", "CREAR")</a>
+        <a id="btnVolverAddCategory" class="btn btn-link text-uppercase volver pl-3">@Html.GetText("COMMON", "CANCELAR")</a>
+    </div>
+</div>

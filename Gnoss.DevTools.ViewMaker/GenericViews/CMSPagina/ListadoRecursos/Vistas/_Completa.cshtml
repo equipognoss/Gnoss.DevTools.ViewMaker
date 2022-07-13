@@ -1,0 +1,213 @@
+﻿@using Es.Riam.Util;
+@model ResourceModel
+@if (Model != null)
+{    
+   <div class="resource" >
+        <div class="box description">
+            <div class="wrapDescription">           
+                @if (Html.GetComunidad().IsCatalog && !string.IsNullOrEmpty(Model.UrlPreview))
+                {
+                    <div class="group miniaturaListado">
+                        <p class="miniatura">
+                            <a href="@Model.CompletCardLink">
+                                <img width="240px" title="@Model.Title" alt="@Model.Title" src="@Model.UrlPreview" />
+                            </a>
+                        </p>
+                    </div>
+                }
+                <div class="wrapDescription">
+                    <div class="group title">
+                        <h2><a href="@Model.CompletCardLink">@Model.Title</a></h2>
+                        <p class="resourceType @(Model.TypeDocument == ResourceModel.DocumentType.Semantico?"semantico " + Model.RdfType:Model.NameImage)"><span>tipo de documento</span><a href="@Model.CompletCardLink">@Model.NameImage</a></p>
+                    </div>
+
+                    <div class="group content">
+                        @{
+                string claseExtraDescripcion = "";
+                if ((Model.ViewSettings != null && ((!Model.MapView && (Model.ViewSettings.DescriptionOnList || Model.ViewSettings.DescriptionOnMosaic)) || (Model.MapView && Model.ViewSettings.DescriptionOnMap))))
+                {
+                    if (Model.ViewSettings != null)
+                    {
+                        if (!Model.ViewSettings.DescriptionOnList)
+                        {
+                            claseExtraDescripcion += " noListView";
+                        }
+                        if (!Model.ViewSettings.DescriptionOnMosaic)
+                        {
+                            claseExtraDescripcion += " noGridView";
+                        }
+                    }
+                }
+                        }
+
+                        <div class="descripcionResumida @claseExtraDescripcion">
+                            @if (!Html.GetComunidad().IsCatalog && !string.IsNullOrEmpty(Model.UrlPreview))
+                            {
+                                <p class="miniatura">
+                                    <a href="@Model.CompletCardLink">
+                                        <img title="@Model.Title" alt="@Model.Title" src="@Model.UrlPreview">
+                                    </a>
+                                </p>
+                            }
+                            @if (Model.ViewSettings == null || (!Model.MapView && (Model.ViewSettings.DescriptionOnList || Model.ViewSettings.DescriptionOnMosaic)) || (Model.MapView && Model.ViewSettings.DescriptionOnMap))
+                            {
+                                if ((Model.Description.Contains("<p ") || Model.Description.Contains("<p>")) && Model.Description.Contains("</p>"))
+                                {
+                                @Html.Raw(Model.Description)
+                                }
+                                else
+                                {
+                                <p>
+                                    @Html.Raw(Model.Description)
+                                </p>
+                                }
+                            }
+                        </div>
+                        <div class="verMasRecurso">
+                            <p>
+                                <a href="@Model.CompletCardLink">...</a>
+                            </p>
+                        </div>
+                        @if (Model.ViewSettings != null)
+                        {
+                            if (!Model.MapView && !string.IsNullOrEmpty(Model.ViewSettings.InfoExtraList))
+                            {
+                            <div class="listado">
+                                @Html.Raw(Model.ViewSettings.InfoExtraList)
+                            </div>   
+                            }
+                            if (!Model.MapView && !string.IsNullOrEmpty(Model.ViewSettings.InfoExtraMosaic))
+                            {
+                            <div class="mosaico">
+                                @Html.Raw(Model.ViewSettings.InfoExtraMosaic)
+                            </div>   
+                            }
+                            if (Model.MapView && !string.IsNullOrEmpty(Model.ViewSettings.InfoExtraMap))
+                            {
+                            <div class="mapa">
+                                @Html.Raw(Model.ViewSettings.InfoExtraMap)
+                            </div>   
+                            }
+                        }
+                    </div>
+                    @if (Model.ViewSettings == null || (!Model.MapView && (Model.ViewSettings.PublisherOnList || Model.ViewSettings.PublisherOnMosaic)) || (Model.MapView && Model.ViewSettings.PublisherOnMap))
+                    {
+                        string claseExtra = "";
+                        if (Model.ViewSettings != null)
+                        {
+                            if (!Model.ViewSettings.PublisherOnList)
+                            {
+                                claseExtra += " noListView";
+                            }
+                            if (!Model.ViewSettings.PublisherOnMosaic)
+                            {
+                                claseExtra += " noGridView";
+                            }
+                        }
+                        <div class="group utils-2 @claseExtra" >
+                            <p>
+                                @if (Model.TypePublication == ResourceModel.PublicationType.Published)
+                                {
+                                    @Html.GetText("BASERECURSOS", "PUBLICADOPORCUANDO", Model.PublishDate.Day.ToString(), Model.PublishDate.Month.ToString(), Model.PublishDate.Year.ToString())
+                                }
+                                else
+                                {
+                                    @Html.GetText("BASERECURSOS", "COMPARTIDOPORCUANDO", Model.PublishDate.Day.ToString(), Model.PublishDate.Month.ToString(), Model.PublishDate.Year.ToString())
+                                }
+
+                                @if (Model.Publisher.TypeProfile == ProfileType.Personal || Model.Publisher.TypeProfile == ProfileType.Teacher)
+                                {
+                                    <span><a property="foaf:name" typeof="foaf:Person" href="@Model.Publisher.UrlPerson">@Model.Publisher.NamePerson</a></span>
+                                }
+                                else if (Model.Publisher.TypeProfile == ProfileType.ProfessionalPersonal)
+                                {
+                                    <span><a property="foaf:name" typeof="foaf:Group" href="@Model.Publisher.UrlPerson">@Model.Publisher.NamePerson @ConstantesDeSeparacion.SEPARACION_CONCATENADOR @Model.Publisher.NameOrganization</a></span>
+                                }
+                                else if (Model.Publisher.TypeProfile == ProfileType.ProfessionalCorporate && !string.IsNullOrEmpty(Model.Publisher.NamePerson))
+                                {
+                                    string idTemp = Guid.NewGuid().ToString();
+                                    <span><a property="foaf:name" typeof="foaf:Group" href="@Model.Publisher.UrlOrganization">@Model.Publisher.NameOrganization</a><span class="userAuthor"><span style="display:none;" id="@idTemp"> (@Model.Publisher.NamePerson) </span><a onclick="javascript:DesplegarImgMas(this, '@idTemp');" style="cursor:pointer;">
+                                        <img src="@Html.GetBaseUrlStatic()/img/verMas.gif" alt="+"></a></span></span>
+                                }
+                                else
+                                {
+                                    <span><a property="foaf:name" typeof="foaf:Group" href="@Model.Publisher.UrlOrganization">@Model.Publisher.NameOrganization</a></span>
+                                }
+                            </p>
+                        </div>
+                    }
+                    @if ((Model.ViewSettings == null || (!Model.MapView && (Model.ViewSettings.CategoriesOnList || Model.ViewSettings.CategoriesOnMosaic)) || (Model.MapView && Model.ViewSettings.CategoriesOnMap)) && Model.Categories != null && Model.Categories.Count() > 0)
+                    {
+                        string claseExtra = "";
+                        if (Model.ViewSettings != null)
+                        {
+                            if (!Model.ViewSettings.CategoriesOnList)
+                            {
+                                claseExtra += " noListView";
+                            }
+                            if (!Model.ViewSettings.CategoriesOnMosaic)
+                            {
+                                claseExtra += " noGridView";
+                            }
+                        }
+                    
+                        <div class="group categorias @claseExtra">
+                            <p>
+                                @Html.GetText("COMMON", "CATEGORIAS"):  
+                            </p>
+                            <ul id="listCat">
+                                @{
+                        int cont = 0;
+                        foreach (CategoryModel categoria in Model.Categories)
+                        {
+                            string separador = "";
+                            if (cont > 0) { separador = ", "; }
+                                    <li>@separador<a href="@Model.UrlSearch/@Html.GetText("URLSEM", "CATEGORIA")/@Html.EliminarCaracteresUrlSem(categoria.Name)/@categoria.Key/"><span>@categoria.Name</span></a></li>
+                            cont++;
+                        }
+                                }
+                            </ul>
+                        </div>  
+                    }
+
+                    @if ((Model.ViewSettings == null || (!Model.MapView && (Model.ViewSettings.TagsOnList || Model.ViewSettings.TagsOnMosaic)) || (Model.MapView && Model.ViewSettings.TagsOnMap)) && Model.Tags != null && Model.Tags.Count() > 0)
+                    {
+                        string claseExtra = "";
+                        if (Model.ViewSettings != null)
+                        {
+                            if (!Model.ViewSettings.TagsOnList)
+                            {
+                                claseExtra += " noListView";
+                            }
+                            if (!Model.ViewSettings.TagsOnMosaic)
+                            {
+                                claseExtra += " noGridView";
+                            }
+                        }                    
+                        <div class="group etiquetas @claseExtra">
+                            <p>
+                                @Html.GetText("COMMON", "ETIQUETAS"):
+                            </p>
+                            <ul class="listTags">
+                                @{
+                        int cont = 0;
+                        foreach (string tag in Model.Tags)
+                        {
+                            string separador = "";
+                            if (cont > 0) { separador = ", "; }
+                                    
+                                    <li>@separador<a resource="@Model.UrlSearch/@Html.GetText("URLSEM", "TAG")/@tag" rel="sioc:topic" href="@Model.UrlSearch/@Html.GetText("URLSEM", "TAG")/@tag"><span about="@Model.UrlSearch/@Html.GetText("URLSEM", "TAG")/@tag" property="dcterms:name" typeof="sioc_t:Tag">@tag</span></a></li>
+                            cont++;
+                        }
+                                }
+                            </ul>
+                        </div>
+                    }
+                    <div id="accionesListado_@Model.Key.ToString()_@Guid.NewGuid()_@Html.GetComunidad().Key.ToString()" class="group acciones noGridView">
+                    </div>
+                    <div class="divContAccList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

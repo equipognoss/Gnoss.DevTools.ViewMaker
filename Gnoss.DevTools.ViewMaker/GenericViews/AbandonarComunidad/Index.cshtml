@@ -1,0 +1,57 @@
+﻿@model bool
+
+@{
+    bool AbandonandoPlataforma = Model;
+    CommunityModel Comunidad = Html.GetComunidad();
+    
+    Html.SetBodyClass("layout03 comGnoss");
+}
+
+<div id="col02">  
+    @{
+    
+        string textoTitulo = Html.GetText("COMMON", "ABANDONARCOMUNIDAD");
+        string textoInfoAbandorar = "";
+
+
+        if (Comunidad.AccessType == CommunityModel.TypeAccessProject.Public || Comunidad.AccessType == CommunityModel.TypeAccessProject.Restricted)
+        {
+            textoInfoAbandorar = Html.GetText("COMUNIDADES", "ABANDONARCOMUNIDADPUBLICAUSUARIO");
+        }
+        else
+        {
+            textoInfoAbandorar = Html.GetText("COMUNIDADES", "ABANDONARCOMUNIDADPRIVADAUSUARIO");
+        }
+        
+        if (AbandonandoPlataforma)
+        {
+            textoTitulo = Html.GetText("COMMON", "ABANDONARPLATAFORMA");
+            textoInfoAbandorar = Html.GetText("COMUNIDADES", "ABANDONARPLATAFORMAUSUARIO");
+        }
+    }      
+    <h2>
+        <span>@textoTitulo</span>
+    </h2>  
+    <div class="box">  
+        <form method="post" action="@Html.GetUrlPagina()/confirm">
+            <p><label>@textoInfoAbandorar</label></p>
+            
+            @if (AbandonandoPlataforma)
+            { 
+                <p>
+                    <label id="lblContrasenya" class="datoObligatorio"></label>
+                    <input class="text medium" type="password" id="txtContrasenya" />
+                </p>
+                <div id="divContenedorError"></div>
+            }
+
+            @{
+                string accionNo = "window.location.href = '" + Comunidad.Url + "'";    
+            }
+
+            <input type="submit" value="@Html.GetText("COMMON", "SI")" onclick="MostrarUpdateProgress();" />
+            <input type="button" value="@Html.GetText("COMMON", "NO")" onclick="@accionNo"/>  
+        </form>       
+    </div>             
+</div>
+

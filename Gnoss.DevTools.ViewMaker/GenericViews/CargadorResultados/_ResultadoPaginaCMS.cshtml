@@ -1,0 +1,23 @@
+﻿@model PaginaCMSModel
+
+@if (Model != null)
+{
+    string id = "paginaCMS_" + Model.Key;
+    
+    <div class="resource" id="@id">
+        <div class="box description">
+            <div class="group title">
+                <h3>
+                    @if (!string.IsNullOrEmpty(Model.Url))
+                    {
+                        <a href="@Model.Url">@Model.Title</a>
+                    }
+                    else
+                    {
+                        @Model.Title
+                    }
+                </h3>
+            </div>
+        </div>
+    </div>
+}

@@ -1,0 +1,38 @@
+﻿@*
+Descripción
+----------------------------------------------------------------
+Vista parcial que contiene los formularios ocultos que son cargados en el Layout.
+Se utilizan para ayudar al Layout a contener información relacionada con el proyecto/comunidad en el que el usuario se encuentra.
+
+Variables
+----------------------------------------------------------------
+*@
+
+@*
+----------------------------------------------------------------
+
+-------------------- Formularios hidden del Layout --------------------*@
+
+<form method="post" target="_blank" action="" name="formularioHidden" id="formularioHidden">
+    <fieldset style="display: none">
+        <legend class="nota">formularioHidden</legend>
+        @if (Html.GetListaInputHidden() != null)
+        {
+        foreach (KeyValuePair<string, string>
+            inputHidden in Html.GetListaInputHidden())
+            {
+            <input type="hidden" id="@inputHidden.Key" class="@inputHidden.Key" value="@inputHidden.Value" />
+            }
+            }
+            <input type="submit" style="display: none;" id="enviarHidden" value="enviar" title="enviar" />
+    </fieldset>
+</form>
+
+<form method="post" target="_blank" action="" name="formularioRDF" id="formularioRDF">
+    <fieldset style="display: none">
+        <legend class="nota">formularioRDF</legend>
+        <input type="text" style="display: none;" title="query" name="query" id="query" />
+        <input type="text" style="display: none;" title="pagina" name="pagina" id="pagina" />
+        <input type="submit" style="display: none;" id="rdfHack" value="enviar" title="enviar" />
+    </fieldset>
+</form>

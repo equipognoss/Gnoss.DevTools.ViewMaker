@@ -1,0 +1,44 @@
+﻿@model ProfileModel
+
+<div class="resource">
+    <div class="box description">
+        <div class="group title">
+            @{
+                string nombreCompleto = Html.ObtenerNombreCompletoDeFichaIdentidad(Model);
+            }
+            <h4><a href="@Model.UrlPerson">@nombreCompleto</a></h4>
+            <div class="logoComunidad resourceType persona">
+                <a href="@Model.UrlPerson" title="@nombreCompleto">
+                    @if (!string.IsNullOrEmpty(Model.UrlFoto))
+                    {
+                        <img title="@nombreCompleto" alt="@nombreCompleto" src="@Html.GetBaseUrlContent()@Model.UrlFoto" />
+                    }
+                </a>
+            </div>
+        </div>
+        @if (Model.Actions != null && Model.ListActions != null && Model.KeyPerson != Html.GetIdentidadActual().KeyPerson)
+        {
+           <div class="group acciones">
+                <p></p>
+                <ul>
+                    <li id="liSeguir">
+                        @if (Model.Actions.FollowingProfile)
+                        {
+                            string accionExtra = "";
+
+                            if (ViewData.ContainsKey("DeleteAtUnFollow") && (bool)ViewData["DeleteAtUnFollow"] == true)
+                            {
+                                accionExtra = ";$(this).closest('.resource').hide();";
+                            }
+                            <a onclick="@accionExtra AccionPerfil_NoSeguir(this, '@Model.ListActions.UrlUnfollow')">@Html.GetText("COMMON", "NOSEGUIR")</a>
+                        }
+                        else
+                        {
+                            <a onclick="AccionPerfil_Seguir(this, '@Model.ListActions.UrlFollow')">@Html.GetText("COMMON", "SEGUIR")</a>
+                        }
+                    </li>
+                </ul>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,36 @@
+﻿
+@{
+    ViewBag.Title = "Administración de trazas";
+    Layout = null;
+}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="Head1">
+    <title>
+        Administración de trazas
+    </title>
+</head>
+<body>
+    <form method="post" action="traza" id="form1">
+        <div>
+            <div id="updEstado">
+                <p>
+                    <span id="lblEstado">@ViewBag.Estado</span>
+                </p>
+                <p>
+                    <input name="txtNombre" type="text" id="txtNombre" />
+                    <input name="txtPassword" type="password" id="txtPassword" />
+                    <input type="submit" name="btnTraza" value="@ViewBag.Accion" id="btnTraza" />
+                </p>
+                <p>
+                    <span id="lblError" style="color: Red;">@ViewBag.Error</span>
+                </p>
+            </div>
+        </div>
+    </form>
+</body>
+</html>
+
+

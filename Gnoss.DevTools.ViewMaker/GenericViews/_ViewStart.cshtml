@@ -1,0 +1,22 @@
+﻿@*@{
+        Layout = "~/Views/Shared/Layout/_Layout" + Html.GetPersonalizacionLayout() + ".cshtml";
+    }*@
+
+@{ string rutaVistasPersonalizadas = @ViewBag.rutaVistasPersonalizadas;
+
+                string layoutView = $"~/{rutaVistasPersonalizadas}/Views/Shared/Layout/_Layout.cshtml";
+                //if (!System.IO.File.Exists(AppContext.BaseDirectory + layoutView.Replace("~/", "")))
+                if (!System.IO.File.Exists(AppContext.GetData("rutaBase") + layoutView.Replace("~/", "")))
+                {
+                    string rutaVistasPersonalizadasEcosistema = @ViewBag.rutaVistasPersonalizadasEcosistema;
+
+                    layoutView = $"~/{rutaVistasPersonalizadasEcosistema}/Views/Shared/Layout/_Layout.cshtml";
+                    //if (!System.IO.File.Exists(AppContext.BaseDirectory + layoutView.Replace("~/", "")))
+                    if (!System.IO.File.Exists(AppContext.GetData("rutaBase") + layoutView.Replace("~/", "")))
+                    {
+                        layoutView = "~/GenericViews/Shared/Layout/_Layout.cshtml";
+                    }
+                }
+
+                Layout = layoutView; 
+   }

@@ -1,0 +1,19 @@
+﻿@using Es.Riam.Gnoss.Web.MVC.Models
+@using Es.Riam.Gnoss.Web.MVC.Models.ViewModels
+@using Es.Riam.Gnoss.Web.MVC.Models.Administracion
+@using Newtonsoft.Json
+@using Es.Riam.Util
+@using Microsoft.AspNetCore.Http
+
+@model CMSComponentSearch
+@if (Model != null)
+{
+    <div class="ficha-expo-carrusel small" id="ficha-expo-carrusel">
+        <div class="tresitems-carousel">
+            @foreach (ResourceModel fichaModel in Model.Resultado.ListaResultados)
+            {
+                @Html.PartialView(Model.ViewNameResources, fichaModel)
+            }
+        </div>
+    </div>
+}

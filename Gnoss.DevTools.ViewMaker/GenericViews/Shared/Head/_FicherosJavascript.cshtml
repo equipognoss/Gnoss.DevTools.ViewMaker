@@ -1,0 +1,204 @@
+﻿@*[security|||shared/head/_ficherosjavascript.cshtml|||elprado]*@
+@using Es.Riam.Gnoss.Web.MVC.Models
+@using Es.Riam.Gnoss.Web.MVC.Models.ViewModels
+@using Es.Riam.Gnoss.Web.MVC.Models.Administracion
+@using Newtonsoft.Json
+@using Es.Riam.Util
+@using Microsoft.AspNetCore.Http
+
+@{
+    CommunityModel Comunidad = Html.GetComunidad();
+    string urlPersonalizacion = ViewBag.BaseURLContent + "/imagenes/proyectos/personalizacion/" + Comunidad.Key.ToString();
+    string versionJS = "";
+    if (Comunidad.VersionJS.HasValue)
+    {
+        versionJS = Comunidad.VersionJS.Value.ToString();
+    }
+    string version = versionJS + "-" + Html.GetVersion();
+}
+
+
+
+@*<script type="text/javascript" src="@urlPersonalizacion/ElPrado/js/tooltips/bs/bootstrap.min.js?v=@version"></script>*@
+<script type="text/javascript" src="@urlPersonalizacion/ElPrado/js/templates/common.js?v=@version" defer="defer"></script>
+<script type="text/javascript" src="@urlPersonalizacion/ElPrado/js/freewall.js?v=@version" defer="defer"></script>
+
+
+
+
+@* JS y libererías para el sitio web - Theme *@
+<!-- JQUERY -->
+<script src="//code.jquery.com/jquery-3.5.1.js"
+        integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+        crossorigin="anonymous"></script>
+
+<!-- JQUERYUI -->
+<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"
+        integrity="sha256-0YPKAwZP7Mp3ALMRVB2i8GXeEndvCq3eSl/WsAl1Ryk="
+        crossorigin="anonymous"></script>
+
+<!-- Waypoints (Scrolling) -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/waypoints/jquery.waypoints.min.js?v=@Html.GetVersion()"></script>
+
+<!-- POPPER + BOOTSTRAP 4 + PROPELLER -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/bootstrap/bootstrap.min.js?v=@Html.GetVersion()"></script>
+<script src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/propeller/js/propeller.js?v=@Html.GetVersion()"></script>
+
+<!-- UNIFICADO JS -->
+<script type="text/javascript" src="@Html.GetBaseUrlStatic()/js/unificado.js?v=@Html.GetVersion()"></script>
+
+<!-- AUTOCOMPLETE -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/autocomplete/jquery.autocomplete.js?v=@Html.GetVersion()"></script>
+
+<!-- LIGHTGALLERY -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/lightgallery/js/lightgallery-all.min.js?v=@Html.GetVersion()"></script>
+
+<!-- SCROLLMAGIC -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/scrollmagic/ScrollMagic.min.js?v=@Html.GetVersion()"></script>
+
+<!-- ADDINDICATORS -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/scrollmagic/debug.addIndicators.min.js?v=@Html.GetVersion()"></script>
+
+<!-- DATATABLES -->
+<script type="text/javascript"
+        src="https://cdn.datatables.net/v/bs4/dt-1.11.3/b-2.1.1/b-html5-2.1.1/fc-4.0.1/fh-3.2.1/r-2.2.9/sc-2.0.5/sl-1.3.4/datatables.min.js"></script>
+
+<!-- CUSTOM SCROLLBAR -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/customscroller/js/jquery.mCustomScrollbar.concat.min.js?v=@Html.GetVersion()"></script>
+
+<!-- JQUERY PROGRESS BAR TIME -->
+<!-- Documentación: https://www.jqueryscript.net/time-clock/Countdown-Timers-Bootstrap-4-Progressbar.html -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/progressBarTime/jquery.progressBarTimer.min.js?v=@Html.GetVersion()"></script>
+
+<!-- JQUERY SLIDE REVEAL -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/slidereveal/jquery.slidereveal.min.js?v=@Html.GetVersion()"></script>
+
+<!-- SELECT2 -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/select2/js/select2.min.js?v=@Html.GetVersion()"></script>
+
+<!-- MomentJS -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/momentJS/moment.js?v=@Html.GetVersion()"></script>
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/momentJS/moment-timezone-with-data.js?v=@Html.GetVersion()"></script>
+
+<!-- Toastr -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/toastr/toastr.min.js?v=@Html.GetVersion()"></script>
+
+<!-- Google no cookies -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/cookies/googleNoCookies.js?v=@Html.GetVersion()"></script>
+
+<!-- Simple Donut -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/simple-donut/simple-donut.js?v=@Html.GetVersion()"></script>
+
+<!-- Owl Carousel -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/owl-carousel/js/owl.carousel.min.js?v=@Html.GetVersion()"></script>
+
+<!-- PERSONALIZACION JS TEMA  -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/theme.js?v=@Html.GetVersion()"></script>
+
+<!-- CKEditor  -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/ckeditor/ckeditor.js?v=@Html.GetVersion()"></script>
+
+<!-- CKEditor Adaptador jquery -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/ckeditor/adapters/jquery.js?v=@Html.GetVersion()"></script>
+
+<!-- Dirty Form -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/dirty-form/jquery.dirty.js?v=@Html.GetVersion()"></script>
+
+
+@* JS insertados en unificados
+       ---------------------------
+    <script type="text/javascript" src="@Html.GetBaseUrlStatic()/jsUnificar/jquery.ui.core.min.js?v=@Html.GetVersion()"></script>
+    <script type="text/javascript" src="@Html.GetBaseUrlStatic()/jsUnificar/jquery.ui.datepicker.min.js?v=@Html.GetVersion()"></script>
+
+    <script type="text/javascript" src="@Html.GetBaseUrlStatic()/jsUnificar/global.js?v=@Html.GetVersion()"></script>
+    <script type="text/javascript" src="@Html.GetBaseUrlStatic()/jsUnificar/custom.js?v=@Html.GetVersion()"></script>
+    <script type="text/javascript" src="@Html.GetBaseUrlStatic()/jsUnificar/ejemplosUso.js?v=@Html.GetVersion()"></script>
+    <script type="text/javascript" src="@Html.GetBaseUrlStatic()/jsUnificar/busquedas.js?v=@Html.GetVersion()"></script>
+    <script type="text/javascript" src="@Html.GetBaseUrlStatic()/jsUnificar/opcionesDestacadasMenuLateral.js?v=@Html.GetVersion()"></script>
+    <script type="text/javascript" src="@Html.GetBaseUrlStatic()/jsUnificar/WS.js?v=@Html.GetVersion()"></script>
+    <script type="text/javascript" src="@Html.GetBaseUrlStatic()/jsUnificar/listToSelect.jquery.js?v=@Html.GetVersion()"></script>
+    <script type="text/javascript" src="@Html.GetBaseUrlStatic()/jsUnificar/jMsAjax.js?v=@Html.GetVersion()"></script>
+    <script type="text/javascript" src="@Html.GetBaseUrlStatic()/jsNuevo/jquery.gnoss.utils.js?v=@Html.GetVersion()"></script>
+    <script type="text/javascript" src="@Html.GetBaseUrlStatic()/jsNuevo/jquery.gnoss.apply.js?v=@Html.GetVersion()"></script>
+    <script type="text/javascript" src="@Html.GetBaseUrlStatic()/jsNuevo/jquery.gnoss.header.js?v=@Html.GetVersion()"></script>
+    <script type="text/javascript" src="@Html.GetBaseUrlStatic()/jsNuevo/waypoints.min.js?v=@Html.GetVersion()"></script>
+
+    <script type="text/javascript" src="@Html.GetBaseUrlStatic()/jsUnificar/MVC.FichaDocumento.js?v=@Html.GetVersion()"></script>
+    <script type="text/javascript" src="@Html.GetBaseUrlStatic()/jsUnificar/MVC.FichaPerfil.js?v=@Html.GetVersion()"></script>
+    <script type="text/javascript" src="@Html.GetBaseUrlStatic()/jsUnificar/MVC.Registro.js?v=@Html.GetVersion()"></script>
+    <script type="text/javascript" src="@Html.GetBaseUrlStatic()/jsUnificar/MVC.Comun.js?v=@Html.GetVersion()"></script>
+    <script type="text/javascript" src="@Html.GetBaseUrlStatic()/jsUnificar/MVC.ComAdmin.js?v=@Html.GetVersion()"></script>
+*@
+
+@{ string idioma = Html.GetUtilIdiomas().LanguageCode;
+
+    if (idioma.Contains("-"))
+    {
+        idioma = idioma.Substring(0, idioma.IndexOf('-'));
+    } }
+<script type="text/javascript" src="@Html.GetBaseUrlStatic()/lang/@idioma/text.js?v=@Html.GetVersion()"></script>
+
+
+@if (Html.GetListaJS() != null)
+{
+    foreach (string js in Html.GetListaJS())
+    {
+        if (js.StartsWith("defer/"))
+        {
+            <script type="text/javascript" src="@js.Substring(6)" defer="defer"></script>
+        }
+        else
+        {
+            <script type="text/javascript" src="@js"></script>
+        }
+    }
+}
+
+@Html.PartialView("../Shared/Head/_FicherosJavascriptPersonalizado")
+
+@* Código Google Analytics*@
+@if (Html.GetGoogleAnalytics() != null && Context.Request.Cookies["analiticas"] != null && Context.Request.Cookies["analiticas"].Equals("yes"))
+{
+    if (Comunidad.IntegracionContinuaActivada)
+    {
+        if (Comunidad.EntornoEsPro)
+        {
+            <script type="text/javascript">@Html.Raw(Html.GetGoogleAnalytics())</script>
+        }
+    }
+    else
+    {
+        <script type="text/javascript">@Html.Raw(Html.GetGoogleAnalytics())</script>
+    }
+
+}
+else if (!string.IsNullOrEmpty(@Html.GetGoogleAnalyticsCode()))
+{
+    <script>
+        $(document).ready(function () {
+            contarVisitaNoCookie("@Html.GetGoogleAnalyticsCode()");
+        });
+    </script>
+}

@@ -1,0 +1,50 @@
+﻿@using Gnoss.DevTools.ViewMaker.Areas.Gnoss.DevTools.ViewMaker.Model
+
+@model ConfigurationModel
+@{ 
+    ConfigurationModel modelAux = @ViewBag.Configuracion;
+}
+
+
+@if (modelAux.proyectos.Any())
+{
+    int count = 0;
+    <h3>Administrar vistas y estilos de proyectos</h3> foreach (ConfigurationModel.ProyectoRamaModel proyecto in modelAux.proyectos)
+    {
+        string cambios = "";
+        foreach (string file in proyecto.localChanges.Keys)
+        {
+            string status = proyecto.localChanges[file].ToString();
+            string nameFile = file.Replace("Proyectos\\" + proyecto.nombreCortoProyecto + "\\", "");
+            cambios += "<span class='fa " + status + "' title='" + status.Replace("InWorkdir", "").Replace("FromWorkdir", "") + "'>" + nameFile + "</span>";
+        }
+
+        string uploadClass = "fa-cloud-upload " + (proyecto.localChanges.Count == 0 ? "no-changes" : proyecto.hasRemoteChanges ? "disabled" : "");
+        string downloadClass = "fa-cloud-download " + (!proyecto.hasRemoteChanges ? "no-changes" : "");
+
+        string nombreProy = proyecto.nombreCortoProyecto;
+
+        <div class="form-group row" data-proy="@nombreProy">
+            <label class="control-label col-md-4">
+                @if (proyecto.changeBranch)
+                {
+                    <span class="fa fa-random" title="Cambiar a última rama" data-action="changeBranch" data-toggle="modal" data-proyecto="@nombreProy" data-target="#confirmationModal"></span> }
+                else
+                {
+                    <span class="fa @uploadClass" title="Subir vistas y estilos" data-action="upload" data-toggle="modal" data-proyecto="@nombreProy" data-target="#confirmationModal"></span>
+                    <span class="fa @downloadClass" title="Descargar vistas y estilos" data-action="download" data-toggle="modal" data-proyecto="@nombreProy" data-target="#confirmationModal"></span>}
+
+                @Html.Hidden($"proyecto[{count}].userFTP", proyecto.userFTP, new { @class = "userFTP" })
+                @Html.Hidden($"proyecto[{count}].passwordFTP", proyecto.passwordFTP, new { @class = "passwordFTP" })
+                @Html.Hidden($"proyecto[{count}].cambios", cambios, new { @class = "cambios" })
+                @nombreProy
+            </label>
+            <label class="control-label col-md-4">
+                @proyecto.rama
+            </label>
+            <label class="control-label col-md-4">
+                @proyecto.userFTP
+            </label>
+        </div>count++;
+    }
+}

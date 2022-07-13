@@ -1,0 +1,49 @@
+﻿@model AdministrarUsuariosOrganizacionViewModel
+@*
+Descripción
+-----------------------------------------------
+Nueva vista que muestra el header de la lista de items-recursos que aparecerá en la zona central-derecha de la página web. Contendría:
+- Recursos y el número de estos
+- ComboBox para "Descargar" (__resource-list-actions)
+- ComboBox para "Ordenar" (__resource-list-actions)
+- ComboBox para "Visualizar" (__resource-list-actions)
+- Panel con etiquetas con las búsquedas realizadas
+
+Variables
+----------------------------------------------------------------*@
+@{ 
+// Obtengo el tipo de item que se desea mostrar en _list-content (Comunidades, Grupos) pasado desde la vista "Comunidades" y "Grupos"
+var listItemType = (String)ViewData["UsuariosOrganizacionListItemType"];
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Cabecera-Header de lista de recursos dentro de una comunidad --------------------
+*@
+
+
+@* Contenedor de la cabecera de resultados con recursos de la Comunidad *@
+<div class="col col-12 header-listado">
+    @* Título de Búsquedas *@
+    <div class="h1-container">
+        @switch (listItemType)
+        {
+            case "Comunidades":
+                <h1>@Html.GetText("COMMON", "COMUNIDADES") <span id="panNumResultados" class="numResultados">@Model.Organization.NumCommunitiesOrg</span></h1>
+                break;
+            case "Grupos":
+                <h1>@Html.GetText("CONTACTOS", "GRUPOS") <span id="panNumResultados" class="numResultados">@Model.Organization.NumGroupsOrg</span></h1>
+                break;
+            case "Usuarios":
+                <h1>@Html.GetText("CONTACTOS", "USUARIOS") <span id="panNumResultados" class="numResultados">@Model.Organization.NumUsersOrg</span></h1>
+                break;
+            default:
+                <h1>No hay datos para ser mostrados</h1>
+                break;
+        }
+    </div>
+
+    @* ComboBox disponibles para filtrado de resultados (Descargar, Ordenar, Visualizar) *@
+    @Html.PartialView("../UsuariosOrganizacion/_partial-views/_list-header-actions", Model)
+
+</div>

@@ -1,0 +1,308 @@
+﻿@model SendLinkViewModel
+
+@{
+    CommunityModel Comunidad = Html.GetComunidad();
+    HeaderModel Cabecera = Html.GetCabecera();
+    UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+        
+    Html.SetBodyClass("layout03 comGnoss");
+    Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/ckeditor.js?v=" + Html.GetVersion());
+    Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/adapters/jquery.js?v=" + Html.GetVersion());
+}
+
+<div id="col02">
+    <h3>Enviar enlace</h3>
+    <fieldset>
+        <form method="post" id="frmEnviarEnlace">
+
+            @if (Comunidad.AccessType == CommunityModel.TypeAccessProject.Public || Comunidad.AccessType == CommunityModel.TypeAccessProject.Restricted)
+            {
+            <div class="envioInv">
+                <div class="group acciones tabspresentation">
+                    <ul>
+                        <li class="active" id="botonContactos"><a onclick="MostrarContactosCorreos(this);">@Html.GetText("INVITACIONES", "INVITARAUSUARIOS")</a></li>
+                        <li id="botonCorreos" class=""><a onclick="MostrarContactosCorreos(this);">@Html.GetText("INVITACIONES", "INVITARAEXTERNOS")</a></li>
+                    </ul>
+                </div>
+            </div>
+            }
+
+
+            <div id="panels" class="stateShowForm" style="display: block;">
+                <div style="display: block;" id="action" class="box form activeForm">
+                    <fieldset id="divContactos" class="">
+                        @{
+                            string instrucciones = "";
+                            if (Comunidad.AccessType == CommunityModel.TypeAccessProject.Public || Comunidad.AccessType == CommunityModel.TypeAccessProject.Restricted)
+                            {
+                                instrucciones = Html.GetText("ENVIOENLACE", "ENVIARATODOS");
+                            }
+                            else
+                            {
+                                instrucciones = Html.GetText("ENVIOENLACE", "ENVIARAMIEMBROS"); 
+                            }
+                        }
+                        <p><label>@instrucciones</label></p>
+                        <fieldset class="filtroRapido">
+                            <p>
+                                <input type="text" onkeydown="if(event.which || event.keyCode){if ((event.which == 13) || (event.keyCode == 13)) {return false;}}" id="txtFiltro" class="filtroFaceta ac_input" autocomplete="off" />
+                                <span class="searchButton"></span>
+                            </p>
+                        </fieldset>
+                    </fieldset>
+                    @if (Comunidad.AccessType == CommunityModel.TypeAccessProject.Public || Comunidad.AccessType == CommunityModel.TypeAccessProject.Restricted)
+                    {
+                    <fieldset class="oculto" id="divCorreos">
+                        <p>
+                            <label>@Html.GetText("INVITACIONES", "CORREOAINVITAR")</label></p>
+                        <p class="textarea">
+                            <textarea id="txtCorreoAInvitar" cols="20" rows="2"></textarea>
+                            <em class="help">@Html.GetText("INVITACIONES", "SEPARADASCOMAS")</em>
+                        </p>
+
+                        <input type="button" value="añadir" onclick="javascript:agregarCorreo();" id="litAñadirCorreo" />
+                        <div class="ko">
+                            <p>
+                                <label id="lblInfoCorreo"></label>
+                            </p>
+                        </div>
+                    </fieldset>
+                    }
+                </div>
+            </div>
+
+            <fieldset class="editorLector">
+                <p>
+                    <label>@Html.GetText("ENVIOENLACE", "ENLACESEENVIARA")</label>
+                </p>
+                <div id="panContenedorInvitados">
+                </div>
+            </fieldset>
+
+            <div>
+                <fieldset>
+                    <p>
+                        <label>@Html.GetText("INVITACIONES", "IDIOMAMENSAJE")</label>
+                    </p>
+                    <p>
+                        <select id="ddlIdioma">
+                        @foreach (KeyValuePair<string, string> idioma in Cabecera.Languajes)
+                        {
+                            <option value="@idioma.Key" @if (Html.GetUtilIdiomas().LanguageCode == idioma.Key){<text>selected="selected"</text>}>@idioma.Value</option>
+                        }
+                        </select>
+                    </p>
+                </fieldset>
+            </div>
+
+            <fieldset>
+                <p>
+                    <label>@Html.GetText("ENVIOENLACE", "AGREGARNOTA")</label>
+                </p>
+                <p class="textarea">
+                    <textarea class="cke ckeSimple mensajes" id="txtNotas"></textarea>
+                </p>
+                <p>
+                    @Html.GetText("ENVIOENLACE", "ENLACE")
+                    <a id="linkEnlace" href="@Model.LinkUrl">@Model.LinkName</a>
+                </p>
+            </fieldset>
+            
+            <input type="hidden" id="txtHackInvitados" />
+
+            <fieldset>
+                <p>
+                    <input type="button" onclick="EnviarInvitaciones()" value="@Html.GetText("COMMON", "ENVIARENLACE")" />
+                </p>
+            </fieldset>
+        </form>
+    </fieldset>
+</div>
+<script type="text/javascript">
+    function EnviarInvitaciones()
+    {
+        EnviarAccGogAnac('Acciones sociales', 'Enviar enlace', '@Model.LinkUrl');
+        try{
+            @Html.Raw(Model.ExtraActionSent);
+        }catch(ex)
+        {}
+        enviarFormularioPagina();
+    }
+
+    function enviarFormularioPagina() {
+        MostrarUpdateProgress();
+       
+        var dataPost = {
+            Receivers: $('#txtHackInvitados').val(),
+            Message: encodeURIComponent($('#txtNotas').val().replace(/\n/g, '')),
+            Lang: $('#ddlIdioma').val()
+        }
+
+        GnossPeticionAjax(
+            '@Html.GetUrlPagina()/save-changes',
+            dataPost,
+            true
+        ).fail(function () {
+            claseDiv = "ko";
+        })
+    }
+
+    function crearInvitado(ficha, nombre, identidad) {
+        document.getElementById('txtFiltro').value = '';
+
+        contenedor = document.getElementById('panContenedorInvitados');
+        if (contenedor.innerHTML.trim().indexOf('<ul') == 0) { contenedor.innerHTML = contenedor.innerHTML.replace('<ul class=\"icoEliminar\">', '').replace('</ul>', ''); }
+        contenedor.innerHTML = '<ul class=\"icoEliminar\">' + contenedor.innerHTML + '<li>' + nombre + '<a class="remove" onclick="javascript:eliminarInvitado(null,this,\'' + identidad + '\');">' + textoRecursos.Eliminar + '</a></li>' + '</ul>';
+
+        if (ficha != null) {
+            ficha.style.display = 'none';
+        }
+        document.getElementById('txtHackInvitados').value = document.getElementById('txtHackInvitados').value + "&" + identidad;
+    }
+
+    function eliminarInvitado(fichaId, nombre, identidad) {
+        contenedor = document.getElementById('panContenedorInvitados');
+        contenedor.children[0].removeChild(nombre.parentNode);
+        document.getElementById('txtHackInvitados').value = document.getElementById('txtHackInvitados').value.replace('&' + identidad, '');
+    }
+
+    function agregarCorreo() {
+        txtCorreo = document.getElementById('txtCorreoAInvitar');
+        infoCorreo = document.getElementById('lblInfoCorreo');
+
+        var correos = txtCorreo.value.split(',');
+
+        for (var i = 0; i < correos.length; i++) {
+            if (correos[i] != '') {
+                if (!validarEmail(correos[i].replace(/^\s*|\s*$/g, ""))) {
+                    infoCorreo.innerHTML = form.emailValido;
+                    infoCorreo.parentNode.parentNode.style.display = 'block';
+                    return;
+                }
+            }
+        }
+        infoCorreo.parentNode.parentNode.style.display = '';
+
+        contenedor = document.getElementById('panContenedorInvitados');
+        if (contenedor.innerHTML.trim().indexOf('<ul') == 0) { contenedor.innerHTML = contenedor.innerHTML.replace('<ul class=\"icoEliminar\">', '').replace('</ul>', ''); }
+
+        for (var i = 0; i < correos.length; i++) {
+            if (correos[i] != '') {
+                contenedor.innerHTML = contenedor.innerHTML + '<li> ' + correos[i].replace(/^\s*|\s*$/g, "") + '<a class="remove" onclick="javascript:eliminarCorreo(\'' + correos[i].replace(/^\s*|\s*$/g, "") + '\',this);">' + textoRecursos.Eliminar + '</a></li>';
+                document.getElementById('txtHackInvitados').value = document.getElementById('txtHackInvitados').value + "&" + correos[i].replace(/^\s*|\s*$/g, "");
+            }
+        }
+
+        contenedor.innerHTML = '<ul class=\"icoEliminar\">' + contenedor.innerHTML + '</ul>';
+
+        txtCorreo.value = '';
+        infoCorreo.innerHTML = '';
+    }
+
+    function eliminarCorreo(correo, nombre) {
+        txtCorreo = document.getElementById('txtCorreoAInvitar');
+
+        contenedor = document.getElementById('panContenedorInvitados');
+        contenedor.children[0].removeChild(nombre.parentNode);
+        document.getElementById('txtHackInvitados').value = document.getElementById('txtHackInvitados').value.replace('&' + correo, '');
+    }
+
+    function MostrarContactosCorreos(pBoton) {
+        if (pBoton.parentNode.id == 'botonContactos') {
+            document.getElementById('botonContactos').className = 'active';
+            document.getElementById('botonCorreos').className = '';
+            document.getElementById('divContactos').className = '';
+            document.getElementById('divCorreos').className = 'oculto';
+        }
+        else {
+            document.getElementById('botonContactos').className = '';
+            document.getElementById('botonCorreos').className = 'active';
+            document.getElementById('divContactos').className = 'oculto';
+            document.getElementById('divCorreos').className = '';
+        }
+    }
+
+    @if (!Html.GetEsEcosistemaSinMetaProyecto()) {
+        <text>
+        $(document).ready(function () { 
+            $('#txtFiltro').autocomplete(
+            null,
+            {
+                url: $('#inpt_urlServicioAutocompletar').val() + "/AutoCompletarEnvioEnlace",
+                type: "POST",
+                delay: 0,
+                multiple: true,
+                scroll: false,
+                selectFirst: false,
+                minChars: 1,
+                width: 300,
+                cacheLength: 0,
+
+                NoPintarSeleccionado: true,
+                txtValoresSeleccID: 'txtHackInvitados',
+
+                extraParams: {
+                    identidad: '@IdentidadActual.KeyIdentity',
+                    identidadMyGnoss: '@IdentidadActual.KeyMetaProyectIdentity',
+                    @{
+                        string identidadOrg = "";
+                        if (IdentidadActual.KeyOrganization.HasValue)
+                        {
+                            identidadOrg = IdentidadActual.KeyOrganization.Value.ToString();
+                        }
+                    }
+
+                    identidadOrg: '@identidadOrg',
+                    proyecto: '@Comunidad.Key',
+
+                    @{
+                        string boolPrivada = "true";
+                        if (Comunidad.AccessType == CommunityModel.TypeAccessProject.Public || Comunidad.AccessType == CommunityModel.TypeAccessProject.Restricted)
+                        {
+                            boolPrivada = "false";
+                        }
+                    }
+                    bool_esPrivada: '@boolPrivada'
+                }
+            });
+
+            $('#txtFiltro').result(function(event, data, formatted){
+                crearInvitado(null,data[0],data[1]);
+            });
+        });
+        </text>
+    }
+    else {
+        <text>
+        $(document).ready(function () { 
+            $('#txtFiltro').autocomplete(
+                null,
+                {
+                    url: $('#inpt_urlServicioAutocompletar').val() + "/AutoCompletarEnvioEnlaceComunidad",
+                    type: "POST",
+                    delay:0,
+                    multiple:true,
+                    scroll:false,
+                    selectFirst: false,
+                    minChars:1,
+                    width:300,
+                    cacheLength:0,
+
+                    NoPintarSeleccionado:true,
+                    txtValoresSeleccID:'txtHackInvitados',
+
+                    extraParams: { 
+                        identidad: '@IdentidadActual.KeyIdentity',
+                        proyecto: '@Comunidad.Key',
+                    }
+                }
+            );
+
+            $('#txtFiltro').result(function(event, data, formatted){
+            crearInvitado(null,data[0],data[1]);
+            });
+        });
+        </text>
+    }
+</script>
+

@@ -1,0 +1,247 @@
+﻿@model SemanticResourceModel
+
+@{
+    Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/jsNuevo/JCROP/js/jquery.Jcrop.min.js?v=" + Html.GetVersion());
+    Html.GetListaCSS().Add(Html.GetBaseUrlStatic() + "/jsNuevo/JCROP/css/jquery.Jcrop.css?v=" + Html.GetVersion());
+}
+
+<div id="panContenedorJcrop" style="display:none;">
+    <div id="contenedorDeContenedorCapaModal">
+        <div id="contenedorCapaModal">
+            <div id="capaModal">
+                <div class="mascara" style="height: 100%; width: 100%; position: fixed; top: 0px; left: 0px; opacity: 0.7; z-index: 10000">
+                </div>
+                <div class="contenedorImg jCrop" style="z-index: 10001; background-color: #373737; height: 540px; left: 0px; position: absolute; top: 0px; width: 540px; margin-top: 100px; margin-left:300px">
+                    <img ID="imagenJCROP" style="max-width: 540px; max-height: 540px;" src=""/>
+                    <label>
+                        <a style="text-decoration: none; color: white; padding: 5px; border: grey; background: grey; display: block; margin-top: 5px; margin-left: 5px;" id="btnAceptarFoto" onclick="javascript:guardarSeleccion();">@Html.GetText("COMMON", "GUARDAR")</a>
+                    </label>
+                    <label style="float:right">
+                        <a style="text-decoration: none; color: white; padding: 5px; border: grey; background: grey; display: block; margin-top: 5px; margin-right: 5px;" id="btnCerrarSelector" onclick="javascript:CerrarSelector();">@Html.GetText("COMMON", "CERRAR")</a>
+                    </label>
+                    <div style="display: none">
+                        <input type="hidden" id="txtX" />
+                        <input type="hidden" id="txtY" />
+                        <input type="hidden" id="txtW" />
+                        <input type="hidden" id="txtH" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript" defer="defer">
+
+    var contenedorJcrop;
+    var argsExtra;
+    var jcrop_api;
+    var documentoID;
+
+    var minY = 0;
+    var minY = 0;
+    var maxY = 0;
+    var maxY = 0;
+
+    var coordInicial = null;
+    var tamMinimo = null;
+    var tamMaximo = null;
+
+    function MontarJCROP(pContenedorJcrop, pSrcImagen, pArgsExtra, pDocumentoID, pDatosJCrop)
+    {
+        contenedorJcrop = pContenedorJcrop;
+        argsExtra = pArgsExtra;
+        documentoID = pDocumentoID;
+
+        var imgJcrop = contenedorJcrop.find('.contenedorImg img')[0];
+        imgJcrop.src = pSrcImagen;
+        var datosJCrop = pDatosJCrop.split(';');
+        minX = parseInt(datosJCrop[0]);
+        minY = parseInt(datosJCrop[1]);
+        maxX = parseInt(datosJCrop[2]);
+        maxY = parseInt(datosJCrop[3]);
+
+        coordInicial = [0, 0, 300, 300];
+        tamMinimo = [75, 75];
+        tamMaximo = [0, 0];
+
+        //centramos el JCROP
+        var mascara = $('.mascara', contenedorJcrop);
+        mascara.show();
+
+        var contenedorImagen = $('.contenedorImg', contenedorJcrop);
+
+        var posX = $(window).scrollLeft() + $(window).width() / 2;
+        var posY = $(window).scrollTop() + $(window).height() / 2;
+
+        var anchoContenedor = contenedorImagen.width();
+        var altoContenedor = contenedorImagen.height();
+
+        contenedorImagen.css('marginLeft', (posX - anchoContenedor / 2) + 'px');
+        contenedorImagen.css('marginTop', (posY - altoContenedor / 2) + 'px');
+
+        contenedorJcrop.show();
+
+        Jcropear();
+    }
+
+    function JcropearSelectivo() {
+        if (minX != 0 || maxX != 0) {
+            var imgJcrop = contenedorJcrop.find('.contenedorImg img')[0];
+            var realWidth = imgJcrop.width;
+            var realHeight = imgJcrop.height;
+            var imgWidth = $(imgJcrop).width();
+            var imgHeight = $(imgJcrop).height();
+            var relAncho = realWidth / imgWidth;
+            var relAlto = realHeight / imgHeight;
+
+            if (minX != 0) {
+                if (realWidth < minX || realHeight < minY) {
+                    CerrarSelector();
+                    ErrorCargarArchivo_SemCms(textoFormSem.errorSubirJCropSize.replace('@Html.Raw("@1@")', minX).replace('@Html.Raw("@2@")', minY));
+                    return;
+                }
+
+                tamMinimo = [(minX / relAncho), (minY / relAlto)];
+                coordInicial = [0, 0, tamMinimo[0], tamMinimo[1]];
+            }
+
+            if (maxX != 0) {
+                tamMaximo = [(maxX / relAncho), (maxY / relAlto)];
+
+                if (minX == 0) {
+
+                    if (realWidth < maxX) {
+                        if (realWidth < (coordInicial[2] * relAncho)) {
+                            coordInicial[2] = imgWidth;
+                        }
+                    }
+                    else if (tamMaximo[0] < coordInicial[2]) {
+                        coordInicial[2] = tamMaximo[0];
+                    }
+
+                    if (realHeight < maxY) {
+                        if (realHeight < (coordInicial[3] * relAlto)) {
+                            coordInicial[3] = imgHeight;
+                        }
+                    }
+                    else if (tamMaximo[1] < coordInicial[3]) {
+                        coordInicial[3] = tamMaximo[1];
+                    }
+                }
+            }
+
+            Jcropear();
+        }
+    }
+
+    function Jcropear() {
+        var imgJcrop = contenedorJcrop.find('.contenedorImg img')[0];
+        $(imgJcrop).Jcrop({
+            //aspectRatio: 1,
+            addClass: 'custom',
+            setSelect: coordInicial,
+            minSize: tamMinimo,
+            maxSize: tamMaximo,
+            sideHandles: false,
+            onChange: showCoords,
+            onSelect: showCoords
+        }, function () {
+            jcrop_api = this;
+            JcropearSelectivo();
+        });
+    }
+
+    function guardarSeleccion()
+    {
+        var img = contenedorJcrop.find('.contenedorImg img')[0];
+        var rutaImagen = img.src;
+
+        var realWidth = img.width;
+        var realHeight = img.height;
+
+        var imgWidth = $(img).width();
+        var imgHeight = $(img).height();
+
+        var relAncho = realWidth / imgWidth;
+        var relAlto = realHeight / imgHeight;
+
+        $('#txtX').val(relAncho * $('#txtX').val());
+        $('#txtY').val(relAlto * $('#txtY').val());
+        
+        $('#txtW').val(relAncho * $('#txtW').val());
+        $('#txtH').val(relAlto * $('#txtH').val());
+
+        AjustarDecimalesCoordenadas();
+
+        CerrarSelector();
+
+        MostrarUpdateProgress();
+        GuardarDisabled(false);
+
+        var args = {};
+        args.XCoord = $('#txtX').val();
+        args.YCoord = $('#txtY').val();
+        args.Width = $('#txtW').val();
+        args.Height = $('#txtH').val();
+        args.ImgSrc = rutaImagen;
+        args.Extra = argsExtra;
+        args.documentoID = documentoID;
+        GnossPeticionAjax(urlPaginaActual + '/savejcrop', args, true).done(function (data) {
+            var img = contenedorJcrop.find('.contenedorImg img')[0];
+            var rutaImagen = img.src;
+            var extensionDoc = rutaImagen.substr(rutaImagen.lastIndexOf('.'));
+
+            AgregarArchivoComoPropiedad('txtHackArchivoSelecc', documentoID, 'txtHackValorImgRepresentante', 'imagenes/Documentos/imgsem/', 'VideosSemanticos/', 'doclinks/', data, extensionDoc);
+        }).fail(function (data) {
+            ErrorCargarArchivo_SemCms(null);
+        }).always(function () {
+            OcultarUpdateProgress();
+            GuardarEnabled();
+        });
+    }
+
+    function AjustarDecimalesCoordenadas() {
+        AjustarDecimalesCoordenada('txtX');
+        AjustarDecimalesCoordenada('txtY');
+
+        if (minX != 0 && maxX != 0 && minX == maxX && minY == maxY) {
+            $('#txtW').val(maxX);
+            $('#txtH').val(maxY);
+        }
+        else {
+            AjustarDecimalesCoordenada('txtW');
+            AjustarDecimalesCoordenada('txtH');
+        }
+    }
+
+    function AjustarDecimalesCoordenada(txt) {
+        var x = $('#' + txt).val();
+
+        if (x.indexOf('.') != -1) {
+            if (parseInt(x.substring(x.indexOf('.') + 1, x.indexOf('.') + 2)) < 5) {
+                $('#' + txt).val(x.substring(0, x.indexOf('.')));
+            }
+            else {
+                $('#' + txt).val(parseInt(x.substring(0, x.indexOf('.'))) + 1);
+            }
+        }
+    }
+
+    function showCoords(c) {
+        $('#txtX').val(c.x);
+        $('#txtY').val(c.y);
+        
+        $('#txtW').val(c.w);
+        $('#txtH').val(c.h);
+    }
+
+    function CerrarSelector()
+    {
+        jcrop_api.destroy();
+
+        contenedorJcrop.hide();
+    }
+
+</script>

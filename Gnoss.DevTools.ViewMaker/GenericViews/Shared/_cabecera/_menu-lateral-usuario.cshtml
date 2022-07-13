@@ -1,0 +1,643 @@
+﻿@using Es.Riam.Gnoss.Web.MVC.Models;
+@if (Html.GetComunidad() != null)
+{
+@*
+Descripción
+-----------------------------------------------
+Menú lateral derecho que aparecerá al pulsar sobre el icono del usuario de la la sección "Header".
+Este panel se deslizará de derecha a izquierda para mostrar información del usuario:
+
+*Navegación*
+- Mensajes
+- Notificaciones
+- Comentarios
+- Contactos
+*Mi Espacio personal*
+- Contribuciones
+- Recursos/Guardados
+- Favoritos
+- Borradores
+*Mis Comunidades*
+- Gestión de proyectos de Gnoss..
+...
+Variables
+----------------------------------------------------------------
+*@
+HeaderModel cabecera = Html.GetCabecera();
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+UserProfileModel perfil = Html.GetPerfil();
+CommunityModel Comunidad = Html.GetComunidad();
+// URL de la foto del usuario
+string urlFoto = "";
+// Nº de posibles solicitudes
+string urlSolicitudes = "";
+// Nº de perfiles existentes
+int contadorPerfilesPerfil = 0;
+// Conocer los permisos del usuario para adminstrar una comunidad
+CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
+
+// Url para poder hacer llamada y obtener los datos del ViewModel y mostrarlos en el Modal (Administrar suscripciones de Comunidad)
+string urlModalAdministrarCategorias = $"{@Html.GetComunidad().Url}/{@Html.GetText("URLSEM", "ADMINISTRARSUSCRIPCIONCOMUNIDAD")}/modal";
+
+// Controlar si dispone o no de fotografía el usuario
+bool containsUrlFoto = true;
+// Controlar el nº de Comunidades a mostrar para que no quede demasiado largo
+int numMaxCommunitiesToDisplay = 5;
+int contCommunity = 0;
+@*
+----------------------------------------------------------------
+-------------------- Menú Lateral Usuario --------------------
+*@
+
+<aside id="menuLateralUsuario" class="menuLateral usuario" role="navigation">
+    <div class="header">
+        <div class="wrap-header">
+            <div class="usuarioWrapper">
+                <div class="nombre">
+                    <span id="usuario_nombre" title="@Html.AcortarTexto((string)perfil.Name, 10)">@Html.AcortarTexto((string)perfil.Name, 10)</span>
+                </div>
+            </div>
+            <span class="material-icons cerrar">close</span>
+            @* Cargar fotografía del usuario *@
+            @if (!IdentidadActual.IsGuestUser)
+            {
+                if (string.IsNullOrEmpty(perfil.Foto))
+                {
+                    containsUrlFoto = false;
+                    urlFoto = Html.ObtenerFotoAnonimaDePerfil(perfil.TypeProfile);
+                }
+                else
+                {
+                    urlFoto = perfil.Foto.Replace("_peque.png", "_grande.png");
+                }
+            }
+            @* Fin Carga fotografía del usuario *@
+
+            @* Panel usuario (foto, nombre) *@
+            <div class="cabeceraUsuario" id="usuario_conectado">
+                @* Controlar la imagen/estilo de la imagen del usuario *@
+                @if (containsUrlFoto == false)
+                {
+                    @* Sin Imagen *@
+                    <div id="usuario_conectado_foto" 
+                         class="imagen-usuario">
+                        <div class="imagen sinImagen">
+		                    <span class="material-icons">person</span>
+	                    </div>
+                    </div>                                             
+                }
+                else
+                { 
+                    @* Con Imagen*@
+                    <div id="usuario_conectado_foto" 
+                         class="imagen-usuario">
+                        <div class="imagen">
+                            <span style="background-image: url(@Html.GetBaseUrlContent()@urlFoto);"></span>
+                        </div>
+                    </div>
+                }
+
+                <div class="nombre-usuario" id="usuario_conectado_nombre">
+                    <p class="nombre">@Html.AcortarTexto((string)perfil.Name, 10)</p>
+                    @*<p class="nombre-completo">
+                        <span>@Html.AcortarTexto((string)perfil.Name, 10)</span>
+                    </p>*@
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="body custom-css-scroll">
+        <div class="menuUsuario">
+            @* Ver Menú de Gnoss si es comunidad GNOSS *@
+            @if (Comunidad.GNOSSCommunity)
+            {
+                <div class="group-collapse navegacion">
+                    <a href="#navegacion" data-toggle="collapse" aria-expanded="true">@Html.GetText("COMMON", "NAVEGACION")</a>
+                    <div id="navegacion" class="collapse show">
+                        <ul class="pmd-sidebar-nav">
+                            <li class="liMensajes d-flex justify-content-between align-items-center">
+                                <a title="@Html.GetText("MENU", "BANDEJAMEN")" href="@perfil.Url@Html.GetText("URLSEM", "MENSAJES")">@Html.GetText("MENU", "BANDEJAMEN")</a>
+                                <span style="display: none;" class="infNumMensajesSinLeer badge badge-pill badge-primary" id="infNumMensajesSinLeer"></span>
+                            </li>
+                            @* Suscripciones *@
+                            @if (cabecera.SubscriptionsAvailable)
+                            {
+                                <li class="liNotificaciones d-flex justify-content-between align-items-center">
+                                    <a title="@Html.GetText("MENU", "SUSCRIPCIONES")" href="@perfil.Url@Html.GetText("URLSEM", "SUSCRIPCIONES")">@Html.GetText("MENU", "SUSCRIPCIONES")</a>
+                                    <span style="display: none;" class="infNumSuscripcionesSinLeer badge badge-pill badge-primary" id="infNumSuscripcionesSinLeer"></span>
+                                </li>
+                            }
+                            @* Invitaciones -> Quitarlo según se indica en MYG-109
+                            <li class="liNotificaciones liInvitaciones d-flex justify-content-between align-items-center">
+                                <a title="@Html.GetText("MENU", "INVITACIONES")" href="@perfil.Url@Html.GetText("URLSEM", "INVITACIONES")">@Html.GetText("MENU", "INVITACIONES")</a>                                
+                                <span style="display: none;" class="infNumInvitacionesSinLeer badge badge-pill badge-primary" id="infNumInvitacionesSinLeer"></span>
+                            </li>
+                            *@
+                            @* Comentarios*@
+                            <li class="liComentarios d-flex justify-content-between align-items-center">
+                                <a title="@Html.GetText("MENU", "COMENTARIOS")" href="@perfil.Url@Html.GetText("URLSEM", "COMENTARIOS")">@Html.GetText("MENU", "COMENTARIOS")</a>
+                                <span style="display: none;" class="infNumComentariosSinLeer badge badge-pill badge-primary" id="infNumComentariosSinLeer"></span>
+                            </li>
+                            @* Contactos Quitarlo según se indica en MYG-109
+                            @if (cabecera.ContactsAvailable)
+                            {
+                                <li class="liContactos d-flex justify-content-between align-items-center">
+                                    <a title="@Html.GetText("MENU", "CONTACTOS")" href="@perfil.Url@Html.GetText("URLSEM", "CONTACTOS")">@Html.GetText("MENU", "CONTACTOS")</a>
+                                </li>
+                            }*@
+                        </ul>
+                    </div>
+                </div>
+            }
+            @* Ver sección de Espacio personal *@
+            <div class="group-collapse espacio">
+                <a href="#espacio" data-toggle="collapse" aria-expanded="true">@Html.GetText("PERFIL", "MIESPACIOPERSONAL")</a>
+                <div id="espacio" class="collapse show">
+                    <ul class="pmd-sidebar-nav">
+                        <li class="liContribuciones">
+                            <a href="@perfil.Url@Html.GetText("URLSEM", "MISCONTRIBUCIONES")">@Html.GetText("PERFIL", "MISCONTRIBUCIONES")</a>
+                        </li>
+                        <!-- Favoritos ocultado: Gestionado desde "Recursos / Guardados"
+                <li class="liFavoritos">
+                    <a href="#">Favoritos_¿Qué son favoritos?</a>
+                </li>
+                -->
+                        <li class="liBorradores">
+                            <a href="@perfil.Url@Html.GetText("URLSEM", "BORRADORES")">@Html.GetText("BANDEJAENTRADA", "MISBORRADORES")</a>
+                        </li>
+                        <li class="liMisRecursos">                            
+                            <a href="@perfil.Url@Html.GetText("URLSEM", "MISRECURSOS")">@Html.GetNombreEspacioPersonal()</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            @* Ver sección de Mis Comunidades o Clases si es perfil Profesor *@
+            <div class="group-collapse comunidades">
+                <a href="#comunidades" data-toggle="collapse" aria-expanded="true">@Html.GetText("COMMON", "MISCOMUNIDADES")</a>
+                <div id="comunidades" class="collapse show">
+                    <ul class="pmd-sidebar-nav">
+                        @if (perfil.IsClassAdministrator && perfil.TypeProfile.Equals(ProfileType.Teacher))
+                        {
+                            <li class="usuarioClases"><a href="@perfil.Url@Html.GetText("URLSEM", "VERCLASESADMINISTRO")">@Html.GetText("ADMINISTRARCLASES", "MISCLASES")</a></li>
+                        }
+                        @* Listado cada item de Comunidades del usuario *@
+                        @{
+                            List<UserProfileModel.ProfileCommunitiesModel> masUsados = perfil.Communities.OrderByDescending(comunidadPerfil => comunidadPerfil.NumberOfConnections).Take(10).ToList();
+
+                            foreach (UserProfileModel.ProfileCommunitiesModel comunidadPerfil in masUsados.OrderBy(comunidadPerfil => comunidadPerfil.Name))
+                            {
+                                string clase = "abierta";
+                                if (comunidadPerfil.Type == 1 || comunidadPerfil.Type == 3) { clase = "cerrada"; }                                
+                                    @* Mostrar como máximo 5 comunidades *@
+                                    if (contCommunity < numMaxCommunitiesToDisplay)
+                                    {
+                                        <li class="@clase"><a href="@comunidadPerfil.Url" title="@comunidadPerfil.Name"><span class="icono"></span>@Html.AcortarTexto(comunidadPerfil.Name, 29)</a></li>
+                                        contCommunity += 1;
+                                    }
+                            }
+                        }
+                        <li class="ver">
+                            <a href="@perfil.Url@Html.GetText("URLSEM", "MISCOMUNIDADES")">@Html.GetText("INICIO", "VERTODOS")</a>
+                        </li>
+                    </ul>
+                </div>
+                @* Fin Listado de comunidades*@
+            </div>
+
+            @* Ver sección de Configuración Máxima invitaciones exceidas (Anteriormente en "_PanelQueHacer") *@
+            @if (permisosComunidad.MaxMembersExceeded)
+            {
+                <div class="group-collapse comunidades">
+                    <a href="#admin_exceso_miembros" data-toggle="collapse" aria-expanded="true">@Html.GetText("QUEPUEDOHACER", "GESTIONACOMUNIDAD")</a>
+                    <div id="admin_exceso_miembros" class="collapse show">
+                        <ul class="pmd-sidebar-nav">
+                            <li>@Html.GetText("QUEPUEDOHACER", "MAXINVITACIONES")</li>
+                        </ul>
+                    </div>
+                </div>
+            }
+
+            @* Ver sección de Configuración de la Comunidad si es usuario Admin y no es la MetaComunidad (Anteriormente en "_PanelQueHacer") *@
+            @if ((Comunidad.GNOSSCommunity || IdentidadActual.IsProyectAdmin) && !Comunidad.MetaProyect)
+            {
+                <div class="group-collapse gestionar">
+                    <a href="#admin_comunidad" data-toggle="collapse" aria-expanded="true">@Html.GetText("QUEPUEDOHACER", "GESTIONACOMUNIDAD")</a>
+                    <div id="admin_comunidad" class="collapse show">
+                        <ul class="pmd-sidebar-nav">
+                            @* Administrar la comunidad *@
+                            @if (permisosComunidad.Manage)
+                            {
+                                <li class="liAdminComunidadAdministrar">
+                                    <a id="administrar_comunidad" href="@Comunidad.Url/@Html.GetText("URLSEM", "ADMINISTRARCOMUNIDADGENERAL")">@Html.GetText("QUEPUEDOHACER", "ADMINISTRARCOMUNIDAD")</a>
+                                </li>
+                            }
+                            @* Crear grupos en la comunidad *@
+                            @if (permisosComunidad.CreateGroup)
+                            {
+                                <li class="liAdminComunidadCrearGrupo">
+                                    <a id="comunidad_crear_grupo" href="@Comunidad.Url/@Html.GetText("URLSEM", "GRUPOS")/@Html.GetText("URLSEM", "CREARGRUPO")">@Html.GetText("GRUPO", "CREARGRUPO")</a>
+                                </li>
+                            }
+                            @* Administrar solicitudes de la comunidad  - Restringidas*@
+                            @if (permisosComunidad.ManageRequestAccess)
+                            {
+                                int numRequestAccess = Comunidad.SolicitudesPendientes;
+                                string classNewManageRequestGroup = "";
+                                if (numRequestAccess > 0) { classNewManageRequestGroup = "nuevos"; }
+
+                                <li class="liAdminComunidadSolicitudesGrupos d-flex justify-content-between align-items-center @classNewManageRequestGroup">                                            
+                                    <a id="administrar_solicitudes_proyecto" href="@Comunidad.Url/@Html.GetText("URLSEM", "ADMINISTRARSOLICITUACCESOPROYECTO")">
+                                        @* @MvcHtmlString.Create(Html.GetText("QUEPUEDOHACER", "SOLICITUDESACCESO", Comunidad.SolicitudesPendientes.ToString())) *@                                                                                                                        
+                                        @Html.GetText("SOLICITUDESACCESOPROYECTO", "TITULOPAGINA")  
+                                    </a>
+                                    @if (numRequestAccess > 0)
+                                    {
+                                        <span class="badge badge-pill badge-primary">@numRequestAccess</span>
+                                    }
+                                </li>
+                            }
+                            @* Administrar solicitudes de la comunidad *@
+                            @if (permisosComunidad.ManageRequestGroup)
+                            {                                
+                                int numRequestGroups = Comunidad.SolicitudesGrupoPendientes;
+                                string classNewManageRequestGroup = "";
+                                if (numRequestGroups > 0) { classNewManageRequestGroup = "nuevos"; }
+                                <li class="liAdminComunidadSolicitudesGrupos d-flex justify-content-between align-items-center @classNewManageRequestGroup">
+                                    <a id="administrar_solicitudes" href="@Comunidad.Url/@Html.GetText("URLSEM", "GRUPOS")/@Html.GetText("URLSEM", "ADMINISTRARSOLICITUDES")">
+                                        @* @MvcHtmlString.Create(Html.GetText("QUEPUEDOHACER", "SOLICITUDESPERTENECERGRUPO", Comunidad.SolicitudesGrupoPendientes.ToString())) *@
+                                        @Html.GetText("QUEPUEDOHACER", "SOLICITUDESPERTENECERGRUPO")
+                                    </a>
+                                    @if (numRequestGroups > 0)
+                                    {
+                                        <span class="badge badge-pill badge-primary">@numRequestGroups</span>
+                                    }
+                                </li>
+                            }
+
+                            @* Administrar recibir newsletters: Diferente a Metaproyect*@
+                            @* Gestionar la aparición del modal Recibir Newsletter - Controlar la página actual -> No el modal de RecibirNewsletters si el usuario accede a la página directamente (no al modal) *@
+                            @{
+                                bool isRecibirNewsletterPage = false;
+                                if (Html.GetUrlPagina() == $"{Html.GetComunidad().Url}/{@Html.GetText("URLSEM", "RECIBIRNEWSLETTER")}")
+                                {
+                                    isRecibirNewsletterPage = true;
+                                }
+                                else
+                                {
+                                    isRecibirNewsletterPage = false;
+                                }                                
+                            }
+                            @if (!Comunidad.MetaProyect && !isRecibirNewsletterPage)
+                            {
+                                <li class="liRecibirNewsletter">
+                                    <a id="newsletters" href="#" class="link" data-toggle="modal" data-target="#modal-receive-newsletters">@Html.GetText("QUEPUEDOHACER", "NEWSLETTER")</a>
+                                </li>
+                            }
+
+                            @* Enviar Newsletter de la comunidad *@
+                            @if (permisosComunidad.SendNewsletter)
+                            {
+                                <li class="liAdminComunidadEnviarNewsletter">
+                                    <a id="enviar_newsletters" href="@Comunidad.Url/@Html.GetText("URLSEM", "SUBIRRECURSO2")/@Guid.NewGuid()/11">@Html.GetText("QUEPUEDOHACER", "ENVIARNEWSLETTER")</a>
+                                </li>
+                            }
+                            @* Administrar RSS de la comunidad *@
+                            @if (permisosComunidad.ManageRSSFeeds)
+                            {
+                                <li class="liGestionarSuscripciones">
+                                    <a id="fuentes_rss" href="@Comunidad.Url/@Html.GetText("URLSEM", "REVISARRECURSOSEXTERNOS")">@Html.Raw(Html.GetText("QUEPUEDOHACER", "FUENTESRSS", Comunidad.RecursosRSSPendientes.ToString()))</a>
+                                </li>
+                            }
+                            @* Solicitar acceso a comunidad - Tener en cuenta si es Guest o es GuestIdentity (logeado) *@
+                            @if (IdentidadActual.IsGuestUser)
+                            {
+                                <li class="liGestionarSuscripciones">
+                                    @if (Comunidad.AccessType == CommunityModel.TypeAccessProject.Restricted)
+                                    {
+                                        <a id="miembro_participa" href="@Comunidad.Url/@Html.GetText("URLSEM", "SOLICITARACCESO")">@Html.GetText("COMINICIOLOGIN", "SOLICITARACCESO")</a>
+                                    }
+                                    else
+                                    {
+                                        <a id="miembro_participa" href="@Comunidad.Url/@Html.GetText("URLSEM", "HAZTEMIEMBRO")">@Html.GetText("COMINICIOLOGIN", "REGISTRATEPARTICIPA")</a>
+                                    }
+                                </li>
+                            }
+                            @* Solicitar acceso a la comunidad/registro en la comunidad - El usuario está logeado *@
+                            else if (IdentidadActual.IsGuestIdentity)
+                            {
+                                if (Comunidad.AccessType == CommunityModel.TypeAccessProject.Restricted || Comunidad.AccessType == CommunityModel.TypeAccessProject.Public)
+                                {
+                                    if (Comunidad.AccessType == CommunityModel.TypeAccessProject.Restricted)
+                                    {
+                                        switch (IdentidadActual.CommunityRequestStatus)
+                                        {
+                                            case UserIdentityModel.CommunityRequestStatusEnum.NoRequest:
+                                                <li class="liGestionarSuscripciones">
+                                                    <a id="miembro_participa" href="@Comunidad.Url/@Html.GetText("URLSEM", "SOLICITARACCESO")">@Html.GetText("COMINICIOLOGIN", "SOLICITARACCESO")</a>
+                                                </li>
+
+                                                break;
+                                            case UserIdentityModel.CommunityRequestStatusEnum.RequestPending:
+                                                <li class="liGestionarSuscripciones">
+                                                    <span>@Html.GetText("COMINICIOLOGIN", "SOLICITUDPENDIENTE")</span>
+                                                </li>
+
+                                                break;
+                                            case UserIdentityModel.CommunityRequestStatusEnum.RequestedWithAnotherProfile:
+                                                <li class="liGestionarSuscripciones">
+                                                    <span>@Html.GetText("COMINICIOLOGIN", "SOLICITUDPENDIENTEOTROPERFIL")</span>
+                                                </li>
+
+                                                break;
+                                        }
+                                    }
+                                    else if (Comunidad.AccessType == CommunityModel.TypeAccessProject.Public)
+                                    {
+                                        <li class="liGestionarSuscripciones">
+                                            <a id="miembro_participa" href="@Comunidad.Url/@Html.GetText("URLSEM", "HAZTEMIEMBRO")">@Html.GetText("COMINICIOLOGIN", "HAZTEMIEMBROPARTICIPA")</a>
+                                        </li>
+
+                                    }
+                                }
+                            }
+
+                            @* Invitar a amigos | Suscribirme a la comunidad *@
+                            @if (!IdentidadActual.IsGuestIdentity && !IdentidadActual.IsGuestUser && !Comunidad.MetaProyect)
+                            {
+                                @* No permitir crear Widgets 
+                                if (Comunidad.AccessType != CommunityModel.TypeAccessProject.Private && Comunidad.AccessType != CommunityModel.TypeAccessProject.Reserved)
+                                {
+                                    <li>
+                                        <a href="@Comunidad.Url/@Html.GetText("URLSEM", "OBJETOGNOSSBUSCADOR")">@Html.GetText("QUEPUEDOHACER", "CREARWIDGET")</a>
+                                    </li>
+                                }
+                                *@
+                                @* Invitar a comunidad - Invitar a amigos*@
+                                if (Comunidad.ProjectState != CommunityModel.StateProject.Closing && (Comunidad.ProjectState != CommunityModel.StateProject.Definition || IdentidadActual.IsProyectAdmin || IdentidadActual.IsProyectSupervisor))
+                                {
+                                    if (permisosComunidad.Invite)
+                                    {
+                                        <li class="liInvitarAmigos">
+                                            <a href="#" class="link" data-toggle="modal" data-target="#modal-invite-community">@Html.GetText("QUEPUEDOHACER", "INVITAAMIGOS")</a>
+                                        </li>
+                                    }
+                                }                            
+                                @* Gestionar suscripciones a grupos de la comunidad *@
+                                if (permisosComunidad.Subscribe)
+                                {
+                                    <li class="liSuscribirse">
+                                        <a href="#" onclick="DeployActionInModalPanel('@urlModalAdministrarCategorias', this, 'modal-dinamic-content', '');"
+                                           data-toggle="modal"
+                                           data-target="#modal-container">
+                                           @Html.GetText("QUEPUEDOHACER", "SUSCRIBETE")
+                                        </a>
+                                    </li>
+                                }
+                            }
+                            
+                            @* Dejar Comunidad. Mostrarlo siempre que se esté en una comunida que no sea MetaComunidad *@
+                            @if (!Comunidad.MetaProyect && !IdentidadActual.IsProyectAdmin) 
+                            {
+                                if (permisosComunidad.LeaveCommunity)
+                                {
+                                        <li class="liAbandonarComunidad">
+                                            <a href="#" class="link" data-toggle="modal" data-target="#modal-leave-community">@Html.GetText("QUEPUEDOHACER", "ABANDONARLACOMUNIDAD")</a>
+                                        </li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                    @* Fin Listado de comunidades*@
+                </div>
+            }
+
+            @* Ver sección de Mis Identidades *@
+            <div class="group-collapse identidades">
+                <a href="#identidades" data-toggle="collapse" aria-expanded="true">@Html.GetText("COMMON", "MIS_IDENTIDADES")</a>
+                <div id="identidades" class="collapse show">
+                    <ul class="pmd-sidebar-nav">
+
+                        @* Listado de identidades del usuario ( Identidad No Personal) *@
+                        @if (perfil.TypeProfile != ProfileType.Personal)
+                        {
+                            IEnumerable
+                            <UserProfileModel>
+                                listaPerfilesPers = (perfil.UserProfiles).Where(perfilAux => perfilAux.TypeProfile == ProfileType.Personal);
+                            if (listaPerfilesPers.Count() > 0)
+                            {
+                                UserProfileModel perfilPersonal = listaPerfilesPers.First();
+
+                                <li class="identidad_@perfilPersonal.Key d-flex justify-content-between align-items-center">
+                                    <a href="@perfilPersonal.Url" title="@perfilPersonal.Name">
+                                        @* Imagen de la identidad del usuario -> Quitado
+                                        @if (!string.IsNullOrEmpty(perfilPersonal.Foto))
+                                        {
+                                            <img alt="@perfilPersonal.Name" src="@Html.GetBaseUrlContent()@perfilPersonal.Foto" class="rounded-circle" style="max-width: 1.5rem" />
+                                        }
+                                        *@
+                                        <span>@perfilPersonal.Name</span>
+                                    </a>
+                                    @* Novedades sin visualizar de la identidad *@
+                                    <span style="display: none;" class="novPerfilOtraIdent badge badge-pill badge-primary infoNov_@perfilPersonal.Key" id="infoNov_@perfilPersonal.Key"></span>
+                                </li>
+                                contadorPerfilesPerfil++;
+                            }
+                        }
+
+                        @* Listado de identidades del usuario (Identidad diferente a profesor) *@
+                        @if (perfil.TypeProfile != ProfileType.Teacher)
+                        {
+                            IEnumerable<UserProfileModel> listaPerfilesProf = ((List<UserProfileModel>)perfil.UserProfiles).Where(perfilAux => perfilAux.TypeProfile == ProfileType.Teacher);
+                                if (listaPerfilesProf.Count() > 0)
+                                {
+                                    UserProfileModel perfilProfesor = listaPerfilesProf.First();
+                                    <li class="identidad_@perfilProfesor.Key d-flex justify-content-between align-items-center">
+                                        <a class="profesor" href="@perfilProfesor.Url" title="@perfilProfesor.Name">
+                                            @* Imagen de la identidad del usuario -> Quitado 
+                                            @if (!string.IsNullOrEmpty(perfilProfesor.Foto))
+                                            {
+                                                <img alt="@perfilProfesor.Name" src="@Html.GetBaseUrlContent()@perfilProfesor.Foto" class="rounded-circle" style="max-width: 2rem" />
+                                            }
+                                            *@
+                                            <span>@perfilProfesor.Name</span>
+                                        </a>
+                                        @* Novedades sin visualizar de la identidad *@
+                                        <span style="display: none;" class="novPerfilOtraIdent badge badge-pill badge-primary infoNov_@perfilProfesor.Key" id="infoNov_@perfilProfesor.Key"></span>
+                                    </li>
+                                    contadorPerfilesPerfil++;
+                                }
+                         }
+                        @* Listado de identidades del usuario (Identidades de Organizaciones ) *@
+                        @foreach (UserProfileModel perfilActual in (perfil.UserProfiles))
+                        {
+                            if (perfilActual.TypeProfile == ProfileType.Teacher || perfilActual.TypeProfile == ProfileType.Personal || perfilActual.Key == perfil.Key)
+                            {
+                            continue;
+                            }
+                            <li class="identidad_@perfilActual.Key d-flex justify-content-between align-items-center">
+                                <a class="organizacion" href="@perfilActual.Url" title="@perfilActual.Name">
+                                    @* Imagen de la identidad del usuario -> Quitado 
+                                    @if (!string.IsNullOrEmpty(perfilActual.Foto) && (contadorPerfilesPerfil < 3 || perfil.UserProfiles.Count == 4))
+                                    {
+                                        <img src="@Html.GetBaseUrlContent()@perfilActual.Foto" class="rounded-circle" style="max-width: 2rem" />
+                                    }
+                                    *@
+                                    <span>@perfilActual.Name</span>
+                                </a>
+                                @* Novedades sin visualizar de la identidad *@
+                                <span style="display: none;" class="novPerfilOtraIdent badge badge-pill badge-primary infoNov_@perfilActual.Key" id="infoNov_@perfilActual.Key"></span>
+                            </li>
+                            contadorPerfilesPerfil++;
+                         }
+
+                        @* Fin Listado de identidades*@
+                        <li class="liVerPerfil">
+                            <a class="font-weight-bold" href="@perfil.UrlViewProfile">@Html.GetText("MENU", "VERPERFIL")</a>
+                        </li>
+                        <li class="liEditarPerfil">
+                            @{ 
+                                string urlEditarPerfil = perfil.Url + Html.GetText("URLSEM", "EDITARPERFIL");
+                                if (!Comunidad.MetaProyect)
+                                {
+                                    urlEditarPerfil = Comunidad.Url + "/" + Html.GetText("URLSEM", "EDITARPERFIL");
+                                }
+                            }
+                            <a class="font-weight-bold" href="@urlEditarPerfil">@Html.GetText("MENU", "EDITARPERFIL")</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            @* Sección de MetaAdministrador *@ 
+            @* Ver sección de si es usuario Admin y es la MetaComunidad *@
+            @*@if ((Comunidad.GNOSSCommunity || IdentidadActual.IsProyectAdmin) && Comunidad.MetaProyect) { *@
+            @if ((Comunidad.GNOSSCommunity && IdentidadActual.IsProyectAdmin) && Comunidad.MetaProyect) {
+                <div class="group-collapse metaAdministrador">
+                    <a href="#metaAdministrador" data-toggle="collapse" aria-expanded="true">@Html.GetText("COMADMINCOMUNIDAD", "ADMINMETAADMINOPTIONS")</a>
+                    <div id="metaAdministrador" class="collapse show">
+                        <ul class="pmd-sidebar-nav">
+                            @*Gestión de las solicitudes*@
+                            @if (IdentidadActual.PermitEditAllCommunities)
+                            {
+                                urlSolicitudes = perfil.Url + Html.GetText("URLSEM", "SOLICITDESACCESOCOM");
+                            }
+                            @if (!string.IsNullOrEmpty(urlSolicitudes))
+                            {
+                                <li class="administrar solicitudAcceso">
+                                    <a href="@urlSolicitudes">@Html.FirstLetterToUpper(@Html.GetText("QUEPUEDOHACER", "SOLICITUDESACCESO"))</a>
+                                </li>
+                            }
+                            
+                            @* Mostrar Crear comunidad sólo en la metaComunidad *@
+                            @if (Comunidad.MetaProyect)
+                            {
+                                @* Solicitar creación de comunidad (Extraido de la Home de la Metacomunidad) *@
+                                <li class="liAdminComunidadCrearComunidad">
+                                    <a href="@perfil.Url@Html.GetText("URLSEM", "SOLICITARCOMUNIDAD")">@Html.GetText("COMMON", "SOLICITARCOMUNIDAD")</a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                 </div>            
+            }
+
+            
+            @if (perfil.OrganizationMenuAvailable)
+            {            
+                <div class="group-collapse administrar-organizacion">
+                    @* Administrar organización *@
+                    @if (perfil.OrganizationMenuAvailable)
+                    { 
+                        <a href="#administrar-organizacion" data-toggle="collapse" aria-expanded="true">@Html.GetText("MENU", "ADMINISTRARORG")</a>
+                        <div id="administrar-organizacion" class="collapse show">                        
+                            <ul>                                                                                                                   
+                                @if (perfil.IsAdministrator)
+                                {
+                                    @*<li style="display:none;">
+                                        <a href="@perfil.Url@Html.GetText("URLSEM", "MENSAJESORG")">@Html.GetText("BANDEJAENTRADA", "BANDEJAENTRADA")</a>
+                                    </li>
+                                    *@
+                                    <li class="admin-perfil-org">
+                                        <a href="@perfil.Url@Html.GetText("URLSEM", "EDITARPERFILORG")">@Html.GetText("PERFIL", "PERFIL")</a>
+                                    </li>
+                                }
+                                <li class="admin-recursos">
+                                    <a href="@perfil.OrganizationPersonalSpaceUrl">@Html.GetText("PERFIL", "BASERECURSOS")</a>
+                                </li>
+                                <li class="admin-contribuciones">
+                                    <a href="@perfil.Url@Html.GetText("URLSEM", "CONTRIBUCIONESORG")">@Html.GetText("COMMON", "CONTRIBUCIONES")</a>
+                                </li>
+                                @if (perfil.IsAdministrator)
+                                {
+                                    @* Url administración para usuarios, grupos, comunidades *@
+                                    string urlAdministracion = Html.GetPerfil().Url + Html.GetText("URLSEM", "ADMINISTRACION") + "/";
+                                    <li class="admin-contactos" id="admin-contactos">
+                                        <a href="@perfil.Url@Html.GetText("URLSEM", "CONTACTOSORG")">@Html.GetText("PERFIL", "CONTACTOS")</a>
+                                    </li>
+                                    <li class="admin-usuarios" id="admin-usuarios">
+                                        <a href="@perfil.AdminOrganizationUsersUrl" title="@Html.GetText("USUARIOS", "USUARIOS")">@Html.GetText("USUARIOS", "USUARIOS")</a>
+                                    </li>
+                                    @* Permitir invitar usuarios a organización *@
+                                    <li class="invitar-organizacion" id="invitar-organizacion">                                        
+                                        @{
+                                            string urlSendInvitation_invite_organization = @Html.GetPerfil().Url + @Html.GetText("URLSEM", "INVITARAORG") + "/load-modal";                                                
+                                        }                
+                                        <a href="@urlSendInvitation_invite_organization"
+                                           id="invitar-organizacion-link"
+                                           onclick="DeployActionInModalPanel('@urlSendInvitation_invite_organization', this, 'modal-dinamic-content', '');"
+                                           class="link"
+                                           title="@Html.GetText("USUARIOS", "INVITARAORGANIZACION")"
+                                           data-toggle="modal" 
+                                           data-target="#modal-container">
+                                            @Html.GetText("USUARIOS", "INVITARAORGANIZACION")
+                                        </a>
+                                    </li>
+                                    <li class="admin-grupos">
+                                        <a href="@urlAdministracion@Html.GetText("URLSEM", "GRUPOS")" title="@Html.GetText("URLSEM", "GRUPOS")">@Html.GetText("CONTACTOS", "GRUPOS")</a>
+                                    </li>
+                                    <li class="admin-comunidades">
+                                        <a href="@urlAdministracion@Html.GetText("URLSEM", "COMUNIDADES")" title="@Html.GetText("URLSEM", "COMUNIDADES")">@Html.GetText("USUARIOS", "COMUNIDADES")</a>
+                                    </li>
+                                }                            
+                            </ul>
+                        </div>   
+                    }
+                </div>
+            }
+            
+            <hr />
+            @* Salir - Desconectar *@
+            <div class="group-collapse desconectar">
+                <div id="desconectar-usuario" class="collapse show">
+                    <ul class="pmd-sidebar-nav">
+                        @* Cambiar contraseña *@
+                        @if (cabecera.ChangePasswordVisible)
+                        {
+                            @*Cambiar la contraseña si el usuario está en Metaproject *@
+                            if (!Comunidad.MetaProyect)
+                            {
+                                <li class="liCambiarContrasenia">
+                                    <a id="cambiar_contrasenia" href="@Html.GetBaseUrlIdioma()/@Html.GetText("URLSEM", "CAMBIARPASSWORD")">@Html.GetText("MENU", "CAMBIOCONTRAS")</a>
+                                </li>
+                            }
+                            @*Cambiar la contraseña si el usuario está en alguna comunidad *@
+                            else {
+                                <li class="liCambiarContrasenia">
+                                    <a id="cambiar_contrasenia" href="@Comunidad.Url/@Html.GetText("URLSEM", "CAMBIARPASSWORD")">@Html.GetText("MENU", "CAMBIOCONTRAS")</a>
+                                </li>
+                            }
+                        }
+                        <li>
+                            <a id="usuario_salir" class="text-danger desconectar-usuario bold" href="@Html.GetUrlLogout()">@Html.GetText("MENU", "SALIR")</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</aside>
+<div class="pmd-sidebar-overlay" data-rel="menuLateralUsuario"></div>
+}
+

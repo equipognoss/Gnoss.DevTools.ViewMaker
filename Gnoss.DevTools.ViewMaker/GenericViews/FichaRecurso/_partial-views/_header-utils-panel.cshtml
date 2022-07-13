@@ -1,0 +1,75 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista que contiene información acerca de la interacción de los usuarios con un determinado recurso:
+- Nº de visualizaciones.
+- Nº de votos positivos.
+- Nº de votos negativos.
+
+También se incluye en esta Vista, la barra de herramientas o de acciones que el usuario podrá utilizar dentro de un recurso (Enviar, Editar...). Estas opciones se cargan en 
+una vista parcial llamada "_FichaAccionesMenu""
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+ResourceModel FichaDocumento = Model.Resource;
+ResourceViewModel model = Model;
+// Número de visitas del recurso
+string textoVisitas = Html.GetText("LISTARECURSOS", "VISITAS");
+CommunityModel Comunidad = Html.GetComunidad();
+bool PresentacionNoSocial = Comunidad.ProyectType == CommunityModel.TypeProyect.CatalogoNoSocial || Comunidad.ProyectType == CommunityModel.TypeProyect.CatalogoNoSocialConUnTipoDeRecurso;
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Panel Utils (Interacción del usuario) Panel Utils --------------------
+*@
+
+
+@* No parece que haga falta
+{
+if (FichaDocumento.NameImage == "video" || FichaDocumento.NameImage == "audio")
+{
+textoVisitas = Html.GetText("LISTARECURSOS", "REPRODUCCIONES");
+}
+}*@
+
+
+<div class="acciones-recurso-wrapper">
+
+    @* Área izquierda - Interacciones del usuario en el recurso *@
+    <div class="izquierda">
+        @* Mostrar Nº de visualizaciones/reproducciones del recurso *@
+        @if (!Model.HideWebsiteVisits)
+        {
+            <div class="visualizacion-recurso">
+                <span class="material-icons">visibility</span>
+                <span class="number">@FichaDocumento.NumVisits</span>
+            </div>
+        }
+        @* Mostrar interacciones del recurso (Likes, Dislikes) *@
+        @if (FichaDocumento.Votes != null && FichaDocumento.AllowVotes)
+        {            
+            @Html.PartialView("../FichaRecurso/_FichaVotos", FichaDocumento.Votes)
+        }
+
+        @* Mostrar certificación del recurso *@
+        @if (FichaDocumento.Certification.Key != Guid.Empty)
+        {
+            <div class="certificar-recurso">
+	            <span class="material-icons">verified_user</span>
+                <span class="texto">@Html.Raw(FichaDocumento.Certification.Value)</span>
+            </div>           
+        }
+    </div>
+
+    @* Área derecha- Acciones del usuario con el recurso*@
+    <div class="derecha">
+        @if (!PresentacionNoSocial || IdentidadActual.IsProyectAdmin || IdentidadActual.IsProyectSupervisor || Model.Resource.Actions.Edit)
+        {                        
+            @Html.PartialView("../FichaRecurso/_FichaAccionesMenu", model)
+        }    
+    </div>
+</div>

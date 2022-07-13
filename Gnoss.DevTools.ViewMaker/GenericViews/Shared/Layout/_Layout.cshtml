@@ -1,0 +1,106 @@
+﻿@*Descripción
+    ----------------------------------------------------------------
+    Vista Layout del proyecto web. Estará formado por diferentes vistas parciales:
+    - _layout-head-section: Contiene los datos relativos al <head>
+    - ProyectoElementoHTML: Información relativa al proyecto
+    - _Cabecera: Contiene la cabecera del proyecto web
+    - _resource-modal-accept-cookies: Panel informativo de cookies
+    - _menu-Lateral: Menú lateral de navegación
+    - _menu-lateral-usuario: Menú lateral de navegación de opciones de un usuario
+    - _menu-lateral-metabuscador: Menú de metabuscador desplegable
+    - _Pie: Pie o footer del proyecto
+
+    Variables
+    ----------------------------------------------------------------
+*@
+@{
+    CommunityModel Comunidad = Html.GetComunidad();
+    UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+    UserProfileModel perfil = Html.GetPerfil();
+}
+@*
+    -------------------- Sección Layout del proyecto web --------------------*@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="@Html.GetUtilIdiomas().LanguageCode" xmlns:og="http://ogp.me/ns#">
+
+<head>
+    @* Carga de la vista que contiene información relativa a <head> *@
+    @Html.PartialView("../Shared/Layout/_partial-views/_layout-head-section")
+</head>
+
+<body class="@Html.GetBodyClass() @(IdentidadActual == null || IdentidadActual.IsGuestUser ? " invitado" : "") @Html.GetBodyClassPestanya()">
+
+    @* Cargar elementos Extra (BeginBody) del proyecto *@
+    @if (Comunidad != null && Comunidad.ProjectExtraHTMLList != null)
+    {
+        @Html.PartialView("../Shared/ProyectoElementoHTML", Comunidad.ProjectExtraHTMLList.Where(a => a.Ubication == UbicacionHtmlProyecto.BeginBody).ToList())
+    } @* Carga de los formularios ocultos del Layout *@
+    @Html.PartialView("../Shared/Layout/_partial-views/_layout-hidden-forms")
+
+    @* Carga de las vistas modales para que estén / o no disponibles *@
+    @Html.PartialView("../Shared/_cabecera/_partial-views/_header-partial-views-modals")
+
+    @* Carga de la Cabecera *@
+    @Html.PartialView("../Shared/_cabecera/_header")
+
+
+    <main role="main" style="padding-top: 100px;">
+        <div class="container">
+            <div class="row-content">
+                @* Mostrar o no el Aviso de Cookies *@
+                @if (!Html.GetUrlPagina().Contains(Html.GetText("URLSEM", "PERSONALIZARCOOKIES")))
+                {
+                    @Html.PartialView("../Shared/Layout/_modal-views/_accept-cookies")
+                    @Html.PartialView("../Shared/Layout/_modal-views/_manage-cookies")
+                } @* Mostrar o no el posibles mensajes acerca del estado de la comunidad *@
+                @Html.PartialView("../Shared/Layout/_partial-views/_layout-admin-messages-community")
+
+                @* Carga de Migas de Pan*@
+                @RenderSection("breadcrumb", required: false)
+
+                @* Carga contenido de la página *@
+                @RenderBody()
+
+            </div>
+
+            @* Carga del footer *@
+            @Html.PartialView("../Shared/_pie/_Pie")
+
+        </div>
+    </main>
+
+    @* Cargar o no la vista modal Login emergente*@
+    @Html.PartialView("../Registro/_modal-views/_login")
+
+    @* Menús del usuario -> Paneles Laterales *@
+    @if (!IdentidadActual.IsGuestUser)
+    {
+        // Mostrar paneles asociados a la cabecera con usuario logeado
+        @Html.PartialView("../Shared/_cabecera/_menu-lateral")
+        ;
+        @Html.PartialView("../Shared/_cabecera/_menu-lateral-usuario")
+    }
+    @Html.PartialView("../Shared/_cabecera/_menu-lateral-metabuscador")
+
+    @* Carga de Modales (Loading, Cookies...) presentes en toda la aplicación *@
+    @Html.PartialView("../Shared/Layout/_modales")
+
+    @RenderSection("javascript", required: false)
+
+    @* Administrar / Gestionar Cookies  *@
+    @Html.PartialView("../Shared/Layout/_partial-views/_layout-admin-cookies")
+
+    @* Cargar elementos Extra (EndBody) del proyecto *@
+    @if (Comunidad != null && Comunidad.ProjectExtraHTMLList != null)
+    {
+        @Html.PartialView("../Shared/ProyectoElementoHTML", Comunidad.ProjectExtraHTMLList.Where(a => a.Ubication == UbicacionHtmlProyecto.EndBody).ToList())
+    }
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            EjecutarScriptsIniciales2();
+        });
+    </script>
+</body>
+</html>
