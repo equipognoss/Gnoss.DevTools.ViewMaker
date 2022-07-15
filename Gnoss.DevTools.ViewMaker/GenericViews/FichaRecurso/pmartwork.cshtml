@@ -936,7 +936,7 @@
                                 }
                                 @if (estaEnCronoscopio)
                                 {
-                                    <li><a target="_blank" class="cronoscopio" href="@Html.GetComunidad().Url/@Html.Translate("URL_CRONOSCOPIO")?search=@semCmsModel.RootEntities[0].Entity.Uri"><span>@Html.Translate("VER_OBRA_EN_LINEA_DEL_TIEMPO")</span></a></li>
+                                    <li><a target="_blank" class="cronoscopio" rel="noopener" href="@Html.GetComunidad().Url/@Html.Translate("URL_CRONOSCOPIO")?search=@semCmsModel.RootEntities[0].Entity.Uri"><span>@Html.Translate("VER_OBRA_EN_LINEA_DEL_TIEMPO")</span></a></li>
                                 }
                             </ul>
                         }
@@ -2531,17 +2531,17 @@
                     <div>
                         @if (idiomaNav.Equals("es"))
                         {
-                            <h1><a href="http://www.tiendaprado.com/es/404-impresion-a-la-carta" target="_blank">@Html.Translate("IMPRESIONALACARTA")</a></h1>
+                            <h1><a href="http://www.tiendaprado.com/es/404-impresion-a-la-carta" rel="noopener" target="_blank">@Html.Translate("IMPRESIONALACARTA")</a></h1>
                             @Html.Raw(@Html.Translate("FICHA_RECURSO_OBRA_IMPRESION"))
                         }
                         else
                         {
-                            <h1><a href="http://www.tiendaprado.com/en/404-print-on-demand" target="_blank">@Html.Translate("IMPRESIONALACARTA")</a></h1>
+                            <h1><a href="http://www.tiendaprado.com/en/404-print-on-demand" rel="noopener" target="_blank">@Html.Translate("IMPRESIONALACARTA")</a></h1>
                             @Html.Raw(@Html.Translate("FICHA_RECURSO_OBRA_IMPRESION"))
                         }
                     </div>
                     <div>
-                        <h1><a href="http://www.bancodeimagenesmuseodelprado.com" target="_blank">@Html.Translate("BANCODEIMAGENES")</a></h1>
+                        <h1><a href="http://www.bancodeimagenesmuseodelprado.com" rel="noopener" target="_blank">@Html.Translate("BANCODEIMAGENES")</a></h1>
                         @Html.Raw(@Html.Translate("FICHA_RECURSO_OBRA_IMAGENES"))
                     </div>
                 </div>
