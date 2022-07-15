@@ -30,7 +30,7 @@
     }
 
     function splitAndTrim(value) {
-        return value.replace(/^\s+|\s+$/g, "").split(/\s*,\s*/g);
+        return value.replace(/^\s+$/g, "").split(/\s*,\s*/g);
     }
 
     function escapeAttributeValue(value) {
