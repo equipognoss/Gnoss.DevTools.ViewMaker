@@ -192,8 +192,6 @@ body.palco .navbar-header span {
 
 body.palco .container.body-content {width: calc(100% - 100px);max-width: calc(100% - 100px);padding: 0;height: 40px;border-bottom: 1px solid #343a40;}
 
-body.palco .container {}
-
 body.palco .navbar-dark .container {
     padding: 0;
     /* margin-top: 13px; */
@@ -221,6 +219,8 @@ body.palco h2 strong {
 input.btn.btn-default {
     display: inline !important;
     float: left;
+    margin: 0 5px;
+    background-color: white;
 }
 
 body.palco h3 {
@@ -230,8 +230,6 @@ body.palco h3 {
 body.palco [hidden]{
     display:none !important
 }
-
-body.palco .form-group.botones {}
 
 body.palco .form, body.palco .form-horizontal {
     width: 100%;
@@ -406,12 +404,7 @@ body.palco .form-group.url .col-md-9 {
     width: calc(100% - 30px);
     padding: 0;
     max-width: 100%;
-}
-
-input.btn.btn-default {
-    margin: 0 5px;
-    background-color: white;
-}								  
+}							  
 							 
  body.palco .form {
     padding-left: 5px;

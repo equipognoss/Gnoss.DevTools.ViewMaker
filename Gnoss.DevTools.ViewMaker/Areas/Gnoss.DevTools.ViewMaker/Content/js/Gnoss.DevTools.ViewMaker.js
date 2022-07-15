@@ -9,15 +9,15 @@
 
         $('iframe', body).remove();
 
-        var url = encodeURIComponent($('input#URL').val());
-        var sessionID = $('input#SessionID').val();
-        var user = $('input#User').val();
-        var pass = $('input#Password').val();
-        var contentLocal = $('input#contentLocal').is(':checked');
-        var submit = $(this).val();
+        let url = encodeURIComponent($('input#URL').val());
+        let sessionID = $('input#SessionID').val();
+        let user = $('input#User').val();
+        let pass = $('input#Password').val();
+        let contentLocal = $('input#contentLocal').is(':checked');
+        let submit = $(this).val();
         
-        var urlIframe = location.protocol + '//' + location.host + '/LoadURL';
-        var srcIframe = urlIframe + "?URL=" + url + "&SessionID=" + sessionID + "&User=" + user + "&Password=" + pass + "&contentLocal=" + contentLocal + "&submit=" + submit
+        let urlIframe = location.protocol + '//' + location.host + '/LoadURL';
+        let srcIframe = urlIframe + "?URL=" + url + "&SessionID=" + sessionID + "&User=" + user + "&Password=" + pass + "&contentLocal=" + contentLocal + "&submit=" + submit
 
         body.append("<iframe id='iframeContenedor' src='" + srcIframe + "' />");
         
@@ -36,10 +36,10 @@
     });
 
     $('#confirmationModal .modal-footer').on('click', '.btn-primary.changeBranch', function () {
-        var boton = $(this);
-        var modal = boton.closest('.modal');
-        var modalBody = modal.find('.modal-body');
-        var proyecto = boton.attr("proyecto");
+        let boton = $(this);
+        let modal = boton.closest('.modal');
+        let modalBody = modal.find('.modal-body');
+        let proyecto = boton.attr("proyecto");
 
         boton.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Descargando...');
         modal.find('.modal-footer .btn-secondary').hide();
@@ -57,10 +57,10 @@
     });
 
     $('#confirmationModal .modal-footer').on('click', '.btn-primary.download', function () {
-        var boton = $(this);
-        var modal = boton.closest('.modal');
-        var modalBody = modal.find('.modal-body');
-        var proyecto = boton.attr("proyecto");
+        let boton = $(this);
+        let modal = boton.closest('.modal');
+        let modalBody = modal.find('.modal-body');
+        let proyecto = boton.attr("proyecto");
 
         boton.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Descargando...');
         modal.find('.modal-footer .btn-secondary').hide();
@@ -82,13 +82,13 @@
 
 
     $('#confirmationModal .modal-footer').on('click', '.btn-primary.upload', function () {
-        var boton = $(this);
-        var modal = boton.closest('.modal');
-        var modalBody = modal.find('.modal-body');
-        var proyecto = boton.attr("proyecto");
+        let boton = $(this);
+        let modal = boton.closest('.modal');
+        let modalBody = modal.find('.modal-body');
+        let proyecto = boton.attr("proyecto");
 
-        var userFTP = modalBody.find("#userFTP").val();
-        var passwordFTP = modalBody.find("#passwordFTP").val();
+        let userFTP = modalBody.find("#userFTP").val();
+        let passwordFTP = modalBody.find("#passwordFTP").val();
 
         boton.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Subiendo...');
         modal.find('.modal-footer .btn-secondary').hide();
@@ -106,43 +106,43 @@
 
     });
 
-    var tituloModal = {
+    let tituloModal = {
         upload: 'Confirmar subida de vistas y estilos de ',
         download: 'Confirmar descarga de vistas y estilos de ',
         changeBranch: 'Confirmar cambio de rama de '
     };
 
     $('#confirmationModal').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget);
+        let button = $(event.relatedTarget);
         if (button.hasClass('disabled') || button.hasClass('no-changes')) {
                 $('#confirmationModal').modal('hide');
                 return false;
         }
-        var parentButton = button.closest('.form-group');
+        let parentButton = button.closest('.form-group');
 
-        var proyecto = parentButton.attr('data-proy');
+        let proyecto = parentButton.attr('data-proy');
 
-        var titleAction = button.attr("title");
-        var btnClass = button.attr("class");
-        var typeAction = button.data('action');
+        let titleAction = button.attr("title");
+        let btnClass = button.attr("class");
+        let typeAction = button.data('action');
 
-        var modal = $(this);
+        let modal = $(this);
         modal.find('.modal-body .alert').remove();
         modal.find('.modal-body').children().hide();
         modal.find('.modal-body .' + typeAction).show();
 
-        var panCambiosRepositorioLocal = modal.find('.modal-body .panCambios');
+        let panCambiosRepositorioLocal = modal.find('.modal-body .panCambios');
         panCambiosRepositorioLocal.find('.cambios').html('');
         panCambiosRepositorioLocal.hide();
 
         if (typeAction == 'upload') {
-            var userFTP = parentButton.find(".userFTP").val();
-            var passwordFTP = parentButton.find(".passwordFTP").val();
+            let userFTP = parentButton.find(".userFTP").val();
+            let passwordFTP = parentButton.find(".passwordFTP").val();
 
             $("#userFTP").val(userFTP);
             $("#passwordFTP").val(passwordFTP);
 
-            var cambios = parentButton.find(".cambios").val();
+            let cambios = parentButton.find(".cambios").val();
             if (cambios != "") {
                 panCambiosRepositorioLocal.find('.cambios').html(cambios);
                 panCambiosRepositorioLocal.show();
@@ -159,11 +159,11 @@
 
     $("#configurationForm").submit(function (e) {
         e.preventDefault();
-        var form = $(this);
-        var btnSubmit = $('button[type=submit]', form);
+        let form = $(this);
+        let btnSubmit = $('button[type=submit]', form);
         btnSubmit.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>  Guardando...');
 
-        var actionUrl = $(this).attr("action");
+        let actionUrl = $(this).attr("action");
         $.post(actionUrl, $(this).serialize(), function (status) {
             $('.alert', form).remove();
             if (status) {
@@ -185,7 +185,7 @@
     toggleVerPassword.init();
 });
 
-var toggleVerPassword = {
+let toggleVerPassword = {
     init: function () {
         this.config();
         this.verPassword();
@@ -199,9 +199,9 @@ var toggleVerPassword = {
     },
     verPassword: function () {
         this.inputsPassword.next('a.verPassword').on('click', function () {
-            var btnPass = $(this);
-            var spanEye = $('span.fa', btnPass);
-            var inputPass = btnPass.prev('input');
+            let btnPass = $(this);
+            let spanEye = $('span.fa', btnPass);
+            let inputPass = btnPass.prev('input');
 
             if (inputPass.attr('type') === 'password') {
                 inputPass.attr('type', 'text');
@@ -218,7 +218,7 @@ var toggleVerPassword = {
 };
 
 function engancharEvento() {
-    var iframe = document.getElementById("iframeContenedor");
+    let iframe = document.getElementById("iframeContenedor");
 
     iframe.contentDocument.onkeydown = fkey;
     iframe.contentDocument.onkeypress = fkey;
@@ -231,8 +231,8 @@ document.onkeydown = fkey;
 document.onkeypress = fkey
 document.onkeyup = fkey;
 
-var recargando = false;
-var body = $('body');
+let recargando = false;
+let body = $('body');
 
 function fkey(e) {
     if (body.hasClass("palco")) {
@@ -253,7 +253,7 @@ function fkey(e) {
 
 window.onbeforeunload = function (e) {
     if (body.hasClass("palco") && recargando) {
-        var dialogText = '¿Seguro que quieres salir?';
+        let dialogText = '¿Seguro que quieres salir?';
         e.returnValue = dialogText;
         return dialogText;
     }
