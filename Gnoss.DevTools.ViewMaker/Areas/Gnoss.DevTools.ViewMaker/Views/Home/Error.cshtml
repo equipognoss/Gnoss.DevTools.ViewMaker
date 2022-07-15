@@ -17,15 +17,15 @@
     }
     httpContext.Response.Headers.Add("Cache-Control", "no-cache, no-store");
     @*
-    if (Session["ErrorAskURL"] != null)
-    {
+        if (Session["ErrorAskURL"] != null)
+        {
         ErrorAskURL = (string)Session["ErrorAskURL"];
-    }
+        }
 
-    Response.Headers.Add("Cache-Control", "no-cache, no-store");*@
+        Response.Headers.Add("Cache-Control", "no-cache, no-store");*@
 }
 <!DOCTYPE html>
-<html>
+<html lang="@Html.GetUtilIdiomas().LanguageCode">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

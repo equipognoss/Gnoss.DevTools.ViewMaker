@@ -110,7 +110,7 @@
 
     string PintarItemFaceta(FacetItemModel pItem)
     {
-        <li>
+        <ul>
             @{
                 string clase = "faceta";
                 if (pItem.Selected)
@@ -130,7 +130,7 @@
                 }
             }
             <a href="@pItem.Filter" class="@clase" name="@pItem.Name" title="@pItem.Tittle">@pItem.Tittle (@pItem.Number)</a>
-        </li>
+        </ul>
         if (pItem.FacetItemlist != null && pItem.FacetItemlist.Count > 0)
         {
             <ul style="display: none" id="cat_@pItem.Tittle">
