@@ -302,8 +302,7 @@ else
             if (mPropiedad.ListaValores.Count > 0)
             {
                 <div id="@idDivContValores">
-                    <table>
-                    <thead>Propiedades de selectores de entidad</thead>
+                    <table>                    
                         @if (mPropiedad.EspecifPropiedad.SelectorEntidad.TipoSeleccion == "Tesauro")
                         {
                             string textoValor = Model.OntologyPropInfo.EntitySelector.SemanticThesaurusAddedValue.Value;
@@ -313,6 +312,7 @@ else
                             }
 
                             <tr class="par">
+                                <th id="cabecera">@textoValor</th>
                                 <td>
                                     <span>@textoValor</span>
                                 </td>

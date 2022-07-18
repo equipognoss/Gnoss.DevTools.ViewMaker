@@ -10,7 +10,7 @@
     this.element = element;
     this.$element = $(element);
 
-    var data = this.$element.data();
+    let data = this.$element.data();
     this.options = $.extend({}, $.fn.checkboxpicker.defaults, options, data);
 
     this.$group = create('div');
@@ -25,7 +25,7 @@
 
   Checkboxpicker.prototype = {
     init: function() {
-      var fn = this.options.html ? 'html' : 'text';
+      let fn = this.options.html ? 'html' : 'text';
 
       this.element.hidden = true;
       this.$group.addClass(this.options.baseGroupCls).addClass(this.options.groupCls);
@@ -79,10 +79,10 @@
     }
   };
 
-  var old = $.fn.checkboxpicker;
+  let old = $.fn.checkboxpicker;
 
   $.fn.checkboxpicker = function(options, elements) {
-    var $elements;
+    let $elements;
 
     if (this instanceof $) {
       $elements = this;
@@ -93,7 +93,7 @@
     }
 
     return $elements.each(function() {
-      var data = $.data(this, 'bs.checkbox');
+      let data = $.data(this, 'bs.checkbox');
 
       if (!data) {
         data = new Checkboxpicker(this, options);
