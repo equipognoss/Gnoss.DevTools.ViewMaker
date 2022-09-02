@@ -15,7 +15,7 @@
 GNOSS Dev Tools View Maker allows you to develop and debug your views with real data before upload them to GNOSS Semantic AI Platform. 
 
 ## Código de conducta
-Este proyecto a adoptado el código de conducta definido por "Contributor Covenant" para definir el comportamiento esperado en las contribuciones a este proyecto. Para más información ver https://www.contributor-covenant.org/
+Este proyecto ha adoptado el código de conducta definido por "Contributor Covenant" para definir el comportamiento esperado en las contribuciones a este proyecto. Para más información ver https://www.contributor-covenant.org/
 
 ## Licencia
 Este producto es una herramienta de desarrollo creada para la plataforma [Gnoss Semantic AI Platform Open Core](https://github.com/equipognoss/Gnoss.SemanticAIPlatform.OpenCORE), es un producto open source y está licenciado bajo LGPLv3.
