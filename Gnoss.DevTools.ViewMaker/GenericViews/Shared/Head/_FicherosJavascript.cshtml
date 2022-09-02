@@ -1,30 +1,8 @@
-﻿@*[security|||shared/head/_ficherosjavascript.cshtml|||elprado]*@
-@using Es.Riam.Gnoss.Web.MVC.Models
-@using Es.Riam.Gnoss.Web.MVC.Models.ViewModels
-@using Es.Riam.Gnoss.Web.MVC.Models.Administracion
-@using Newtonsoft.Json
-@using Es.Riam.Util
 @using Microsoft.AspNetCore.Http
 
 @{
     CommunityModel Comunidad = Html.GetComunidad();
-    string urlPersonalizacion = ViewBag.BaseURLContent + "/imagenes/proyectos/personalizacion/" + Comunidad.Key.ToString();
-    string versionJS = "";
-    if (Comunidad.VersionJS.HasValue)
-    {
-        versionJS = Comunidad.VersionJS.Value.ToString();
-    }
-    string version = versionJS + "-" + Html.GetVersion();
 }
-
-
-
-@*<script type="text/javascript" src="@urlPersonalizacion/ElPrado/js/tooltips/bs/bootstrap.min.js?v=@version"></script>*@
-<script type="text/javascript" src="@urlPersonalizacion/ElPrado/js/templates/common.js?v=@version" defer="defer"></script>
-<script type="text/javascript" src="@urlPersonalizacion/ElPrado/js/freewall.js?v=@version" defer="defer"></script>
-
-
-
 
 @* JS y libererías para el sitio web - Theme *@
 <!-- JQUERY -->
@@ -123,9 +101,16 @@
         src="@Html.GetBaseUrlStatic()/ckeditor/adapters/jquery.js?v=@Html.GetVersion()"></script>
 
 <!-- Dirty Form -->
-<script type="text/javascript"
+<script type="text/javascript"  
         src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/dirty-form/jquery.dirty.js?v=@Html.GetVersion()"></script>
 
+<!-- FullScreenImageViewer ddFullScreenViewer - Zoom en imágenes -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/fullScreenImageViewer/ddfullscreenimageviewer.js?v=@Html.GetVersion()"></script>
+
+<!-- FullScreenImageViewer zoomio - Zoom en imágenes -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/fullScreenImageViewer/zoomio.js?v=@Html.GetVersion()"></script>
 
 @* JS insertados en unificados
        ---------------------------
@@ -152,12 +137,14 @@
     <script type="text/javascript" src="@Html.GetBaseUrlStatic()/jsUnificar/MVC.ComAdmin.js?v=@Html.GetVersion()"></script>
 *@
 
-@{ string idioma = Html.GetUtilIdiomas().LanguageCode;
+@{
+    string idioma = Html.GetUtilIdiomas().LanguageCode;
 
     if (idioma.Contains("-"))
     {
         idioma = idioma.Substring(0, idioma.IndexOf('-'));
-    } }
+    }
+}
 <script type="text/javascript" src="@Html.GetBaseUrlStatic()/lang/@idioma/text.js?v=@Html.GetVersion()"></script>
 
 
@@ -202,3 +189,8 @@ else if (!string.IsNullOrEmpty(@Html.GetGoogleAnalyticsCode()))
         });
     </script>
 }
+
+<script type="text/javascript">
+    var metaEtiquetasOntologia = '@Html.Raw(Html.GetMetaEtiquetasXMLOntologias())';
+    var metaEtiquetasOntologiaJSON = JSON.parse(metaEtiquetasOntologia);
+</script>
