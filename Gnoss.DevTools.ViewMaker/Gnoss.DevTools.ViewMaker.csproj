@@ -70,7 +70,7 @@
       <HintPath>Areas\Gnoss.DevTools.ViewMaker\Libraries\Es.Riam.Gnoss.ExportarImportar.dll</HintPath>
     </Reference>
     <Reference Include="Es.Riam.Gnoss.Recursos">
-      <HintPath>Areas\GnossTestView\Libraries\Es.Riam.Gnoss.Recursos.dll</HintPath>
+      <HintPath>Areas\Gnoss.DevTools.ViewMaker\Libraries\Es.Riam.Gnoss.Recursos.dll</HintPath>
     </Reference>
     <Reference Include="Es.Riam.Gnoss.Util">
       <HintPath>Areas\Gnoss.DevTools.ViewMaker\Libraries\Es.Riam.Gnoss.Util.dll</HintPath>
@@ -85,7 +85,7 @@
       <HintPath>Areas\Gnoss.DevTools.ViewMaker\Libraries\Es.Riam.Gnoss.Web.MVC.Controles.dll</HintPath>
     </Reference>
     <Reference Include="Es.Riam.Gnoss.Web.MVC.Models">
-      <HintPath>Areas\GnossTestView\Libraries\Es.Riam.Gnoss.Web.MVC.Models.dll</HintPath>
+      <HintPath>Areas\Gnoss.DevTools.ViewMaker\Libraries\Es.Riam.Gnoss.Web.MVC.Models.dll</HintPath>
     </Reference>
     <Reference Include="Es.Riam.Gnoss.Web.UtilOAuth">
       <HintPath>Areas\Gnoss.DevTools.ViewMaker\Libraries\Es.Riam.Gnoss.Web.UtilOAuth.dll</HintPath>
@@ -94,7 +94,7 @@
       <HintPath>Areas\Gnoss.DevTools.ViewMaker\Libraries\Es.Riam.Interfaces.dll</HintPath>
     </Reference>
     <Reference Include="Es.Riam.Semantica">
-      <HintPath>Areas\GnossTestView\Libraries\Es.Riam.Semantica.dll</HintPath>
+      <HintPath>Areas\Gnoss.DevTools.ViewMaker\Libraries\Es.Riam.Semantica.dll</HintPath>
     </Reference>
     <Reference Include="Es.Riam.Util">
       <HintPath>Areas\Gnoss.DevTools.ViewMaker\Libraries\Es.Riam.Util.dll</HintPath>

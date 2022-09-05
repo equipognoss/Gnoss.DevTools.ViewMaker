@@ -1276,6 +1276,11 @@ namespace Gnoss.DevTools.ViewMaker.Extensions
             //return (string)helper.ViewBag.BaseUrlStatic;
         }
 
+        public static string GetMetaEtiquetasXMLOntologias(this IHtmlHelper helper)
+        {
+            return (string)helper.ViewBag.MetaEtiquetasXMLOntologias;
+        }
+
         public static string GetBaseUrlContent(this IHtmlHelper helper)
         {
             return (string)helper.ViewBag.BaseUrlContent.Replace("http://", "https://");
