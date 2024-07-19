@@ -40,8 +40,10 @@ Variables
     string idPanelInfoInvitationSent_invite_organization = "panelInfoInvitationSent_invite_organization";
     // Etiqueta que indica si hay o no destinatarios seleccionados para enviar la invitación
     string idLblInfoCorreo_invite_organization = "lblInfoCorreo_invite_organization";
+    // Evitar espacios en nombre de la identidad para el envío de la invitación
+    string nombreIdentidadClaveUriString = Uri.EscapeUriString(nombreIdentidadClave);
     // Url a la que habrá que mandar la petición para invitar a comunidad
-    string urlSendInvitation_invite_organization = $"{@Html.GetBaseUrl()}/identidad/{nombreIdentidadClave}/{Html.GetText("URLSEM", "INVITARAORG")}/save-changes";   //$"{@Html.GetComunidad().Url}/{@Html.GetText("URLSEM", "INVITARAORG")}/save-changes";
+    string urlSendInvitation_invite_organization = $"{@Html.GetBaseUrl()}/identidad/{nombreIdentidadClaveUriString}/{Html.GetText("URLSEM", "INVITARAORG")}/save-changes";   //$"{@Html.GetComunidad().Url}/{@Html.GetText("URLSEM", "INVITARAORG")}/save-changes";
 
 }
 
@@ -118,12 +120,12 @@ Variables
                                 <div class="autocompletar autocompletar-tags form-group">
                                     <div class="input-wrap form-sticky-button">
                                         <input type="text"
-                                               placeholder="Introduce los correos separados por comas y haz clic en añadir"
+                                               placeholder="@Html.GetText("COMMON","INTRODUCELOSCORREOSSEPARADOSPORCOMASYHAZCLICENAÑADIR")"
                                                id="@idTxtCorreoAInvitar_invite_organization"
                                                class="form-control"
                                                autocomplete="off" />
                                         <a id="@idButtonLitAniadirCorreo_invite_organization"
-                                           class="btn btn-primary uppercase">Añadir</a>
+                                           class="btn btn-primary uppercase">@Html.GetText("COMMON","ANYADIRENMAYUSCULA")</a>
                                     </div>
                                 </div>
                                 @*</div>*@
@@ -134,7 +136,7 @@ Variables
                     @* Panel informativo de Destinatarios/No Destinatarios *@
                     <div id="@idPanContenedorInvitados_invite_organization" class="mb-4 @idPanContenedorInvitados_invite_organization">
                         @* Panel No Destinatarios *@
-                        <span id="@idNoDestinatarios_invite_organization" class="@idNoDestinatarios_invite_organization texto-gris-claro mb-3">Ningún destinatario añadido...</span>
+                        <span id="@idNoDestinatarios_invite_organization" class="@idNoDestinatarios_invite_organization texto-gris-claro mb-3">@Html.GetText("COMMON","NINGUNDESTINATARIOAÑADIDO")</span>
                         @* Panel con Destinatarios ELEGIDOS PARA ENVIAR *@
                         <span class="tag-list @idListaDestinatarios_invite_organization" id="@idListaDestinatarios_invite_organization">
                         </span>

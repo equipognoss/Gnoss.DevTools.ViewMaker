@@ -1,21 +1,24 @@
 ﻿@model HomeViewModel
-@*@model dynamic*@
 @*
-Descripción
------------------------------------------------
-Vista que contiene los elementos principales para cargar el html cuando el usuario está en la home de una comunidad.
+    Descripción
+    -----------------------------------------------
+    Vista que contiene los elementos principales para cargar el html cuando el usuario está en la home de una comunidad.
 
-Variables
-----------------------------------------------------------------
+    Variables
+    ----------------------------------------------------------------
 *@
 @{
-Html.SetBodyClass("comGnoss layout01 homeComunidad comunidad");
-CommunityModel Comunidad = Html.GetComunidad();
-UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
-@* Nº de items que se mostrarán como máximo en Widgets de usuarios*@
-int numMaxItemsDisplayed = 5;
-
-
+    Html.SetBodyClass("comGnoss layout01 homeComunidad comunidad");
+    CommunityModel Comunidad = Html.GetComunidad();
+    UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+    @* Nº de items que se mostrarán como máximo en Widgets de usuarios*@
+    int numMaxItemsDisplayed = 5;
+    // Mensaje informativo de acceso a comunidad restringida/privada
+    string accessRestrictedCommunityMessage = "";
+    string accessRestrictedCommunityUrl = "";
+    string buttonText = "";
+    string buttonClass = "";
+    bool showMessageRestrictedCommunityAccess = false;
 }
 
 @*
@@ -23,9 +26,54 @@ int numMaxItemsDisplayed = 5;
     -------------------- Vista de la Home cuando el usuario está en la Home de una comunidad --------------------
 *@
 
+@{
+    @* Controlar mensaje de acceso a comunidad privada/restringida *@
+    if (IdentidadActual.IsGuestIdentity)
+    {
+
+        @* Controlar la visualización en la Home de la comunidad dependiendo del tipo de Comunidad a visualizar*@
+        if (((CommunityModel.TypeAccessProject)Comunidad.AccessType).Equals(CommunityModel.TypeAccessProject.Public))
+        {
+            //Comunidad pública
+            accessRestrictedCommunityUrl = $"{@Comunidad.Url}/{@Html.GetText("URLSEM", "HAZTEMIEMBRO")}";
+            accessRestrictedCommunityMessage = @Html.GetText("COMINICIOLOGIN", "TIENESQUEHACERTEMIEMBRO");            
+            buttonText = @Html.GetText("COMINICIOLOGIN", "HAZTEMIEMBROPARTICIPA");
+            showMessageRestrictedCommunityAccess = true;
+        }
+        else if (((CommunityModel.TypeAccessProject)Comunidad.AccessType).Equals(CommunityModel.TypeAccessProject.Restricted))
+        {
+            //Comunidad Restringida
+            switch (IdentidadActual.CommunityRequestStatus)
+            {
+                case UserIdentityModel.CommunityRequestStatusEnum.NoRequest:
+                    accessRestrictedCommunityUrl = $"{@Comunidad.Url}/{@Html.GetText("URLSEM", "SOLICITARACCESO")}";
+                    accessRestrictedCommunityMessage = @Html.GetText("COMINICIOLOGIN", "TIENESQUESOLICITAR");
+                    buttonText = @Html.GetText("COMINICIOLOGIN", "SOLICITARACCESO");
+                    showMessageRestrictedCommunityAccess = true;
+                    break;
+                case UserIdentityModel.CommunityRequestStatusEnum.RequestPending:
+                    accessRestrictedCommunityMessage = @Html.GetText("COMINICIOLOGIN", "SOLICITUDPENDIENTE");
+                    showMessageRestrictedCommunityAccess = true;
+                    break;
+
+                case UserIdentityModel.CommunityRequestStatusEnum.RequestedWithAnotherProfile:
+                    accessRestrictedCommunityMessage = @Html.GetText("COMINICIOLOGIN", "SOLICITUDPENDIENTEOTROPERFIL");
+                    showMessageRestrictedCommunityAccess = true;
+                    break;
+            }
+        }
+        else
+        {
+            accessRestrictedCommunityMessage = @Html.GetText("COMINICIOLOGIN", "NOACCESOPROY");
+            showMessageRestrictedCommunityAccess = true;
+        }
+    }
+}
+
 
 @* Tener en cuenta el nº máximo de usuarios más activos para evitar errores si no hay más de 5 usuarios *@
-@if (Model.MostActiveUsers.Count < numMaxItemsDisplayed) {
+@if (Model.MostActiveUsers.Count < numMaxItemsDisplayed)
+{
     numMaxItemsDisplayed = Model.MostActiveUsers.Count;
 }
 
@@ -41,15 +89,35 @@ int numMaxItemsDisplayed = 5;
             </ul>
         </div>
         @* Contenedor del buscador principal - Eliminar el buscador Home -> Solo estará el Metabuscador Lateral
-        <div class="col col-12 col-buscador">
-            @* Buscador de elementos en la home - Vista parcial 
-            @Html.PartialView("_partial-views/_searcher")
-        </div>
+            <div class="col col-12 col-buscador">
+                @* Buscador de elementos en la home - Vista parcial
+                @Html.PartialView("_partial-views/_searcher")
+            </div>
         *@
 
         @* Contenedor izquierda/central del Home *@
         <div class="col col-12 col-xl-8 col-contenido izquierda">
             <div class="wrapCol">
+                @if (showMessageRestrictedCommunityAccess)
+                {
+                    <div class="solicitar-acceso">
+                        <div>
+                            <span class="material-icons cerrar">close</span>
+                            <span class="material-icons">vpn_key</span>
+                            @if (!string.IsNullOrEmpty(@Comunidad.Name))
+                            {
+                                <p class="titulo">@Comunidad.Name</p>
+                            }
+                            <p>@accessRestrictedCommunityMessage</p>
+                            @if (!string.IsNullOrEmpty(accessRestrictedCommunityUrl))
+                            {
+                                <a href="@accessRestrictedCommunityUrl" class="btn btn-primary btn-round acceso @buttonClass">@buttonText</a>
+                            }
+                        </div>
+                    </div>
+                }
+
+
                 @* Título de la home: Actividad Reciente *@
                 <div class="header-contenido">
                     <div class="h1-container">
@@ -62,7 +130,7 @@ int numMaxItemsDisplayed = 5;
                 {
                     @* Listado de sección Actividad Reciente *@
                     <div class="resource-list listView resource-list-personas">
-                        <div class="resource-list-wrap">                            
+                        <div class="resource-list-wrap">
                             @* Item de cada comunidad *@
                             @if (Model.RecentActivity.RecentActivityItems.Count > 0)
                             {
@@ -76,7 +144,7 @@ int numMaxItemsDisplayed = 5;
                 {
                     <div>
                         <div class="group content">
-                            <p>
+                            <p aria-label="@Html.GetText("COMMON","ENLACEPARAIRAAÑADIRRECURSOS")">
                                 @Html.Raw(Html.GetText("CONTROLESLIVE", "ACTIVIDADRECIENTEVACIOCOM", (string)Comunidad.Url + "/" + Html.GetText("URLSEM", "SUBIRRECURSO")))
                             </p>
                         </div>
@@ -142,11 +210,11 @@ int numMaxItemsDisplayed = 5;
                 <h2 class="section-title">@Html.GetText("COMADMIN", "MASACTIVOS")</h2>
                 <div class="resource-list usuarios con-borde">
                     @* No mostrar todos -> Mostrar un número determinado de usuarios
-                    @foreach (ProfileModel usuario in Model.MostActiveUsers)
-                    {
-                        @* Cada uno de los usuarios
-                        @Html.PartialView("_partial-views/_list-user-item", usuario)
-                    }
+                        @foreach (ProfileModel usuario in Model.MostActiveUsers)
+                        {
+                            @* Cada uno de los usuarios
+                            @Html.PartialView("_partial-views/_list-user-item", usuario)
+                        }
                     *@
                     @for (int i = 0; i < numMaxItemsDisplayed; i++)
                     {
@@ -164,23 +232,25 @@ int numMaxItemsDisplayed = 5;
                 <div class="resource-list usuarios con-borde">
                     @foreach (ProfileModel usuario in Comunidad.Administrators)
                     {
-                        @* Cada uno de los usuarios *@                        
+                        @* Cada uno de los usuarios *@
                         @Html.PartialView("_partial-views/_list-user-item", usuario)
                     }
                 </div>
             </div>
 
-            @* Comunidades relacionadas que están como Gadgets *@            
-            @if (Model.Gadgets != null && Model.Gadgets.Count > 0) { 
+            @* Comunidades relacionadas que están como Gadgets *@
+            @if (Model.Gadgets != null && Model.Gadgets.Count > 0)
+            {
 
                 foreach (GadgetModel gadget in ((List<GadgetModel>)Model.Gadgets).OrderBy(gadget => gadget.Order))
                 {
-                    if (gadget is GadgetCommunitiesListModel) { 
+                    if (gadget is GadgetCommunitiesListModel)
+                    {
                         @Html.PartialView("ControlesMVC/_FichaGadgetComunidadesRelacionadas", gadget)
-                    }                    
-                }                
+                    }
+                }
             }
-            
+
         </div>
     </div>
 

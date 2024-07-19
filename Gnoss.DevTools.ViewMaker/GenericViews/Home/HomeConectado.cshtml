@@ -76,7 +76,7 @@ int numCommunitiesToShow = 5;
             {
                 <div>
                     <div class="group content">
-                        <p>
+                        <p aria-label="@Html.GetText("COMMON","ENLACEPARAIRAAÑADIRRECURSOS")">
                             @Html.Raw(Html.GetText("CONTROLESLIVE", "ACTIVIDADRECIENTEVACIOCOM", (string)Comunidad.Url + "/" + Html.GetText("URLSEM", "SUBIRRECURSO")))
                         </p>
                     </div>
@@ -98,7 +98,7 @@ int numCommunitiesToShow = 5;
                     {
                         if (contadorComunidadesPerfil == numCommunitiesToShow) {
                             if (perfil.Communities.Count > numCommunitiesToShow) {
-                                <a href="@perfil.Url@Html.GetText("URLSEM", "MISCOMUNIDADES")">@Html.GetText("INICIO", "VERTODOS")</a>
+                                <a class="withUnderline" aria-label="@Html.GetText("COMMON","ENLACEPARAVERTODASLASCOMUNIDADES")" href="@perfil.Url@Html.GetText("URLSEM", "MISCOMUNIDADES")">@Html.GetText("INICIO", "VERTODOS")</a>
                             }
                             break;
                         }
@@ -123,38 +123,41 @@ int numCommunitiesToShow = 5;
 
         @* Contenedor para paneles Home (Mi Espacio personal, Registro Organización para empresa, asociación y Gestión de clases para profesores Clases. (Presente en el viejo Front en el lazo izquierdo a modo de "Widget" *@
         <div class="wrapCol">
-            @* Solicitar creación de Comunidad *@
-            @if (Comunidad.MetaProyect) { 
-            
+            @* Solicitar creación de Comunidad - Sólo podrá hacerlo el MetaAdministrador *@
+            @if (Comunidad.MetaProyect && IdentidadActual.IsProyectAdmin) {             
                 <h2 class="section-title">Crear comunidad</h2>
                 <div class="resource-list mgOrganizaciones">
                     <article class="resource">
-                        <p>                            
-                            <a href="@perfil.Url@Html.GetText("URLSEM", "SOLICITARCOMUNIDAD")">Crea una comunidad, una red social donde podrás compartir información e invitar a personas que desees</a>
+                        <p>
+                            <a class="withUnderline" href="@perfil.Url@Html.GetText("URLSEM", "SOLICITARCOMUNIDAD")" aria-label="@Html.GetText("COMMON","ENLACEPARAIRACREAUNACOMUNIDAD")">
+                                @Html.GetText("COMMON","CREAUNACOMUNIDADUNAREDSOCIALDONDEPODRASCOMPARTIRINFORMACION")
+                            </a>
                         </p>
                     </article>
                 </div>                                      
             }        
 
 
-            <h2 class="section-title">@Html.GetNombreEspacioPersonal()</h2>
+            <h2 class="section-title">@Html.GetText("DEVTOOLS","MIESPACIOPERSONAL")</h2>
             <div class="resource-list mgOrganizaciones">
                 <article class="resource ">
                     <p>
-                        <a href="@perfil.Url@Html.GetText("URLSEM", "MISRECURSOS")">@Html.GetText("HOMEUSU", "TEXTOESPACIOPERSONAL", Html.GetNombreProyectoEcosistema())</a>
+                        <a aria-label="@Html.GetText("COMMON","ENLACEPARAIRALESPACIOPERSONAL")" class="withUnderline withDarker" href="@perfil.Url@Html.GetText("URLSEM", "MISRECURSOS")">@Html.GetText("HOMEUSU", "TEXTOESPACIOPERSONAL", Html.GetNombreProyectoEcosistema())</a>
                     </p>
                 </article>
             </div>
 
-            @* Crea tu red para tu empresa, asociación o colectivo (Presente en el viejo Front en el lazo izquierdo a modo de "Widget" *@
-            <h2 class="section-title">@Html.GetText("HOMEUSU", "MENUORGANIZACIONES")</h2>
-            <div class="resource-list mgEspacioPersonal">
-                <article class="resource">
-                    <p>
-                        <a href="@perfil.Url@Html.GetText("URLSEM", "REGISTROORGANIZACION")">Crea tu red para tu empresa, asociación o colectivo</a>
-                    </p>
-                </article>
-            </div>
+            @* Crea tu red para tu empresa, asociación o colectivo - Sólo podrá hacerlo el MetaAdministrador *@
+            @if (Comunidad.MetaProyect && IdentidadActual.IsProyectAdmin) {                                     
+                <h2 class="section-title">@Html.GetText("HOMEUSU", "MENUORGANIZACIONES")</h2>
+                <div class="resource-list mgEspacioPersonal">
+                    <article class="resource">
+                        <p>
+                            <a href="@perfil.Url@Html.GetText("URLSEM", "REGISTROORGANIZACION")">Crea tu red para tu empresa, asociación o colectivo</a>
+                        </p>
+                    </article>
+                </div>
+            }
             @* Opciones en caso de ser Profesor -> Administrar clases (Presente en el viejo Front en el lazo izquierdo a modo de "Widget" --> Ocultado (MYG-82) 
             <h2 class="section-title">@Html.GetText("HOMEUSU", "MENUCLASES")</h2>
             <div class="resource-list mgClases">

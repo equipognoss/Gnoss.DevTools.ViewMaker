@@ -10,7 +10,8 @@ Variables
 ----------------------------------------------------------------
 *@
 @{
-
+// Comprobar si hay una imagen miniatura del recurso generada por archivo adjunto
+bool isImagePreview = false;
 
 }
 
@@ -31,15 +32,15 @@ Variables
 
         if (Model.UrlPreview.StartsWith("//www.youtube"))
         {
-            <iframe width="100%" height="468" src="@Model.UrlPreview" frameborder="0" allowfullscreen="true"></iframe>
+            <iframe style="width:100%;" height="468" frameborder="0" src="@Model.UrlPreview" title="@($"{@Html.GetText("COMMON", "VIDEODE")} {Model.Title}")" aria-label="@Html.GetText("COMMON","DESCRIPCIONDELVIDEO")" aria-labelledby="video-title" role="presentation" allowfullscreen="allowfullscreen"></iframe>
         }
         else if (Model.UrlPreview.StartsWith("//player.vimeo.com/"))
         {
-            <iframe frameborder="0" width="100%" height="326" style="z-index:0" src="@Model.UrlPreview" allowfullscreen="true"></iframe>
+            <iframe style="width:100%; z-index:0" height="326" frameborder="0" src="@Model.UrlPreview" title="@($"{@Html.GetText("COMMON", "VIDEODE")} {Model.Title}")" aria-label="@Html.GetText("COMMON","DESCRIPCIONDELVIDEO")" aria-labelledby="video-title" role="presentation" allowfullscreen="allowfullscreen"></iframe>
         }
         else if (Model.UrlPreview.StartsWith("https://embed.ted.com") || Model.UrlPreview.StartsWith("http://tedxtalks.ted.com"))
-        {
-            <iframe src="@Model.UrlPreview" width="100%" height="321" frameborder="0" scrolling="no"></iframe>
+        {            
+            <iframe style="width:100%;" height="321" frameborder="0" scrolling="no" src="@Model.UrlPreview" title="@($"{@Html.GetText("COMMON", "VIDEODE")} {Model.Title}")" aria-label="@Html.GetText("COMMON","DESCRIPCIONDELVIDEO")" aria-labelledby="video-title" role="presentation" allowfullscreen="allowfullscreen"></iframe>
         }
         else if (Model.UrlPreview.StartsWith("Brightcove:"))
         {
@@ -85,19 +86,22 @@ Variables
         }
     }else if (Model.NameImage == "presentacion" && Model.OpenInNewWindow)
     {
-        <iframe frameborder="0" width="100%" height="450px" allowfullscreen="" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" scrolling="no" marginheight="0" marginwidth="0" src="@Model.UrlPreview"> </iframe>
+        <iframe style="width:100%; border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" height="450" scrolling="no" frameborder="0" marginheight="0" marginwidth="0" src="@Model.UrlPreview" title="@($"{@Html.GetText("COMMON","PRESENTACIONDE")} {Model.Title}")" aria-label="@Html.GetText("COMMON","DESCRIPCIONDELAPRESENTACION")" aria-labelledby="video-title" role="presentation" allowfullscreen="allowfullscreen"></iframe>
     }
     else if (Model.NameImage == "imagen" || Model.NameImage == "hipervinculo")
     {
-        <a href="@Model.UrlDocument" >
-        <img src="@Model.UrlPreview" alt="@Model.Title"/>
-        </a>
+        isImagePreview = true;
+        <div style="float: left; margin-right: 1rem; margin-bottom: 1rem;">
+            <a href="@Model.UrlDocument" aria-label="@($"{@Html.GetText("COMMON","VERRECURSO")} {Model.Title}")">
+                <img src="@Model.UrlPreview" alt="@Model.Title" style="width: auto; max-width: 100%;" />                
+            </a>
+        </div>
     }
     else if (Model.NameImage == "digital" && !string.IsNullOrEmpty(Model.UrlDocument) && Model.UrlDocument.Contains("VisualizarFlash.aspx"))
     {            
-        <object width="100%" height="450px" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000">
+        <object style="width:100%; height:450px;" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000">
             <param name="movie" value="@Model.UrlPreview"/>
-            <embed  width="100%" height="450px" src="@Model.UrlPreview" pluginspage="http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash"/>
+            <embed style="width:100%; height:450px" src="@Model.UrlPreview" pluginspage="http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash" />
         </object>
     }
 }
@@ -112,7 +116,7 @@ Variables
     }
     else if (Model.NameImage == "newsletter" && Model.Description == "")
     {
-        <iframe id="iframeNewsletter" class="newsletter" src="@Html.GetBaseUrl()/objetonewsletter.aspx?docid=@Model.Key&temp=false" style="display:none" width="837" onload="newsletterLoad(this)"></iframe>
+        <iframe id="iframeNewsletter" class="newsletter" src="@Html.GetBaseUrl()/objetonewsletter?docid=@Model.Key&temp=false" style="display:none" width="837" onload="newsletterLoad(this)"></iframe>
         <script type="text/javascript">
             function newsletterLoad(iframe) {
                 $(iframe).show();
@@ -133,4 +137,10 @@ Variables
     {
         @Html.Raw(Model.Description)
     }
+    @* Deshacer el float de imagen miniatura *@
+    @if (isImagePreview)
+    {
+        <div style="clear:both; display:block"></div>    
+    }    
+
 </div>

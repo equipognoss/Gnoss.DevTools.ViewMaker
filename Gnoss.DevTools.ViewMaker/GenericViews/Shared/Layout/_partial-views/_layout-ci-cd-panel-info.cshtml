@@ -1,0 +1,135 @@
+﻿@*
+Descripción
+----------------------------------------------------------------
+Vista parcial donde se mostrará información acerca de la activación del servicio/sistema de integración continua (CI/CD).
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+    CommunityModel Comunidad = Html.GetComunidad();
+}
+@*
+----------------------------------------------------------------
+*@
+
+
+@if (Comunidad.IntegracionContinuaActivada)
+{
+    if (String.Equals(Comunidad.RamaActualGit, "") || String.Equals(Comunidad.RamaActualGit, "develop"))
+    {
+        @* Entorno Bloqueado *@
+        if (Comunidad.EntornoBloqueado)
+        {
+            <div class="headerCICD">
+                <div class="headerCICD__container">
+                    <span class="material-icons-outlined mr-2">info</span>
+                    <span>@Html.GetText("DEVTOOLS","ELENTORNOACTUALESTABLOQUEADOPORQUESEHAVALIDADOUNAVERSIONDEB")</span>                    
+                </div>
+            </div>
+        }
+        else if (!string.IsNullOrEmpty(Comunidad.ShortName))
+        {
+            @* Sin Rama activa -> Crear una rama para poder subir los cambios *@
+            <div class="headerCICD">
+                <div class="headerCICD__container">
+                    <span class="material-icons-outlined mr-2">info</span>
+                    <span>@Html.GetText("DEVTOOLS","NOTIENESUNARAMAACTIVA,DEBESCREARUNARAMAPARAPODERSUBIRLOSCAMB")</span>
+                    @* Administrar Ramas *@
+                    <a class="btn btn-primary ml-2 mr-2 btnCICD withTextShadow" 
+                       href="@Comunidad.Url/@Html.GetText("URLSEM", "ADMINISTRAINTEGRACIONCONTINUA")">
+                        @Html.GetText("DEVTOOLS","ADMINISTRARRAMAS")
+                    </a>
+                    @* Administrar Despliegues *@
+                    <a class="btn btn-primary btnCICD withTextShadow" 
+                       href="@Comunidad.Url/@Html.GetText("URLSEM", "ADMINISTRARDESPLIEGUES")">
+                        @Html.GetText("DEVTOOLS","ADMINISTRARDESPLIEGUES")
+                    </a>
+                </div>
+            </div>
+        }
+        else
+        {
+            @* Sin Rama activa en ecosistema -> Crear una rama para poder subir los cambios *@            
+            <div class="headerCICD">
+                <div class="headerCICD__container">
+                    <span class="material-icons-outlined mr-2">info</span>
+                    <span>@Html.GetText("DEVTOOLS","NOTIENESUNARAMAACTIVA,DEBESCREARUNARAMAPARAPODERSUBIRLOSCAMB")</span>
+                    @* Administrar Ramas *@
+                    <a class="btn btn-primary ml-2 mr-2 btnCICD withTextShadow" 
+                       href="@Comunidad.Url/@Html.GetText("URLSEM", "ADMINISTRAINTEGRACIONCONTINUA")-ecosistema">
+                        @Html.GetText("DEVTOOLS","ADMINISTRARRAMAS")
+                    </a>
+                    @* Administrar Despliegues *@
+                    <a class="btn btn-primary btnCICD withTextShadow" 
+                       href="@Comunidad.Url/@Html.GetText("URLSEM", "ADMINISTRARDESPLIEGUES")-ecosistema">
+                        @Html.GetText("DEVTOOLS","ADMINISTRARDESPLIEGUES")
+                    </a>
+                </div>
+            </div>
+        }
+    } else if (Comunidad.RamaActualGit.Contains("release_"))
+    {
+        @* Rama release *@
+        if (!string.IsNullOrEmpty(Comunidad.ShortName))
+        {
+            <div class="headerCICD">
+                <div class="headerCICD__container">
+                    <span class="material-icons-outlined mr-2">info</span>
+                    <span>@Html.GetText("DEVTOOLS","ESTASENLARAMARELEASE(VERSION@1@)PUEDESHACERCAMBIOSENLAADMIN", @Comunidad.VersionRamaRelease)</span>
+                    @* Administrar Ramas *@
+                    <a class="btn btn-primary ml-2 btnCICD withTextShadow" 
+                       href="@Comunidad.Url/@Html.GetText("URLSEM", "ADMINISTRARDESPLIEGUES")">
+                        @Html.GetText("DEVTOOLS","ADMINISTRARDESPLIEGUES")
+                    </a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="headerCICD">
+                <div class="headerCICD__container">
+                    <span class="material-icons-outlined mr-2">info</span>
+                    <span>@Html.GetText("DEVTOOLS","ESTASENLARAMARELEASE(VERSION@1@)PUEDESHACERCAMBIOSENLAADMIN", @Comunidad.VersionRamaRelease)</span>
+                    @* Administrar Ramas *@
+                    <a class="btn btn-primary ml-2 btnCICD withTextShadow" 
+                       href="@Comunidad.Url/@Html.GetText("URLSEM", "ADMINISTRARDESPLIEGUES")-ecosistema">
+                       @Html.GetText("DEVTOOLS","ADMINISTRARDESPLIEGUES")
+                    </a>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        @* Rama Actual. Hacer cambios y cerrar rama *@
+        if (!string.IsNullOrEmpty(Comunidad.ShortName))
+        {
+            <div class="headerCICD">
+                <div class="headerCICD__container">
+                    <span class="material-icons-outlined mr-2">info</span>
+                    <span>@Html.GetText("DEVTOOLS","ESTASENLA@1@,SOLOSETEPERMITEHACERCAMBIOSENADMINISTRACIONYCER", @Comunidad.RamaActualGit)</span>
+                    @* Administrar Ramas *@
+                    <a class="btn btn-primary ml-2 btnCICD withTextShadow" 
+                       href="@Comunidad.Url/@Html.GetText("URLSEM", "ADMINISTRAINTEGRACIONCONTINUA")">
+                        @Html.GetText("DEVTOOLS","ADMINISTRARRAMAS")
+                    </a>
+                </div>
+            </div>      
+        }
+        else
+        {
+            <div class="headerCICD">
+                <div class="headerCICD__container">
+                    <span class="material-icons-outlined mr-2">info</span>
+                    <span>@Html.GetText("DEVTOOLS","ESTASENLA@1@,SOLOSETEPERMITEHACERCAMBIOSENADMINISTRACIONYCER", @Comunidad.RamaActualGit)</span>
+                    @* Administrar Ramas *@
+                    <a class="btn btn-primary ml-2 btnCICD withTextShadow" 
+                       href="@Comunidad.Url/@Html.GetText("URLSEM", "ADMINISTRAINTEGRACIONCONTINUA")-ecosistema">
+                        @Html.GetText("DEVTOOLS","ADMINISTRARRAMAS")
+                    </a>
+                </div>
+            </div>            
+        }
+    }
+}

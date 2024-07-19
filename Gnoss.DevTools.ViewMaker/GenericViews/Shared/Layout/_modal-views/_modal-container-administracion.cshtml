@@ -1,0 +1,45 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista contenedor de modales que servirá para albergar otros modales de bootstrap. Usado para la adminsitración de la comunidad o devtools.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista "Vacía" donde se pintará el contenido de una vista --------------------
+*@
+
+<div id="modal-container"
+     class="modal modal-top fade modal-edicion"     
+     role="dialog">
+    <div class="modal-dialog" role="document">
+        @* HAY QUE CARGAR EL MODAL-CONTENT de los demás modales en el #modal-dinamic-content *@
+        <div class="modal-content">
+            <div id="modal-dinamic-content">
+                @* Loading del Modal para llamada asíncrona *@
+                
+                @* Cargar aquí el contenido de los paneles modales *@
+                <div id="content">
+                    @* Header del Modal *@
+                    <div class="modal-header">
+                        <p class="modal-title">
+                            <span class="spinner-border white-color mr-2"></span>
+                            Cargando ...
+                        </p>
+                        <span class="material-icons cerrar" data-dismiss="modal" aria-label="Close">close</span>
+                    </div>
+                    @* Contenido donde se mostrará el contenido del Modal cargado *@
+                    <div class="modal-body">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

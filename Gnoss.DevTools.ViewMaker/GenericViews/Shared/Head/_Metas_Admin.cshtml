@@ -1,0 +1,111 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista parcial que se utiliza para incluir todo el código Meta necesario en la página o Layout de DevTools.
+
+Variables
+----------------------------------------------------------------
+*@
+
+@{
+CommunityModel Comunidad = Html.GetComunidad();
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista parcial de Metas del Layout para DevTools --------------------
+*@
+
+@* Metas Layout *@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
+
+@* Metas personalizadas para proyecto *@
+@if (Comunidad != null && Comunidad.ProjectExtraHTMLList != null)
+{
+    @Html.PartialView("../Shared/ProyectoElementoHTML", Comunidad.ProjectExtraHTMLList.Where(a => a.Ubication == UbicacionHtmlProyecto.BeginHead).ToList());
+}
+
+@* Html Canonical para Buscadores - URL canónica donde hay el mismo contenido *@	
+@if (!string.IsNullOrEmpty(Html.GetUrlCanonical()))
+{
+    <link rel="canonical" href="@Html.GetUrlCanonical()" />
+}
+@* URL alternativas según idiomas *@
+@if (Html.GetCabecera() != null && Html.GetCabecera().MultiLingualLinks != null)
+{
+    if (Html.GetCabecera().MultiLingualLinks.Keys.Contains(Html.GetUtilIdiomas().LanguageCode))
+    {
+        <link rel="alternate" hreflang="@Html.GetUtilIdiomas().LanguageCode" href="@Html.GetCabecera().MultiLingualLinks[Html.GetUtilIdiomas().LanguageCode].Value" />
+    }
+    foreach (string language in Html.GetCabecera().MultiLingualLinks.Keys)
+    {
+        if (!language.Equals(Html.GetUtilIdiomas().LanguageCode))
+        {
+            if (Html.GetCabecera().MultiLingualLinks[language].Key)
+            {
+                <link rel="alternate" hreflang="@language" href="@Html.GetCabecera().MultiLingualLinks[language].Value" />
+            }
+        }
+    }
+}
+
+@* URL de RDF *@
+@if (!string.IsNullOrEmpty(Html.GetURLRDF()))
+{
+    <link rel="alternate" type="application/rdf+xml" href="@Html.GetURLRDF()" />
+}
+
+@* Información MetaDescription *@
+@if (Html.GetMetaDescriptionPestanya() != null)
+{
+    string metaDescription = Html.GetMetaDescriptionPestanya();
+    <meta name="description" content="@Html.GetMetaDescriptionPestanya()" />
+}
+
+@* Listado de Metas Adicionales *@
+@if (Html.GetListaMetas() != null)
+{
+    foreach (KeyValuePair<string, string> contentMeta in Html.GetListaMetas())
+    {
+        <meta name="@contentMeta.Key" content="@contentMeta.Value" />
+    }
+}
+
+@* Listado de Metas Complejas *@
+@if (Html.GetListaMetasComplejas() != null)
+{
+    foreach (Dictionary<string, string> atributosMeta in Html.GetListaMetasComplejas())
+    {
+        System.Text.StringBuilder meta = new System.Text.StringBuilder("<meta");
+
+        foreach (string clave in atributosMeta.Keys)
+        {
+            meta.Append(" ");
+            meta.Append(clave);
+            meta.Append("=");
+            meta.Append("\"");
+            meta.Append(atributosMeta[clave]);
+            meta.Append("\"");
+        }
+
+        meta.Append(" />\r\n");
+        @Html.Raw(meta)
+    }
+}
+
+@* Carga de links para búsquedas *@       
+@if (Html.GetBusquedasXml() != null)
+{
+    foreach (string busqueda in Html.GetBusquedasXml())
+    {
+        <link rel="search" type="application/opensearchdescription+xml" href="@busqueda" />
+    }
+}
+
+@* Extra HTML de la comunidad *@  
+@if (Comunidad != null && Comunidad.ProjectExtraHTMLList != null)
+{
+    @Html.PartialView("../Shared/ProyectoElementoHTML", Comunidad.ProjectExtraHTMLList.Where(a => a.Ubication == UbicacionHtmlProyecto.EndHead).ToList());
+}

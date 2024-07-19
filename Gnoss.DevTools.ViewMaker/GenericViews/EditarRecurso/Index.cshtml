@@ -36,14 +36,13 @@ Variables
     }
 
     if (Model.TypePage == Es.Riam.Gnoss.Web.MVC.Models.EditResourceModel.TypePageEditResource.CreateResource || Model.TypePage == Es.Riam.Gnoss.Web.MVC.Models.EditResourceModel.TypePageEditResource.CreateSemanticResource)
-    {
-        titulo = "Nuevo " + tipoRecurso;
-
+    {                
+        titulo = $"{Html.GetText("COMMON","NUEVO")} {tipoRecurso}";
         //Model.CreateResourceModel.UrlCancelButton
     }
     else
-    {
-        titulo = "Editar " + tipoRecurso;
+    {        
+        titulo = $"{Html.GetText("COMMON", "EDITAR")} {tipoRecurso}";
     }
 
     if (Context.Request.Headers["Referer"].ToString() != "" || Context.Request.Headers["Referer"].ToString().Length > 1)
@@ -60,7 +59,10 @@ Variables
     else
     {
         // Acceso directo al recurso
-        urlCancelar = Model.ModifyResourceModel.UrlCancelButton;
+        if (Model.ModifyResourceModel != null)
+        {
+            urlCancelar = Model.ModifyResourceModel.UrlCancelButton;
+        }
     }
 }
 

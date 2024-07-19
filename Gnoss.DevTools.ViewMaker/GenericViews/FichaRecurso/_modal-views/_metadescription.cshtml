@@ -1,0 +1,55 @@
+﻿@*
+    Descripción
+    -----------------------------------------------
+    Vista modal que servirá para añadir la meta descripcion a un recurso.
+
+    Variables
+    ----------------------------------------------------------------
+*@
+@{
+    ResourceModel fichaRecurso = Model.Resource;
+    // Construcción para realizar la llamada JS para agregar meta descripcion
+    string funcionAceptarMetaDescipcion = "AccionRecurso_MetaDescripcion('" + fichaRecurso.ListActions.UrlAddMetaDescripcion + "', '" + fichaRecurso.Key + "')";
+
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Vista Modal para añadir meta descripcion a un recurso --------------------
+*@
+
+<div class="modal-header">
+    <p class="modal-title">
+        <span class="material-icons">label</span>@Html.GetText("METAETIQUETAS", "METADESCRIPTION")
+    </p>
+    <span class="material-icons cerrar"
+          data-dismiss="modal"
+          aria-label="Close">close</span>
+</div>
+<div class="modal-body">
+    <div class="formulario-edicion">
+        <div class="form-group">
+            <label for="metatitulo" class="control-label">URL del recurso</label>
+            <input placeholder="@Html.GetText("METAETIQUETAS", "INFOMETADESCRIPTION")"
+                   type="text"
+                   name="vincular-url-recurso"
+                   id="txtMetaDescripcion_@fichaRecurso.Key"
+                   class="form-control not-outline" />
+        </div>
+
+        @* Mensaje informativo del proceso*@
+        <div id="despAccionRec_@fichaRecurso.Key">
+            <div>
+                <div id="menssages">
+                    <div class="ok"></div>
+                    <div class="ko"></div>
+                </div>
+            </div>
+        </div>
+        <div class="form-actions">
+            @* Botón que guardará posibles cambios *@
+            <button onclick="@funcionAceptarMetaDescipcion" class="btn btn-primary">@Html.GetText("COMMON", "ACEPTAR")</button>
+        </div>
+
+    </div>
+</div>

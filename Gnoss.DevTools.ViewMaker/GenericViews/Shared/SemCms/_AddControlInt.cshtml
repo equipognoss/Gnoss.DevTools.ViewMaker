@@ -1,0 +1,197 @@
+﻿@model SharedSemCms
+
+@{
+    Es.Riam.Semantica.OWL.Propiedad mPropiedad = Model.semanticPropertyModel.Element.Propiedad;
+    bool readMode = Model.semanticPropertyModel.ReadMode;
+
+    if (!readMode)
+    {
+        string idControl = Model.semanticPropertyModel.OntologyPropInfo.ControlID;
+        string idControlError = idControl.Replace("panel_contenedor_Entidades_", "divError_");
+        string idControlAgre = idControl.Replace("panel_contenedor_Entidades_", "lbCrear_");
+        string idControlGuardar = idControl.Replace("panel_contenedor_Entidades_", "lbGuardar_");
+        string idControlCancelar = idControl.Replace("panel_contenedor_Entidades_", "lbCancelar_");
+        string textoBtnAgre = Html.GetText("CONTROLESDOCUMENTACION", "ANYADIR");
+        string textoBtnGuardar = Html.GetText("CONTROLESDOCUMENTACION", "ACEPTAR");
+        string textoBtnCancelar = Html.GetText("PERFILBASE", "CANCELAR");
+
+        if (mPropiedad.EspecifPropiedad.TextoAgregarElem != null)
+        {
+            textoBtnAgre = mPropiedad.EspecifPropiedad.TextoAgregarElem;
+        }
+
+        if (mPropiedad.EspecifPropiedad.TextoBotonAceptarElemento != null)
+        {
+            textoBtnGuardar = mPropiedad.EspecifPropiedad.TextoBotonAceptarElemento;
+        }
+
+        if (mPropiedad.EspecifPropiedad.TextoCancelarElem != null)
+        {
+            textoBtnCancelar = mPropiedad.EspecifPropiedad.TextoCancelarElem;
+        }
+
+        string displayBtnAgre = "";
+
+        if (!Model.semanticPropertyModel.OntologyPropInfo.ItIsPossibleToSddMoreValues)
+        {
+            displayBtnAgre = "style=\"display:none;\"";
+        }
+
+        string metodoLimpiar = "LimpiarControlesEntidad('" + mPropiedad.Rango + "',TxtValorRdf,TxtRegistroIDs,TxtCaracteristicasElem,TxtElemEditados);MarcarElementoEditado('" + mPropiedad.ElementoOntologia.TipoEntidad + "','" + mPropiedad.Nombre + "',-1,TxtElemEditados,TxtCaracteristicasElem);EstablecerBotonesEntidad('" + mPropiedad.ElementoOntologia.TipoEntidad + "','" + mPropiedad.Nombre + "',true,TxtRegistroIDs);";
+        //metodoLimpiar = metodoLimpiar.Replace("'", "\\'");
+        // Cambiado a modal por nuevo Front
+        // string metodoCancelar = "MostrarPanelConfirmacionEvento(event,'" + Html.GetText("CONTROLESCVSEM", "ENTIDADCAMBIOS") + "','" + metodoLimpiar + "')";
+        // string metodoCancelar = "MostrarPanelConfirmacionEvento(event,'" + Html.GetText("CONTROLESCVSEM", "ENTIDADCAMBIOS") + "','" + metodoLimpiar + "')";
+        string metodoCancelar = metodoLimpiar;
+
+        string displayConValores = "";
+
+        if (Model.semanticPropertyModel.OntologyPropInfo.PropertyValues.Count == 1)
+        {
+            displayConValores = "style=\"display:none;\"";
+        }
+
+        Es.Riam.Semantica.OWL.ElementoOntologia entidadASelecionarTitulo = Model.semanticPropertyModel.EntityParent.Entity.Ontologia.GetEntidadTipo(mPropiedad.Rango);
+        string claseFila = "par";
+        string imgEditar = Html.GetBaseUrlStatic() + "/img/icoEditar.gif";
+        string textoEliminar = Html.GetText("CONTROLESCVSEM", "CONFIRMARELIMINARENT");
+
+        if (mPropiedad.EspecifPropiedad.TextoEliminarElemSel != null)
+        {
+            textoEliminar = mPropiedad.EspecifPropiedad.TextoEliminarElemSel;
+        }
+
+        <div>
+            <div id="@idControlError"></div>
+            @Html.PartialView("SemCms/_Entidad", Model.semanticPropertyModel.OntologyPropInfo.PropertyValues[Model.semanticPropertyModel.OntologyPropInfo.PropertyValues.Count - 1].RelatedEntity)
+            <div class="mb-4 panelAgregarObjectNoFuncionalProp">
+                <input id="@idControlAgre" type="button" class="btn btn-primary mt-2" value="@textoBtnAgre" @Html.Raw(displayBtnAgre) onclick="AgregarObjectNoFuncionalProp('@mPropiedad.ElementoOntologia.TipoEntidad', '@mPropiedad.Nombre', '@mPropiedad.Rango', '@idControl',TxtValorRdf,TxtRegistroIDs,TxtCaracteristicasElem,TxtElemEditados,true,true,-1)" />
+                <input id="@idControlGuardar" type="button" class="btn btn-primary mt-2" value="@textoBtnGuardar" style="display:none;" onclick="GuardarObjectNoFuncionalProp('@mPropiedad.ElementoOntologia.TipoEntidad', '@mPropiedad.Nombre', '@mPropiedad.Rango', '@idControl',TxtValorRdf,TxtRegistroIDs,TxtCaracteristicasElem,TxtElemEditados)" />
+                @* <input id="@idControlCancelar" type="button" class="btn btn-outline-primary mt-2" style="display: none" value="@textoBtnCancelar" onclick="@metodoCancelar"/>*@
+                <input id="@idControlCancelar" type="button" class="btn btn-outline-primary mt-2" style="display: none" value="@textoBtnCancelar"
+                       onclick="
+                                $('#modal-container').modal('show', this);
+                                AccionFichaPerfil(
+                                    '@Html.GetText("COMMON", "CANCELAR")',
+                                    '@Html.GetText("COMMON", "SI")',
+                                    '@Html.GetText("COMMON", "NO")',
+                                    '@Html.GetText("CONTROLESCVSEM", "ENTIDADCAMBIOS")',
+                                    'sin-definir',
+                                    function(){
+                                        @metodoCancelar
+                                        $('#modal-container').modal('hide');
+                                    }
+                                );"
+                />
+
+            </div>
+            <div id="@idControl" class="contAgr" @Html.Raw(displayConValores)>
+                <table>
+                    <tr>
+                        @foreach (string titulo in Model.semanticPropertyModel.OntologyPropInfo.RepresentativeEntityTitles)
+                        {
+                            <th class="tdtit">@titulo</th>
+                        }
+                    </tr>
+                    @for (int i = 0; i < (Model.semanticPropertyModel.OntologyPropInfo.PropertyValues.Count - 1); i++)
+                    {
+                        string metodo = "EliminarObjectNoFuncionalProp('" + i + "','" + mPropiedad.ElementoOntologia.TipoEntidad + "','" + mPropiedad.Nombre + "','" + mPropiedad.Rango + "','" + idControl + "',TxtValorRdf,TxtRegistroIDs,TxtCaracteristicasElem,TxtElemEditados);";
+                        //metodo = metodo.Replace("'", "\\'");
+                        //string metodoEliminar = "MostrarPanelConfirmacionEvento(event,'" + textoEliminar + "','" + metodo + "')";
+                        string metodoEliminar = metodo;
+                        string metodoSelecionar = "SeleccionarElementoGrupoPaneles('" + mPropiedad.ElementoOntologia.TipoEntidad + "','" + mPropiedad.Nombre + "','" + Model.semanticPropertyModel.OntologyPropInfo.PropertyValues[i].RelatedEntity.Entity.TipoEntidad + "', '" + i + "',TxtValorRdf,TxtRegistroIDs,TxtCaracteristicasElem,TxtElemEditados)";
+
+                        <tr class="@claseFila">
+                            @foreach (string valor in Model.semanticPropertyModel.OntologyPropInfo.PropertyValues[i].RepresentativeEntityTitles)
+                            {
+                                <td class="tdval">@Html.Raw(valor)</td>
+                            }
+                            @* Acción de editar *@
+                            <td class="tdaccion">
+                                @*<a onclick="@Html.Raw(metodoSelecionar)">
+                                <img src="@imgEditar" alt="editar" /></a>*@
+                                <a href="javascript:void(0)" onclick="@Html.Raw(metodoSelecionar)" style="color: var(--c-primario)">
+                                    <span class="material-icons pr-0">edit</span>
+                                </a>
+
+                            </td>
+                            @* Acción de Borrar *@
+                            @*<td class="tdaccion"><a class="remove" onclick="@metodoEliminar"></a></td>*@
+                            <td class="tdaccion">
+                                <a href="javascript:void(0)"      
+                                        class="remove"
+                                        data-showmodalcentered="1"
+                                        onclick="
+                                            $('#modal-container').modal('show', this);
+                                            AccionFichaPerfil(
+                                                '@Html.GetText("COMMON", "ELIMINAR")',
+                                                '@Html.GetText("COMMON", "SI")',
+                                                '@Html.GetText("COMMON", "NO")',
+                                                '@textoEliminar',
+                                                'sin-definir',
+                                                function(){
+                                                        @metodoEliminar;
+                                                        $('#modal-container').modal('hide');
+                                                }
+                                            );
+                                        ">
+                                    <span class="material-icons pr-0">delete</span>
+                                </a>
+                            </td>
+                        </tr>
+
+                        if (claseFila == "par")
+                        {
+                            claseFila = "impar";
+                        }
+                        else
+                        {
+                            claseFila = "par";
+                        }
+                    }
+                </table>
+            </div>
+        </div>
+    }
+    else
+    {
+        int countGal = 0;
+
+        foreach (SemanticPropertyModel.PropertyValue propertyValue in Model.semanticPropertyModel.OntologyPropInfo.PropertyValues)
+        {
+            if (mPropiedad.EspecifPropiedad.GaleriaImagenes == null)
+            {
+                if (Model.semanticPropertyModel.Element.TipoPresentacion != null && Model.semanticPropertyModel.Element.TipoPresentacion.ToLower() == "ul")
+                {
+                    <li>
+                        @Html.PartialView("SemCms/_Entidad", propertyValue.RelatedEntity)
+                    </li>
+                }
+                else
+                {
+                    @Html.PartialView("SemCms/_Entidad", propertyValue.RelatedEntity)
+                }
+            }
+            else
+            {
+                string[] paramGal = mPropiedad.EspecifPropiedad.GaleriaImagenes.Split(',');
+                string styleGal = "float:left;width:" + paramGal[0] + ";height:" + paramGal[1] + ";";
+                countGal++;
+
+                if (countGal == int.Parse(paramGal[3]))
+                {
+                    countGal = 0;
+                }
+                else
+                {
+                    styleGal += "margin-right:" + paramGal[2] + ";";
+                }
+
+                <div style="@styleGal">
+                    @Html.PartialView("SemCms/_Entidad", propertyValue.RelatedEntity)
+                </div>
+            }
+        }
+    }
+}
+

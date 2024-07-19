@@ -20,8 +20,10 @@
             @Html.Raw("<" + Model.SpecificationEntity.TagNameTituloLectura + classTit + ">" + Model.EntityNameForTitle + "</" + Model.SpecificationEntity.TagNameTituloLectura + ">");
         }
         else
-        {
-            @Html.Raw("<h" + Model.Depth + classTit + (Model.Depth == 1 ? " id=\"htitPag\"" : "") + ">" + Model.EntityNameForTitle + "</h" + Model.Depth + ">");
+        {   
+            @* Mejorar visualización *@
+            @* @Html.Raw("<h" + Model.Depth + classTit + (Model.Depth == 1 ? " id=\"htitPag\"" : "") + ">" + Model.EntityNameForTitle + "</h" + Model.Depth + ">");*@
+            @Html.Raw("<h6" + classTit + (Model.Depth == 1 ? " id=\"htitPag\"" : "") + ">" + Model.EntityNameForTitle + "</h6>")
         }
     }
     else //TODO XX

@@ -21,49 +21,67 @@ Variables
 CommunityModel Comunidad = Html.GetComunidad();
 UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
 string claseOcultarCommunityRow= "";
+
+// Mensaje informativo de acceso a comunidad restringida/privada
+string accessRestrictedCommunityMessage = "";
+string accessRestrictedCommunityUrl = "";
+string buttonText = "";
+string buttonClass = "";
+string communityDescription = Html.ExtractValueInStringFromStartAndEnd(Comunidad.Description, "<p>", "</p>");
+
 @*
 ----------------------------------------------------------------
 -------------------- Menú Navegación de la Comunidad --------------------
 *@
 
 
-@* Mostrar "Menú Administración" si se disponen de permisos. ¿Dónde colorcarlo? De momento lo coloco aquí. *@
-if (ViewBag.PermisosPaginas != null)
-{
-    @Html.PartialView("../Shared/_MenuAdministracion")
-}
+@* Controlar mensaje de acceso a comunidad privada/restringida *@
+if (IdentidadActual.IsGuestIdentity) {
 
-@functions{
-    string PintarPestanya(CommunityModel.TabModel pPestanya, bool pPintarEnlaces)
+    @* Controlar la visualización en la Home de la comunidad dependiendo del tipo de Comunidad a visualizar*@
+    switch ((CommunityModel.TypeAccessProject)Comunidad.AccessType)
     {
-        if (pPestanya.Visible)
-        {
-            string clasePest = "nivel01";
-            if (pPestanya.Active)
+        case CommunityModel.TypeAccessProject.Public:
+            //Comunidad pública        
+            accessRestrictedCommunityUrl = $"{@Comunidad.Url}/{@Html.GetText("URLSEM", "HAZTEMIEMBRO")}";
+            accessRestrictedCommunityMessage = @Html.GetText("COMINICIOLOGIN", "TIENESQUEHACERTEMIEMBRO");
+            if (IdentidadActual.IsGuestUser)
             {
-                clasePest += " active";
+                buttonText = @Html.GetText("COMINICIOLOGIN", "HAZTEMIEMBROPARTICIPA");
             }
-            if (pPestanya.Name == "Home")
+            else
             {
-                clasePest += " navHomeCom";
-            }
+                buttonText = @Html.GetText("COMINICIOLOGIN", "HAZTEMIEMBROPARTICIPA");
+            }            
+            break;
 
-            <li class="@clasePest @pPestanya">
-                <a @Html.Raw(pPintarEnlaces ? "href=\"" + pPestanya.Url + "\"" : " disabled=\"disabled\"") @Html.Raw(pPestanya.OpenInNewWindow ? "target=\"_blank\"" : "")>@pPestanya.Name</a>
-                @if (pPestanya.SubTab != null && pPestanya.SubTab.Count > 0)
-                {
-                    <ul>
-                        @foreach (CommunityModel.TabModel pPestanyaInt in pPestanya.SubTab)
-                        {
-                            @PintarPestanya(pPestanyaInt, pPintarEnlaces);
-                        }
-                    </ul>
-                }
-            </li>
-        }
-        return string.Empty;
+        case CommunityModel.TypeAccessProject.Restricted:
+            //Comunidad Restringida
+            switch (IdentidadActual.CommunityRequestStatus)
+            {
+                case UserIdentityModel.CommunityRequestStatusEnum.NoRequest:
+                    buttonClass = "pedir-acceso";
+                    accessRestrictedCommunityUrl = $"{@Comunidad.Url}/{@Html.GetText("URLSEM", "SOLICITARACCESO")}";
+                    accessRestrictedCommunityMessage = @Html.GetText("COMINICIOLOGIN", "TIENESQUESOLICITAR");
+                    buttonText = @Html.GetText("COMINICIOLOGIN", "SOLICITARACCESO");                    
+                    break;
+                case UserIdentityModel.CommunityRequestStatusEnum.RequestPending:
+                    accessRestrictedCommunityMessage = @Html.GetText("COMINICIOLOGIN", "SOLICITUDPENDIENTE");                    
+                    break;
+
+                case UserIdentityModel.CommunityRequestStatusEnum.RequestedWithAnotherProfile:
+                    accessRestrictedCommunityMessage = @Html.GetText("COMINICIOLOGIN", "SOLICITUDPENDIENTEOTROPERFIL");                    
+                    break;
+            }
+            break;
+
+        default:
+            //Comunidad Reservada y Privada
+            accessRestrictedCommunityMessage = @Html.GetText("COMINICIOLOGIN", "NOACCESOPROY");            
+            break;
     }
 }
+
 @* Ocultar o no la fila de comunidades para móvil si la comunidad principal es la misma que la metaComunidad *@
 @if (Comunidad.NameMetaComunidad.ToLower().Equals(Comunidad.Name.ToLower())) {
     claseOcultarCommunityRow = "d-none";
@@ -74,18 +92,18 @@ if (ViewBag.PermisosPaginas != null)
 <div class="row community-row @claseOcultarCommunityRow">
     <div class="community-menu-wrapper">
         @* Mostrar el menú trigger de la MetaComunidad si la MetaComunidad es diferente al nombre de la comunidad *@
-        @if (!Comunidad.NameMetaComunidad.ToLower().Equals(Comunidad.Name.ToLower())) { 
+        @if (!Comunidad.NameMetaComunidad.ToLower().Equals(Comunidad.Name.ToLower()))
+        {
             <a href="javascript: void(0);"
-                id="menuLateralComunidadTrigger"
-                data-target="menuLateralComunidad"
-                class="texto-blanco">
+               id="menuLateralComunidadTrigger"
+               data-target="menuLateralComunidad"
+               class="texto-blanco">
                 <span class="material-icons">menu</span>
             </a>
         }
-        
+
         <div class="page-name-wrapper">
             <span class="page-name">@Comunidad.Name</span>
-            
         </div>
         <div id="community-menu" class="">
             <ul>
@@ -97,12 +115,91 @@ if (ViewBag.PermisosPaginas != null)
                     }
                     foreach (CommunityModel.TabModel pPestanya in Comunidad.Tabs)
                     {
-                        @PintarPestanya(pPestanya, pintarEnlaces);
+                        PintarPestanyaCabecera pintar = new PintarPestanyaCabecera();
+                        pintar.pPestanya = pPestanya;
+                        pintar.pPintarEnlaces = pintarEnlaces;
+                        @Html.PartialView("../Shared/_cabecera/_PintarPestanya", pintar);
                     }
                 }
+
+                    @* Pintar Ver Más en Menú si hay más items que anchura en Header *@
+                    <li class="level01 showMore con-sub-menu d-none">
+                        <a href="javascript: void(0);">
+                            @Html.GetText("COMBUSQUEDAAVANZADA","VERMAS")
+                        </a>
+                        <a class="sub-menu-toggle"></a>
+                        <ul class="sub-menu" id="submenu_showMore">
+                        </ul>
+                    </li>
             </ul>
         </div>
     </div>
+
+    @* Tooltip informativo de la Comunidad actual *@
+    @if (Comunidad != null)
+    {
+        <div class="tooltip comunidad" role="tooltip">
+            <div class="tooltip-arrow"></div>
+            <div class="tooltip-inner">
+                <span class="material-icons cerrar">close</span>
+                <div class="d-flex">
+                    @* Controlar posible Logo de Comunidad *@
+                    @if (!string.IsNullOrEmpty(Comunidad.Logo))
+                    {
+                        <div class="col-imagen con-icono-before">
+                            <img alt="@Comunidad.Name" title="@Comunidad.Name" src="@Comunidad.Logo" />
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-imagen icono-mundo con-icono-before"></div>
+                    }
+
+                    <div class="col-datos">
+                        <p class="tooltip-title">@Html.Raw(Html.getCommunityNameType(Comunidad))</p>
+                        <p>@Comunidad.Name</p>
+                        <div class="d-flex flex-wrap">
+                            <p class="tipo-comunidad">
+                                @* Mostrar icono de tipo de comunidad *@
+                                @{string communityIconType = Html.getCommunityIconType(Comunidad);}
+                                <span class="material-icons comunidad">@communityIconType</span>
+                                <span>@Html.Raw(Html.getCommunityNameType(Comunidad))</span>
+                            </p>
+                            @if (!string.IsNullOrEmpty(accessRestrictedCommunityUrl))
+                            {
+                                <a href="@accessRestrictedCommunityUrl" class="btn btn-primary btn-round acceso @buttonClass">@buttonText</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+                @if (!string.IsNullOrEmpty(communityDescription)){
+                    <p>
+                        @* @Html.Raw(Comunidad.Description) *@
+                        @Html.Raw(communityDescription)
+                    </p>
+                }
+                @{ string urlAcercaDe = $"{@Comunidad.Url}/{@Html.GetText("URLSEM", "ACERCADE")}";}
+                <a href="@urlAcercaDe">
+                    @Html.GetText("COMMON", "ADMINCOMTITINFORMACION")                    
+                    <span class="material-icons">keyboard_arrow_right</span>
+                </a>
+                <ul class="no-list-style d-flex align-items-center">
+                    <li>
+                        @{ string urlRecursos = $"{@Comunidad.Url}/{@Html.GetText("URLSEM", "RECURSOS")}";}
+                        <a href="@urlRecursos">
+                            Recursos<span class="numResultados">(@Comunidad.NumberOfResources)</span>
+                        </a>
+                    </li>                    
+                    <li>
+                        @{ string urlPersonas = $"{@Comunidad.Url}/{@Html.GetText("URLSEM", "PERSONASYORGANIZACIONES")}";}
+                        <a href="@urlPersonas">
+                            Personas<span class="numResultados">(@Comunidad.NumberOfPerson)</span>
+                        </a>
+                    </li>                    
+                </ul>           
+            </div>
+        </div>
+    }
 
     @* Menú Lateral de navegación de Comunidad para móviles *@
     <aside id="menuLateralComunidad"
@@ -139,7 +236,10 @@ if (ViewBag.PermisosPaginas != null)
                         }
                         foreach (CommunityModel.TabModel pPestanya in Comunidad.Tabs)
                         {
-                            @PintarPestanya(pPestanya, pintarEnlacesMovil);
+                            PintarPestanyaCabecera pintar = new PintarPestanyaCabecera();
+                            pintar.pPestanya = pPestanya;
+                            pintar.pPintarEnlaces = pintarEnlacesMovil;
+                            @Html.PartialView("../Shared/_cabecera/_PintarPestanya", pintar);
                         }
                     }
                 </ul>
@@ -148,8 +248,5 @@ if (ViewBag.PermisosPaginas != null)
     </aside>
     <!-- <div class="pmd-sidebar-overlay" data-rel="menuLateralComunidad"></div> -->
 </div>
-
-
-
 }
 

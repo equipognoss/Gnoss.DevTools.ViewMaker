@@ -1,0 +1,31 @@
+﻿@model SharedSemCms
+@{ 
+    Es.Riam.Semantica.OWL.Propiedad mPropiedad = Model.semanticPropertyModel.Element.Propiedad;
+    string idControl = Model.semanticPropertyModel.OntologyPropInfo.ControlID;
+    string idBtnCrear = idControl.Replace("Campo_", "lbCrear_");
+    string idBtnGuardar = idControl.Replace("Campo_", "lbGuardar_");
+    string idControlValoresAg = idControl.Replace("Campo_", "contedor_Valores_");
+    string mensajeCrear = null;
+    string mensajeGuardar = null;
+
+    if (mPropiedad.EspecifPropiedad.TextoAgregarElem != null)
+    {
+        mensajeCrear = mPropiedad.EspecifPropiedad.TextoAgregarElem;
+    }
+    else
+    {
+        mensajeCrear = Html.GetText("CONTROLESDOCUMENTACION", "ANYADIR");
+    }
+
+
+    if (mPropiedad.EspecifPropiedad.TextoBotonAceptarElemento != null)
+    {
+        mensajeGuardar = mPropiedad.EspecifPropiedad.TextoBotonAceptarElemento;
+    }
+    else
+    {
+        mensajeGuardar = Html.GetText("CONTROLESDOCUMENTACION", "ACEPTAR");
+    }
+}
+<input id="@idBtnCrear" class="btn btn-primary mt-2" type="button" value="@mensajeCrear" onclick="AgregarValorADataNoFuncionalProp('@mPropiedad.ElementoOntologia.TipoEntidad','@mPropiedad.Nombre','@idControlValoresAg',TxtValorRdf,TxtRegistroIDs,TxtCaracteristicasElem,TxtElemEditados);" />
+<input id="@idBtnGuardar" class="btn btn-primary mt-2" type="button" value="@mensajeGuardar" onclick="GuardarValorADataNoFuncionalProp('@mPropiedad.ElementoOntologia.TipoEntidad','@mPropiedad.Nombre','@idControlValoresAg',TxtValorRdf,TxtRegistroIDs,TxtCaracteristicasElem,TxtElemEditados);" style="display:none;" />

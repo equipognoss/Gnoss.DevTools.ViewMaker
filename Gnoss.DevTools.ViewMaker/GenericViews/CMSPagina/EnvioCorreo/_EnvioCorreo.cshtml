@@ -9,7 +9,7 @@ Variables
 ----------------------------------------------------------------
 *@
 @{
-
+    string funcionEnviarCorreo = "EnviarCorreo('" + Model.Key.ToString() + "')";
 }
 @*
 ----------------------------------------------------------------
@@ -29,26 +29,22 @@ Variables
                     {
                         nombrecampo += " *";
                     }
-                    <div class="fila">
-                        <label for="@idCampo">@nombrecampo</label>
+
+                    <div class="fila form-group">
+                        <label for="@idCampo" class="control-label">@nombrecampo</label>                        
                         @switch (campoFormulario.FormFiledType)
                         {
-                            case CMSComponentMail.CMSFormFiled.CMSFormFiledType.Short:
-                                <input id="@idCampo" class="text medium campoEnvioCorreo" type="text" />
+                            case CMSComponentMail.CMSFormFiled.CMSFormFiledType.Short:                                
+                                <input type="text" class="form-control text medium campoEnvioCorreo" id="@idCampo"/>
                                 break;
-                            case CMSComponentMail.CMSFormFiled.CMSFormFiledType.Long:
-                                <textArea id="@idCampo" class="campoEnvioCorreo"></textArea>
+                            case CMSComponentMail.CMSFormFiled.CMSFormFiledType.Long:                                
+                                <textarea id="@idCampo" class="form-control campoEnvioCorreo" rows="3"></textarea>
                                 break;
                         }
                     </div>
-                }
-
-                <p class="button">
-                    @{
-                        string funcionEnviarCorreo = "EnviarCorreo('" + Model.Key.ToString() + "')";
-                    }
-                    <input class="submit" type="button" value="@Model.TextButton" onclick="@funcionEnviarCorreo" />
-                </p>
+                }                
+                @*Botón envío de formulario*@                 
+                <button class="btn btn-primary" onclick="@funcionEnviarCorreo">@Model.TextButton</button>                
                 <div id="@Model.Key.ToString()_mensaje"></div>
             }
         </div>
@@ -60,7 +56,7 @@ Variables
 <script type="text/javascript">
     function EnviarCorreo(idComponente) {
         MostrarUpdateProgress();
-        var args = {};
+        const args = {};
         args.ComponentKey = '@Model.Key';
         $('#' + idComponente + ' .campoEnvioCorreo').each(function () {
             args[$(this).attr("id")] = $(this).val();

@@ -1,0 +1,75 @@
+﻿@model CategoryModel
+
+@{
+	// Indicar si la categoría tiene a su vez categorías hijas
+	bool tieneHijos = false;
+	// Clase para controlar que esté plegada la categoría o no
+	string showSubcategoriesClass = "d-none";
+	bool showSubcategories = false;
+}
+
+
+@{
+	@* Determinar si la categoría tiene subcategorias/hijos*@
+	tieneHijos = Model.Subcategories.Count > 0;
+
+	@* Determinar si la categoría está plegada o no *@
+	/*if (tieneHijos)
+	{
+		showSubcategoriesClass = "";
+		showSubcategories = true;
+	}*/
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista para pintar categoría y subcategoria de un Tesauro --------------------
+*@
+
+@* 1ª Categoría + Subcategorías *@
+<li class="component-wrap category-row list-unstyled">
+
+	<div class="component" data-categoryname="@Model.Name" data-id="@Model.Key">
+		<div class="component-header-wrap">
+			@* Sección header de la categoría*@
+			<div class="component-header">
+				@* Contenido de la categoría *@
+				<div class="component-header-content">
+					<div class="component-header-left">					
+						@* Botón de tiene hijos o no *@
+						@if (tieneHijos)
+						{
+							if (!showSubcategories)
+							{
+								@* Hijos contraidos *@
+								<span class="material-icons-outlined showHide-icon collapsed" onclick="mostrarOcultarCategorias(this)">add_circle_outline</span>
+							}
+							else
+							{
+								@* Hijos desplegados *@
+								<span class="material-icons-outlined showHide-icon expanded" onclick="mostrarOcultarCategorias(this)">remove_circle_outline</span>
+							}
+						}	
+						<div class="custom-control custom-checkbox">
+							<input type="checkbox" class="custom-control-input" id="@Model.Key" name="@Model.Key" @(Model.Selected ? "checked=\"checked\"" : "") />
+							<label class="custom-control-label" for="@Model.Key">@Model.Name</label>
+						</div>
+					</div>					
+				</div>
+			</div>
+		</div>
+		@* Sección de hijos de la categoría. Por defecto no visible *@
+		<div class="component-content categoryChildrenPanel @(showSubcategoriesClass)">
+			<ul class="js-community-categories-list component-list no-list-style">
+				@if (tieneHijos)
+				{
+					@* Subcategorías hijas *@
+					@foreach (CategoryModel categoria in Model.Subcategories)
+					{
+						@Html.PartialView("../Shared/EditorTesauro/_PintarCategoria_AdminCom", categoria)
+					}
+				}
+			</ul>
+		</div>
+	</div>
+</li>

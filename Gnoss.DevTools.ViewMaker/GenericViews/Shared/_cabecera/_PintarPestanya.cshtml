@@ -1,0 +1,83 @@
+﻿@model PintarPestanyaCabecera
+
+
+@* Variables *@
+@{
+    // Indica si se han de pintar los enlaces de la página donde esta apunta
+    bool pintarEnlaces = Model.pPintarEnlaces;
+    // Indica si la página debe abrirse en una nueva pestaña web
+    bool openInNewWindow = Model.pPestanya.OpenInNewWindow;
+    // Indica si la pestaña de la página es o no visible en el menú
+    bool isPestanyaVisible = Model.pPestanya.OpenInNewWindow;
+    // Indica si la página está activa
+    bool isPestanyaActive = Model.pPestanya.Active;
+    // Indica si la pestaña es o no visible
+    bool isVisible = Model.pPestanya.Visible;
+    // Clase de la pestaña
+    string clasePest = "level01"; // level1 * level2
+    // Indicará si tiene un submenú
+    bool hasSubmenu = false; 
+
+    @if (Model.pPestanya.SubTab != null && Model.pPestanya.SubTab.Count > 0) 
+    { 
+        hasSubmenu = true;
+    }
+
+    @* Controlar el nivel del menú (Padre, hijo) *@
+    if (ViewBag.isSubpanelChild == true)
+    {
+        clasePest = "level02";
+    }
+}
+
+
+
+
+@if (isVisible)
+{
+    if (isPestanyaActive)
+    {
+        clasePest += " active";
+    }
+
+    if (Model.pPestanya.Name == "Home")
+    {
+        clasePest += " navHomeCom";
+    }
+
+    if (!string.IsNullOrEmpty(Model.pPestanya.Name))
+    {        
+        <li class="@clasePest @Model.pPestanya.Name.ToLower()  @( (hasSubmenu) ? "con-sub-menu" : "")">
+
+            <a @Html.Raw(pintarEnlaces ? "href=\" " + Model.pPestanya.Url + " \"" : " disabled=\" disabled\"") 
+               @Html.Raw(openInNewWindow ? "target=\"_blank\"" : "")>
+               @Model.pPestanya.Name               
+            </a>
+            @if (hasSubmenu)
+            {
+                <a class="sub-menu-toggle"></a>
+            }            
+
+            @{
+                if (hasSubmenu)
+                {
+                    <ul class="sub-menu" id="submenu_@Model.pPestanya.Key">                    
+                        @foreach (CommunityModel.TabModel pPestanyaInt in Model.pPestanya.SubTab)
+                        {
+                            // Indicará si la pestaña que se está pintado es hija o no (para aplicar level1 o level2
+                            ViewBag.isSubpanelChild = true;
+                            PintarPestanyaCabecera pintar = new PintarPestanyaCabecera();
+                            pintar.pPestanya = pPestanyaInt;
+                            pintar.pPintarEnlaces = Model.pPintarEnlaces;
+                            @Html.PartialView("../Shared/_cabecera/_PintarPestanya", pintar)
+                        }
+                    </ul>
+                }
+                else
+                {
+                    ViewBag.isSubpanelChild = false;
+                }
+            }            
+        </li>
+    }
+}

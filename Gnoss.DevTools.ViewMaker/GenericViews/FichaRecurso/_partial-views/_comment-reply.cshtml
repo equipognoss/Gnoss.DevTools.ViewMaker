@@ -68,7 +68,7 @@ else
 }
 
 @* Tener que el recurso tiene las acciones creadas (Escribir, responder...)*@
-@if (Model!= null && Model.Actions != null)
+@if (Model != null && Model.Actions != null)
 {
     // Acción responder comentario
     if (Model.Actions.Reply)
@@ -89,8 +89,8 @@ else
     {
         funcionComentario_EliminarComentario = "Comentario_EliminarComentario('" + Model.Actions.UrlDelete + "', '" + Model.Key + "');";
     }
-
-    <div class="bloque-respuestas">
+}
+<div class="bloque-respuestas">
         <div class="comentario-respuestas">
             <div class="comentario @( (isCurrentUser) ? "usuario-actual" : null)"
                  rel="sioc:has_discussion"
@@ -307,7 +307,7 @@ else
     </div>
 
     @* Respuestas al comentario *@
-    if (hasReplies)
+    @if (hasReplies)
     {
         <div>
             @foreach (CommentModel comentarioHijo in Model.Replies)
@@ -316,7 +316,7 @@ else
             }
         </div>
     }
-}
+
 
 <script lang="javascript" type="text/javascript">
     $(document).ready(function () {

@@ -1,0 +1,32 @@
+﻿@using System.Text;
+@model ThesaurusEditorModel
+@*
+Descripción
+-----------------------------------------------
+Vista para pintar modelos de thesauros que mostrará categorías padres e hijas.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+    ViewBag.ThesaurusEditor = Model;
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista para gestionar el pintado de las categorías a partir del Tesauro --------------------
+*@
+
+@foreach (CategoryModel categoria in Model.ThesaurusCategories.OrderBy(cat => cat.Order))
+{
+    @Html.PartialView("../Shared/EditorTesauro/_PintarCategoria_Admin", categoria)
+}
+
+
+@if (Model.SuggestedThesaurusCategories != null)
+{
+    foreach (CategoryModel categoria in Model.SuggestedThesaurusCategories.Where(cat => cat.ParentCategoryKey == Guid.Empty).OrderBy(cat => cat.Order))
+    {
+        @Html.PartialView("../Shared/EditorTesauro/_PintarCategoriaSugerida_Admin", categoria)        
+    }
+}

@@ -40,7 +40,7 @@ string nombreComunidad = "GNOSS";
 }
 
 <!DOCTYPE html>
-<html lang="@Html.GetUtilIdiomas().LanguageCode">
+<html>
     <head>
         <meta name="viewport" content="width=device-width" />                
         <meta http-equiv="refresh" content="0; url=@Model.UrlIframe&redirect=@System.Net.WebUtility.UrlEncode(Model.UrlRedirect)" />
@@ -83,14 +83,6 @@ string nombreComunidad = "GNOSS";
             <!-- LIGHTGALLERY -->
             <script type="text/javascript"
                     src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/lightgallery/js/lightgallery-all.min.js?v=@Html.GetVersion()"></script>
-
-            <!-- SCROLLMAGIC -->
-            <script type="text/javascript"
-                    src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/scrollmagic/ScrollMagic.min.js?v=@Html.GetVersion()"></script>
-
-            <!-- ADDINDICATORS -->
-            <script type="text/javascript"
-                    src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/scrollmagic/debug.addIndicators.min.js?v=@Html.GetVersion()"></script>
 
             <!-- DATATABLES -->
             <script type="text/javascript"

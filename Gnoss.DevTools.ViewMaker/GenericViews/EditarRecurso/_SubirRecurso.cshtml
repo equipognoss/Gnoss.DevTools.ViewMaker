@@ -196,7 +196,23 @@ CommunityModel Comunidad = Html.GetComunidad();
     </form>
 </div>
 
+@{
+    string urlSem = Html.GetText("URLSEM", Html.EsPaginaEspacioPersonal() || Html.EsPaginaContribuciones() ? "SUBIRRECURSOMYGNOSS" : "SUBIRRECURSO");
 
+    string metodoInicializarSubirRecurso = $"InicializarSubirRecursoExt('{Comunidad.Url}/{urlSem}')";
+}
+
+
+<script>
+
+    $(document).ready(function () {
+
+        @Html.Raw(metodoInicializarSubirRecurso);
+
+    });
+
+</script>
+@*
 <script>
     /**
      * Llamada a acción para inicializar la opción de crear el recurso de tipo Nota al pulsar sobre "Nueva Nota o artículo"
@@ -206,3 +222,4 @@ CommunityModel Comunidad = Html.GetComunidad();
         InicializarSubirRecursoExt("@Comunidad.Url/@Html.GetText("URLSEM", "SUBIRRECURSO")");
     });
 </script>
+*@

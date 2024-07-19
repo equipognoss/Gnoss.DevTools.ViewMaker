@@ -119,7 +119,7 @@ int cont = 0;
  @*Item devuelto de tipo "Recurso"*@   
 <article id="resource_@Model.Key" typeof="sioc_t:Item" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:sioc_t="http://rdfs.org/sioc/types#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:sioc="http://rdfs.org/sioc/ns#" class="resource @claseTipoRecurso @clasePrivado" >
     <div class="wrap">
-       
+
         @* Permitir checkbox en el título del Recurso (Mantenida funcionalidad para nuevo Front) *@
         @if (Model.SelectionCheckAvailable)
         {
@@ -319,7 +319,7 @@ int cont = 0;
                 </div>
 
                 @* Likes del recurso *@
-                @Html.PartialView("_partial-views/_list-votes", Model)
+                @Html.PartialView("../CargadorResultados/_partial-views/_list-votes", Model)
 
                 @* Acción de seguir al usuario *@
                 @if (permitirFollow)

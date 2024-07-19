@@ -1,0 +1,133 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista parcial contiene las cargas necesarias de estilos para DevTools.
+
+Variables
+----------------------------------------------------------------
+*@
+@using Microsoft.AspNetCore.Http
+@{
+    CommunityModel Comunidad = Html.GetComunidad();
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista parcial para código CSS que se incluirá en DevTools --------------------
+*@
+
+<!-- MATERIAL ICONS -->
+<link type="text/css"
+      rel="stylesheet"
+      class="styleForCkEditorPreview"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined"
+      media="all" />
+
+<!-- FONT AWESOME -->
+<link href="https://use.fontawesome.com/releases/v5.0.8/css/all.css"
+      class="styleForCkEditorPreview"
+      rel="stylesheet" />
+
+<!-- JQUERY UI (Datepicker) -->
+<link type="text/css"
+      class="styleForCkEditorPreview"
+      rel="stylesheet"
+      href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
+
+<!-- BOOTSTRAP 4 + PROPELLER + SIDEMODALS -->
+<link rel="stylesheet"
+      href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/bootstrap/bootstrap.min.css?v=@Html.GetVersion()"
+      class="styleForCkEditorPreview"
+      type="text/css" />
+<link rel="stylesheet"
+      href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/propeller/css/propeller.min.css?v=@Html.GetVersion()"
+      class="styleForCkEditorPreview"
+      type="text/css" />
+
+<link rel="stylesheet"
+      href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/bootstrap/bootstrap-side-modals.css?v=@Html.GetVersion()"     
+      type="text/css" />
+
+
+<!-- JQUERY CUSTOM SCROLL BAR Version: 3.1.13 -->
+<link type="text/css"
+      rel="stylesheet"
+      href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/customscroller/css/jquery.mCustomScrollbar.min.css?v=@Html.GetVersion()" />
+
+<!-- BUSYLOAD -> VISTAS LOADING -->
+<link type="text/css"
+      rel="stylesheet"
+      href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/busy-load/app.min.css?v=@Html.GetVersion()" />
+
+<!-- PRELOADER MATERIALIZE -->
+<link type="text/css"
+      rel="stylesheet"
+      class="styleForCkEditorPreview"
+      href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/spinner-material/spinner-material.css?v=@Html.GetVersion()" />
+
+<!-- SELECT2 -->
+<link type="text/css"
+      rel="stylesheet"
+      href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/select2/css/select2.min.css?v=@Html.GetVersion()" />
+
+<!-- Toastr -->
+<link type="text/css"
+      rel="stylesheet"
+      href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/toastr/toastr.min.css?v=@Html.GetVersion()" />
+
+<!-- DatePicker -->
+<link type="text/css"
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" />
+
+<!-- cropperJS / jCropper -->
+<link type="text/css"
+      rel="stylesheet"
+      href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/cropperJs/css/cropper.css?v=@Html.GetVersion()" />      
+<link type="text/css"
+      rel="stylesheet"
+      href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/cropperJs/css/main.css?v=@Html.GetVersion()" />
+
+<!-- GnossDragAndDrop -->
+<link type="text/css"
+      rel="stylesheet"
+      href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/GnossDragAndDrop/GnossDragAndDrop.css?v=@Html.GetVersion()" />
+
+<!-- Wizard Modal -->
+<link type="text/css"
+      rel="stylesheet"
+      href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/smartwizard/css/smart_wizard_all.min.css?v=@Html.GetVersion()" />
+  
+<!-- PERSONALIZACION TEMA -->
+<link type="text/css"
+      rel="stylesheet"
+      class="styleForCkEditorPreview"
+      href="@Html.GetBaseUrlStatic()/responsive/theme/theme.css?v=@Html.GetVersion()" />
+
+<!-- PERSONALIZACION DevTools -->
+<link type="text/css"
+      rel="stylesheet"
+      class="styleForCkEditorPreview"
+      href="@Html.GetBaseUrlStatic()/responsive/theme/community.css?v=@Html.GetVersion()" />
+
+
+
+<!-- OPERATIVA CI-CD -JQUERY ->
+<!-- JQUERY 3.6.1 -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+
+<!-- JQUERYUI 1.13.2 -->
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"
+        integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0="
+        crossorigin="anonymous">
+</script>
+
+
+    
+@if (Html.GetListaCSS() != null)
+{
+    foreach (string css in Html.GetListaCSS())
+    {
+        <link media="screen" type="text/css" rel="stylesheet" href="@css" />
+    }
+}

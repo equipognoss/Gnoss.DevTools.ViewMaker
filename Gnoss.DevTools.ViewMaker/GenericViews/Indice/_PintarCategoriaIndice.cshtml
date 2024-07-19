@@ -1,0 +1,34 @@
+﻿@model PintarCategoriasIndice
+
+@{
+CommunityModel Comunidad = Html.GetComunidad();
+@* Comprobar si dispone de hijos la categoría actual *@
+bool tieneHijos = Model.indexView.Categories.Count(cat => cat.ParentCategoryKey == Model.categoryModel.Key) > 0;
+string urlCategoria = Model.indexView.UrlBaseCategories + Html.EliminarCaracteresUrlSem(Model.categoryModel.Name) + "/" + Model.categoryModel.Key;
+
+}
+
+@* Mostrar o pintar la categoría*@
+<div class="categoria-wrap">
+    
+    <div class="custom-control themed little primary categoria">
+        <label> <a href="@urlCategoria">@Model.categoryModel.Name @(Comunidad.Key != ProyectoAD.MetaProyecto?"(" + Model.categoryModel.NumResources + ")":"") </a></label>
+    </div>
+
+    @if (tieneHijos)
+    {
+        @* Mostrar opción de desplegar si tiene hijos la categoría*@
+        <div class="boton-desplegar mostrar-hijos">
+            <span class="material-icons">keyboard_arrow_down</span>
+        </div>
+        <div class="panHijos">
+            @foreach (CategoryModel categoria in Model.indexView.Categories.Where(cat => cat.ParentCategoryKey == Model.categoryModel.Key).OrderBy(cat => cat.Order))
+            {
+                PintarCategoriasIndice pintar = new PintarCategoriasIndice();
+                pintar.indexView = Model.indexView;
+                pintar.categoryModel = categoria;
+                @Html.PartialView("../Indice/_PintarCategoriaIndice", pintar)
+            }
+        </div>
+    }
+</div>

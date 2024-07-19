@@ -9,16 +9,18 @@ Variables
 ----------------------------------------------------------------
 *@
 @{
-int NUM_PAG_INICIO = 3;
-int NUM_PAG_PROX_CENTRO = 2;
-int NUM_PAG_FIN = 3;
+    int NUM_PAG_INICIO = 3;
+    int NUM_PAG_PROX_CENTRO = 2;
+    int NUM_PAG_FIN = 3;
 
 
-int numTotal = Model.NumElementosFiltradosPage;
-int numResultadosPagina = 10;
-int PaginaActual = Model.NumPage;
+    int numTotal = Model.NumElementosFiltradosPage;
+    int numResultadosPagina = 10;
+    int PaginaActual = Model.NumPage;
 
-int numPaginas = (int)Math.Ceiling((double)numTotal / (double)numResultadosPagina);
+    int numPaginas = (int)Math.Ceiling((double)numTotal / (double)numResultadosPagina);
+
+    string urlFilter = (string)ViewData["BaseAccionesUsuariosOrganizacion"];
 
 }
 
@@ -39,7 +41,9 @@ int numPaginas = (int)Math.Ceiling((double)numTotal / (double)numResultadosPagin
             @if (PaginaActual == 1)
             {
                 <li class="page-item disabled">
-                    <a class="page-link material-icons-outlined" style="font-size: 1rem;">                        
+                    <a class="page-link material-icons-outlined" 
+                       style="font-size: 1rem;" 
+                       data-url-filter="@urlFilter">                        
                         arrow_back_ios                        
                     </a>
                 </li>
@@ -47,7 +51,10 @@ int numPaginas = (int)Math.Ceiling((double)numTotal / (double)numResultadosPagin
             else
             {                
                 <li class="page-item">
-                    <a aux="@Html.Raw((PaginaActual - 1).ToString())" name="pagina|@Html.Raw((PaginaActual - 1).ToString())" class="page-link indiceNavegacion filtro primeraPagina material-icons-outlined" style="font-size: 1rem;">
+                    <a aux="@Html.Raw((PaginaActual - 1).ToString())" name="pagina|@Html.Raw((PaginaActual - 1).ToString())" 
+                       class="page-link indiceNavegacion filtro primeraPagina material-icons-outlined" 
+                       style="font-size: 1rem;"
+                       data-url-filter="@urlFilter">
                         arrow_back_ios
                     </a>
                 </li>
@@ -65,13 +72,15 @@ int numPaginas = (int)Math.Ceiling((double)numTotal / (double)numResultadosPagin
                     if (i == PaginaActual)
                     {
                         <li class="page-item active">
-                            <a class="page-link actual indiceNavegacion">@i</a>
+                            <a class="page-link actual indiceNavegacion" 
+                               data-url-filter="@urlFilter">@i</a>
                         </li>
                     }
                     else
                     {                        
                         <li class="page-item">
-                            <a aux="@i" name="pagina|@i" class="page-link indiceNavegacion filtro">@i</a>
+                            <a aux="@i" name="pagina|@i" class="page-link indiceNavegacion filtro" 
+                               data-url-filter="@urlFilter">@i</a>
                         </li>
 
                     }
@@ -128,13 +137,15 @@ int numPaginas = (int)Math.Ceiling((double)numTotal / (double)numResultadosPagin
                         if (i == PaginaActual)
                         {
                             <li class="page-item active">
-                                <a class="page-link indiceNavegacion filtro">@i</a>
+                                    <a class="page-link indiceNavegacion filtro" 
+                                       data-url-filter="@urlFilter">@i</a>
                             </li>
                         }
                         else
                         {                            
                             <li class="page-item">
-                                <a aux="@i" name="pagina|@i" class="page-link indiceNavegacion filtro">@i</a>
+                                <a aux="@i" name="pagina|@i" class="page-link indiceNavegacion filtro"
+                                   data-url-filter="@urlFilter">@i</a>
                             </li>
                         }
                     }
@@ -167,13 +178,13 @@ int numPaginas = (int)Math.Ceiling((double)numTotal / (double)numResultadosPagin
                             if (i == PaginaActual)
                             {
                                 <li class="page-item active">
-                                    <a class="page-link actual indiceNavegacion">@i</a>
+                                    <a class="page-link actual indiceNavegacion" data-url-filter="@urlFilter">@i</a>
                                 </li>
                             }
                             else
                             {                                
                                 <li class="page-item">
-                                    <a aux="@i" name="pagina|@i" class="page-link actual indiceNavegacion filtro">@i</a>
+                                    <a aux="@i" name="pagina|@i" class="page-link actual indiceNavegacion filtro" data-url-filter="@urlFilter">@i</a>
                                 </li>
                             }
                         }
@@ -191,7 +202,9 @@ int numPaginas = (int)Math.Ceiling((double)numTotal / (double)numResultadosPagin
                 {
                     
                     <li class="page-item">
-                        <a aux="@Html.Raw((PaginaActual + 1).ToString())"  name="pagina|@Html.Raw((PaginaActual).ToString())" class="page-link indiceNavegacion filtro ultimaPagina material-icons-outlined" style="font-size: 1rem;">
+                        <a aux="@Html.Raw((PaginaActual + 1).ToString())"  name="pagina|@Html.Raw((PaginaActual).ToString())" 
+                           class="page-link indiceNavegacion filtro ultimaPagina material-icons-outlined" style="font-size: 1rem;"
+                           data-url-filter="@urlFilter">
                            arrow_forward_ios                            
                         </a>                        
                     </li>                    

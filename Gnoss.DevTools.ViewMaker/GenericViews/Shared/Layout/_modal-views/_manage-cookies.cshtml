@@ -1,7 +1,6 @@
-﻿
+﻿@using Es.Riam.Gnoss.AD.EntityModel.Models.Cookies;
 @{
     List<PersonalizacionCategoriaCookieModel> ListaCategoriasCookies = ViewBag.ListaCategoriaCookie;
-    //List<PersonalizacionCategoriaCookieModel> ListaCategoriasCookies = JsonConvert.DeserializeObject<List<PersonalizacionCategoriaCookieModel>>(Convert.ToString(ViewBag.ListaCategoriaCookie));
 }
 
 
@@ -12,13 +11,13 @@
             <div id="phAvisoCookie">
                 <div class="info cookies" id="info">
                     <div class="box" id="divAvisoCookie">
-                        <p>Utilizamos cookies propias y de terceros para mejorar tu experiencia de navegación.</a></p>
+                        <p>@Html.Raw(Html.GetText("MENSAJECOOKIES", "AVISOPOLITICA", $"{Html.GetComunidad().Url}/{Html.GetText("URLSEM", "POLITICACOOKIES")}"))</p>
                     </div>
                     <div class="panelcookies" id="panelcookies">
                         <form method="post" id="formaceptcookies" action="javascript:void(0)">
                             <p>
-                                <input type="submit" title="Aceptar" value="Aceptar todo" class="btn btn-primary" onclick="guardarAceptarCookies()">
-                                <input type="submit" id="modificarcookie" title="Configurar" value="Configurar" class="btn background-blanco" onclick="MostrarConfiguracion()">
+                                <input type="submit" title="Aceptar" value="@Html.GetText("MENSAJECOOKIES", "ACEPTARTODO")" class="btn btn-primary" onclick="guardarAceptarCookies()">
+                                <input type="submit" id="modificarcookie" title="Configurar" value="@Html.GetText("MENSAJECOOKIES", "MODIFICAR")" class="btn background-blanco" onclick="MostrarConfiguracion()">
                             </p>
                         </form>
                     </div>
@@ -28,40 +27,38 @@
     </div>
     <div id="modificar-cookies" style="">
         <div class="cookies-header">
-            <p>Sobre las cookies de este sitio web</p>
+            <p>@Html.GetText("MENSAJECOOKIES", "SOBRECOOKIES")</p>
             <span class="material-icons close" id="close">close</span>
         </div>
         <div class="cookies-content">
-            <p>Las cookies utilizadas en este sitio web están categorizadas, y más adelante usted podrá leer sobre cada categoría y así habilitar o bloquear algunas o todas las respectivas cookies. Cuando se deshabilitan categorías que previamente estaban habilitadas, todas las cookies asignadas a esa categoría serán eliminadas de su navegador web. Adicionalmente, usted podrá ver una lista de cookies asignadas a cada categoría, e información detallada al respecto, en la declaración de cookies.</p>
-            <button id="checkAll" class="btn btn-primary">Permitir todas las cookies</button>
+            <p>@Html.GetText("MENSAJECOOKIES", "SOBRECOOKIES")</p>
+            <button id="checkAll" class="btn btn-primary">@Html.GetText("MENSAJECOOKIES", "PERMITIRTODASCOOKIES")</button>
             <div class="settings-options">
-
                 @foreach (PersonalizacionCategoriaCookieModel categoriaCookie in ListaCategoriasCookies)
                 {
-
                     <div class="setting-option">
-                        @switch (categoriaCookie.Estado)
-                        {
-                            case 0:
-                                <div class="switch">
-                                    <input type="checkbox" class="cookieAceptada" id="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()" value="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()" style="border: 0px; padding: 0px; margin-top: 0px;" />
-                                    <label for="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()">@categoriaCookie.CategoriaCookie.Nombre</label>
-                                </div>
-                                break;
-                            case 1:
-                                <div class="switch">
-                                    <input type="checkbox" class="cookieAceptada" id="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()" value="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()" checked style="border: 0px; padding: 0px; margin-top: 0px;" />
-                                    <label for="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()">@categoriaCookie.CategoriaCookie.Nombre.ToLower()</label>
-                                </div>
-                                break;
-                            case 2:
-                                <div class="switch">
-                                    <input type="checkbox" class="cookieAceptada" id="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()" value="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()" style="border: 0px; padding: 0px; margin-top: 0px;" />
-                                    <label for="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()">@categoriaCookie.CategoriaCookie.Nombre.ToLower()</label>
-                                </div>
-                                break;
-                            default:
-                                break;
+                    @switch (categoriaCookie.Estado)
+                    {
+                        case 0:
+                            <div class="switch">
+                                <input type="checkbox" class="cookieAceptada" id="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()" value="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()" style="border: 0px; padding: 0px; margin-top: 0px;" />
+                                <label for="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()">@categoriaCookie.CategoriaCookie.Nombre</label>
+                            </div>
+                            break;
+                        case 1:
+                            <div class="switch">
+                                <input type="checkbox" class="cookieAceptada" id="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()" value="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()" checked style="border: 0px; padding: 0px; margin-top: 0px;"/>
+                                <label for="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()">@categoriaCookie.CategoriaCookie.Nombre.ToLower()</label>
+                            </div>
+                            break;
+                        case 2:
+                            <div class="switch">
+                                <input type="checkbox" class="cookieAceptada" id="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()" value="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()" style="border: 0px; padding: 0px; margin-top: 0px;" />
+                                <label for="@categoriaCookie.CategoriaCookie.NombreCorto.ToLower()">@categoriaCookie.CategoriaCookie.Nombre.ToLower()</label>
+                            </div>
+                            break;
+                        default:
+                            break;
                         }
                         <div class="details">
                             <p class="title">@categoriaCookie.CategoriaCookie.Nombre</p>
@@ -69,11 +66,10 @@
                         </div>
                     </div>
                 }
-
             </div>
         </div>
         <div class="cookies-actions">
-            <input type="submit" id="guardar" title="Guardar configuración" value="Guardar configuración" class="btn btn-primary" />
+            <input type="submit" id="guardar" title="Guardar configuración" value="@Html.GetText("MENSAJECOOKIES", "GUARDARCONFIGURACION")" class="btn btn-primary" />
         </div>
     </div>
 </div>
@@ -110,19 +106,15 @@
 
         $('.cookieAceptada').each(function (indice, elemento) {
             if ($(elemento).prop("checked")) {
-                document.cookie = $(elemento).val() + "=yes; expires=" + fecha.toUTCString();
+                document.cookie = $(elemento).val() + "=yes;path=/; expires=" + fecha.toUTCString();
             }
         });
 
         $('.cookieAceptada').each(function (indice, elemento) {
             if (!$(elemento).prop("checked")) {
-                document.cookie = $(elemento).val() + "=no; expires=" + fecha.toUTCString();
+                document.cookie = $(elemento).val() + "=no;path=/; expires=" + fecha.toUTCString();
             }
-        });
-        $('#modalAvisoCookies').modal('toggle');
-        $('#modalAvisoCookies').modal('hide');
-        modal = document.getElementById("myModal");
-        modal.style.display = "none";
+        });             
         var that = this;
         MostrarUpdateProgress();
         GnossPeticionAjax(
@@ -132,11 +124,12 @@
         ).fail(function (data) {
             mostrarErrorGuardado(data);
         }).done(function () {
-            $('#phAvisoCookie').hide();
+            
         }).always(function () {
-            OcultarUpdateProgress();
-            modal = document.getElementById("myModal");
-            modal.style.display = "none";
+            OcultarUpdateProgress(); 
+            $('#phAvisoCookie').hide();
+            $("#aviso-cookies").hide();
+            $("#modalAvisoCookies").hide();
         });
     }
 

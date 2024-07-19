@@ -46,7 +46,7 @@ string funcionAccionRecurso_Compartir_Aceptar = "AccionRecurso_Compartir_Aceptar
     
     @* Lista de categorías de la comunidad -> TesauroÁrbol *@
     <div id="panCategoriasTesauroArbol">
-        @Html.PartialView("../FichaRecurso/_FichaCategoriaTesauroArbol", Model)
+        @Html.PartialView("_FichaCategoriaTesauroArbol", Model)
     </div>
     
     @*Controlar si el usuario es o no editor o la comunidad es privada, reservada...*@
@@ -117,7 +117,7 @@ string funcionAccionRecurso_Compartir_Aceptar = "AccionRecurso_Compartir_Aceptar
 
     @* Botón Aceptar para confirmar lo elegido por el usuario*@
     <div class="form-actions">
-        <input type="button" class="btn btn-primary" onclick="@funcionAccionRecurso_Compartir_Aceptar" value="@Html.GetText("COMMON", "ACEPTAR")" />
+        <input id="btnShareToCommunity" type="button" class="btn btn-primary" onclick="@funcionAccionRecurso_Compartir_Aceptar" value="@Html.GetText("COMMON", "ACEPTAR")" />
     </div>
 </div>
 

@@ -21,7 +21,7 @@ else if (propiedad.Tipo == Es.Riam.Semantica.OWL.TipoPropiedad.DatatypeProperty)
     }
     else
     {
-        claseProOntoData = "mb-5 cont_" + propiedad.NombreGeneracionClases;
+        claseProOntoData = "mb-3 cont cont_" + propiedad.NombreGeneracionClases;        
 
         if (unicoValor)
         {
@@ -109,11 +109,8 @@ else
             @if (Model.OntologyPropInfo.UniqueValue || Model.ReadMode)
             {
                 string entityNameAux = Model.OntologyPropInfo.PropertyValues[0].RelatedEntity.EntityNameForTitle;
-            
-                if (!Model.OntologyPropInfo.UniqueValue)
-                {
-                    Model.OntologyPropInfo.PropertyValues[0].RelatedEntity.EntityNameForTitle = Model.Element.Propiedad.EspecifPropiedad.NombreLectura;
-                }
+                                
+                Model.OntologyPropInfo.PropertyValues[0].RelatedEntity.EntityNameForTitle = Model.Element.Propiedad.EspecifPropiedad.NombreLectura;                
             
                 @Html.PartialView("SemCms/_TituloEntidad", Model.OntologyPropInfo.PropertyValues[0].RelatedEntity)
 
@@ -169,7 +166,7 @@ else
     
         if (!Model.ReadMode)
         {
-            <div class="form-group mb-5 campomultievaluado">
+            <div class="form-group mb-3 campomultievaluado">
                 <div class="@classGrupoEntidades">
                     @Html.PartialView("SemCms/_PropiedadOntoSelectorEntidad", Model)
                 </div>

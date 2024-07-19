@@ -1,0 +1,55 @@
+﻿@*
+    Descripción
+    -----------------------------------------------
+    Vista modal que servirá para añadir el meta titulo a un recurso.
+
+    Variables
+    ----------------------------------------------------------------
+*@
+@{
+    ResourceModel fichaRecurso = Model.Resource;
+    // Construcción para realizar la llamada JS para agregar metatitulo
+    string funcionAceptarMetatitle = "AccionRecurso_MetaTitulo('" + fichaRecurso.ListActions.UrlAddMetaTitle + "', '" + fichaRecurso.Key + "')";
+
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Vista Modal para añadir meta titulo a un recurso --------------------
+*@
+
+<div class="modal-header">
+    <p class="modal-title">
+        <span class="material-icons">label</span>@Html.GetText("METAETIQUETAS", "METATITULO")
+    </p>
+    <span class="material-icons cerrar"
+          data-dismiss="modal"
+          aria-label="Close">close</span>
+</div>
+<div class="modal-body">
+    <div class="formulario-edicion">
+        <div class="form-group">
+            <label for="metatitulo" class="control-label">URL del recurso</label>
+            <input placeholder="@Html.GetText("METAETIQUETAS", "INFOMETATITULO")"
+                   type="text"
+                   name="vincular-url-recurso"
+                   id="txtMetaTitulo_@fichaRecurso.Key"
+                   class="form-control not-outline" />
+        </div>
+
+        @* Mensaje informativo del proceso*@
+        <div id="despAccionRec_@fichaRecurso.Key">
+            <div>
+                <div id="menssages">
+                    <div class="ok"></div>
+                    <div class="ko"></div>
+                </div>
+            </div>
+        </div>
+        <div class="form-actions">
+            @* Botón que guardará posibles cambios *@
+            <button onclick="@funcionAceptarMetatitle" class="btn btn-primary">@Html.GetText("COMMON", "ACEPTAR")</button>
+        </div>
+
+    </div>
+</div>

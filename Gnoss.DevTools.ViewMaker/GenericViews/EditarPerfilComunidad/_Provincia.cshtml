@@ -39,11 +39,11 @@ string idRegion= "ProfilePersonal_Region";
 
 @* Select / Input de la provincia *@
 <div class="form-group mb-5">    
-    <label class="control-label d-block" for="@nameCampoProvincia">Provincia</label>
+    <label class="control-label d-block" for="@nameCampoProvincia">@Html.GetText("REGISTRO", "PROVINCIASIMPLE")</label>
     @if (Model.RegionList != null && Model.RegionList.Count > 0)
     {
         <select id="@idRegion" name="@nameCampoProvincia" class="js-select2" data-select-search="true">
-            <option value="@Guid.Empty">Provincia</option>
+            <option value="@Guid.Empty">@Html.GetText("REGISTRO","PROVINCIASIMPLE")</option>
             @foreach (Guid provinciaID in Model.RegionList.Keys)
             {
                 <option value="@provinciaID" @(provinciaID.ToString() == provinciaPerfil ? "selected=selected" : "" )>@Model.RegionList[provinciaID]</option>
@@ -51,11 +51,11 @@ string idRegion= "ProfilePersonal_Region";
         </select>
     }
     else
-    {
+    {        
         //  INPUT de provincia en lugar de "Select"
         <input type="text"
                id="@idRegion"
-               value="@provinciaPerfil"
+               value="@( provinciaPerfil != Guid.Empty.ToString() ? provinciaPerfil : "")"
                name="@nameCampoProvincia"
                class="form-control not-outline" />
     }

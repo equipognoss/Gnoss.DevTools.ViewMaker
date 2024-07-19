@@ -198,7 +198,7 @@ bool containsUrlFoto = true;
                 }
 
                 @*Bloque de contactos ocultos *@
-                if (Model.PeopleInOrganization.Count > numMaxPersonasOrganizacion)
+                if (Model.PeopleInOrganization != null && Model.PeopleInOrganization.Count > numMaxPersonasOrganizacion)
                 {
                     <div class="collapse listado-profileContacts-extra" id="js-profileContacts">
                         @for (contadorPersonas = numMaxPersonasOrganizacion; contadorPersonas < Model.ProfileContacts.Count; contadorPersonas++)

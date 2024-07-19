@@ -1,123 +1,180 @@
 ﻿@model ManageSuscriptionsViewModel
+@*
+    Vista que se utiliza para mostrar un listado con las comunidades a las que está suscrito un determinado usuaario.
+    Desde aquí se podrá editar las diferentes suscripciones a las categorías de cada una de las comunidades.
+*@
 
 @{
-    Html.SetBodyClass("layout02  listadoMyGnoss  ");
-
+    Html.SetBodyClass("layout02  listadoMyGnoss");
     UserProfileModel Perfil = Html.GetPerfil();
+    CommunityModel Comunidad = Html.GetComunidad();
+    UserProfileModel perfil = Html.GetPerfil();
+    @* Url de la foto de la comunidad *@
+    string urlFotoComunidad = "";
+    @* Url de la foto del usuario al que se está suscrito *@
+    string urlFotoUser = "";
+    @* Url para construir la url de edición de las categorías suscritas - Comunidad *@
+    string urlModalAdministrarCategoriasCategoria = "";
+    @* Url para construir la url de edición de las categorías suscritas - Persona *@
+    string urlModalAdministrarCategoriasPersona = "";
 }
 
-<div id="col01">
-    <div class="mgHerramientas">
-        @Html.PartialView("../Shared/ControlesMVC/_Novedades", "Suscriptions")
+<div class="row">
+    @* Breadcrumb / Migas de pan en la ficha del recurso *@
+    <div class="col col-12 col-breadcrumb" id="breadcrumb">
+        <ul>
+            <li><a href="@Comunidad.Url"><strong>@Html.GetText("COMMON", "HOME")</strong></a></li>
+            <li><a href="@perfil.Url@Html.GetText("URLSEM", "SUSCRIPCIONES")">@Html.GetText("MENU", "SUSCRIPCIONES")</a></li>
+            <li>@Html.GetText("SUSCRIPCIONES", "ADMINISTRARSUSCRIPCIONES")</li>
+        </ul>
     </div>
-</div>
-<div id="col02">
-    <h2>@Html.GetText("SUSCRIPCIONES", "ADMINISTRARSUSCRIPCIONES")</h2>
-    @if (Model.Communities.Count > 0)
-    {
-        <h2><a onclick="$('#panComunidades').toggle()">@Html.GetText("SUSCRIPCIONES", "SUSCRIPCIONESACOM")</a></h2>
-        <div id="panComunidades" class="resource-list listView">
-            @foreach (CommunityModel comunidad in Model.Communities.Values)
-            { 
-                <div class="resource">
-                    <div class="box description">
-                        <div class="group title">
-                            <h3>
-                                <a href="@comunidad.Url">@comunidad.Name</a>
-                            </h3>
-                            <div class="logoComunidad">
-                                <a href="@comunidad.Url">
-                                    <img alt="@comunidad.Name" src="@comunidad.Logo" />
-                                </a>
-                            </div>
-                        </div>
-                        <div class="group content">
-                            <span class="descripcionResumida">@Html.Raw(comunidad.Description)</span>
-                        </div>
-                    </div>
-                    <div class="group acciones noGridView">
-                        <p>Acciones </p>
-                        <ul>
-                            <li><a href="@comunidad.Url/@Html.GetText("URLSEM", "ADMINISTRARSUSCRIPCIONCOMUNIDAD")">@Html.GetText("SUSCRIPCIONES", "EDITARSUSCRIPCION")</a></li>
-                        </ul>
-                    </div>
-                </div>
-            }
+
+    <div class="col col-12 header-listado">
+        <div class="h1-container">
+            <h1>@Html.GetText("SUSCRIPCIONES", "ADMINISTRARSUSCRIPCIONES")</h1>
         </div>
-    }
-    @if (Model.Profiles.Count > 0)
-    {
-        <h2><a onclick="$('#panPersonas').toggle()">@Html.GetText("SUSCRIPCIONES", "SUSCRIPCIONESAPER")</a></h2>
-        <div id="panPersonas" class="resource-list listView">
-            @foreach (ProfileModel perfil in Model.Profiles.Values)
-            {
-                string nombrePerfil = Html.ObtenerNombrePerfil(perfil);
-                string urlPerfil = Html.ObtenerUrlPerfil(perfil);
-                
-                <div class="resource" style="height: auto;">
-                    <div class="box description">
-                        <div class="group title">
-                            <h2><a href="@urlPerfil">@nombrePerfil</a></h2>
-                            <p class="resourceType persona conImagenPerfil">
-                                <a href="@urlPerfil">
-                                    @{
-                                        string urlFoto = perfil.UrlFoto;
-                                        if(string.IsNullOrEmpty(urlFoto))
+    </div>
+    <div class="col col-12">
+        <div id="panDesplegableSuscripciones">
+            <ul class="nav nav-tabs" id="tabSuscripciones" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active"
+                       id="suscripcionComunidades-tab"
+                       data-toggle="tab"
+                       href="#suscripcionComunidades"
+                       role="tab"
+                       aria-controls="suscripcionComunidades"
+                       aria-selected="true">@Html.GetText("SUSCRIPCIONES", "SUSCRIPCIONESACOM")</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"
+                       id="suscripcionPersonas-tab"
+                       data-toggle="tab"
+                       href="#suscripcionPersonas"
+                       role="tab"
+                       aria-controls="suscripcionPersonas"
+                       aria-selected="false">@Html.GetText("SUSCRIPCIONES", "SUSCRIPCIONESAPER")</a>
+                </li>
+            </ul>
+            @* Paneles del Tab *@
+            <div class="tab-content">
+                @* Panel con la lista de suscripción de Comunidades *@
+                <div class="tab-pane fade active show" id="suscripcionComunidades" role="tabpanel" aria-labelledby="suscripcionComunidades-tab">
+                    <div id="panResultadosComunidades" class="resource-list grupos listView">
+                        @* Listado de las comunidades a las que está suscritas el usuario *@
+                        @foreach (CommunityModel comunidad in Model.Communities.Values)
+                        {
+
+                            @* Logo de la comunidad y url para editar las categorías suscritas *@
+                            urlFotoComunidad = @comunidad.Logo;
+                            urlModalAdministrarCategoriasCategoria = $"{@Html.GetComunidad().Url}/{Html.GetText("URLSEM", "COMUNIDAD")}/{comunidad.ShortName}/{@Html.GetText("URLSEM", "ADMINISTRARSUSCRIPCIONCOMUNIDAD")}/modal";
+
+                            <article class="resource" id="@comunidad.Key">
+                                <div class="wrap">
+                                    <div class="user-miniatura">
+                                        @* Imagen/Logo de la comunidad*@
+                                        @if (String.IsNullOrEmpty(urlFotoComunidad))
                                         {
-                                            urlFoto = "imagenes/personas/anonimo_peque.png";
-                                            if(!string.IsNullOrEmpty(perfil.UrlOrganization))
-                                            {
-                                                urlFoto = "imagenes/organizaciones/anonimo_peque.png";
-                                            }
-                                        }    
+                                            <div class="imagen-usuario-wrap">
+                                                <div class="imagen sinImagen">
+                                                    <span class="material-icons">language</span>
+                                                </div>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="imagen-usuario-wrap">
+                                                <div class="imagen">
+                                                    <span style="background-image: url(@urlFotoComunidad);"></span>
+                                                </div>
+                                            </div>
+                                        }
+
+                                        @* Nombre e información de la comunidad a la que se está suscrito *@
+                                        <div class="nombre-usuario-wrap">
+                                            <a href="@comunidad.Url">                                                
+                                                <p class="nombre">@Html.ObtenerTextoIdiomaUsuario(comunidad.Name)</p>
+                                                @*<small class="text-muted">@Html.CleanHtmlParagraphsStringHtml(comunidad.Description.ToString())</small>*@
+                                                <small class="text-muted">@Html.Raw(Html.CleanHtmlParagraphsStringHtml(comunidad.Description.ToString()))</small>
+                                            </a>
+                                        </div>
+                                        @* Acciones disponibles -> Editar la suscripción de la comunidad *@
+                                        <div class="acciones-usuario-wrap">
+                                            <ul class="no-list-style">
+                                                <li>
+                                                    <a href="#" class="btn btn-outline-grey"
+                                                       onclick="DeployActionInModalPanel('@urlModalAdministrarCategoriasCategoria', this, 'modal-dinamic-content', '')"
+                                                       data-toggle="modal"
+                                                       data-target="#modal-container">
+                                                        <span class="material-icons">edit</span>
+                                                        <span>@Html.GetText("COMMON", "EDITAR")</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        }
+                    </div>
+                </div>
+                @* Panel con la lista de suscripción de Personas *@
+                <div class="tab-pane fade" id="suscripcionPersonas" role="tabpanel" aria-labelledby="suscripcionPersonas-tab">
+
+                    @foreach (ProfileModel mPerfil in Model.Profiles.Values)
+                    {
+                        string nombrePerfil = Html.ObtenerNombrePerfil(mPerfil);
+                        string urlPerfil = Html.ObtenerUrlPerfil(mPerfil);
+                        @* Imagen de la persona a la que se está suscrita*@
+                        urlFotoUser = mPerfil.UrlFoto;
+                        urlModalAdministrarCategoriasCategoria = "#";
+
+
+                        @* Información de la suscripción - Persona *@
+                        <article class="resource" id="@mPerfil.Key">
+                            <div class="wrap">
+                                <div class="user-miniatura">
+                                    @* Imagen/Logo de la comunidad*@
+                                    @if (String.IsNullOrEmpty(urlFotoUser))
+                                    {
+                                        <div class="imagen-usuario-wrap">
+                                            <div class="imagen sinImagen">
+                                                <span class="material-icons">person</span>
+                                            </div>
+                                        </div>
                                     }
-                                    <img alt="@nombrePerfil" src="@Html.GetBaseUrlContent()/@urlFoto" />
-                                </a>
-                            </p>
-                        </div>
-                        <div class="group content">
-                            <span class="descripcionResumida">
-                                <p></p>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="group acciones noGridView">
-                        <p>Acciones </p>
-                        <ul>
-                            <li><a href="@Perfil.Url@Html.GetText("URLSEM", "ADMINISTRARSUSCRIPCIONIDENTIDAD")@urlPerfil.Substring(urlPerfil.LastIndexOf("/"))">@Html.GetText("SUSCRIPCIONES", "EDITARSUSCRIPCION")</a></li>
-                        </ul>
-                    </div>
+                                    else
+                                    {
+                                        <div class="imagen-usuario-wrap">
+                                            <div class="imagen">
+                                                <span style="background-image: url(@Html.GetBaseUrlContent()/@urlFotoUser );"></span>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @* Nombre e información de la comunidad a la que se está suscrito *@
+                                    <div class="nombre-usuario-wrap">
+                                        <a href="@urlPerfil">
+                                            <p class="nombre">@nombrePerfil</p>
+                                        </a>
+                                    </div>
+                                    @* Acciones disponibles -> Editar la suscripción de la comunidad *@
+                                    <div class="acciones-usuario-wrap">
+                                        <ul class="no-list-style">
+                                            <li>
+                                                <a class="btn btn-primary btn-no-seguir" onclick="AccionPerfil_NoSeguir(this, '@urlPerfil/unfollow')">
+                                                    <span class="material-icons">person_remove_alt_1</span>
+                                                    <span>@Html.GetText("COMMON", "NOSEGUIR")</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    }
                 </div>
-            }
+            </div>
         </div>
-    }
-    @if (Model.Organizations.Count > 0)
-    {
-        <h2><a onclick="$('#panOrganizaciones').toggle()">Suscripciones a organizaciones</a></h2>
-        <div id="panOrganizaciones" class="resource-list listView">
-            @foreach (ProfileModel perfil in Model.Organizations.Values)
-            {
-                string nombrePerfil = Html.ObtenerNombrePerfil(perfil);
-                string urlPerfil = Html.ObtenerUrlPerfil(perfil);
-                
-                <div class="resource" style="height: auto;">
-                    <div class="box description">
-                        <div class="group title">
-                            <h2><a href="@urlPerfil">@nombrePerfil</a></h2>
-                            <p class="resourceType organizacion conImagenPerfil">
-                                <a href="@urlPerfil">
-                                    <img alt="@nombrePerfil" src="@ViewBag.BaseUrlContent/@perfil.UrlFoto" />
-                                </a>
-                            </p>
-                        </div>
-                        <div class="group content">
-                            <span class="descripcionResumida">
-                                <p></p>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
-    }
+    </div>
 </div>

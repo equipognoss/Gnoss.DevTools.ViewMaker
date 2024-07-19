@@ -118,7 +118,7 @@ else
                 @* Si el usuario visualiza su perfil, Mostrar botón para "Editarlo" *@
                 @if (Perfil.Key == IdentidadActual.KeyIdentity)
                 {
-                    <li>
+                    <li class="ml-2">
                         <a href="@urlEditarPerfil"
                            class="btn btn-primary d-xl-flex">
                             <span class="material-icons">edit</span>
@@ -133,13 +133,13 @@ else
                     @* No permitirse mandar mensaje a uno mismo*@
                     if (Perfil.Key != IdentidadActual.KeyIdentity)
                     {
-                        <li>
+                        <li class="ml-2">
                             <a data-toggle="modal"
                                data-target="#modal-container"
-                               onclick="javascript:AccionEnviarMensajeMVC('@Html.GetUrlPagina()', '@Perfil.Key','Enviar mensaje');"
+                               onclick="javascript:AccionEnviarMensajeMVC('@Html.GetUrlPagina()', '@Perfil.Key','@Html.GetText("PERSONAS","ENVIARMENSAJE")');"
                                class="btn btn-outline-grey d-none d-xl-flex">
                                 <span class="material-icons">send</span>
-                                <span>Enviar mensaje</span>
+                                <span>@Html.GetText("PERSONAS","ENVIARMENSAJE")</span>
                             </a>
                         </li>
                     }
@@ -185,7 +185,7 @@ else
                     /* Mostrar Más acciones si no solo puede enviar mensajes */
                     if (actionsAllowedCounter > 0)
                     {
-                        <li>
+                        <li class="ml-2">
                             <div class="acciones-recurso-listado">
                                 <div class="dropdown">
                                     <a href="#"
@@ -232,7 +232,7 @@ else
                                data-target="#js-lista-comunidades-extra"
                                aria-expanded="false"
                                aria-controls="js-lista-comunidades-extra">
-                                Ver más
+                                @Html.GetText("COMBUSQUEDAAVANZADA","VERMAS")                                
                             </a>
                         </li>
                         break;
@@ -286,7 +286,7 @@ else
     else if (Perfil.Key == Guid.Empty)
     {
         <div class="group content">
-            <p>No se ha encontrado el perfil que está buscando</p>
+            <p>@Html.GetText("COMMON","NOSEHAENCONTRADOELPERFILQUEESTABUSCANDO")</p>
         </div>
     } 
     
@@ -296,11 +296,11 @@ else
         string description = Model.Curriculum.Description;
         if (Model.Curriculum.Description.IndexOf("<p>") != 0)
         {
-            <p>@Html.AcortarTexto(description, 400).Replace("\n", "<br />")</p>
+            <p id="user-description">@Html.Raw(Html.AcortarTexto(description, 400).Replace("\n", "<br />"))</p>
         }
         else
         {
-            <p>@Html.AcortarTexto(description, 400).Replace("\n", "<br />")</p>
+            <p id="user-description">@Html.Raw(Html.AcortarTexto(description, 400).Replace("\n", "<br />"))</p>
         }                
     }
     

@@ -1,0 +1,342 @@
+﻿@model ProfileModel
+
+@*
+Descripción
+-----------------------------------------------
+Vista que muestra las diferentes acciones que se podrán hacer sobre un perfil de una comunidad. 
+Estas acciones se cargan solo si el usuario ha accedido a administrar miembros de la comunidad (Desde Backoffice) vía JS desde ObtenerAccionesListadoMVC.
+
+Variables
+----------------------------------------------------------------
+*@
+
+@{
+    // Lista de acciones posibles a realizar sobre un determinado perfil/miembro
+    ProfileModel.ActionsModel acciones = Model.Actions;
+    // Identidad del usuario actual 
+    UserIdentityModel identidad = Html.GetIdentidadActual();
+    // Id y botones para realizar las acciones
+    // Bloquear a un miembro
+    string idBotonBloquear = Model.Key + "_Bloquear";
+    bool accionBloquearUsuarioDisponible = false;
+    // Enviar Newsletters
+    string idBotonEnviarNewsletter = Model.Key + "_EnviarNewsletter";
+    bool accionEnviarNewslettersDisponible = false;
+    // Expulsar
+    string idBotonExpulsar = Model.Key + "_Expulsar";
+    bool accionExpulsarDisponible = false;
+    // Cambiar rol
+    string idBotonCambiarRol = Model.Key + "_CambiarRol";
+    // Cambiar contraseña
+    string idBotonCambiarPass = Model.Key + "_CambiarPass";
+    bool accionCambiarRolDisponible = false;
+    // Obtener el nombre completo de la Identidad
+    string nombre = Html.ObtenerNombreCompletoDeFichaIdentidad((ProfileModel)Model);
+    // Roles del usuario
+    // Controlar rol del perfil
+    bool isAdministratorRol = false;
+    bool isSupervisorRol = false;
+    bool isUserRol = false; 
+    // Tipo de rol del usuario
+    string userRol = "Usuario";
+ 
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Menú de acciones a realizar por un administrador sobre los miembros de una comunidad --------------------
+*@
+
+@* Controlar accion de No/Enviar Newsletters*@
+@if (acciones.SendNewsletter || acciones.NotSendNewsletter)
+{
+    accionEnviarNewslettersDisponible = true;
+}
+
+@* Controlar accion de No/Expulsar miembro *@
+@if (acciones.ExpelMember || acciones.ReadmitMember)
+{
+    accionExpulsarDisponible = true;   
+}
+
+@* Controlar accion de No/Bloquear miembro *@
+@if (acciones.BlockUser || acciones.UnblockUser)
+{
+    accionBloquearUsuarioDisponible = true;   
+}
+
+@* Controlar accion de Cambiar Rol a un miembro *@
+@if (acciones.ChangeRol)
+{
+    accionCambiarRolDisponible = true;   
+}
+
+
+@* Comprobar el tipo de rol del usuario *@
+@switch ( (short)Model.Rol)
+{
+    case 0:
+        // Administrador
+        isAdministratorRol = true;
+        userRol = @Html.GetText("ADMINISTRACIONBASICA","ADMINISTRADOR");
+        break;
+
+    case 1:
+        // Supervisor
+        isSupervisorRol = true;
+        userRol = @Html.GetText("ADMINISTRACIONBASICA","SUPERVISOR");
+        break;
+
+    case 2:
+        // Usuario
+        isUserRol = true;
+        userRol = @Html.GetText("ADMINISTRACIONBASICA","USUARIO");
+        break;
+
+    default:
+        // Usuario             
+        userRol = "-";
+        break;
+}
+
+
+@if (identidad.IsProyectAdmin == true)
+{
+    <div class="dropdown dropdown-select">               
+        @* Primera acción - Título *@                                      
+        <a class="dropdown-toggle"
+            data-toggle="dropdown"
+            aria-expanded="false"
+            onclick="">
+             <span class="material-icons">edit</span>
+             <span class="texto">@Html.GetText("ADMINISTRACIONBASICA","ACCIONES")</span>
+        </a>
+
+        @* Menú dropdown con el resto de acciones a realizar sobre el perfil : Mostrarlo sólo si el usuario dispone de permisos /  *@
+        <div class="dropdown-menu basic-dropdown dropdown-icons dropdown-menu-right" style="will-change: transform">
+
+
+            @* Acciones del dropdown *@
+            @* Acción -> Enviar / No enviar Newsletter *@
+            @if (accionEnviarNewslettersDisponible)
+            {
+                @* Acción - Enviar Newsletter *@
+                @if (acciones.SendNewsletter)
+                {
+                    <a class="item-dropdown" data-value="@Html.GetText("COMMON", "NO")"
+           data-toggle="modal"
+           data-target="#modal-container"
+           onclick="MostrarAccionSiNoEnModal('@Html.GetText("COMADMIN", "ENVIAR")',
+                                                       '@Html.GetText("COMMON", "SI")',
+                                                       '@Html.GetText("COMMON", "NO")',
+                                                       '@Html.GetText("COMADMIN", "CONFIRMACIONENVIARNEWSLETTER", nombre, Html.GetNombreProyectoEcosistema())',
+                                                       '@Model.Key',
+                                                        function () {
+                                                            operativaGestionMiembros.enviarNewsletter('@Model.Url');
+                                                            operativaGestionMiembros.cambiarTextoAndEliminarAtributos('@idBotonEnviarNewsletter', '@Html.GetText("COMADMIN", "RECIBENEWSLETTER")', ['onclick','data-target','data-toggle']);
+                                                        },
+                                                        '@Model.NamePerson',
+                                                    '');
+                                    ">
+                        <span class="material-icons">email</span>
+                        <span id="@idBotonEnviarNewsletter"
+                          class="item-dropdown">
+                          @Html.GetText("COMADMIN", "ENVIAR")
+                        </span>
+                    </a>                 
+                }
+                @* Acción - No Enviar Newsletter *@
+                @if (acciones.NotSendNewsletter)
+                {
+                    <a class="item-dropdown" data-toggle="modal"
+                                  data-target="#modal-container"
+                                  data-value="@Html.GetText("COMMON", "SI")"
+                                  onclick="MostrarAccionSiNoEnModal('@Html.GetText("COMADMIN", "NOENVIAR")',
+                                                               '@Html.GetText("COMMON", "SI")',
+                                                               '@Html.GetText("COMMON", "NO")',
+                                                               '@Html.GetText("COMADMIN", "CONFIRMACIONNOENVIARNEWSLETTER", nombre, Html.GetNombreProyectoEcosistema())',
+                                                               '@Model.Key',
+                                                                function () {                                                                
+                                                                    operativaGestionMiembros.cambiarTextoAndEliminarAtributos('@idBotonEnviarNewsletter', '@Html.GetText("COMADMIN", "NORECIBENEWSLETTER")', ['onclick','data-target','data-toggle']);
+                                                                    operativaGestionMiembros.noEnviarNewsletter('@Model.Url');                                                                
+                                                                },
+                                                                '@Model.NamePerson',
+                                                            '');
+                                            ">
+                            <span class="material-icons">unsubscribe</span>
+                            <span id="@idBotonEnviarNewsletter"
+                                  class="item-dropdown">
+                                @Html.GetText("COMADMIN", "NOENVIAR")
+                            </span>
+                    </a>
+                }
+            }
+
+
+            @* Acción -> Expulsar / Readmitir miembro *@
+            @if (accionExpulsarDisponible)
+            {
+                    @* Acción - Expulsar miembro *@
+                    @if (acciones.ExpelMember)
+                    {
+                    <a class="item-dropdown" data-toggle="modal"
+           data-target="#modal-container"
+           data-value="@Html.GetText("COMMON", "NO")"
+           onclick="operativaGestionMiembros.expulsarMiembro('@Model.Url',
+                                                                                    '@Model.Key',
+                                                                                    '@Html.GetText("COMADMIN", "EXPULSAR")',
+                                                                                    '@Html.GetText("COMMON", "SI")',
+                                                                                    '@Html.GetText("COMMON", "NO")',
+                                                                                    '@Html.GetText("COMADMIN", "CONFIRMACIONEXPULSARUSUARIO", nombre, Html.GetNombreProyectoEcosistema())',
+                                                                                     function () {
+                                                                                        operativaGestionMiembros.cambiarTextoAndEliminarAtributos('@idBotonExpulsar', accionesUsuarioAdminComunidad.miembroExpulsado, ['onclick','data-target','data-toggle']);
+                                                                                     },
+                                                                                     '@Model.NamePerson'
+                                                                )
+                                              ">
+                        <span class="material-icons">person_remove</span>
+                            <span id="@idBotonExpulsar"
+                                  class="item-dropdown">
+                                @Html.GetText("COMADMIN", "EXPULSAR")
+                            </span>
+                        </a>
+                    }
+
+                    @* Acción - Readmitir miembro *@
+                    @if (Model.Actions.ReadmitMember)
+                    {
+                    <a class="item-dropdown" data-toggle="modal"
+           data-target="#modal-container"
+           data-value="@Html.GetText("COMMON", "SI")"
+           onclick="MostrarAccionSiNoEnModal('@Html.GetText("COMADMIN", "READMITIR")',
+                                                                           '@Html.GetText("COMMON", "SI")',
+                                                                           '@Html.GetText("COMMON", "NO")',
+                                                                           '@Html.GetText("COMADMIN", "CONFIRMACIONREADMITIRUSUARIO", nombre, Html.GetNombreProyectoEcosistema())',
+                                                                           '@Model.Key',
+                                                                            function () {
+                                                                                operativaGestionMiembros.readmitirMiembro('@Model.Url');
+                                                                                operativaGestionMiembros.cambiarTextoAndEliminarAtributos('@idBotonExpulsar','@Html.GetText("COMADMIN", "USUARIOREADMITIDO")', ['onclick','data-target','data-toggle']);
+                                                                            },
+                                                                            '@Model.NamePerson',
+                                                                        '');
+                                                        ">
+                            <span class="material-icons">person_add</span>
+                            <span id="@idBotonExpulsar"
+                                  class="item-dropdown">
+                                @Html.GetText("COMADMIN", "READMITIR")
+                            </span>
+                        </a>
+                    }
+            }
+
+            @* Acción -> Bloquear / Desbloquear miembro *@
+            @if (accionBloquearUsuarioDisponible)
+            {
+                @* Accion - Bloquear usuario *@
+                @if (acciones.BlockUser)
+                {
+                    <a class="item-dropdown" data-toggle="modal"
+           data-target="#modal-container"
+           data-value="@Html.GetText("COMMON", "NO")"
+           onclick="MostrarAccionSiNoEnModal('@Html.GetText("COMADMIN", "BLOQUEAR")',
+                                                           '@Html.GetText("COMMON", "SI")',
+                                                           '@Html.GetText("COMMON", "NO")',
+                                                           '@Html.GetText("COMADMIN", "CONFIRMACIONBLOQUEARUSUARIO", nombre, Html.GetNombreProyectoEcosistema())',
+                                                           '@Model.Key',
+                                                            function () {
+                                                                operativaGestionMiembros.bloquearMiembro('@Model.Url');
+                                                                operativaGestionMiembros.cambiarTextoAndEliminarAtributos('@idBotonBloquear', '@Html.GetText("COMADMIN", "USUARIOBLOQUEADO")', ['onclick','data-target','data-toggle']);
+                                                            },
+                                                            '@Model.NamePerson',
+                                                        '');
+                                        ">
+                        <span class="material-icons">no_accounts</span>
+                        <span id="@idBotonBloquear"
+                              class="item-dropdown">
+                            @Html.GetText("COMADMIN", "BLOQUEAR")
+                            @*TODO Victor: @Model.KeyPerson*@
+                        </span>
+                    </a>
+                }
+
+                @* Accion - Desbloquear usuario *@
+                @if (acciones.UnblockUser)
+                {
+                    <a class="item-dropdown" data-toggle="modal"
+                              data-target="#modal-container"
+                              data-value="@Html.GetText("COMMON", "SI")"
+                              onclick="MostrarAccionSiNoEnModal('@Html.GetText("COMADMIN", "BLOQUEAR")',
+                                                           '@Html.GetText("COMMON", "SI")',
+                                                           '@Html.GetText("COMMON", "NO")',
+                                                           '@Html.GetText("COMADMIN", "CONFIRMACIONDESBLOQUEARUSUARIO", nombre, Html.GetNombreProyectoEcosistema())',
+                                                           '@Model.Key',
+                                                            function () {                                                            
+                                                                operativaGestionMiembros.desbloquearMiembro('@Model.Url'); 
+                                                                operativaGestionMiembros.cambiarTextoAndEliminarAtributos('@idBotonBloquear', '@Html.GetText("COMADMIN", "USUARIODESBLOQUEADO")', ['onclick','data-target','data-toggle']);
+                                                            },
+                                                            '@Model.NamePerson',
+                                                        '');
+                                        ">
+                        <span class="material-icons">account_circle</span>
+                        <span id="@idBotonBloquear"
+                              class="item-dropdown">
+                            @Html.GetText("COMADMIN", "DESBLOQUEAR")
+                        </span>
+                    </a>
+                }
+            }
+
+            @* Acción -> Cambiar rol a un miembro *@
+            @if (accionCambiarRolDisponible)
+            {
+                <a class="item-dropdown" data-toggle="modal"
+           data-target="#modal-container"
+           data-value="@userRol"
+           onclick="operativaGestionMiembros.cambiarRolMiembro('@Model.Key',
+                                                  '@((short)Model.Rol)',
+                                                  '@Model.Url',
+                                                  '@Model.NamePerson',
+                                                  );
+                                        ">
+                    <span class="material-icons">supervisor_account</span>
+                    <span id="@idBotonCambiarRol"
+                              class="item-dropdown">
+                            @Html.GetText("USUARIOS", "CAMBIARROL")
+                    </span>
+                </a>
+            }
+
+            @* Acción -> Cambiar la contraseña de un miembro *@
+            @if (acciones.ResetPassword)
+            {
+                <a class="item-dropdown" data-toggle="modal"
+           data-target="#modal-container"
+           data-value="@userRol"
+           onclick="operativaGestionMiembros.cambiarPassword('@Model.UrlPerson',
+                                                  '@Model.NamePerson',
+                                                  );
+                                        ">
+                    <span class="material-icons">edit</span>
+                    <span id="@idBotonCambiarPass"
+                          class="item-dropdown">
+                        @Html.GetText("MENU", "CAMBIOCONTRAS")
+                    </span>
+                </a>
+            }
+
+            @* Acción para editar administrar páginas de la comunidad *@
+            @if (!isAdministratorRol)
+            {
+                <a class="item-dropdown btnLoadManagePagePermissions" data-toggle="modal"
+           data-target="#modal-container"
+           data-user-id="@Model.Key">
+                    <span class="material-icons">manage_accounts</span>
+                    <span class="item-dropdown">
+                        @Html.GetText("DEVTOOLS","ADMINISTRARPERMISOSDEPAGINAS")
+                    </span>
+                </a>
+            }    
+
+        </div>
+    </div>  
+}

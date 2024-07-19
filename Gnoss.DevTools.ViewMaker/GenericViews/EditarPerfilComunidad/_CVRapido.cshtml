@@ -59,7 +59,7 @@ string idTagsContainer = "tagsContainer";
             <span class="icon material-icons">search</span>
             @* Input de Tags *@
             <input type="text"
-                   placeholder="Introduce una etiqueta y pulsa AÑADIR"
+                   placeholder="@Html.GetText("COMMON","INTRODUCEUNAETIQUETAYPULSAAÑADIR")"
                    onfocus="CrearAutocompletarTags(this, $('input#inpt_urlServicioAutocompletar').val(), $('input.inpt_proyID').val(), $('input.inpt_bool_esMyGnoss').val() == 'True',  $('input.inpt_bool_estaEnProyecto').val() == 'True', $('input.inpt_bool_esUsuarioInvitado').val() == 'True', $('input.inpt_identidadID').val());"                   
                    class="txtAutocomplete form-control"
                    id="txtTags"
@@ -67,7 +67,7 @@ string idTagsContainer = "tagsContainer";
                    autocomplete="off" />
 
             @* Botón de Añadir Etiqueta/Tag *@
-            <a id="anadir-tag" class="btn btn-grey uppercase">Añadir</a>
+            <a id="anadir-tag" class="btn btn-grey uppercase">@Html.GetText("COMMON","ANYADIRENMAYUSCULA")</a>
 
             @* Campo oculto que almacenará los Tags *@
             <input type="hidden" id="@idTags" name="@inputTags" value="" />

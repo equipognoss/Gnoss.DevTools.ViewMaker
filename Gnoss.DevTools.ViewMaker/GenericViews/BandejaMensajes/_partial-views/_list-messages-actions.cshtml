@@ -30,7 +30,8 @@ string idMessageActionSelectNotRead = "messageActionSelectNotRead";
             @* Contenedor de botones en listado de mensajes *@
             <div class="custom-control custom-checkbox">
                 @* Selección múltiple de mensajes *@
-                <input type="checkbox"
+                <input type="checkbox"                
+                       aria-label="@Html.GetText("COMMON","SELECCIONMULTIPLEDEMENSAJES")"
                        class="custom-control-input"
                        id="checkAllMesages" />
                 <label class="custom-control-label" for="checkAllMesages"> </label>

@@ -1,0 +1,47 @@
+﻿@model SharedSemCms
+
+@*
+Descripción
+-----------------------------------------------
+Vista que pinta cada una de las Tabs de una propiedad ontológica que es multilingüe. 
+Se mostrará por tanto los tabs con los diferentes idiomas para que sea mostrada la propiedad en los diferentes idiomas.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+Es.Riam.Semantica.OWL.Propiedad mPropiedad = Model.semanticPropertyModel.Element.Propiedad;
+string clase = "";
+string claseParent = "";
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista que pinta cada una de las Tabs de una propiedad ontológica que es multilingüe --------------------
+*@
+
+@{
+    if (Model.pIdioma == Model.semanticPropertyModel.EntityParent.SemanticResourceModel.DefaultLanguage)
+    {
+        clase = "active";
+        claseParent = "activo";
+    }
+
+    string onclick = "SeleccionarIdioma(this, '" + mPropiedad.ElementoOntologia.TipoEntidad + "', '" + mPropiedad.Nombre + "', '" + Model.pIdioma + "', " + (!Model.semanticPropertyModel.OntologyPropInfo.UniqueValue).ToString().ToLower() + ")";
+    /*
+    <li class="@clase" rel="@Model.pIdioma">
+        <a onclick="@onclick">@Model.semanticPropertyModel.EntityParent.SemanticResourceModel.AvailableLanguages[Model.pIdioma]</a>
+    </li>
+    */
+    <li class="nav-item @clase" role="presentation" rel="@Model.pIdioma">
+        <a class="nav-link @clase"          
+           onclick="@onclick"
+           data-toggle="tab" 
+           href="javascript:void(0);" 
+           role="tab" 
+           aria-controls="@Model.semanticPropertyModel.EntityParent.SemanticResourceModel.AvailableLanguages[Model.pIdioma]" 
+           aria-selected="false">
+        @Model.semanticPropertyModel.EntityParent.SemanticResourceModel.AvailableLanguages[Model.pIdioma]
+        </a>
+    </li>
+}

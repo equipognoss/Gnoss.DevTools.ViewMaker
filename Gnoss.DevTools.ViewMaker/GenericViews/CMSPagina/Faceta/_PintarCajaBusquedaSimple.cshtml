@@ -1,0 +1,32 @@
+﻿@model CMSComponentFacet
+
+@{ 
+    string butId = Model.FacetModel.Key + "fbotonBuscar";
+    string facetaIDf = Model.FacetModel.Key + "f";
+}
+
+<div class="facetedSearchBox">
+    <label for="@facetaIDf" class="botonBuscarFaceta"></label>
+    @if (Model.FacetModel.AutocompleteTypeSearchBox.Equals(AutocompleteTypeSearchBox.AutocompleteUser))
+    {
+        <input type="text" name="@Model.FacetModel.FacetKey" class="filtroFaceta ac_input" id="@facetaIDf"
+               onfocus="autocompletarUsuario(this, '@Model.FacetModel.FacetKey', '@Model.FacetModel.Order', '@Html.GetParametros()', '@Html.GetGrafoID()');" />
+    }
+    else if (Model.FacetModel.AutocompleteTypeSearchBox.Equals(AutocompleteTypeSearchBox.AutocompleteTipedTags))
+    {
+        string languajeCode = Html.GetUtilIdiomas().LanguageCode;
+        <input type="text" name="@Model.FacetModel.FacetKey" class="filtroFaceta ac_input" id="@facetaIDf"
+               onfocus="autocompletarEtiquetasTipado(this, '@Model.FacetModel.FacetKey', @Model.FacetModel.Multilanguage);" />
+    }
+    else if (Model.FacetModel.AutocompleteTypeSearchBox.Equals(AutocompleteTypeSearchBox.AutocompleteGeneric))
+    {
+        <input type="text" name="@Model.FacetModel.FacetKey" class="filtroFaceta ac_input" id="@facetaIDf"
+               onfocus="autocompletarGenerico(this, '@Model.FacetModel.FacetKey', '@Model.FacetModel.Order', '@Html.GetParametros()');" />
+    }
+    else if (Model.FacetModel.AutocompleteTypeSearchBox.Equals(AutocompleteTypeSearchBox.AutocompleteGenericWithContextFilter))
+    {
+        <input type="text" name="@Model.FacetModel.FacetKey" class="filtroFaceta ac_input" id="@facetaIDf"
+               onfocus="autocompletarGenericoConFiltroContexto(this, '@Model.FacetModel.FacetKey', '@Model.FacetModel.Order', '@Html.GetParametros()', '@Html.GetFiltroContextoWhere()');" />
+    }
+    <a name="@Model.FacetModel.FacetKey" class="searchButton" id="@butId"></a>
+</div>

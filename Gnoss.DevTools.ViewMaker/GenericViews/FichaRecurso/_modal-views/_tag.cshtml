@@ -63,7 +63,7 @@ string idTagsContainer = "tagsContainer";
                 <div class="input-wrap form-sticky-button autocompletar" onclick="$('#txtTags').focus();">
                     @* Input de Tags *@
                     <input type="text"
-                           placeholder="Introduce una etiqueta y pulsa AÑADIR"
+                           placeholder="@Html.GetText("COMMON","INTRODUCEUNAETIQUETAYPULSAAÑADIR")"
                            onfocus="CrearAutocompletarTags(this, $('input#inpt_urlServicioAutocompletar').val(), '@Comunidad.Key', $('input#inpt_bool_esMyGnoss').val(), $('input#inpt_bool_estaEnProyecto').val(), $('input#inpt_bool_esUsuarioInvitado').val(), '@IdentidadActual.KeyIdentity');"                           
                            onload="pintarTagsInicio()"
                            class="txtAutocomplete form-control"
@@ -71,7 +71,7 @@ string idTagsContainer = "tagsContainer";
                            autocomplete="off" />
 
                     @* Botón de Añadir Etiqueta/Tag *@
-                    <a id="anadir-tag" class="btn btn-grey uppercase">Añadir</a>
+                    <a id="anadir-tag" class="btn btn-grey uppercase">@Html.GetText("COMMON","ANYADIRENMAYUSCULA")</a>
 
                     @* Campo oculto que almacenará los Tags del recurso *@                    
                     <input type="hidden" id="@txtHack" value="@tagsEditar" />
@@ -115,7 +115,7 @@ string idTagsContainer = "tagsContainer";
         </div>
         <div class="form-actions">
             @* Botón que guardará posibles cambios *@
-            <button onclick="@funcionAgregarTagsAceptar" class="btn btn-primary">@Html.GetText("COMMON", "ACEPTAR")</button>
+            <button id="btnAddTags" onclick="@funcionAgregarTagsAceptar" class="btn btn-primary">@Html.GetText("COMMON", "ACEPTAR")</button>
         </div>
     </div>
 </div>

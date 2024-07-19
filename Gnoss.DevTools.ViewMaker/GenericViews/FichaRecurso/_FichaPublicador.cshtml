@@ -98,10 +98,10 @@ string iconoTipoRecurso = "";
 
         <div class="upper-wrap">
             <div class="user-miniatura">
-                @* Imagen del publisher *@                               
+                @* Imagen del publisher *@
                 <div class="imagen-usuario-wrap">
                     <a href="@fichaPublicador.UrlPerson">
-                        <div class="imagen @( string.IsNullOrEmpty(fichaPublicador.UrlFoto) ? "sinImagen" : null) ">  
+                        <div class="imagen @( string.IsNullOrEmpty(fichaPublicador.UrlFoto) ? "sinImagen" : null) ">
                             @if (fichaPublicador.UrlFoto != null)
                             {
                                 <span style="background-image: url(@Html.GetBaseUrlContent()@fichaPublicador.UrlFoto);"></span>
@@ -113,7 +113,7 @@ string iconoTipoRecurso = "";
                         </div>
                     </a>
                 </div>
-                
+
                 @* Controlar el tipo de publicador del recurso (Teacher o Personal, Profesional) *@
                 @* Tipo 1*@
                 @if (fichaPublicador.TypeProfile == ProfileType.Personal || fichaPublicador.TypeProfile == ProfileType.Teacher)
@@ -121,16 +121,16 @@ string iconoTipoRecurso = "";
                     @* Texto del publisher *@
                     <div class="nombre-usuario-wrap">
                         <a href="@fichaPublicador.UrlPerson" typeof="foaf:Person" rel="sioc:has_creator">
-                        @if (String.IsNullOrEmpty(@fichaPublicador.NameOrganization))
-                        {
-                            <p property="foaf:name" class="nombre">@fichaPublicador.NamePerson</p>
-                            @*<p property="foaf:name" class="nombre-completo">@fichaPublicador.NamePerson · @fichaPublicador.NameOrganization</p>*@
-                        }
-                        else
-                        {
-                            <p property="foaf:name" class="nombre">@fichaPublicador.NamePerson</p>
-                            @*<p property="foaf:name" class="nombre-completo">@fichaPublicador.NamePerson @ConstantesDeSeparacion.SEPARACION_CONCATENADOR @fichaPublicador.NameOrganization</p>*@
-                        }                        
+                            @if (String.IsNullOrEmpty(@fichaPublicador.NameOrganization))
+                            {
+                                <p property="foaf:name" class="nombre">@fichaPublicador.NamePerson</p>
+                                @*<p property="foaf:name" class="nombre-completo">@fichaPublicador.NamePerson · @fichaPublicador.NameOrganization</p>*@
+                            }
+                            else
+                            {
+                                <p property="foaf:name" class="nombre">@fichaPublicador.NamePerson</p>
+                                @*<p property="foaf:name" class="nombre-completo">@fichaPublicador.NamePerson @ConstantesDeSeparacion.SEPARACION_CONCATENADOR @fichaPublicador.NameOrganization</p>*@
+                            }
                         </a>
                     </div>
 
@@ -162,6 +162,18 @@ string iconoTipoRecurso = "";
                             @*<p property="foaf:name" class="nombre-completo">@fichaPublicador.NameOrganization</p>*@
                         </a>
                     </div>
+
+                    @* Bloque del usuario de la corporación autor del recurso *@
+                    <div id="userCorporateInfo" class="userCorporateInfo" style="display: flex">
+                        <span onclick="javascript:DesplegarUserImgMasMVC(this, $(this).next());"
+                              class="material-icons ml-2 mr-2">
+                            person_search
+                        </span>
+                        @* Nombre del autor del recurso desde perfil corporación *@
+                        <span class="userCorporateInfoAuthor d-none" property="foaf:name">
+                            @fichaPublicador.NamePerson
+                        </span>
+                    </div>
                 }
                 else
                 {
@@ -170,7 +182,7 @@ string iconoTipoRecurso = "";
                         <a href="@fichaPublicador.UrlOrganization" typeof="foaf:Group">
                             <p property="foaf:name" typeof="foaf:Group" class="nombre">@fichaPublicador.NameOrganization</p>
                             @* Ocultar en este caso el nombre completo ya que sería el mismo: - (MYG-83)
-                            <p property="foaf:name" typeof="foaf:Group" class="nombre-completo">@fichaPublicador.NameOrganization</p>
+                    <p property="foaf:name" typeof="foaf:Group" class="nombre-completo">@fichaPublicador.NameOrganization</p>
                             *@
                         </a>
                     </div>
@@ -214,6 +226,15 @@ string iconoTipoRecurso = "";
         <div role="alert" class="alert alert-warning mt-2 d-flex" id="noUltVer-info">
             <span class="material-icons mr-3">content_paste_off</span>
             <span>@Html.Raw(Html.GetText("PERFILBASERECURSOSFICHA", "NOULTIMAVERSION", Html.GetUrlPagina().Replace(FichaDocumento.Key.ToString(), FichaDocumento.LastVersion.ToString())))</span>
+        </div>
+    }
+
+    @* Mostrar información de versión. Si la versión del documento no es reciente *@
+    @if (FichaDocumento.EsEnlaceSharepoint && !FichaDocumento.EstaAlineadoConSharepoint)
+    {
+        <div role="alert" class="alert alert-warning mt-2 d-flex" id="noAlineadoSP-info">
+            <span class="material-icons mr-3">content_paste_off</span>
+            <span>@Html.Raw(Html.GetText("PERFILBASERECURSOSFICHA", "NOALINEADOSHAREPOINT"))</span>
         </div>
     }
 </div>

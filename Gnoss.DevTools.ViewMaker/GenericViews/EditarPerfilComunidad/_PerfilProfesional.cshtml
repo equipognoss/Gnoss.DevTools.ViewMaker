@@ -24,7 +24,7 @@ string inputEmailProfesional = "ProfileProfesional.Email";
 @* Correo electrónico - Email *@
 <div class="form-group mb-5 edit-correo">
     <label class="control-label d-block" for="@idEmailProfesional">@Html.GetText("REGISTROUSUARIOORGANIZACION", "EMAIL")</label>
-    <input placeholder="Introduce tu correo electrónico"
+    <input placeholder="@Html.GetText("COMMON","INTRODUCETUCORREOELECTRONICO")"
            type="text"
            name="@inputEmailProfesional"
            id="@idEmailProfesional"

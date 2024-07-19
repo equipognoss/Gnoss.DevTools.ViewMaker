@@ -1,0 +1,182 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista parcial contiene las cargas necesarias de comportamientos JS para DevTools.
+
+Variables
+----------------------------------------------------------------
+*@
+@using Microsoft.AspNetCore.Http
+@{
+    CommunityModel Comunidad = Html.GetComunidad();
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista parcial para código JS que se incluirá en DevTools --------------------
+*@
+
+
+<!-- JQUERY 3.7.1 -->
+<script src="//code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+        crossorigin="anonymous"></script>
+
+<!-- JQUERYUI 1.13.2 -->
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js" 
+        integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" 
+        crossorigin="anonymous">
+</script>
+
+<!-- NestedSortable -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/nestedSortable/jquery.mjs.nestedSortable.js?v=@Html.GetVersion()"></script>
+
+<!-- POPPER + BOOTSTRAP 4 + PROPELLER -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/bootstrap/bootstrap.min.js?v=@Html.GetVersion()"></script>
+<script src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/propeller/js/propeller.js?v=@Html.GetVersion()"></script>
+
+<!-- AUTOCOMPLETE -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/autocomplete/jquery.autocomplete.js?v=@Html.GetVersion()"></script>
+
+<!-- SELECT2 -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/select2/js/select2.min.js?v=@Html.GetVersion()"></script>
+
+<!-- MomentJS -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/momentJS/moment.js?v=@Html.GetVersion()"></script>
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/momentJS/moment-timezone-with-data.js?v=@Html.GetVersion()"></script>
+
+<!-- Toastr -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/toastr/toastr.min.js?v=@Html.GetVersion()"></script>
+
+<!-- Google no cookies -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/cookies/googleNoCookies.js?v=@Html.GetVersion()"></script>
+
+<!-- BusyLoad - Vistas para Loading -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/busy-load/app.min.js?v=@Html.GetVersion()"></script>
+
+<!-- jCrop - CropperJS -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/cropperJs/js/cropper.js?v=@Html.GetVersion()"></script>
+
+<!-- jCrop - jQueryCropper -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/cropperJs/js/jquery-cropper.js?v=@Html.GetVersion()"></script>
+
+<!-- SORTABLE - https://github.com/SortableJS/Sortable -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/sortable/Sortable.min.js?v=@Html.GetVersion()"></script>
+
+<!-- GnossDragAndDrop -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/GnossDragAndDrop/GnossDragAndDrop.js?v=@Html.GetVersion()"></script>
+
+<!-- Traducciones para textos JS -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/logic/textosDevTools.js?v=@Html.GetVersion()"></script>
+
+<!-- FileSaver (Descarga ficheros blob) -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/fileSaver/FileSaver.min.js?v=@Html.GetVersion()"></script>
+
+<!-- Helpers JS / Funcionalidad compartida -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/helpers.js?v=@Html.GetVersion()"></script>
+
+<!-- PERSONALIZACION JS TEMA  -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/community.js?v=@Html.GetVersion()"></script>
+
+<!-- TinyMCE V6 -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/tinymce/js/tinymce/tinymce.min.js?v=@Html.GetVersion()"></script>
+
+<!-- TinyMCE Config -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/tinymce/js/tinymce/tinymceConfig.js?v=@Html.GetVersion()"></script>
+
+<!-- Dirty Form -->
+<script type="text/javascript"  
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/dirty-form/jquery.dirty.js?v=@Html.GetVersion()"></script>
+
+<!-- Importar comportamientos para búsquedas/facetas -->
+<script type="text/javascript"  
+        src="@Html.GetBaseUrlStatic()/responsive/theme/logic/busquedas.js?v=@Html.GetVersion()"></script>
+<script type="text/javascript"  
+        src="@Html.GetBaseUrlStatic()/responsive/theme/logic/WS.js?v=@Html.GetVersion()"></script>
+@* Peticiones jMsAjax *@
+<script type="text/javascript" src="@Html.GetBaseUrlStatic()/responsive/theme/logic/jMsAjax.js?v=@Html.GetVersion()"></script>
+
+
+<!-- Wizard Modal -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/smartwizard/js/jquery.smartWizard.js?v=@Html.GetVersion()"></script>
+
+<!-- ChartsJS -->
+<script type="text/javascript" 
+        src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<!-- Popper para explicaciones en hover-->
+<script src="https://unpkg.com/@@popperjs/core@2/dist/umd/popper.js"></script>
+
+@{
+    string idioma = Html.GetUtilIdiomas().LanguageCode;
+
+    if (idioma.Contains("-"))
+    {
+        idioma = idioma.Substring(0, idioma.IndexOf('-'));
+    }
+}
+<script type="text/javascript" src="@Html.GetBaseUrlStatic()/lang/@idioma/text.js?v=@Html.GetVersion()"></script>
+
+@if (Html.GetListaJS() != null)
+{
+    foreach (string js in Html.GetListaJS())
+    {
+        if (js.StartsWith("defer/"))
+        {
+            <script type="text/javascript" src="@js.Substring(6)" defer="defer"></script>
+        }
+        else
+        {
+            <script type="text/javascript" src="@js"></script>
+        }
+    }
+}
+
+@Html.PartialView("../Shared/Head/_FicherosJavascriptPersonalizado")
+
+@* Código Google Analytics*@
+@if (Html.GetGoogleAnalytics() != null && Context.Request.Cookies["analiticas"] != null && Context.Request.Cookies["analiticas"].Equals("yes"))
+{
+    if (Comunidad.IntegracionContinuaActivada)
+    {
+        if (Comunidad.EntornoEsPro)
+        {
+            <script type="text/javascript">@Html.Raw(Html.GetGoogleAnalytics())</script>
+        }
+    }
+    else
+    {
+        <script type="text/javascript">@Html.Raw(Html.GetGoogleAnalytics())</script>
+    }
+
+}
+else if (!string.IsNullOrEmpty(@Html.GetGoogleAnalyticsCode()))
+{
+    <script>
+        $(document).ready(function () {
+            contarVisitaNoCookie("@Html.GetGoogleAnalyticsCode()");
+        });
+    </script>
+}

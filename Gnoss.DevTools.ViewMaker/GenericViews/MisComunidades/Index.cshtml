@@ -27,88 +27,6 @@ List<MyCommunitiesViewModel.MyCommunityModel> communityItems = new List<MyCommun
     Html.SetBodyClass("layout02 listadoMyGnoss ");
 }
 
-@functions{
-
-    string PintarComunidad(MyCommunitiesViewModel.MyCommunityModel comunidad){        
-
-        @* Tipo de la comunidad (Abierta, Privada...)*@
-        string communityType = "";
-        @* Logo de la comunidad *@
-        bool hasLogo = false;
-
-        switch ((CommunityModel.TypeAccessProject)comunidad.AccessType)
-        {
-            case CommunityModel.TypeAccessProject.Private:
-                communityType = Html.GetText("COMUNIDADES", "COMUNIDADPRIVADA");
-                break;
-            case CommunityModel.TypeAccessProject.Public:
-                communityType = Html.GetText("COMUNIDADES", "COMUNIDADPUBLICA");
-                break;
-            case CommunityModel.TypeAccessProject.Reserved:
-                communityType = Html.GetText("COMUNIDADES", "COMUNIDADRESERVADA");
-                break;
-            case CommunityModel.TypeAccessProject.Restricted:
-                communityType = Html.GetText("COMUNIDADES", "COMUNIDADRESTRINGIDA");
-                break;
-        }
-
-        @* Logo de la comunidad *@
-        if ( !String.IsNullOrEmpty(comunidad.Logo)) { 
-            hasLogo = true;
-        }
-
-        <div id="card-community-@comunidad.Key" class="col-md-4 card-community">
-            <div class="card p-3 mb-2">
-                <div class="d-flex justify-content-between">
-                    <div class="d-flex flex-row align-items-center">
-                        <div class="user-miniatura" style="align-items: center">
-                            <div class="imagen-usuario-wrap">
-                                <a href="@comunidad.Url">
-                                   <div class="imagen @( !hasLogo ? "sinImagen" : null) ">  
-                                       @if (hasLogo)
-                                       {
-                                            <span style="background-image: url(@comunidad.Logo);"></span>
-                                       }
-                                       else { 
-                                            <span class="material-icons">groups</span>
-                                       }                                    
-                                    </div>                                                                
-                                </a>
-                            </div>
-                            <div class="nombre-usuario-wrap">
-                                <a href="@comunidad.Url">
-                                    @* Nombre de la comunidad *@
-                                    <p class="nombre">@comunidad.Name</p>
-                                    @* Privacidad de la Comunidad *@
-                                    <span class="text-muted">@Html.Raw(communityType)</span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @* Información adicional de la comunidad 
-                <div class="mt-3">
-                    <div class="mt-2">
-                        <p class="card-text">
-                            <small class="text-muted">@comunidad.Name</small>
-                        </p>
-                    </div>
-                </div>
-                *@
-            </div>
-        </div>
-
-        @*Acceder a posibles comunidades hijas con X niveles *@
-        @foreach (MyCommunitiesViewModel.MyCommunityModel comunidadHija in Model.Communities.Where(com => com.ParentKey == comunidad.Key))
-        {
-            @PintarComunidad(comunidadHija);
-        }
-
-        return String.Empty;
-    }
-
-}
-
 <div class="row">
     @if (Comunidad.Key != ProyectoAD.MetaProyecto)
     {
@@ -142,9 +60,10 @@ List<MyCommunitiesViewModel.MyCommunityModel> communityItems = new List<MyCommun
             <div class="col-buscador">
                 <form onsubmit="return false">
                     <fieldset style="display: block">
+                        <legend class="sr-only">@Html.GetText("COMMON","BUSCAR")</legend>
                         <div class="finderUtils" id="divCajaBusqueda">
                             <div class="group finderSection txtFiltrarItems">
-                                <label for="finderSection">Encontrar</label>
+                                <label for="txtFiltrarItems sr-only">@Html.GetText("COMMON","BUSCAR")</label>
                                 <input type="text" id="txtFiltrarItems" 
                                        name="txtFiltrarItems" 
                                        class="not-outline finderSectionText ac_input" 
@@ -165,7 +84,10 @@ List<MyCommunitiesViewModel.MyCommunityModel> communityItems = new List<MyCommun
                     <div class="row pr-2 pl-2">
                         @foreach (MyCommunitiesViewModel.MyCommunityModel comunidad in Model.Communities.Where(com => com.ParentKey == Guid.Empty))
                         {
-                            @PintarComunidad(comunidad)
+                            PintarComunidad pintar = new PintarComunidad();
+                            pintar.myCommunitiesView = Model;
+                            pintar.communityModel = comunidad;
+                            @Html.PartialView("../MisComunidades/_PintarComunidad", pintar)
                         }
                     </div>
                 </div>

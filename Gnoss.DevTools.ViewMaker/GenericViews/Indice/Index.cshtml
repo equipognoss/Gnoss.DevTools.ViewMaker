@@ -1,11 +1,11 @@
 ﻿@model IndexViewModel
 @*
-Descripción
------------------------------------------------
-Vista que muestra las diferentes categorías que hay en la comunidad.
+    Descripción
+    -----------------------------------------------
+    Vista que muestra las diferentes categorías que hay en la comunidad.
 
-Variables
-----------------------------------------------------------------
+    Variables
+    ----------------------------------------------------------------
 *@
 @{
     CommunityModel Comunidad = Html.GetComunidad();
@@ -13,59 +13,12 @@ Variables
 }
 
 @*
-----------------------------------------------------------------
--------------------- Vista de listado de categorías de la comunidad  --------------------
+    ----------------------------------------------------------------
+    -------------------- Vista de listado de categorías de la comunidad  --------------------
 *@
 
-@functions{
-
-    string PintarOptionCategoria(CategoryModel pCategoriaTesauro) { 
-        bool tieneHijos = ((List<CategoryModel>)Model.Categories).Count(cat => cat.ParentCategoryKey == pCategoriaTesauro.Key) > 0;
-
-        <option value="@pCategoriaTesauro.Key">@pCategoriaTesauro.Name</option>
-
-        if (tieneHijos)
-        {
-            foreach (CategoryModel categoria in Model.Categories.Where(cat => cat.ParentCategoryKey == pCategoriaTesauro.Key).OrderBy(cat => cat.Order))
-            {
-                @PintarOptionCategoria(categoria)
-            }
-        }
-        return string.Empty;
-    }
-
-    string PintarCategoria(CategoryModel pCategoriaTesauro){
-        CommunityModel Comunidad = Html.GetComunidad();
-        bool tieneHijos = Model.Categories.Count(cat => cat.ParentCategoryKey == pCategoriaTesauro.Key) > 0;
-        string urlCategoria = Model.UrlBaseCategories + Html.EliminarCaracteresUrlSem(pCategoriaTesauro.Name) + "/" + pCategoriaTesauro.Key;
-
-        <div class="categoria-wrap">
-
-            @* <a href="@urlCategoria">@pCategoriaTesauro.Name @(Comunidad.Key != ProyectoAD.MetaProyecto?"(" + pCategoriaTesauro.NumResources + ")":"") </a> *@
-            <div class="custom-control themed little primary categoria">
-                <label> <a href="@urlCategoria">@pCategoriaTesauro.Name @(Comunidad.Key != ProyectoAD.MetaProyecto?"(" + pCategoriaTesauro.NumResources + ")":"") </a></label>
-            </div>
-
-            @if (tieneHijos)
-            {
-                @* Mostrar opción de desplegar si tiene hijos la categoría*@
-                <div class="boton-desplegar mostrar-hijos">
-                    <span class="material-icons">keyboard_arrow_down</span>
-                </div>
-                <div class="panHijos">
-                    @foreach (CategoryModel categoria in Model.Categories.Where(cat => cat.ParentCategoryKey == pCategoriaTesauro.Key).OrderBy(cat => cat.Order))
-                    {
-                        @PintarCategoria(categoria)
-                    }
-                </div>
-            }
-        </div>
-        return String.Empty;
-    }
-}
-
 @{
-    Html.SetBodyClass("indice"); 
+    Html.SetBodyClass("indice");
 }
 
 
@@ -78,122 +31,67 @@ Variables
         </ul>
     </div>
 
-    <div class="col col-12 col-xl-12 col-contenido izquierda">
-        <div class="wrapCol">                        
-            <div class="header-contenido mb-3">
-                <div class="h1-container">
-                    <h1>@Html.GetText("TESAURO", "INDICE")</h1>
-                </div>
-                                    
-                @if (Comunidad.Key != ProyectoAD.MetaProyecto && !IdentidadActual.IsGuestIdentity)
-                {
-                    <a class="btn btn-primary" onclick="Categorias_DesplegarSolicitarCategoria();">@Html.GetText("TESAURO", "SOLICITARCATEGORIA")</a>
-                }            
-            </div>
-
-            <div class="row">
-                @* Contenido principal *@
-                <div class="col col-xl-12 ">
-                    <div class="indiceCat wrapCol">                        
-                        @if (Comunidad.Key != ProyectoAD.MetaProyecto && !IdentidadActual.IsGuestIdentity)
-                        {
-                            <div style="display: none;" id="despSolicCat">
-                                <div style="display: block;" class="stateShowForm" id="panels">
-                                    <div id="menssages">
-                                        <div class="ok"></div>
-                                        <div class="ko"></div>
-                                    </div>
-                                    <div class="box form activeForm" id="action">
-
-                                        @* Formulario para solicitar nueva categoría *@
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <h2 class="card-title">Solicitar nueva categoría</h2>
-                                                <p class="card-text">
-                                                    @Html.GetText("TESAURO", "OPCIONESSOLICITARCATEGORIA")
-                                                </p>
-
-                                                <div class="form-group mb-3">
-                                                    <label class="control-label d-block" for="">@Html.GetText("TESAURO", "NOMBRE")</label>
-                                                    <input placeholder=""
-                                                           onkeydown="if(event.which || event.keyCode){if ((event.which == 13) || (event.keyCode == 13)) {return false;}}"
-                                                           type="text"
-                                                           name=""
-                                                           id="txtBoxNombreNuevaCategoria"
-                                                           value=""
-                                                           class="form-control not-outline" />
-                                                </div>
-
-                                                @* Combo para elegir Categoría dentro de ... *@
-                                                <div class="form-group mb-3">                                                    
-                                                    <select id="cboPadreNuevaCategoria" class="js-select2 form-control" data-select-search="true">
-                                                        <option value="@Guid.Empty">@Html.GetText("TESAURO", "INDICE")</option>
-                                                        @foreach (CategoryModel categoria in Model.Categories.Where(cat => cat.ParentCategoryKey == Guid.Empty).OrderBy(cat => cat.Order))
-                                                        {
-                                                            @PintarOptionCategoria(categoria)
-                                                        }
-                                                    </select>
-                                                </div>
-
-                                                @{string funcion_Categorias_SolicitarCategoria = "Categorias_SolicitarCategoria('" + Html.GetUrlPagina() + "')";}
-                                                <a class="btn btn-outline-primary" style="cursor:pointer" onclick="$('#despSolicCat').hide()" title="@Html.GetText("CONTROLDESPLEGAR", "CERRARFORM")">@Html.GetText("CONTROLESSELCATEGORIASBUSQUEDDAS", "CERRAR")</a>
-                                                <a class="btn btn-primary" style="cursor:pointer" onclick="@funcion_Categorias_SolicitarCategoria">@Html.GetText("TESAURO", "SOLICITAR")</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-
-                        <div class="box mt-4">
-                            <div class="indice" id="indice">
-                                @* Buscador-Filtrador de Categorías*@
-
-                                <div class="buscador-categorias">
-                                    <div class="form-group">
-                                        <input class="filtroRapido form-control not-outline"
-                                               placeholder="Busca una categoría"
-                                               type="text"
-                                               onkeydown="javascript:if(event.which || event.keyCode){if ((event.which == 13) || (event.keyCode == 13)) {return false;}}"
-                                               onkeyup="javascript:MVCFiltrarListaSelCatArbol(this, 'indice');" />
-                                    </div>
-                                </div>
-
-                                
-                                
-                                <div class="divTesArbol divCategorias clearfix mt-3" id="indice" style="margin-left:0;">
-                                    @foreach (CategoryModel categoria in ((List<CategoryModel>)Model.Categories).Where(cat => cat.ParentCategoryKey == Guid.Empty).OrderBy(cat => cat.Order))
-                                    {
-                                        @PintarCategoria(categoria);
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    <div class="col col-12 header-listado">
+        <div class="h1-container">
+            <h1>@Html.GetText("TESAURO", "INDICE")</h1>
+        </div>
+        @if (Comunidad.Key != ProyectoAD.MetaProyecto && !IdentidadActual.IsGuestIdentity)
+        {
+            <div class="acciones-listado">
+                <div class="wrap">
+                    <a class="btn btn-outline-grey"
+                       data-toggle="modal"
+                       data-target="#modal-request-category"
+                       href="#">
+                        <span class="material-icons">add</span>
+                        <span>@Html.GetText("TESAURO", "SOLICITARCATEGORIA")</span>
+                    </a>
                 </div>
             </div>
+        }
+    </div>
+
+    @* Buscador de categorías *@
+    <div class="col col-12">
+        <div class="buscador-categorias">
+            <div class="form-group">
+                <input class="filtroRapido form-control not-outline"
+                       placeholder="@Html.GetText("COMMON","BUSCAR")"
+                       type="text"
+                       data-filterlistid="indice"
+                       onkeydown="javascript:if(event.which || event.keyCode){if ((event.which == 13) || (event.keyCode == 13)) {return false;}}" />
+            </div>
+        </div>
+    </div>
+
+    @* Listado de categorías *@
+    <div id="indice" class="col col-12">
+        <div class="divTesArbol divCategorias clearfix mt-3" style="margin-left:0;">
+            @foreach (CategoryModel categoria in ((List<CategoryModel>)Model.Categories).Where(cat => cat.ParentCategoryKey == Guid.Empty).OrderBy(cat => cat.Order))
+            {
+
+                PintarCategoriasIndice pintar = new PintarCategoriasIndice();
+                pintar.indexView = Model;
+                pintar.categoryModel = categoria;
+                @Html.PartialView("../Indice/_PintarCategoriaIndice", pintar)
+            }
         </div>
     </div>
 </div>
 
+@* Vista modal para poder solicitar nuevas categorías *@
+@Html.PartialView("_modal-views/_request_category", Model)
 
 
 @section javascript
 {
     <script type="text/javascript">
-        function Categorias_DesplegarSolicitarCategoria() {
-            $('#txtBoxNombreNuevaCategoria').val('');
-            $('#cboPadreNuevaCategoria option:eq(0)').prop('selected', true);
-
-            DesplegarPanelMVC('despSolicCat');
-        }
-
         function Categorias_SolicitarCategoria(urlPagina) {
             MostrarUpdateProgress();
             var datosPost = {
                 callback: "Categorias|SolicitarCategoria",
                 nombreCategoria: $('#txtBoxNombreNuevaCategoria').val(),
-                categoriaSupID: $('#cboPadreNuevaCategoria option:selected').val(),
+                categoriaSupID: $('#txtHackCatTesSel').val(),
             };
             $.post(urlPagina, datosPost, function (data) {
                 var html = "";
@@ -206,8 +104,17 @@ Variables
                     html = textoRecursos.SolicitarCatOK;
                     ok = true;
                 }
-                DesplegarResultadoAccionMVC("despSolicCat", ok, html);
 
+                if (ok == true) {
+                    // 2 - Cerrar modal
+                    $('#modal-request-category').modal('hide');
+                    // 3 - Mostrar mensaje OK
+                    setTimeout(() => {
+                        mostrarNotificacion('success', html);
+                    }, 1500)
+                } else {
+                    mostrarNotificacion('error', html);
+                }
                 OcultarUpdateProgress();
             });
         }

@@ -86,7 +86,7 @@ var urlBaseAccionesUsuariosOrganizacion = (String)ViewData["BaseAccionesUsuarios
                            >
                             @* Acción / Opción para Añadir usuarios a la comunidad *@
                             <span class="material-icons">person_add_alt_1</span>
-                            <span>Asignar usuarios a comunidad</span>
+                            <span>@Html.GetText("USUARIOS","ASIGNARUSUARIOSCOM")</span>
                         </a>
                     </li>
                 </ul>
@@ -213,7 +213,7 @@ var urlBaseAccionesUsuariosOrganizacion = (String)ViewData["BaseAccionesUsuarios
 
 @* Activación Registro automático*@
 <div id="modalActivarRegAuto_@comunidad.Key"
-     class="modal modal-top fade show modalActivarRegAuto"
+     class="modal modal-top fade modalActivarRegAuto"
      tabindex="-1"
      role="dialog">
     <div class="modal-dialog" role="document">
@@ -224,11 +224,11 @@ var urlBaseAccionesUsuariosOrganizacion = (String)ViewData["BaseAccionesUsuarios
                     <span class="material-icons">@(comunidad.RegistroAutomatico ? "group_remove" : "group_add") </span>
                     @if (comunidad.RegistroAutomatico)
                     {
-                        <span>Desactivar registro automático</span>
+                        <span>@Html.GetText("COMMON","DESACTIVARREGISTROAUTOMATICO")</span>
                     }
                     else
                     {
-                        <span>Activar registro automático</span>
+                        <span>@Html.GetText("COMMON","ACTIVARREGISTROAUTOMATICO")</span>
                     }
                 </p>
                 <span class="material-icons cerrar" data-dismiss="modal" aria-label="Close">close</span>
@@ -239,11 +239,11 @@ var urlBaseAccionesUsuariosOrganizacion = (String)ViewData["BaseAccionesUsuarios
                     <label class="control-label">
                         @if (comunidad.RegistroAutomatico)
                         {
-                            <span>Si continúas, desactivarás el registro automático para esta comunidad.</span>
+                            <span>@Html.GetText("COMMON","SICONTINUASDESACTIVARASELREGISTROAUTOMATICOPARAESTACOMUNIDA")</span>
                         }
                         else
                         {
-                            <span>Si continúas, activarás el registro automático y todos los usuarios de la organización formarán parte de esta comunidad.</span>
+                            <span>@Html.GetText("COMMON","SICONTINUASACTIVARASELREGISTROAUTOMATICOYTODOSLOSUSUARIOSDE")</span>
                         }
                     </label>
                 </div>
@@ -265,7 +265,7 @@ var urlBaseAccionesUsuariosOrganizacion = (String)ViewData["BaseAccionesUsuarios
 
 @* Abandonar Comunidad *@
 <div id="modalAbandonarCommunity_@comunidad.Key"
-     class="modal modal-top fade show modalAbandonarCommunity"     
+     class="modal modal-top fade modalAbandonarCommunity"     
      tabindex="-1"
      role="dialog">
     <div class="modal-dialog" role="document">
@@ -274,7 +274,7 @@ var urlBaseAccionesUsuariosOrganizacion = (String)ViewData["BaseAccionesUsuarios
             <div class="modal-header">
                 <p class="modal-title">
                     <span class="material-icons">exit_to_app</span>                                        
-                        Abandonar comunidad
+                        @Html.GetText("COMMON","ABANDONARCOMUNIDAD")
                 </p>
                 <span class="material-icons cerrar" data-dismiss="modal" aria-label="Close">close</span>
             </div>
@@ -282,7 +282,7 @@ var urlBaseAccionesUsuariosOrganizacion = (String)ViewData["BaseAccionesUsuarios
             <div class="modal-body">
                 <div class="form-group">
                     <label class="control-label">                                                
-                        <span>Si continúas, la organización abandonará la comunidad.</span>                        
+                        <span>@Html.GetText("COMMON","SICONTINUASLAORGANIZACIONABANDONARALACOMUNIDAD")</span>                        
                     </label>
                 </div>
 

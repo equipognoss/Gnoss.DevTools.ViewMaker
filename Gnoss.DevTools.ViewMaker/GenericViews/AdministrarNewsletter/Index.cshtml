@@ -35,7 +35,6 @@ bool isReceivingNewsletter = Html.GetIdentidadActual().ReceiveNewsletter;
             <h1>@Html.GetText("COMMON", "NEWSLETTERSINGULAR")</h1>
             <div class="fieldset fieldset01">
                 <fieldset>
-                    <legend>Form to change your password</legend>
                     <div class="fieldsetContent">
                         @* Mensaje para abandonar una comunidad *@
                         <div class="form-group">
@@ -70,6 +69,7 @@ bool isReceivingNewsletter = Html.GetIdentidadActual().ReceiveNewsletter;
                         </div>
                         @* Botón de acción*@
                         <div class="form-actions">
+                            <!--<input type="submit" value="@Html.GetText("COMMON", "SI")" onclick="MostrarUpdateProgress();" />-->
                             <input id="@btnSubmitReceiveNewsletters" type="submit" class="btn btn-primary" value="@Html.GetText("COMMON", "ACEPTAR")" />
                         </div>
                     </div>

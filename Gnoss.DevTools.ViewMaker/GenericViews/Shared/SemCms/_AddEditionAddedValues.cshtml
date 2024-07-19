@@ -1,0 +1,107 @@
+﻿@model SharedSemCms
+
+@{
+    Es.Riam.Semantica.OWL.Propiedad mPropiedad = Model.semanticPropertyModel.Element.Propiedad;
+    string idControl = Model.semanticPropertyModel.OntologyPropInfo.ControlID;
+
+    if ((!Model.semanticPropertyModel.OntologyPropInfo.UniqueValue && mPropiedad.EspecifPropiedad.SelectorEntidad.TipoSeleccion != "ListaCheck") || (mPropiedad.EspecifPropiedad.SelectorEntidad.TipoSeleccion == "Tesauro" && mPropiedad.ValoresUnificados.Count > 0))
+    {
+        string idDivContValores = idControl.Replace("selEnt_", "contEntSelec_");
+
+        if (mPropiedad.ListaValores.Count > 0)
+        {
+            <div id="@idDivContValores">
+                <table>
+                    @if (mPropiedad.EspecifPropiedad.SelectorEntidad.TipoSeleccion == "Tesauro")
+                    {
+                        string textoValor = Model.semanticPropertyModel.OntologyPropInfo.EntitySelector.SemanticThesaurusAddedValue.Value;
+                        if (textoValor.Length > 143)
+                        {
+                            textoValor = textoValor.Substring(0, 143);
+                        }
+
+                        <tr class="par">
+                            <td>
+                                <span>@textoValor</span>
+                            </td>
+                            <td>
+                                @{
+                                    SharedSemCms sharedSemCms = new SharedSemCms();
+                                    sharedSemCms.semanticPropertyModel = Model.semanticPropertyModel;
+                                    sharedSemCms.pNumValor = 0;
+                                    sharedSemCms.pTesauroSemSimple = Model.semanticPropertyModel.OntologyPropInfo.UniqueValue;
+                                    sharedSemCms.pValor = textoValor;
+                                }
+                                @Html.PartialView("../Shared/SemCMS/_AddDeleteButon", sharedSemCms)
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        string claseFila = "par";
+                        int count = 0;
+                        string imgEditar = Html.GetBaseUrlStatic() + "/img/icoEditar.gif";
+
+                        foreach (string valor in mPropiedad.ListaValores.Keys)
+                        {
+                            string textoValor = null;
+
+                            if (Model.semanticPropertyModel.OntologyPropInfo.EntitySelector.EditionEntitiesValues.ContainsKey(valor))
+                            {
+                                textoValor = Model.semanticPropertyModel.OntologyPropInfo.EntitySelector.EditionEntitiesValues[valor];
+                            }
+                            else
+                            {
+                                textoValor = valor;
+                            }
+
+                            if (textoValor.Length > 143)
+                            {
+                                textoValor = textoValor.Substring(0, 143);
+                            }
+
+                            <tr class="claseFila">
+                                <td>
+                                    <span>@textoValor</span>
+                                </td>
+                                @if (mPropiedad.EspecifPropiedad.SelectorEntidad.TipoSeleccion != "Autocompletar" && mPropiedad.EspecifPropiedad.SelectorEntidad.TipoSeleccion != "GruposGnoss" && mPropiedad.EspecifPropiedad.SelectorEntidad.TipoSeleccion != "PersonaGnoss")
+                                {
+                                    <td>
+                                        <a onclick="SeleccionarObjectNoFuncionalSeleccEnt('@mPropiedad.ElementoOntologia.TipoEntidad','@mPropiedad.Nombre','@count')"><img src="@imgEditar" alt="editar" /></a>
+                                    </td>
+                                }
+                                <td>
+                                    @{
+                                        SharedSemCms sharedSemCms = new SharedSemCms();
+                                        sharedSemCms.semanticPropertyModel = Model.semanticPropertyModel;
+                                        sharedSemCms.pNumValor = count;
+                                        sharedSemCms.pTesauroSemSimple = false;
+                                        sharedSemCms.pValor = textoValor;
+                                    }
+                                    @Html.PartialView("../Shared/SemCMS/_AddDeleteButon", sharedSemCms)
+                                </td>
+                            </tr>
+
+                            if (claseFila == "par")
+                            {
+                                claseFila = "impar";
+                            }
+                            else
+                            {
+                                claseFila = "par";
+                            }
+
+                            count++;
+                        }
+                    }
+                </table>
+            </div>
+        }
+        else
+        {
+            <div id="@idDivContValores"></div>
+        }
+    }
+
+
+}

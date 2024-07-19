@@ -1,26 +1,33 @@
 ﻿@using Es.Riam.Gnoss.Web.MVC.Models;
 @model CMSComponentSearchBox
+
+@{
+    HeaderModel cabecera = Html.GetCabecera();
+}
 @if (Model != null)
 {   
-    <div class="cp0103">
-        @if (!string.IsNullOrEmpty(Model.Title))
-        {
-            <div class="titulo">
-                <h4>
-                    @Model.Title                    
-                </h4>
-            </div>
-        }        
-        <div class="contenido">
-            <div class="buscador-theme-01">
-                <fieldset style="display: block;">
-                    <legend class="nota">buscador</legend>
-                    <div class="fieldsetGroup searchGroup">
-                        <input type="text" id="criterio" class="text defaultText autocompletar" origen="@Model.AutocompleteID" placeholder="@Model.DefaultText"/>
-                        <input type="button" id="btEncontrar" class="encontrar" />
+    <div class="col-buscador" style="width: 100%;">        
+        <form method="post" class="encontrar_cms_form" action="@Model.UrlBusqueda">
+            <fieldset style="display: block" class="form-inline">
+                <legend class="nota">buscador</legend>                
+                @if (!string.IsNullOrEmpty(Model.Title))
+                {                   
+                   <label class="control-label d-block">@Model.Title</label>
+                }   
+                <div class="fieldsetGroup searchGroup finderUtils">
+                    <div class="group finderSection">
+                        <input type="text" id="criterio"
+                               origen="@Model.AutocompleteID" 
+                               placeholder="@Model.DefaultText"
+                               class="text defaultText autocompletar finderSectionText input_buscador_cms"                                       
+                               autocomplete="off">
+         
+                        <input type="button" class="encontrar_cms findAction">                                                               
+                        <input type="submit" id="btEncontrar" class="encontrar encontrar_cms_submit d-none" />
+
                     </div>
-                </fieldset>
-            </div>
-        </div>
+                </div>
+            </fieldset>
+        </form>
     </div>
 }

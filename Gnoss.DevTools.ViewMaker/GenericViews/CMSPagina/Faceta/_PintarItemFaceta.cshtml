@@ -1,0 +1,32 @@
+﻿@model FacetItemModel
+
+<li>
+    @{
+        string clase = "faceta";
+        if (Model.Selected)
+        {
+            clase += " applied";
+        }
+    }
+    @if (Model.FacetItemlist != null && Model.FacetItemlist.Count > 0)
+    {
+        if (Model.Selected)
+        {
+            <img class="imgMas" onclick="DesplegarImgMas(this, 'cat_@Model.Tittle')" alt="-" src="@Html.GetBaseUrlStatic()/img/verMenos.gif" />
+        }
+        else
+        {
+            <img class="imgMas" onclick="DesplegarImgMas(this, 'cat_@Model.Tittle')" alt="+" src="@Html.GetBaseUrlStatic()/img/verMas.gif" />
+        }
+    }
+    <a href="@Model.Filter" class="@clase" name="@Model.Name" title="@Model.Tittle">@Model.Tittle (@Model.Number)</a>
+</li>
+@if (Model.FacetItemlist != null && Model.FacetItemlist.Count > 0)
+{
+<ul style="display: none" id="cat_@Model.Tittle">
+    @foreach (FacetItemModel item in Model.FacetItemlist)
+    {
+        @Html.PartialView("../CMSPagina/Faceta/_PintarItemFaceta", item)
+    }
+</ul>
+}

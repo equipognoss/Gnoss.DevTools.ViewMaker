@@ -24,8 +24,8 @@ CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
 @*Buscador utilizado para buscar en toda la comunidad o en todo GNOSS*@
     <div class="header-contenido">
         <div id="buscador" class="col-buscador">
-            @* Formulario del buscador *@    
-            <form method="post" id="formBuscador" action="@(new Uri($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}").AbsoluteUri)">
+            @* Formulario del buscador *@
+            <form method="post" id="formBuscador" action="@($"{Html.GetBaseUrlIdioma()}{Context.Request.Path}")">
                 <fieldset style="display: block" class="form-inline">
                     <legend class="nota">buscador</legend>
                     @* SELECT + CAMPOS OCULTOS PARA EL BUSCADOR *@
@@ -45,7 +45,7 @@ CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
                                 }
                             }
                         </select>
-                        @* Más campos ocultos para el buscador en base al SELECT *@
+                        @* Más campos ocultos para el buscador en base al SELECT -> Movido a _layout-hidden-forms para que esté disponible en todas las webs
                         @foreach (HeaderModel.SearchHeaderModel.SearchSelectComboModel combo in cabecera.Searcher.ListSelectCombo)
                         {
                             <input type="hidden" value="ub_@combo.ID@Html.Raw("@")@combo.Url" class="inpt_tipo_busqueda" />
@@ -60,7 +60,7 @@ CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
                             {
                                 <input type="hidden" value="fa_@combo.ID@Html.Raw("@")@combo.FacetAutocomplete" class="inpt_FacetasAutocompletar" />
                             }
-                        }
+                        }*@
 
                         @* Buscador *@
                         <!-- #buscador //-->
@@ -68,7 +68,7 @@ CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
                             <div class="group finderSection">
                                 <label for="criterio" class="nota">Buscar en &nbsp;</label>
                                 @* Caja de texto para buscar *@
-                                <input type="text" id="txtBusquedaPrincipal" class="text txtBusqueda autocompletar not-outline finderSectionText ac_input" autocomplete="off" placeholder="Buscar en sección" />
+                                <input type="text" id="txtBusquedaPrincipal" class="text txtBusqueda autocompletar not-outline finderSectionText ac_input" autocomplete="off" placeholder="@Html.GetText("COMMON","BUSCAR")" />
                                 @* Botón de búsqueda que será la propia lupa*@
                                 <input type="button" title="@Html.GetText("METABUSCADOR", "ENCONTRAR")" class="encontrar findAction" id="btnBuscarPrincipal" />
                             </div>

@@ -47,7 +47,7 @@ string FiltroOrdenSeleccionado = Model.FilterOrderSelected;
 }
 
 
-<div class="row">    
+<div class="row">
     @if (Comunidad.Key != ProyectoAD.MetaProyecto)
     {
         @*Breadcrumb / Migas de pan en la ficha del recurso*@
@@ -83,11 +83,11 @@ string FiltroOrdenSeleccionado = Model.FilterOrderSelected;
     }
 
     @* Header o cabecera donde aparecen los resultados o recursos de una comunidad *@
-    @Html.PartialView("../Busqueda/_partial-views/_list-header", Model)
+    @Html.PartialView("_partial-views/_list-header", Model)
 
     @* Panel izquierdo de Facetas *@
     <div class="col col-12 col-xl-3 col-facetas col-lateral izquierda">
-        @Html.PartialView("../Busqueda/_partial-views/_list-content-facetes", Model)
+        @Html.PartialView("_partial-views/_list-content-facetes", Model)
     </div>
 
     @* Panel derecho-central donde estará el contenido del "buscador"*@
@@ -97,11 +97,44 @@ string FiltroOrdenSeleccionado = Model.FilterOrderSelected;
             @* Buscador de recursos *@
             @if (Model.SearchBoxVisible)
             {
-                @Html.PartialView("../Busqueda/_partial-views/_searcher", Model);
+                @Html.PartialView("_partial-views/_searcher")
             }
 
             @* Listado de resultados (resource-list) donde aparecerán los recursos-items *@
-            @Html.PartialView("../Busqueda/_partial-views/_list-content", Model)
+            @Html.PartialView("_partial-views/_list-content", Model)
+
+            @* Leyenda cuando en modo desconectado se trata de ver Personas *@
+            @if (IdentidadActual.IsGuestUser && nombrePestanyaActual == Html.GetText("COMMON", "PERSONASYORGANIZACIONES"))
+            {
+                @* Tipo de comunidad *@
+                switch ((CommunityModel.TypeAccessProject)Comunidad.AccessType)
+                {
+                    case CommunityModel.TypeAccessProject.Public:
+                            @* PÚBLICA *@
+                            <p>
+                                @Html.GetText("BUSQUEDAAVANZADA", "INICIOPEROSNASYORG")
+                                <a id="hlBotonInicio" href="@Comunidad.Url/@Html.GetText("URLSEM", "HAZTEMIEMBRO")">@Html.GetText("COMINICIOLOGIN", "REGISTRATEPARTICIPA")</a>
+                                @Html.GetText("PERFIL", "VISITANTEPERFILO")
+                                <a id="hlBotonInicio2" href="@Comunidad.Url/@Html.GetText("URLSEM", "LOGIN")">@Html.GetText("COMINICIOLOGIN", "INICIASESION")</a>
+                            </p>
+                        break;
+
+                    case CommunityModel.TypeAccessProject.Restricted:
+                            @* RESTRINGIDA *@
+                            <p>
+                                @Html.GetText("BUSQUEDAAVANZADA", "INICIOPEROSNASYORG")
+                                @{String requestCommunityAccessUrl = $"{@Comunidad.Url}/{@Html.GetText("URLSEM", "SOLICITARACCESO")}"; }
+                                <br />
+                                <a id="hlBotonInicio" href="@requestCommunityAccessUrl">@Html.GetText("COMINICIOLOGIN", "TIENESQUESOLICITAR")</a>                                                        
+                                @Html.GetText("PERFIL", "VISITANTEPERFILO")
+                                <a id="hlBotonInicio2" href="@Comunidad.Url/@Html.GetText("URLSEM", "LOGIN")">@Html.GetText("COMINICIOLOGIN", "INICIASESION")</a>
+                            </p>
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
         </div>
     </div>
 
@@ -110,7 +143,7 @@ string FiltroOrdenSeleccionado = Model.FilterOrderSelected;
 <script type="text/javascript">
         @Html.Raw(jsExtra)
 
-        @if (htmlFacetas == null && htmlResultados == null && Model.JSONResourceList == null&& Model.JSONFaceted == null)
+        @if (htmlFacetas == null && htmlResultados == null)
         {
             <text>
                 $(document).ready(function () {

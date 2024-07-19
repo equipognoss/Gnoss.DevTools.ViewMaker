@@ -1,0 +1,154 @@
+﻿@model CategoryModel
+@*
+Descripción
+-----------------------------------------------
+Vista para pinta la categoría partir de PintarCategoriaEditorTesauro que ha sido gestionada desde EditorTesauroCatArbol
+
+Variables
+----------------------------------------------------------------
+*@
+
+@{
+	// Determinar si la categoría es compartida. Por defecto 'false'
+	bool esCategoriaCompartida = false;
+	// Indicar si la categoría tiene a su vez categorías hijas
+	bool tieneHijos = false; 
+	// Clase para controlar que esté plegada la categoría o no
+	string showSubcategoriesClass = "";
+	bool showSubcategories = false;
+}
+
+
+@{
+	@* Determinar si es una categoría compartida *@
+	if (ViewBag.ThesaurusEditor.SharedCategories != null && ViewBag.ThesaurusEditor.SharedCategories.Contains(Model.Key))
+	{
+		esCategoriaCompartida = true;
+	}
+	@* Determinar si la categoría tiene subcategorias/hijos*@
+	tieneHijos = !esCategoriaCompartida && Model.Subcategories.Count > 0;
+
+	@* Determinar si la categoría está plegada o no *@
+	if (tieneHijos)
+	{
+		if (ViewBag.ThesaurusEditor.ExpandedCategories == null || !ViewBag.ThesaurusEditor.ExpandedCategories.Contains(Model.Key))
+		{
+			showSubcategoriesClass = "d-none";			
+		}
+		else
+		{
+			showSubcategoriesClass = "";
+			showSubcategories = true;
+		}
+	}
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista para pintar categoría y subcategoria de un Tesauro --------------------
+*@
+
+@* 1ª Categoría + Subcategorías *@
+<li class="component-wrap category-row">	
+
+	<div class="component" data-categoryname="@Model.Name" data-id="@Model.Key">
+		<div class="component-header-wrap">
+			@* Sección header de la categoría*@
+			<div class="component-header">
+				@* Botón para arrastrar *@
+				<div class="component-sortable js-component-sortable-category">
+					<span class="material-icons-outlined sortable-icon">drag_handle</span>
+				</div>
+				@* Contenido de la categoría *@
+				<div class="component-header-content">
+					<div class="component-header-left">
+						@* Botón de tiene hijos o no *@
+						@if (tieneHijos)						
+						{													
+							if (!showSubcategories)
+							{
+								@* Hijos contraidos *@
+								<span class="material-icons-outlined showHide-icon collapsed">add_circle_outline</span>
+							}
+							else
+							{
+								@* Hijos desplegados *@
+								<span class="material-icons-outlined showHide-icon expanded">remove_circle_outline</span>
+							}												
+						}
+						
+						@* Nombre de la categoría *@
+						<div class="component-name-wrap">
+							<span class="component-name" data-categoryname="@Model.Name" data-categoryid="@Model.Key">@Model.Name</span>							
+						</div>
+					</div>
+					@* Sección de acciones de la derecha *@
+					<div class="component-header-right">
+						<div class="component-actions-wrap">
+							@* Acciones en la categoría *@
+							<ul class="no-list-style component-actions">							
+								@* Editar categoría *@
+								<li>
+									<a class="action-edit round-icon-button js-action-edit-component"
+									    data-categoryid="@Model.Key" 
+										data-categoryname="@Model.Name"
+										data-target="#modal-container" 	
+										data-toggle="modal"
+										style="cursor:pointer">
+										<span class="material-icons">edit</span>
+									</a>
+								</li>
+								@* Crear nueva categoría dentro de la propia categoría *@
+								<li>
+									<a class="action-add round-icon-button js-action-add"
+										data-categoryid="@Model.Key" 
+										data-categoryname="@Model.Name"
+										data-target="#modal-container" 										
+										data-toggle="modal"
+										style="cursor:pointer">
+										<span class="material-icons">create_new_folder</span>
+									</a>
+								</li>
+								@* Borrar categoría *@
+								<li>
+									<a
+										class="action-delete round-icon-button js-action-delete"
+										data-categoryid="@Model.Key" 
+										data-categoryname="@Model.Name"
+										data-target="#modal-delete-category" 
+										data-toggle="modal"
+										style="cursor:pointer">
+										<span class="material-icons">delete</span>
+									</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		@* Sección de hijos de la categoría. Por defecto no visible *@
+		<div class="component-content categoryChildrenPanel @(showSubcategoriesClass)">
+				<ul class="js-community-categories-list component-list no-list-style">
+				@if (tieneHijos)
+				{
+					@* Subcategorías hijas *@
+					@foreach (CategoryModel categoria in Model.Subcategories)
+					{
+						@Html.PartialView("../Shared/EditorTesauro/_PintarCategoria_Admin", categoria)
+					}
+
+					@* Pintar categorías sugeridas *@
+					@if (ViewBag.ThesaurusEditor.SuggestedThesaurusCategories != null)
+					{
+						foreach (CategoryModel categoria in ((List<CategoryModel>)ViewBag.ThesaurusEditor.SuggestedThesaurusCategories).Where(cat => cat.ParentCategoryKey == Model.Key).OrderBy(cat => cat.Order))
+						{
+							@Html.PartialView("../Shared/EditorTesauro/_PintarCategoriaSugerida_Admin", categoria)
+						}
+					}
+				}
+
+			</ul>
+		</div>
+	</div>
+</li>

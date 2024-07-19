@@ -16,7 +16,7 @@ bool AbandonandoPlataforma = false;
 
 // URL formateada para poder pasarla al formulario para realizar la baja de la comunidad ya que se puede dar de baja en cualquier página de la comunidad
 // Llamada endpoint para el "action" del formulario: 'http://depuracion.net/comunidad/gnoss-developers-community/abandonar-comunidad/confirm'
-string urlFormattedLeaveCommunity = $"{Html.GetUrlComunidadPrincipal()}/comunidad/{Comunidad.ShortName}/abandonar-comunidad/confirm";
+string urlFormattedLeaveCommunity = $"{Html.GetComunidad().Url}/abandonar-comunidad/confirm";
 }
 @*
 ----------------------------------------------------------------
@@ -43,7 +43,7 @@ string urlFormattedLeaveCommunity = $"{Html.GetUrlComunidadPrincipal()}/comunida
 
 
 
-<div class="modal modal-top fade show"
+<div class="modal modal-top fade"
      tabindex="-1"
      role="dialog"
      id="modal-leave-community">

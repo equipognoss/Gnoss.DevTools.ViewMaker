@@ -25,7 +25,9 @@ UserProfileModel Perfil = Html.GetPerfil();
 <div class="row">    
     <div id="col01" class="col">
         <div class="form formularioRegistroUsuarios panel-centrado">
-            <h1>Hola <strong>@Perfil.Name</strong>, gracias por unirte a <strong>@Comunidad.Name</strong></h1>
+            <h1>
+                <strong>@Perfil.Name</strong>, @Html.GetText("COMMON","GRACIASPORUNIRTEA") <strong>@Comunidad.Name</strong>
+            </h1>
             <div class="box box01">
                 @* Paso actual de registro en el que se encuentra el usuario *@
                 <div class="step-progress-wrap mb-5">
@@ -33,7 +35,9 @@ UserProfileModel Perfil = Html.GetPerfil();
                         @* Comprobar el paso en el que se encuentra el usuario*@                                                
                         @* Paso0-1: Registro inicial: Paso realizado (registro inicial realizado)  *@
                         <li class="step-progress__circle done active">
-                            <span class="step-progress__text">Datos básicos</span>
+                            <span class="step-progress__text">
+                                @Html.GetText("COMMON","DATOSBASICOS")
+                            </span>
                         </li>
 
                         @* Paso2: Crear tu perfil - Datos (Nombre, datos, foto) *@

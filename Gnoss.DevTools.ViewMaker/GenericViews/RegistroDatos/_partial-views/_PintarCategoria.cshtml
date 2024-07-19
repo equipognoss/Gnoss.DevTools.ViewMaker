@@ -1,0 +1,25 @@
+﻿@model PintarCategoriaRegistroDatos
+
+@{
+    string nombreCategoria = Model.listaPreferencias[Model.catID].Key;
+    // Recorrer y pintar los items de cada nombreCategoria
+    int numCatHija = 0;
+}
+
+@foreach (Guid catHijaID in Model.listaPreferencias[Model.catID].Value.Keys)
+{
+    string claseDiv = "item" + Model.numCat + numCatHija;
+    string idInput = "id_" + Model.numCat + "_" + numCatHija;
+
+    @* Pintar cada item *@
+    <div class="custom-control custom-checkbox themed little primary @claseDiv">
+        <input type="checkbox"
+               id="@catHijaID"
+               data-item="@idInput"
+               categoriaid="@catHijaID"
+               class="custom-control-input categoriaPreferencia" />
+        <label class="custom-control-label"
+               for="@catHijaID">@Model.listaPreferencias[Model.catID].Value[catHijaID]</label>
+        </div>
+        numCatHija += 1;
+    }

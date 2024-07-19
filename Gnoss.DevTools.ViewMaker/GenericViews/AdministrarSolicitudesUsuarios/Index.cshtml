@@ -6,14 +6,12 @@
 
 @{
     Html.SetBodyClass("layout02 comunidad listado comGnoss");
-
     Html.SetPintarH1(false);
 }
 
 
-
 <div class="row">
-    @*Breadcrumb / Migas de pan en la ficha del recurso*@
+    @* Breadcrumb / Migas de pan en la ficha del recurso *@
     <div class="col col-12 col-breadcrumb" id="breadcrumb">
         <ul>
             <li><a href="@Model.ComunidadUrl"><strong>@Html.GetText("COMMON", "HOME")</strong></a></li>
@@ -21,69 +19,54 @@
         </ul>
     </div>
 
-    @* Panel derecho-central donde estará el contenido del "buscador"*@
-    <div class="col col-12 col-xl-9 col-contenido derecha">
-        @* Div que envuelve todo el contenido central-derecho*@
-        <div class="wrapCol">
-            @* Header o cabecera donde aparecen los resultados o recursos de una comunidad *@
-            @Html.PartialView("_partial-views/_list-header", Model)
+    @* Header o cabecera donde aparecen los resultados o recursos de una comunidad *@
+    @Html.PartialView("_partial-views/_list-header", Model)
 
-            @* Listado de resultados (resource-list) donde aparecerán los recursos-items *@
-            <div id="panResultados" class="resource-list listView usuarios ">
-                <div class="listadoRecursos">
-                    <div class="resource-list listView">
-                        @foreach (var item in Model.SolicitudesNuevoUsuario)
-                        {
-                            <article class="resource" id="@item.SolicitudID">
-                                <div class="wrap">
-                                    <div class="user-miniatura">
-                                        <div class="imagen-usuario-wrap">
-                                            <div class="imagen">
-
-                                                <span class="material-icons" style="font-size: 40px;">person</span>
-
-                                            </div>
-                                        </div>
-                                        <div class="nombre-usuario-wrap">
-                                            <a href="">
-                                                <p class="nombre">@item.Nombre</p>
-                                            </a>
-                                        </div>
-                                        <div class="acciones-usuario-wrap">
-                                            @if (IdentidadActual.IsProyectAdmin == true)
-                                            {
-                                                string funcionSolicitud_RechazarSolicitudUsuarioComunidad = "Solicitud_RechazarSolicitudUsuarioComunidad('" + @Html.GetText("URLSEM", "ADMINISTRARSOLICITUACCESOPROYECTO")+"/refuse" + "', '" + item.SolicitudID + "');";
-                                                string funcionSolicitud_AceptarSolicitudUsuarioComunidad = "Solicitud_AceptarSolicitudUsuarioComunidad('" + @Html.GetText("URLSEM", "ADMINISTRARSOLICITUACCESOPROYECTO") + "/accept" + "', '" + item.SolicitudID + "');";
-                                                    <input type="text" name="solicitud_id" value="@item.SolicitudID" hidden />
-                                                    <button type="button" onclick="@funcionSolicitud_AceptarSolicitudUsuarioComunidad" class="btn btn-outline-success"><span class="material-icons">check</span> @Html.GetText("COMMON", "ACEPTAR")</button>
-
-                                                    <input type="text" name="solicitud_id" value="@item.SolicitudID" hidden />
-                                                    <button type="button" onclick="@funcionSolicitud_RechazarSolicitudUsuarioComunidad" class="btn btn-outline-danger"><span class="material-icons">close</span> @Html.GetText("COMMON", "RECHAZAR")</button>                                               
-                                            }
-                                        </div>
-                                    </div>
+    <div class="col col-12">
+        @* Panel con la lista de suscripción de Comunidades *@
+        <div id="panResultados" class="resource-list listView usuarios ">
+            @* Listado de las comunidades a las que está suscritas el usuario *@
+            @foreach (var item in Model.SolicitudesNuevoUsuario)
+            {
+                <article class="resource" id="@item.SolicitudID">
+                    <div class="wrap">
+                        <div class="user-miniatura">
+                            <div class="imagen-usuario-wrap">
+                                <div class="imagen sinImagen">
+                                    <span class="material-icons">person</span>
                                 </div>
-                            </article>
-                        }
+                            </div>
+                            <div class="nombre-usuario-wrap">
+                                <a href="">
+                                    <p class="nombre">@item.Nombre</p>
+                                </a>
+                            </div>
+                            <div class="acciones-usuario-wrap">
+                                @if (IdentidadActual.IsProyectAdmin == true)
+                                {
+                                    //string funcionSolicitud_RechazarSolicitudUsuarioComunidad = "Solicitud_RechazarSolicitudUsuarioComunidad('" + @Html.GetText("URLSEM", "ADMINISTRARSOLICITUACCESOPROYECTO") + "/refuse" + "', '" + item.SolicitudID + "');";
+                                    string funcionSolicitud_AceptarSolicitudUsuarioComunidad = "Solicitud_AceptarSolicitudUsuarioComunidad('" + @Html.GetText("URLSEM", "ADMINISTRARSOLICITUACCESOPROYECTO") + "/accept" + "', '" + item.SolicitudID + "');";
+                                    string funcionSolicitud_RechazarSolicitudUsuarioComunidad = $"Solicitud_RechazarSolicitudUsuarioComunidad('{Html.GetText("URLSEM", "ADMINISTRARSOLICITUACCESOPROYECTO")}/refuse', '{item.SolicitudID}');";
+
+                                    <input type="text" name="solicitud_id" value="@item.SolicitudID" hidden />
+                                    <button type="button" id="btnAceptar_@item.SolicitudID" onclick="@funcionSolicitud_AceptarSolicitudUsuarioComunidad" class="btn btn-primary mr-3"><span class="material-icons">check</span> @Html.GetText("COMMON", "ACEPTAR")</button>
+
+                                    <input type="text" name="solicitud_id" value="@item.SolicitudID" hidden />
+                                    <button type="button" id="btnCancelar_@item.SolicitudID" onclick="@funcionSolicitud_RechazarSolicitudUsuarioComunidad" class="btn btn-outline-primary"><span class="material-icons">close</span> @Html.GetText("COMMON", "RECHAZAR")</button>
+                                }
+                            </div>
+                        </div>
                     </div>
-                    @* Paginador de resultados *@
-                    @Html.PartialView("_partial-views/_pagination", Model)
-                </div>
-            </div>
+                </article>
+            }
+            @if (Model.SolicitudesNuevoUsuario.Count == 0)
+            {
+                <p>@Html.GetText("SOLICITUDES", "NOPENDIENTES")</p>
+            }
         </div>
-
+        @* Paginador de resultados *@
+        @Html.PartialView("_partial-views/_pagination", Model)
     </div>
+</div>
 
-    <script type="text/javascript">
-        @Html.Raw(jsExtra)
 
-        @if (!string.IsNullOrEmpty(Html.GetJSMapa()))
-        {
-            @Html.Raw(Html.GetJSMapa())
-        }
-
-        @if (!string.IsNullOrEmpty(Html.GetJSGraficos()))
-        {
-            @Html.Raw(Html.GetJSGraficos())
-        }
-    </script>

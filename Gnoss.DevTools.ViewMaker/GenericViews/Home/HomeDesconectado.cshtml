@@ -18,7 +18,10 @@ Variables
 <div class="row">
     <div id="col01" class="col">
         <div class="form formtheme01 formularioRegistroUsuarios panel-centrado">                                   
-            <h1>Inicia sesión en <strong>myGNOSS</strong></h1>                        
+            <h1>
+                @Html.GetText("COMMON","INICIASESION")
+                <strong>myGNOSS</strong>
+            </h1>
             <div>                
                 @Html.PartialView("../Registro/_FormularioLogin")
             </div>

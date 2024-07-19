@@ -14,7 +14,6 @@ Variables
 *@
 @{
 
-UserProfileModel Perfil = Html.GetPerfil();
 CommunityModel Comunidad = Html.GetComunidad();
 
 // Url para redirigir/cancelar simplemente la edición del perfil del usuario
@@ -37,6 +36,9 @@ string inputLastName = "ProfilePersonal.Name";
 @* ID del input Email *@    
 string idEmail = "ProfilePersonal_Email";
 string inputEmail = "ProfilePersonal.Email";
+@* ID del input Authentication *@ 
+string idTwoFactorAuthentication = "ProfilePersonal_TwoFactorAuthentication";
+string inputTwoFactorAuthentication = "ProfilePersonal.TwoFactorAuthentication";
 @* ID del input FechaNacimiento *@     
 string idBornDate = "ProfilePersonal_BornDate";
 string inputBornDate = "ProfilePersonal.BornDate";
@@ -94,6 +96,8 @@ string inputWebOrganization = "ProfileOrganization.WebSite";
 @* ID de la dirección de la Organización *@
 string idAddressOrganization = "ProfileOrganization_Address";
 string inputAddressOrganization = "ProfileOrganization.Address";
+@* ID del checkbox para indicar que se desea utilizar la foto del perfil personal en la identidad profesional *@
+string idChkUsarImagenPersonal = "chkUsarImagenPersonal";
 
 @*ID de inputs de Redes sociales (Twitter, Facebook y Linkedin) *@
 string idTwitterSocial = "twitterSocialUrl";
@@ -127,12 +131,27 @@ string idBtnRedSocial = "btnRedSocial";
 // Id Botón para eliminar una determinada URL en el perfil del usuario
 string idBtnBorrarUrl = "btnBorrarUrl";
 
+// Nombre del tab según el tipo de perfil a editar (Perfil Personal | PersonalProfesional | Organización)
+string nombreTabDatos = "";
 }
 
 @*
 ----------------------------------------------------------------
 -------------------- Editar perfil usuario en comunidad --------------------
 *@
+
+@{ 
+
+    @* Controlar el nombre de la pestaña para mostrar los datos Personales o de Organización *@
+    if (Model.ProfileOrganization != null) {         
+        nombreTabDatos = Html.GetText("PERFIL", "DATOSORGANIZACION");
+    }
+    else {
+        nombreTabDatos = Html.GetText("PERFIL", "DATOSPERSONALES");
+    }
+
+}
+
 
 @{
     Html.SetBodyClass(bodyClass);
@@ -146,23 +165,23 @@ string idBtnBorrarUrl = "btnBorrarUrl";
         urlCancelar = Context.Request.Headers["Referer"].ToString();               
     }
     else if ( !string.IsNullOrEmpty(Comunidad.ShortName)){
-        urlCancelar = $"{Html.GetUrlComunidadPrincipal()}/comunidad/{Comunidad.ShortName}";
+        //urlCancelar = $"{Html.GetUrlComunidadPrincipal()}/comunidad/{Comunidad.ShortName}";
+        urlCancelar = Html.GetComunidad().Url;
     }
     else {
         urlCancelar = Html.GetUrlComunidadPrincipal();
     }
 
     @* Comprobar la foto de perfil del usuario y mostrar anónimo si no dispone de foto actual.*@    
-    if (string.IsNullOrEmpty(Perfil.Foto))
-    {
-        //urlFoto = Html.ObtenerFotoAnonimaDePerfil(Perfil.TypeProfile);
+    if (string.IsNullOrEmpty(Model.UrlFoto))
+    {        
         urlFoto = Html.GetBaseUrlStatic() + "/img/iconos/Personas/anonimo_grande.png";
     }
     else
     {        
         // Cogemos la foto grande para que se visualice mejor
-        urlFoto = Perfil.Foto.Replace("_peque.png","_grande.png");
-        urlFoto = @Html.GetBaseUrlContent() + urlFoto;
+        urlFoto = Model.UrlFoto.Replace("_peque.png","_grande.png");
+        urlFoto = @Html.GetBaseUrlContent() + "/" + urlFoto;
     }
 }
 
@@ -172,7 +191,7 @@ string idBtnBorrarUrl = "btnBorrarUrl";
         <div class="container">
             <div class="modal-header">
                 <p class="modal-title">
-                    <span class="material-icons">mode_edit</span>Editar perfil
+                    <span class="material-icons">mode_edit</span>@Html.GetText("PERFIL", "EDITARPERFIL")
                 </p>
                 <a href="@urlCancelar" class="cerrar texto-blanco">
                     <span class="material-icons">close</span>
@@ -193,7 +212,7 @@ string idBtnBorrarUrl = "btnBorrarUrl";
                         href="#ver-datos-personales"
                         role="tab"
                         aria-controls="ver-datos-personales"
-                        aria-selected="true">@Html.GetText("PERFIL", "DATOSPERSONALES")</a>
+                        aria-selected="true">@nombreTabDatos</a>
                     </li>
                     @if (Model.ProfileOrganization == null) {
                         <li class="nav-item">
@@ -222,12 +241,26 @@ string idBtnBorrarUrl = "btnBorrarUrl";
                     <div class="tab-pane fade active show" id="ver-datos-personales" role="tabpanel" aria-labelledby="ver-datos-personales-tab">
                         @* Contenedor de imagen del usuario *@
                         <div class="form-group mb-5">
-                            <label for="" class="control-label d-block">@Html.GetText("PERFIL", "FOTOPERFIL")</label>
-                            <div class="image-uploader js-image-uploader">
+                            <label class="control-label d-block">@Html.GetText("PERFIL", "FOTOPERFIL")</label>
+
+                            @* Checkbox para Identidad profesional - Indicar que se desea la foto del perfil personal *@
+                            @if (Model.ProfileProfesional != null)
+                            {
+                                <div id="panUsarImagenPersonal" class="form-group form-check d-flex">
+                                    <input id="@idChkUsarImagenPersonal"
+                                           class="form-check-input"
+                                           type="checkbox"
+                                           @(Model.UsarFotoPersonal ? "checked" : "") />
+                                    <label class="control-label" for="chkUsarImagenPersonal">
+                                        @Html.GetText("PERFIL", "USARIMAGENPERSONAL")
+                                    </label>
+                                </div>
+                            }
+                            <div id="panelLoadImageId" class="image-uploader js-image-uploader" @(Model.UsarFotoPersonal ? "style=display:none" : "")>
                                 <div class="image-uploader__drop-area">
                                     <div class="image-uploader__preview" style="display: block; border:1px solid #ccc; position: relative">
                                         @* Image Preview - Por defecto mostrar "Anónimo"*@
-                                        <img class="image-uploader__img d-block" alt="Imagen Usuario" src="@urlFoto" />
+                                        <img class="image-uploader__img d-block" alt="@Html.GetText("COMMON","IMAGENDELUSUARIO")" src="@urlFoto" />
                                         @* Botón eliminar foto de perfil *@
                                         <div class="image-uploader-delete @( string.IsNullOrEmpty(Model.UrlFoto) ? "d-none" : null)">
                                             <a id="@idDeleteProfileImage" class="btn btn-outline-grey w-100">
@@ -320,6 +353,7 @@ string idBtnBorrarUrl = "btnBorrarUrl";
                 idEmail: "@idEmail",
                 idEmailProfesional: "@idEmailProfesional",
                 idBornDate: "@idBornDate",
+                idTwoFactorAuthentication: "@idTwoFactorAuthentication",
                 idCountry: "@idCountry",
                 idRegion: "@idRegion",
                 idLocation: "@idLocation",
@@ -336,6 +370,7 @@ string idBtnBorrarUrl = "btnBorrarUrl";
                 idAliasOrganization: "@idAliasOrganization",
                 idWebsiteOrganization: "@idWebsiteOrganization",
                 idAddressOrganization: "@idAddressOrganization",
+                idChkUsarImagenPersonal: "@idChkUsarImagenPersonal",
             },
             curriculum: {
                 idDescription: "@idDescription",

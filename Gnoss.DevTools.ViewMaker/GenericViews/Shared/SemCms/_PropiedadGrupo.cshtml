@@ -1,5 +1,5 @@
 ﻿@model SemanticPropertyModel
-
+@using Microsoft.AspNetCore.Mvc.Razor;
 @{
     string idGrupo = "";
 
@@ -44,13 +44,23 @@
     if (Model.Element.TipoGrupo == "subtitulo")
     {
         <h2 @Html.Raw(idGrupo) @Html.Raw(claseGrupo) @Html.Raw(display)>
-            @AddChildren()
+        @Html.Raw(@AddChildren())
+            
+        @foreach (SemanticPropertyModel semPropMod in Model.Properties)
+        {
+            @Html.PartialView("SemCms/_Propiedad", semPropMod);
+        }
         </h2>
     }
     else if (Model.Element.TipoGrupo == "titulo")
     {
         <h1 @Html.Raw(idGrupo) @Html.Raw(claseGrupo) @Html.Raw(display)>
-            @AddChildren()
+        @Html.Raw(@AddChildren())
+            
+        @foreach (SemanticPropertyModel semPropMod in Model.Properties)
+        {
+            @Html.PartialView("SemCms/_Propiedad", semPropMod);
+        }
         </h1>
 
         if (Model.GroupInfo.IncludeGnossIcon)
@@ -77,25 +87,67 @@
     else if (Model.Element.TipoGrupo == "dl")
     {
         <dl @Html.Raw(idGrupo) @Html.Raw(claseGrupo) @Html.Raw(display)>
-            @AddChildren()
+            @Html.Raw(@AddChildren())
+            
+        @foreach (SemanticPropertyModel semPropMod in Model.Properties)
+        {
+            @Html.PartialView("SemCms/_Propiedad", semPropMod);
+        }
         </dl>
     }
     else
     {
         @Html.Raw("<" + Model.Element.TipoGrupo + idGrupo + claseGrupo + display + ">")
-        @AddChildren()
+        @Html.Raw(@AddChildren())
+        
+        @foreach (SemanticPropertyModel semPropMod in Model.Properties)
+        {
+            @Html.PartialView("SemCms/_Propiedad", semPropMod);
+        }
         @Html.Raw("</" + Model.Element.TipoGrupo + ">")
     }
 }
 else
 {
     <div @Html.Raw(idGrupo) @Html.Raw(claseGrupo) @Html.Raw(display)>
-        @AddChildren()
+        @Html.Raw(@AddChildren())
+        
+        @foreach (SemanticPropertyModel semPropMod in Model.Properties)
+        {
+            @Html.PartialView("SemCms/_Propiedad", semPropMod);
+        }
     </div>
 }
 
+@{
+    string AddChildren()
+    {
+        string devolver = "";
+        if (!string.IsNullOrEmpty(Model.GroupInfo.GroupName))
+        {
+            string claseNombreGrupo = "";
 
-@functions{
+            if (!string.IsNullOrEmpty(Model.GroupInfo.GroupNameClass))
+            {
+                claseNombreGrupo = " class=" + Model.GroupInfo.GroupNameClass;
+            }
+
+            if (!string.IsNullOrEmpty(Model.GroupInfo.GroupNameTag))
+            {
+                
+                devolver = "<" + Model.GroupInfo.GroupNameTag + claseNombreGrupo + ">" + Model.GroupInfo.GroupName + "</" + Model.GroupInfo.GroupNameTag + ">";
+            }
+            else
+            {
+                devolver = "<h" + Model.Depth + claseNombreGrupo + ">" + Model.GroupInfo.GroupName + "</h" + Model.Depth + ">";
+            }
+
+            Model.Depth++;
+        }
+        return devolver;
+    }
+}
+@*@functions{
     string AddChildren()
     {
         if (!string.IsNullOrEmpty(Model.GroupInfo.GroupName))
@@ -109,11 +161,11 @@ else
 
             if (!string.IsNullOrEmpty(Model.GroupInfo.GroupNameTag))
             {
-                @Html.Raw("<" + Model.GroupInfo.GroupNameTag + claseNombreGrupo + ">" + Model.GroupInfo.GroupName + "</" + Model.GroupInfo.GroupNameTag + ">")
+                @Html.Raw("<" + Model.GroupInfo.GroupNameTag + claseNombreGrupo + ">" + Model.GroupInfo.GroupName + "</" + Model.GroupInfo.GroupNameTag + ">");
             }
             else
             {
-                @Html.Raw("<h" + Model.Depth + claseNombreGrupo + ">" + Model.GroupInfo.GroupName + "</h" + Model.Depth + ">")
+                @Html.Raw("<h" + Model.Depth + claseNombreGrupo + ">" + Model.GroupInfo.GroupName + "</h" + Model.Depth + ">");
             }
 
             Model.Depth++;
@@ -121,8 +173,8 @@ else
 
         foreach (SemanticPropertyModel semPropMod in Model.Properties)
         {
-            @Html.PartialView("SemCms/_Propiedad", semPropMod)
+            @Html.PartialView("SemCms/_Propiedad", semPropMod);
         }
         return string.Empty;
     }
-}
+}*@

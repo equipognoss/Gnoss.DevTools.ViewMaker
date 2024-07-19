@@ -1,0 +1,53 @@
+﻿@model PintarCategoriasIndice
+
+@{
+    CommunityModel Comunidad = Html.GetComunidad();
+    @* Comprobar si dispone de hijos la categoría actual *@
+    bool tieneHijos = Model.indexView.Categories.Count(cat => cat.ParentCategoryKey == Model.categoryModel.Key) > 0;
+    string urlCategoria = Model.indexView.UrlBaseCategories + Html.EliminarCaracteresUrlSem(Model.categoryModel.Name) + "/" + Model.categoryModel.Key;
+}
+
+@* Mostrar o pintar la categoría*@
+<div class="categoria-wrap">
+    <div class="categoria @Model.categoryModel.Key">
+        @{
+            string accionClick = "MVCMarcarElementoSelCat(this, 'selectorCategoriasSusc', 'txtHackCatTesSel');";
+            string cadenaChecked = "";
+            string cadenaDisabled = "";
+
+            if (Model.categoryModel.Selected)
+            {
+                cadenaChecked = "checked=\"checked\"";
+            }
+
+        }
+        @* Mostrar o pintar el input y el título de la categoría correspondiente*@
+        <div class="custom-control custom-checkbox themed little primary">
+            <input type="checkbox"
+                   name="tesauro-category"
+                   id="arb_@Model.categoryModel.Key"
+                   onclick="@accionClick" @cadenaChecked @cadenaDisabled
+                   data-item="@Model.categoryModel.Key"
+                   class="custom-control-input" />
+            <label class="custom-control-label"
+                   for="arb_@Model.categoryModel.Key">@Model.categoryModel.Name</label>
+        </div>
+    </div>
+        @if (tieneHijos)
+        {
+            @* Mostrar opción de desplegar si tiene hijos la categoría*@
+            <div class="boton-desplegar">
+                <span class="material-icons">keyboard_arrow_down</span>
+            </div>
+            @* Mostrar o no el panel de los hijos (subcategorías) si esta categoría dispone de subcategorías*@
+            <div class="panHijos">
+                @foreach (CategoryModel categoria in Model.indexView.Categories.Where(cat => cat.ParentCategoryKey == Model.categoryModel.Key).OrderBy(cat => cat.Order))
+                {
+                    PintarCategoriasIndice pintar = new PintarCategoriasIndice();
+                    pintar.indexView = Model.indexView;
+                    pintar.categoryModel = categoria;
+                    @Html.PartialView("../Indice/_PintarCategoriaTesauro", pintar)
+                }
+            </div>
+        }
+</div>

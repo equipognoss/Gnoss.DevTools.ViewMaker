@@ -28,7 +28,7 @@ string urlFoto = Html.GetBaseUrlStatic() + "/img/iconos/Personas/anonimo_grande.
 <form method="post" id="formDatosRegistro">
     @* Nombre *@
     <div class="form-group mb-3">
-        <label for="" class="control-label d-block">Nombre</label>
+        <label for="txtNombre" class="control-label d-block">@Html.GetText("COMMON","NOMBRE")</label>
         <input placeholder=""
                type="text"
                value="@Model.Name"
@@ -39,7 +39,7 @@ string urlFoto = Html.GetBaseUrlStatic() + "/img/iconos/Personas/anonimo_grande.
     </div>
     @* Apellidos *@
     <div class="form-group mb-3">
-        <label for="" class="control-label d-block">@Html.GetText("INVITACIONES", "APELLIDOS")</label>
+        <label for="txtApellidos" class="control-label d-block">@Html.GetText("INVITACIONES", "APELLIDOS")</label>
         <input placeholder=""
                type="text"
                value="@Model.LastName"
@@ -53,8 +53,8 @@ string urlFoto = Html.GetBaseUrlStatic() + "/img/iconos/Personas/anonimo_grande.
     @if (Model.AskLocation)
     {
         <div class="form-group mb-3">
-            <label id="lblPoblacion" for="" class="control-label d-block">Localidad</label>
-            <input placeholder="Introduce tu localidad"
+            <label id="lblPoblacion" for="txtPoblacion" class="control-label d-block">@Html.GetText("PERFIL","POBLACIONSIMPLE")</label>
+            <input placeholder="@Html.GetText("PERFIL","POBLACIONSIMPLE")"
                    type="text"
                    name="txtPoblacion"
                    id="txtPoblacion"
@@ -67,7 +67,7 @@ string urlFoto = Html.GetBaseUrlStatic() + "/img/iconos/Personas/anonimo_grande.
     @if (Model.AskCountry)
     {
         <div class="form-group mb-3">
-            <label for="" class="control-label d-block">Pais</label>
+            <label for="ddlPais" class="control-label d-block">@Html.GetText("REGISTRO","PAISSIMPLE")</label>
             <select id="ddlPais"
                     name="ddlPais"
                     class="js-select2"
@@ -179,7 +179,7 @@ string urlFoto = Html.GetBaseUrlStatic() + "/img/iconos/Personas/anonimo_grande.
                             urlFoto = Html.GetBaseUrlContent() + "/" + Model.Foto;
                         }
                     }
-                    <img class="image-uploader__img d-block" alt="Imagen Usuario" src="@urlFoto" />
+                    <img class="image-uploader__img d-block" alt="@Html.GetText("COMMON","IMAGENDELUSUARIO")" src="@urlFoto" />
                 </div>
                 @*Descripción de la acción*@
                 <div class="image-uploader__instructions">
@@ -265,7 +265,7 @@ string urlFoto = Html.GetBaseUrlStatic() + "/img/iconos/Personas/anonimo_grande.
         <div class="mb-3">
             <input id="submit"
                    type="submit"
-                   value="GUARDAR Y SIGUIENTE"
+                   value="@Html.GetText("COMMON","GUARDAR")"
                    class="btn btn-primary principal submit uppercase"
                    onclick="if (ComprobarDatos()) { return false; }" />
         </div>

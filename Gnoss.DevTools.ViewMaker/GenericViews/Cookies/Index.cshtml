@@ -1,4 +1,5 @@
-﻿
+﻿@using Es.Riam.Gnoss.AD.EntityModel.Models.Cookies;
+
 @{
     List<PersonalizacionCategoriaCookieModel> ListaCategoriasCookies = ViewBag.ListaCategoriaCookie;
 }
@@ -89,17 +90,16 @@
 
         $('.cookieAceptada').each(function (indice, elemento) {
             if ($(elemento).prop("checked")) {
-                document.cookie = $(elemento).val() + "=yes; expires=" + fecha.toUTCString();
+                document.cookie = $(elemento).val() + "=yes;path=/; expires=" + fecha.toUTCString();
             }
         });
 
         $('.cookieAceptada').each(function (indice, elemento) {
             if (!$(elemento).prop("checked")) {
-                document.cookie = $(elemento).val() + "=no; expires=" + fecha.toUTCString();
+                document.cookie = $(elemento).val() + "=no;path=/; expires=" + fecha.toUTCString();
             }
         });
 
-        modal = document.getElementById("myModal");
         var that = this;
         MostrarUpdateProgress();
         GnossPeticionAjax(
@@ -109,9 +109,12 @@
         ).fail(function (data) {
             mostrarErrorGuardado(data);
         }).done(function () {
-            $('#phAvisoCookie').hide();
+
         }).always(function () {
             OcultarUpdateProgress();
+            $('#phAvisoCookie').hide();
+            $("#aviso-cookies").hide();
+            $("#modalAvisoCookies").hide();
         });
 
         cm.innerHTML = "Se han modificado las cookies del sitio web.";

@@ -26,7 +26,7 @@ Variables
                 @* Mostrar el título de filtro de facetas / Loading *@                
                 <p class="modal-title">
                     <span class="spinner-border white-color mr-2 loading-modal-facet"></span>
-                    <span class="loading-modal-facet-title">Cargando ...</span>
+                    <span class="loading-modal-facet-title">@Html.GetText("COMMON","CARGANDO")</span>
                 </p>
                 <span class="material-icons cerrar"
                       data-dismiss="modal"
@@ -34,15 +34,13 @@ Variables
             </div>
             <div class="modal-body">
                 <div class="buscador-coleccion">
-                    <form>
-                        @* Input para buscador de Facetas *@
-                        <div>
-                            <span class="buscar">
-                                <input type="text" value="" class="texto" />
-                                <span class="material-icons lupa">search</span>
-                            </span>
-                        </div>
-                    </form>
+                    @* Input para buscador de Facetas *@
+                    <div>
+                        <span class="buscar">
+                            <input type="text" value="" class="texto" />
+                            <span class="material-icons lupa">search</span>
+                        </span>
+                    </div>
                 </div>
                 @* Contenedor de resultados (facetas) y header de paginador*@
                 <div class="indice-lista no-letra facetas-wrap">

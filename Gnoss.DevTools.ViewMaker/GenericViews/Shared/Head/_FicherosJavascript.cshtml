@@ -1,4 +1,4 @@
-@using Microsoft.AspNetCore.Http
+﻿@using Microsoft.AspNetCore.Http
 
 @{
     CommunityModel Comunidad = Html.GetComunidad();
@@ -6,13 +6,13 @@
 
 @* JS y libererías para el sitio web - Theme *@
 <!-- JQUERY -->
-<script src="//code.jquery.com/jquery-3.5.1.js"
-        integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+<script src="//code.jquery.com/jquery-3.7.1.min.js" 
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" 
         crossorigin="anonymous"></script>
 
 <!-- JQUERYUI -->
-<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"
-        integrity="sha256-0YPKAwZP7Mp3ALMRVB2i8GXeEndvCq3eSl/WsAl1Ryk="
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"
+        integrity="sha256-xLD7nhI62fcsEZK2/v8LsBcb4lG7dgULkuXoXB/j91c="
         crossorigin="anonymous"></script>
 
 <!-- Waypoints (Scrolling) -->
@@ -26,6 +26,18 @@
 <script src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/bootstrap/bootstrap.min.js?v=@Html.GetVersion()"></script>
 <script src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/propeller/js/propeller.js?v=@Html.GetVersion()"></script>
 
+<!-- TinyMCE V6 -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/tinymce/js/tinymce/tinymce.min.js?v=@Html.GetVersion()"></script>
+
+<!-- TinyMCE Config -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/tinymce/js/tinymce/tinymceConfig.js?v=@Html.GetVersion()"></script>
+
+<!-- Zooming -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/zooming/zooming.min.js?v=@Html.GetVersion()"></script>
+
 <!-- UNIFICADO JS -->
 <script type="text/javascript" src="@Html.GetBaseUrlStatic()/js/unificado.js?v=@Html.GetVersion()"></script>
 
@@ -36,14 +48,6 @@
 <!-- LIGHTGALLERY -->
 <script type="text/javascript"
         src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/lightgallery/js/lightgallery-all.min.js?v=@Html.GetVersion()"></script>
-
-<!-- SCROLLMAGIC -->
-<script type="text/javascript"
-        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/scrollmagic/ScrollMagic.min.js?v=@Html.GetVersion()"></script>
-
-<!-- ADDINDICATORS -->
-<script type="text/javascript"
-        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/scrollmagic/debug.addIndicators.min.js?v=@Html.GetVersion()"></script>
 
 <!-- DATATABLES -->
 <script type="text/javascript"
@@ -88,29 +92,36 @@
 <script type="text/javascript"
         src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/owl-carousel/js/owl.carousel.min.js?v=@Html.GetVersion()"></script>
 
+<!-- BusyLoad - Vistas para Loading -->
+<script type="text/javascript"
+        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/busy-load/app.min.js?v=@Html.GetVersion()"></script>
+
 <!-- PERSONALIZACION JS TEMA  -->
 <script type="text/javascript"
         src="@Html.GetBaseUrlStatic()/responsive/theme/theme.js?v=@Html.GetVersion()"></script>
 
-<!-- CKEditor  -->
+<!-- Visualizador Prism para Code en TinyMCE -->
 <script type="text/javascript"
-        src="@Html.GetBaseUrlStatic()/ckeditor/ckeditor.js?v=@Html.GetVersion()"></script>
-
-<!-- CKEditor Adaptador jquery -->
-<script type="text/javascript"
-        src="@Html.GetBaseUrlStatic()/ckeditor/adapters/jquery.js?v=@Html.GetVersion()"></script>
+        src="@Html.GetBaseUrlStatic()/responsive/theme/prism/prism.js?v=@Html.GetVersion()"></script>
 
 <!-- Dirty Form -->
-<script type="text/javascript"  
+<script type="text/javascript"
         src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/dirty-form/jquery.dirty.js?v=@Html.GetVersion()"></script>
 
-<!-- FullScreenImageViewer ddFullScreenViewer - Zoom en imágenes -->
-<script type="text/javascript"
-        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/fullScreenImageViewer/ddfullscreenimageviewer.js?v=@Html.GetVersion()"></script>
+<!-- Chartjs -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- FullScreenImageViewer zoomio - Zoom en imágenes -->
-<script type="text/javascript"
-        src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/fullScreenImageViewer/zoomio.js?v=@Html.GetVersion()"></script>
+<!-- Google Charts -->
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script>
+    google.charts.load('current', { 'packages': ['table'] });
+</script>
+
+<!-- Highcharts -->
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/heatmap.js"></script>
+
+
 
 @* JS insertados en unificados
        ---------------------------
@@ -177,7 +188,7 @@
     }
     else
     {
-        <script type="text/javascript">@Html.Raw(Html.GetGoogleAnalytics())</script>
+        <script type="text/javascript">    @Html.Raw(Html.GetGoogleAnalytics())</script>
     }
 
 }

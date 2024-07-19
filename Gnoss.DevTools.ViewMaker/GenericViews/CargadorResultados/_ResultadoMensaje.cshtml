@@ -143,84 +143,87 @@ List<ProfileModel> listProfileModelHidden = new List<ProfileModel>();
                     </div>                
                 }
                 
-                @* Fecha del mensaje *@
-                <p class="fecha" id="@Model.Key">@fecha</p>
+                @* Fecha y Acciones *@
+                <div class="d-flex align-items-center flex-wrap">
+                    @* Fecha del mensaje *@
+                    <p class="fecha" id="@Model.Key">@fecha</p>
 
-                @* Acciones a realizar con/el mensaje*@
-                <div class="acciones-recurso-listado">
-                    <div class="dropdown">
-                        <a href="#"
-                           class="dropdown-toggle"
-                           role="button"
-                           data-toggle="dropdown"
-                           aria-haspopup="true"
-                           aria-expanded="false">
-                            <span class="material-icons">more_vert</span>
-                        </a>
-                        @* Acciones a realizar con el mensaje *@
-                        <div class="dropdown-menu basic-dropdown dropdown-icons dropdown-menu-right">
-                            <ul class="no-list-style">
-                                @if (Model.Received)
-                                {
-                                    @* Acción responder *@
+                    @* Acciones a realizar con/el mensaje*@
+                    <div class="acciones-recurso-listado">
+                        <div class="dropdown">
+                            <a href="#"
+                               class="dropdown-toggle"
+                               role="button"
+                               data-toggle="dropdown"
+                               aria-haspopup="true"
+                               aria-expanded="false">
+                                <span class="material-icons">more_vert</span>
+                            </a>
+                            @* Acciones a realizar con el mensaje *@
+                            <div class="dropdown-menu basic-dropdown dropdown-icons dropdown-menu-right">
+                                <ul class="no-list-style">
+                                    @if (Model.Received)
+                                    {
+                                        @* Acción responder *@
+                                        <li>
+                                            <a class="item-dropdown"
+                                               href="@Model.Url.Replace("?mensaje", "?responder&mensaje")"
+                                               title="@Html.GetText("CORREO", "RESPONDERMENSAJESINTEXTOMENSAJE")">
+                                                <span class="material-icons">reply</span>
+                                                <span>@Html.GetText("CORREO", "RESPONDERMENSAJESINTEXTOMENSAJE")</span>
+                                            </a>
+                                        </li>
+
+                                    }
+                                    @* Acción reenviar *@
                                     <li>
                                         <a class="item-dropdown"
-                                           href="@Model.Url.Replace("?mensaje", "?responder&mensaje")"
-                                           title="@Html.GetText("CORREO", "RESPONDERMENSAJESINTEXTOMENSAJE")">
-                                            <span class="material-icons">reply</span>
-                                            <span>@Html.GetText("CORREO", "RESPONDERMENSAJESINTEXTOMENSAJE")</span>
+                                           href="@Model.Url.Replace("?mensaje", "?reenviar&mensaje")"
+                                           title="@Html.GetText("CORREO", "REENVIARMENSAJESINTEXTOMENSAJE")">
+                                            <span class="material-icons">forward</span>
+                                            <span>@Html.GetText("CORREO", "REENVIARMENSAJESINTEXTOMENSAJE")</span>
                                         </a>
                                     </li>
-
-                                }
-                                @* Acción reenviar *@
-                                <li>
-                                    <a class="item-dropdown"
-                                       href="@Model.Url.Replace("?mensaje", "?reenviar&mensaje")"
-                                       title="@Html.GetText("CORREO", "REENVIARMENSAJESINTEXTOMENSAJE")">
-                                        <span class="material-icons">forward</span>
-                                        <span>@Html.GetText("CORREO", "REENVIARMENSAJESINTEXTOMENSAJE")</span>
-                                    </a>
-                                </li>
-                                @* Acción responder a todos *@
-                                <li>
-                                    <a class="item-dropdown"
-                                        href="@Model.Url.Replace("?mensaje", "?responderATodos&mensaje")"
-                                        title="@Html.GetText("CORREO", "REENVIARMENSAJEATODOS")">
-                                        <span class="material-icons">reply_all</span>
-                                        <span>@Html.GetText("CORREO", "REENVIARMENSAJEATODOS")</span>
-                                    </a>
-                                </li>
-                                @* Acción eliminar *@
-                                <li>
-                                    <a 
-                                       class="item-dropdown deleteMessage"
-                                       data-toggle="modal"
-                                       data-target="#modal-container"
-                                       onclick="AccionFichaPerfil('Eliminar mensaje',
-                                                           '@Html.GetText("COMMON", "SI")',
-                                                           '@Html.GetText("COMMON", "NO")',
-                                                           '¿Estás seguro de eliminar el mensaje seleccionado?',
-                                                           '@Model.Key',
-                                                            function () {                                                            
-                                                                EliminarCorreoSeleccionado('@Model.Key');
-                                                            },
-                                                        '');
-                                        ">
-                                        <span class="material-icons">delete</span>
-                                        <span>Eliminar</span>
-                                    </a>
-                                </li>
-                            </ul>
+                                    @* Acción responder a todos *@
+                                    <li>
+                                        <a class="item-dropdown"
+                                            href="@Model.Url.Replace("?mensaje", "?responderATodos&mensaje")"
+                                            title="@Html.GetText("CORREO", "REENVIARMENSAJEATODOS")">
+                                            <span class="material-icons">reply_all</span>
+                                            <span>@Html.GetText("CORREO", "REENVIARMENSAJEATODOS")</span>
+                                        </a>
+                                    </li>
+                                    @* Acción eliminar *@
+                                    <li>
+                                        <a 
+                                           class="item-dropdown deleteMessage"
+                                           data-toggle="modal"
+                                           data-target="#modal-container"
+                                           onclick="AccionFichaPerfil('Eliminar mensaje',
+                                                               '@Html.GetText("COMMON", "SI")',
+                                                               '@Html.GetText("COMMON", "NO")',
+                                                               '@Html.GetText("COMMON","DESEASELIMINARELMENSAJESELECCIONADO")',
+                                                               '@Model.Key',
+                                                                function () {                                                            
+                                                                    EliminarCorreoSeleccionado('@Model.Key');
+                                                                },
+                                                            '');
+                                            ">
+                                            <span class="material-icons">delete</span>
+                                            <span>@Html.GetText("COMMON","Eliminar")</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </div>                
             </div>
 
             @* Vista preliminar descripción del mensaje *@
             <div class="desc descripcionResumida">
-                <p>                    
-                    @Html.Raw(@Html.CleanHtmlFromMultimediaItems(Model.Body))
+                <p>                                        
+                    @Html.Raw(Html.CleanHtmlInMessages(Model.Body))
                 </p>
             </div>
         </div>

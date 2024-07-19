@@ -1,4 +1,6 @@
-﻿@*
+﻿@model SendInvitationComViewModel
+
+@*
     Descripción
     -----------------------------------------------
     Vista modal que se utiliza para poder invitar a amigos a una comunidad.
@@ -25,9 +27,13 @@ string idButtonLitAniadirCorreo_invite_community = "litAniadirCorreo_invite_comm
 
 //Id del input vacío donde se añadirán los invitados para enviar el email.
 string idTxtHackInvitados_invite_community = "txtHackInvitados_invite_community";
+// Id del input vacío donde se añadirán los grupos 
+string idTxtHackGrupos_invite_community = "txtHackGrupos_invite_community";
 
 // Id de Contenedor general de destinatarios
 string idPanContenedorInvitados_invite_community = "panContenedorInvitados_invite_community";
+string idPanContenedorGrupos_invite_community = "panContenedorGrupos_invite_community";
+
 // Id de Contenedor donde irán los items seleccionados
 string idListaDestinatarios_invite_community = "lista-destinatarios_invite_community";
 // Id de Contenedor informativo de "No destinatarios"
@@ -39,6 +45,11 @@ string idBtnEnviarInvitaciones_invite_community = "btnEnviarInvitaciones_invite_
 string idPanelInfoInvitationSent_invite_community = "panelInfoInvitationSent_invite_community";
 // Etiqueta que indica si hay o no destinatarios seleccionados para enviar la invitación
 string idLblInfoCorreo_invite_community = "lblInfoCorreo_invite_community";
+
+// Id del input para personalizar mensaje a enviar en la invitación
+string idTxtNotas  = "txtNotas";
+// Id del input para buscar grupos de comnidad
+string idTxtFiltroGrupos = "txtFiltroGrupos";
 
 // Parametros para servicio autocompletar
 string idInpt_urlServicioAutocompletar_invite_community = "inpt_urlServicioAutocompletar";
@@ -80,17 +91,10 @@ string urlSendInvitation_invite_community = $"{@Html.GetComunidad().Url}/{@Html.
 }
 
 
-<div class="modal modal-top fade show"
-     tabindex="-1"
-     role="dialog"
-     id="modal-invite-community">
-
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
             @* Título del modal *@
             <div class="modal-header">
                 <p class="modal-title">
-                    <span class="material-icons">send</span>Invitar a comunidad
+                    <span class="material-icons">group_add</span>@Html.GetText("COMMON","INVITARACOMUNIDAD")
                 </p>
                 <span class="material-icons cerrar"
                       data-dismiss="modal"
@@ -99,83 +103,55 @@ string urlSendInvitation_invite_community = $"{@Html.GetComunidad().Url}/{@Html.
             <div class="modal-body">
                 <div class="formulario-edicion formulario-enviar">
 
-                    <div class="form-group mb-1">
+                    <div class="form-group mb-3">                                                
+                        <label class="control-label d-block">@Html.GetText("INVITACIONES", "INVITACIONESSEENVIANA")</label>                                                      
                         <div id="panDesplegableDestinatarios">
-                            @* Quitar Tabs ya que solo habrá una opción -> Invitar vía email
-                            <ul class="nav nav-tabs" id="myTab" role="tablist">
-                                @* Mostrar Tabs de "Destinatarios" dependiendo del tipo de comunidad  
-                                @if (Comunidad.AccessType == CommunityModel.TypeAccessProject.Public || Comunidad.AccessType == CommunityModel.TypeAccessProject.Restricted)
-                                {
-                                    <li class="nav-item">
-                                        <a class="nav-link active"
-                                           id="botonCorreos_invite_community"
-                                           data-toggle="tab"
-                                           href="#cuentas-correo_invite_community"
-                                           role="tab"
-                                           aria-controls="cuentas-correo_invite_community"
-                                           aria-selected="false">@Html.GetText("INVITACIONES", "INVITARAEXTERNOS")</a>
-                                    </li>
-                                }
-                                <li class="nav-item">
-                                    <a class="nav-link"
-                                       id="botonContactos_invite_community"
-                                       data-toggle="tab"
-                                       href="#miembros_invite_community"
-                                       role="tab"
-                                       aria-controls="miembros_invite_community"
-                                       aria-selected="true">@Html.GetText("INVITACIONES", "INVITARAUSUARIOS")</a>
-                                </li>
-                            </ul>
-                            *@
-
-                            <div class="tab-content">
-                                @* Panel para introducir correos DE MIS CONTACTOS 
-                                <div class="tab-pane fade active show"
-                                     id="miembros_invite_community"
-                                     role="tabpanel"
-                                     aria-labelledby="miembros-tab_invite_community">
-                                    <div class="filtroRapido">
-                                        <input type="text"
-                                               placeholder=""
-                                               onkeydown="if(event.which || event.keyCode){if ((event.which == 13) || (event.keyCode == 13)) {return false;}}"
-                                               id="@idTxtFiltro_invite_community"
-                                               class="form-control ac_input"
-                                               autocomplete="off" />
-                                        <span class="icon material-icons">search</span>
-                                    </div>
-                                </div>
-                                *@            
-
-                                @* Panel para introducir correos a enviar el recurso 
-                                <div class="tab-pane fade"
-                                     id="cuentas-correo_invite_community"
-                                     role="tabpanel"
-                                     aria-labelledby="cuentas-correo-tab_invite_community">*@
-                                    <div class="autocompletar autocompletar-tags form-group">
-                                        <div class="input-wrap form-sticky-button">
-                                            <input type="text"
-                                                   placeholder="Introduce los correos separados por comas y haz clic en añadir"
-                                                   id="@idTxtCorreoAInvitar_invite_community"
-                                                   class="form-control"
-                                                   autocomplete="off" />
-                                            <a id="@idButtonLitAniadirCorreo_invite_community"
-                                               class="btn btn-primary uppercase">Añadir</a>
-                                        </div>
-                                    </div>
-                                @*</div>*@
-                            </div>
+                             <div class="autocompletar autocompletar-tags form-group">
+                                 <div class="input-wrap form-sticky-button">
+                                     <input type="text"
+                                            placeholder="@Html.GetText("COMMON","INTRODUCELOSCORREOSSEPARADOSPORCOMASYHAZCLICENAÑADIR")"
+                                            id="@idTxtCorreoAInvitar_invite_community"
+                                            class="form-control"
+                                            autocomplete="off" />
+                                     <a id="@idButtonLitAniadirCorreo_invite_community"
+                                        class="btn btn-primary uppercase">@Html.GetText("COMMON","ANYADIRENMAYUSCULA")</a>
+                                 </div>
+                             </div>                                                           
                         </div>
                     </div>
 
                     @* Panel informativo de Destinatarios/No Destinatarios *@
-                    <div id="@idPanContenedorInvitados_invite_community" class="mb-4 @idPanContenedorInvitados_invite_community">
+                    <div id="@idPanContenedorInvitados_invite_community" class="mb-3 @idPanContenedorInvitados_invite_community">                        
                         @* Panel No Destinatarios *@
-                        <span id="@idNoDestinatarios_invite_community" class="@idNoDestinatarios_invite_community texto-gris-claro mb-3">Ningún destinatario añadido...</span>
+                        <span id="@idNoDestinatarios_invite_community" class="@idNoDestinatarios_invite_community texto-gris-claro mb-3">@Html.GetText("COMMON","NINGUNDESTINATARIOAÑADIDO")</span>
                         @* Panel con Destinatarios ELEGIDOS PARA ENVIAR *@
                         <span class="tag-list @idListaDestinatarios_invite_community" id="@idListaDestinatarios_invite_community">
                         </span>
                     </div>
 
+                    @* Permitir añadir grupos *@
+                    @if (Model.AllowGroupsInvitations)
+                    {                                                                               
+                        <div class="form-group mb-3">
+                            <label class="control-label d-block">@Html.Raw(Html.GetText("INVITACIONES", "SELECCIONAGRUPOS"))</label>   
+                             <div class="input-wrap">
+                                <input type="text" id="@idTxtFiltroGrupos" placeholder="@Html.GetText("CONTACTOS","GRUPO")" class="filtroFaceta ac_input form-control" autocomplete="off" />
+                            </div>
+                            <label class="control-label d-block mt-3">@Html.Raw(Html.GetText("INVITACIONES", "INVITACIONESSEENVIANAGRUPOS"))</label>
+                        </div>    
+                        @* Contenedor de grupos seleccionados *@
+                        <span class="tag-list mb-3" id="@idPanContenedorGrupos_invite_community"></span>
+                    }
+
+                    @* Posibilidad de personalización del mensaje a enviar *@
+                    @if(Model.AllowPersonlizeMessage)
+                    {
+                        <div class="form-group mb-3">
+                            <label class="control-label d-block">@Html.GetText("COMMON", "TITULONOTAPERS")</label>                            
+                            <textarea id="@idTxtNotas" class="cke mensajes" >@Model.Message</textarea>
+                        </div>
+                    }    
+                    
                     @* Mensaje de error de detección de emails a enviar*@
                     <div style="display: none" id="@idPanelInfoInvitationSent_invite_community">
                         <p>
@@ -185,6 +161,8 @@ string urlSendInvitation_invite_community = $"{@Html.GetComunidad().Url}/{@Html.
 
                     @* Input que guardará los correos/contactos seleccionados*@
                     <input type="hidden" id="@idTxtHackInvitados_invite_community" />
+                    @* Input que guardará los los grupos invitados *@
+                    <input type="hidden" id="@idTxtHackGrupos_invite_community" />
 
                     @* Panel para aceptar/enviar email *@
                     <div class="form-actions">
@@ -192,35 +170,40 @@ string urlSendInvitation_invite_community = $"{@Html.GetComunidad().Url}/{@Html.
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
 
 <script type="text/javascript">
-    // Gestión de operativa de enviar invitaciones de una comunidad
-    const pParamsInviteCommunity = {
-        idTxtFiltro: "@idTxtFiltro_invite_community",
-        idTxtCorreoAInvitar: "@idTxtCorreoAInvitar_invite_community",
-        idButtonLitAniadirCorreo: "@idButtonLitAniadirCorreo_invite_community",
-        idTxtHackInvitados: "@idTxtHackInvitados_invite_community",
-        idPanContenedorInvitados: "@idPanContenedorInvitados_invite_community",
-        idListaDestinatarios: "@idListaDestinatarios_invite_community",
-        idNoDestinatarios: "@idNoDestinatarios_invite_community",
-        idBtnEnviarInvitaciones: "@idBtnEnviarInvitaciones_invite_community",
-        idPanelInfoInvitationSent: "@idPanelInfoInvitationSent_invite_community",
-        idLblInfoCorreo: "@idLblInfoCorreo_invite_community",
-        urlSend: "@urlSendInvitation_invite_community",
-        autocompleteParams: {
-            identidad: "@IdentidadActual.KeyIdentity",
-            identidadMyGnoss: "@IdentidadActual.KeyMetaProyectIdentity",
-            identidadOrg: "@identidadOrg_invite_community",
-            proyecto: "@Comunidad.Key",
-            idInpt_urlServicioAutocompletar: "@idInpt_urlServicioAutocompletar_invite_community",
-            metodo: "@metodoEnvio_invite_community",
-            isEcosistemasinMetaProyecto: @isEcosistemaSinMetaProyecto_invite_community,
-            esPrivada: @boolPrivada_invite_community,
-        }
-    };
-    // Gestión de operativa para cambio de contraseña
-    operativaEnviarResource_Link_Community_Invitation.init(pParamsInviteCommunity);
+
+    (function ($) {
+        // Gestión de operativa de enviar invitaciones de una comunidad
+        const pParamsInviteCommunity = {
+            idTxtFiltro: "@idTxtFiltro_invite_community",
+            idTxtCorreoAInvitar: "@idTxtCorreoAInvitar_invite_community",
+            idButtonLitAniadirCorreo: "@idButtonLitAniadirCorreo_invite_community",
+            idTxtHackInvitados: "@idTxtHackInvitados_invite_community",
+            idTxtHackGrupos_invite_community: "@idTxtHackGrupos_invite_community",
+            idPanContenedorInvitados: "@idPanContenedorInvitados_invite_community",
+            idPanContenedorGrupos: "@idPanContenedorGrupos_invite_community",
+            idListaDestinatarios: "@idListaDestinatarios_invite_community",
+            idNoDestinatarios: "@idNoDestinatarios_invite_community",
+            idBtnEnviarInvitaciones: "@idBtnEnviarInvitaciones_invite_community",
+            idPanelInfoInvitationSent: "@idPanelInfoInvitationSent_invite_community",
+            idLblInfoCorreo: "@idLblInfoCorreo_invite_community",
+            urlSend: "@urlSendInvitation_invite_community",
+            idTxtNotas: "@idTxtNotas",
+            idTxtFiltroGrupos: "@idTxtFiltroGrupos",
+            autocompleteParams: {
+                identidad: "@IdentidadActual.KeyIdentity",
+                identidadMyGnoss: "@IdentidadActual.KeyMetaProyectIdentity",
+                identidadOrg: "@identidadOrg_invite_community",
+                proyecto: "@Comunidad.Key",
+                idInpt_urlServicioAutocompletar: "@idInpt_urlServicioAutocompletar_invite_community",
+                metodo: "@metodoEnvio_invite_community",
+                isEcosistemasinMetaProyecto: @isEcosistemaSinMetaProyecto_invite_community,
+                esPrivada: @boolPrivada_invite_community,
+            }
+        };
+        // Gestión de operativa para cambio de contraseña
+        operativaEnviarResource_Link_Community_Invitation.init(pParamsInviteCommunity);
+    })();
+
 </script>

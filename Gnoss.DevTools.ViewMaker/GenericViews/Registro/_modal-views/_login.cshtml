@@ -51,8 +51,8 @@ bool showModalLogin = true;
                     <div id="content">
                         @* Header del Modal *@
                         <div class="modal-header">
-                            <p class="modal-title">                        
-                                Inicia sesión o regístrate
+                            <p class="modal-title">                                                        
+                                @Html.GetText("COMMON","INICIASESIONOREGISTRATE")
                             </p>
                             <span class="material-icons cerrar" data-dismiss="modal" aria-label="Close">close</span>
                         </div>
@@ -60,25 +60,26 @@ bool showModalLogin = true;
                         <div class="modal-body">
                             <form method="post"
                                   id="formPaginaLogin"
+                                  class="formPaginaLogin"
                                   action="@Html.GetUrlActionLogin()">
                                 <div class="fieldset fieldset01">
                                     <fieldset>
                                         <div class="fieldsetContent">
                                             <div class="form-group">
                                                 <label for="usuario_Login" class="control-label">@Html.GetText("LOGIN", "NOMBREUSUARIOOCORREO")</label>
-                                                <input placeholder="Introduce tu correo electrónico"
+                                                <input placeholder="@Html.GetText("COMMON","INTRODUCETUCORREOELECTRONICO")"
                                                        type="text"
                                                        name="usuario"
                                                        id="usuario_Login"
-                                                       class="form-control" />
+                                                       class="form-control usuario_Login " />
                                             </div>
                                             <div class="form-group">
                                                 <label for="password_login" class="control-label">@Html.GetText("LOGIN", "CONTRASEÑA")</label>
-                                                <input placeholder="Introduce tu contraseña"
+                                                <input placeholder="@Html.GetText("COMMON","INTRODUCETUCONTRASEÑA")"
                                                        type="password"
                                                        name="password"
                                                        id="password_login"
-                                                       class="form-control" />
+                                                       class="form-control password_login" />
                                             </div>
                                             @{                                        
                                                 if (IdentidadActual.IsGuestUser && !string.IsNullOrEmpty(@Html.GetTokenLoginUsuario()) && IdentidadActual.NumberOfLoginAttemptsIP >= 2)
@@ -87,24 +88,24 @@ bool showModalLogin = true;
                                                     <p id="panCaptcha">
                                                         <label>
                                                             @Html.GetText("LOGIN", "TEXTOCAPTCHA")
-                                                            <img id="imgCaptcha" src="@srcCaptcha" />
+                                                            <img id="imgCaptcha" src="@srcCaptcha" class="imgCaptcha" />
                                                         </label>
-                                                        <input name="captcha" type="captcha" id="captcha" class="text medium" onkeydown="if(event.which || event.keyCode){if ((event.which == 13) || (event.keyCode == 13)) {Entrar(); return false;}}" />
+                                                        <input name="captcha" type="captcha" id="captcha" class="text medium captcha" onkeydown="if(event.which || event.keyCode){if ((event.which == 13) || (event.keyCode == 13)) {Entrar(); return false;}}" />
                                                     </p>
                                                 }
                                             }
-                                            <div id="loginError" class="error-wrap">
-                                                <div class="ko">
+                                            <div id="loginError" class="error-wrap loginError">
+                                                <div class="ko loginErrorKo">
                                                     <p id="mensajeError">@Html.GetText("LOGIN", "CLAVEERRONEA")</p>
                                                 </div>
                                             </div>
-                                            <div id="loginErrorAutenticacionExterna" class="error-wrap">
-                                                <div class="ko">
+                                            <div id="loginErrorAutenticacionExterna" class="error-wrap loginError">
+                                                <div class="ko loginErrorAutenticacionExternaKo">
                                                     <p>@Html.GetText("LOGIN", "AUTENTICACIONEXTERNA")</p>
                                                 </div>
                                             </div>
-                                            <div id="logintwice" class="error-wrap">
-                                                <div class="ko">
+                                            <div id="logintwice" class="error-wrap loginError">
+                                                <div class="ko logintwiceKo">
                                                     <p id="mensajeErrorLoginTwice">@Html.GetText("LOGIN", "LOGINTWICE", @Html.GetSessionTimeout())</p>
                                                 </div>
                                             </div>
@@ -125,7 +126,7 @@ bool showModalLogin = true;
                                             @* Link para recuperar contraseña olvidada *@
                                             <a class="olvidaste-password mb-2" href="@Comunidad.Url/@Html.GetText("URLSEM", "OLVIDEPASSWORD")">@Html.GetText("INICIO", "OLVIDOPASSWORD")</a>
 
-                                            <input class="principal submit btn btn-primary"
+                                            <input class="principal submit btn btn-primary btnSubmit"
                                                    id="btnSubmit"                                                                                    
                                                    title="@Html.GetText("COMMON", "INICIARSESION")"
                                                    value="@Html.GetText("COMMON", "INICIARSESION")" />
@@ -141,12 +142,12 @@ bool showModalLogin = true;
 
                                                     if (Comunidad.AccessType == CommunityModel.TypeAccessProject.Restricted && (!Comunidad.MetaProyect))
                                                     {
-                                                        <span>Si todavía no tienes cuenta</span>
+                                                        <span>@Html.GetText("COMMON","SITODAVIANOTIENESCUENTA")</span>
                                                         <a class="olvidaste-password" href="@Comunidad.Url/@Html.GetText("URLSEM", "SOLICITARACCESO")">@Html.GetText("COMINICIOLOGIN", "SOLICITARACCESO")</a>
                                                     }
                                                     else if (Comunidad.AccessType == CommunityModel.TypeAccessProject.Public && (!Comunidad.MetaProyect))
                                                     {
-                                                        <span>Si todavía no tienes cuenta</span>
+                                                        <span>@Html.GetText("COMMON","SITODAVIANOTIENESCUENTA")</span>
                                                         <a class="olvidaste-password" href="@Comunidad.Url/@Html.GetText("URLSEM", "HAZTEMIEMBRO")">@Html.GetText("COMINICIOLOGIN", "HACERSEMIEMBRO")</a>
                                                     }
                                                 }

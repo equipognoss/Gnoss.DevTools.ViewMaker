@@ -1,0 +1,55 @@
+﻿@*
+Descripción
+----------------------------------------------------------------
+Vista que mostrará las comunidades del usuario o los cursos o recursos que se deseen listar en caso de ser personalizados por el desarrollador.
+Estos items se mostrarán en el panel lateral del usuario, a modo de "group-collapsed"
+
+@*
+Variables
+----------------------------------------------------------------
+*@
+@{ 
+    UserProfileModel perfil = Html.GetPerfil();
+    // Controlar el nº de Comunidades a mostrar para que no quede demasiado largo
+    int numMaxCommunitiesToDisplay = 5;
+    int contCommunity = 0;
+}
+
+<div class="group-collapse comunidades">
+    <a href="#comunidades" data-toggle="collapse" aria-expanded="true">@Html.GetText("COMMON", "MISCOMUNIDADES")</a>
+    <div id="comunidades" class="collapse show">
+        <ul class="pmd-sidebar-nav">
+            @if (perfil.IsClassAdministrator && perfil.TypeProfile.Equals(ProfileType.Teacher))
+            {
+                <li class="usuarioClases">
+                    <a href="@perfil.Url@Html.GetText("URLSEM", "VERCLASESADMINISTRO")">@Html.GetText("ADMINISTRARCLASES", "MISCLASES")</a>
+                </li>
+            }
+            @* Listado cada item de Comunidades del usuario *@
+            @{
+                List<UserProfileModel.ProfileCommunitiesModel> masUsados = perfil.Communities.OrderByDescending(comunidadPerfil => comunidadPerfil.NumberOfConnections).Take(10).ToList();
+
+                foreach (UserProfileModel.ProfileCommunitiesModel comunidadPerfil in masUsados.OrderBy(comunidadPerfil => comunidadPerfil.Name))
+                {
+                    string clase = "abierta";
+                    if (comunidadPerfil.Type == 1 || comunidadPerfil.Type == 3) { clase = "cerrada"; }
+                    @* Mostrar como máximo 5 comunidades *@
+                    if (contCommunity < numMaxCommunitiesToDisplay)
+                    {
+                        <li class="@clase">
+                            <a href="@comunidadPerfil.Url" title="@comunidadPerfil.Name">
+                                <span class="icono"></span>
+                                @Html.AcortarTexto(comunidadPerfil.Name, 29)
+                            </a>
+                        </li>
+                        contCommunity += 1;
+                    }
+                }
+            }
+            <li class="ver">
+                <a href="@perfil.Url@Html.GetText("URLSEM", "MISCOMUNIDADES")">@Html.GetText("INICIO", "VERTODOS")</a>
+            </li>
+        </ul>
+    </div>
+</div>
+

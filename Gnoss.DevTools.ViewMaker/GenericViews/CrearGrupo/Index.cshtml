@@ -120,7 +120,7 @@ else
                 <label id="lblDescripcion" class="control-label d-block" for="txtDescripcion">@Html.GetText("PERFILBASESUBIRRECURSO", "DESCRIPCION")</label>
                 @* TextArea de Descripción *@
                 <div id="divDescripcion">
-                    <textarea rows="2" cols="20" class="cke ckeSimple recursos" id="txtDescripcion" name="txtDescripcion" style="visibility: hidden; display: none;">@(descripcion.Equals(string.Empty)?"":descripcion)</textarea>
+                    <textarea rows="2" cols="20" class="cke ckeSimple recursos" id="txtDescripcion" name="txtDescripcion" style="visibility: hidden;">@(descripcion.Equals(string.Empty)?"":descripcion)</textarea>
                     <input type="text" style="display: none;" id="txtHackTagsDescripcion" name="txtHackTagsDescripcion">
                 </div>
             </div>
@@ -132,14 +132,14 @@ else
                     <div class="input-wrap form-sticky-button autocompletar" onclick="$('#txtTags').focus();">
                         @* Input de Tags *@
                         <input type="text"
-                               placeholder="Introduce una etiqueta y pulsa AÑADIR"
+                               placeholder="@Html.GetText("COMMON","INTRODUCEUNAETIQUETAYPULSAAÑADIR")"
                                id="txtTags"
                                class="form-control txtAutocomplete"
                                value="@(tags.Equals(string.Empty)?"":tags)"
                                autocomplete="off" />
 
                         @* Botón de Añadir Etiqueta/Tag *@
-                        <a href="" id="anadir-tag" class="btn btn-grey uppercase">Añadir</a>
+                        <a href="#" id="anadir-tag" class="btn btn-grey uppercase">Añadir</a>
 
                         @* Campo oculto que almacenará los Tags del recurso *@
                         <input type="hidden" id="txtTags_Hack" />

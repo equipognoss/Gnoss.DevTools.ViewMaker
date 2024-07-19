@@ -1,0 +1,37 @@
+﻿@model List<SemanticPropertyModel.PropertyValue>
+
+
+@foreach (SemanticPropertyModel.PropertyValue propertyValue in Model)
+{
+    string idHijo = null;
+
+    if (propertyValue.ThesaurusSemanticTreeChildren != null && propertyValue.ThesaurusSemanticTreeChildren.Count > 0)
+    {
+        idHijo = "hijo_" + Guid.NewGuid().ToString();
+    }
+
+    <li>
+        @if (idHijo != null)
+        {
+            string srcImg = Html.GetBaseUrlStatic() + "/img/verMenos.gif";
+            <a onclick="DesplegarImgMas(this, '@idHijo')"><img class="imgMas" alt="-" src="@srcImg" /></a>
+        }
+        @if (!string.IsNullOrEmpty(propertyValue.UrlAuxiliaryLinkControl))
+        {
+            <a href="@propertyValue.UrlAuxiliaryLinkControl">@propertyValue.Value</a>
+        }
+        else
+        {
+            <span>@propertyValue.Value</span>
+        }
+    </li>
+
+    if (idHijo != null)
+    {
+        <li id="@idHijo">
+            <ul>
+                @Html.PartialView("../Shared/SemCMS/_AddThesaurusSemanticTreeChildren", propertyValue.ThesaurusSemanticTreeChildren)
+            </ul>
+        </li>
+    }
+}

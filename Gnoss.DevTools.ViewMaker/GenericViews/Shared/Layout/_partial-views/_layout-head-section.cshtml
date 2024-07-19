@@ -6,41 +6,41 @@ Variables
 ----------------------------------------------------------------
 *@
 @{
-CommunityModel Comunidad = Html.GetComunidad();
+    CommunityModel Comunidad = Html.GetComunidad();
 }
 @*
 -------------------- Sección <head> del proyecto web --------------------*@
 
-    @* Carga de información relativa al Proyecto (Begin) *@    
-    @if (Comunidad != null && Comunidad.ProjectExtraHTMLList != null)
-    {
-        @Html.PartialView("../Shared/ProyectoElementoHTML", Comunidad.ProjectExtraHTMLList.Where(a => a.Ubication == UbicacionHtmlProyecto.BeginHead).ToList())
-    }    
+@* Carga de información relativa al Proyecto (Begin) *@
+@if (Comunidad != null && Comunidad.ProjectExtraHTMLList != null)
+{
+    @Html.PartialView("../Shared/ProyectoElementoHTML", Comunidad.ProjectExtraHTMLList.Where(a => a.Ubication == UbicacionHtmlProyecto.BeginHead).ToList())
+}
 
-    @* Carga de ficheros Metas *@
-    @Html.PartialView("../Shared/Head/_Metas")
+@* Carga de ficheros Metas *@
+@Html.PartialView("../Shared/Head/_Metas")
 
 
-    @* Título de la página actual + Favicon*@
-    <title>@Html.GetTituloPagina()</title>
-    <link id="IMGfavicon" rel="shortcut icon" type="image/ico" href="@Html.GetFavicon()" />
+@* Título de la página actual + Favicon*@
+<title>@Html.GetTituloPagina()</title>
+<link id="IMGfavicon" rel="shortcut icon" type="image/ico" href="@Html.GetFavicon()" />
 
-    @* Vista parcial para cargar información relativa a SEO (Seo, Canonical...) *@    
-    @Html.PartialView("../Shared/Layout/_partial-views/_layout-seo-canonical")
+@* Vista parcial para cargar información relativa a SEO (Seo, Canonical...) *@
+@Html.PartialView("../Shared/Layout/_partial-views/_layout-seo-canonical")
 
-    @if (!string.IsNullOrEmpty(Html.GetURLRDF()))
-    {
-        <link rel="alternate" type="application/rdf+xml" href="@Html.GetURLRDF()" />
-    }
+@if (!string.IsNullOrEmpty(Html.GetURLRDF()))
+{
+    <link rel="alternate" type="application/rdf+xml" href="@Html.GetURLRDF()" />
+}
 
-    @* Carga de Hojas de estilo para la Web *@
-    @Html.PartialView("../Shared/Head/_HojasDeEstilo")
+@* Carga de Hojas de estilo para la Web *@
+@Html.PartialView("../Shared/Head/_HojasDeEstilo")
 
-    @* Carga de Hojas JS para la Web *@
-    @Html.PartialView("../Shared/Head/_FicherosJavascript")
+@* Carga de Hojas JS para la Web *@
+@Html.PartialView("../Shared/Head/_FicherosJavascript")
 
-    @* Carga de información relativa al Proyecto (End) *@    
-    @if (Comunidad != null && Comunidad.ProjectExtraHTMLList != null)
-    {
-        @Html.PartialView("../Shared/ProyectoElementoHTML", Comunidad.ProjectExtraHTMLList.Where(a => a.Ubication == UbicacionHtmlProyecto.EndHead).ToList())
-    }                  
+@* Carga de información relativa al Proyecto (End) *@
+@if (Comunidad != null && Comunidad.ProjectExtraHTMLList != null)
+{
+    @Html.PartialView("../Shared/ProyectoElementoHTML", Comunidad.ProjectExtraHTMLList.Where(a => a.Ubication == UbicacionHtmlProyecto.EndHead).ToList())
+}

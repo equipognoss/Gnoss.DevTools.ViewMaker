@@ -1,0 +1,85 @@
+﻿@model SharedSemCms
+
+@{
+
+    Es.Riam.Semantica.OWL.Propiedad mPropiedad = Model.semanticPropertyModel.Element.Propiedad;
+    string titulo = null;
+    string classTitle = "lb lb_" + mPropiedad.NombreGeneracionClases;
+
+    if (Model.pTipoCampo == 0 && !string.IsNullOrEmpty(Model.pRecLink.TitleLabel))
+    {
+        titulo = Model.pRecLink.TitleLabel;
+        classTitle += "_TituloDoc";
+    }
+    else if (Model.pTipoCampo == 1 && !string.IsNullOrEmpty(Model.pRecLink.ImageUrlLabel))
+    {
+        titulo = Model.pRecLink.ImageUrlLabel;
+        classTitle += "_ImagenDoc";
+    }
+    else if (Model.pTipoCampo == 2 && !string.IsNullOrEmpty(Model.pRecLink.DescriptionLabel))
+    {
+        titulo = Model.pRecLink.DescriptionLabel;
+        classTitle += "_DescripcionDoc";
+    }
+    else if (Model.pTipoCampo == 3 && !string.IsNullOrEmpty(Model.pRecLink.AuthorsLabel))
+    {
+        titulo = Model.pRecLink.AuthorsLabel;
+        classTitle += "_AutoresDoc";
+    }
+
+    if (!string.IsNullOrEmpty(titulo))
+    {
+        <strong class="@classTitle">@titulo</strong>
+    }
+
+    string href = "";
+    string target = "";
+
+    if (!Model.semanticPropertyModel.EntityParent.SemanticResourceModel.HideInfoIsNotMember)
+    {
+        href = Model.pRecLink.Link;
+
+        if (mPropiedad.EspecifPropiedad.SelectorEntidad.NuevaPestanya)
+        {
+            target = "target=\"_blank\"";
+        }
+    }
+
+    <span class="values">
+        @if (Model.pTipoCampo == 0)
+        {
+            <a class="value" href="@href" @Html.Raw(target)>@Model.pRecLink.Title</a>
+        }
+        else if (Model.pTipoCampo == 1)
+        {
+            <a class="value" href="@href" @Html.Raw(target)>
+                <img class="value" src="@Model.pRecLink.ImageUrl" alt="@Model.pRecLink.Title" />
+            </a>
+        }
+        else if (Model.pTipoCampo == 2)
+        {
+            <div>@Html.Raw(Model.pRecLink.Description)</div>
+        }
+        else if (Model.pTipoCampo == 3)
+        {
+            bool agregarComa = false;
+            <span class="value">
+                @foreach (string autor in Model.pRecLink.Authors.Keys)
+                {
+                    if (agregarComa)
+                    {
+                        @Html.Raw(",")
+                    }
+
+                    <a href="@Model.pRecLink.Authors[autor]" @Html.Raw(target)>@autor</a>
+
+                    agregarComa = true;
+                }
+            </span>
+        }
+    </span>
+
+
+}
+
+

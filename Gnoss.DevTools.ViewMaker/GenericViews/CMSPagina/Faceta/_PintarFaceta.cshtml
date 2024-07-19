@@ -1,0 +1,74 @@
+﻿@model CMSComponentFacet
+
+<div id="facetedSearch" class="facetedSearch">
+    @if (Model.FacetModel.ThesaurusID != Guid.Empty)
+    {
+        string contenidoID = "contenido_" + Model.FacetModel.Key;
+        if (Model.FacetModel.ThesaurusID != ProyectoAD.MetaProyecto)
+        {
+            contenidoID += "_" + Model.FacetModel.ThesaurusID.ToString().ToUpper();
+        }
+
+        <div id="@contenidoID">
+            <div id="@contenidoID">
+                <div class="box" id="@Model.FacetModel.Key">
+                    @if (!string.IsNullOrEmpty(Model.Title))
+                    {
+                        <span class="faceta-title">@Model.Title</span>
+                    }
+                    else
+                    {
+                        <span class="faceta-title">@Model.FacetModel.Name</span>
+                    }
+                    @Html.PartialView("../CMSPagina/Faceta/_PintarCajaBusqueda", Model)
+                    <div class="section">
+                        <ul class="listadoFacetas">
+                            @foreach (FacetItemModel item in Model.FacetModel.FacetItemList)
+                            {
+                                @Html.PartialView("../CMSPagina/Faceta/_PintarItemFaceta", item)
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        string noCollapse = "";
+        string ulClass = "";
+        if (Model.FacetModel.Key == "rdf_type")
+        {
+            noCollapse = "noCollapse";
+        }
+        else
+        {
+            ulClass = "listadoFacetas";
+        }
+
+        string contenidoOut = "out_" + Model.FacetModel.Key;
+        string contenidoIn = "in_" + Model.FacetModel.Key;
+        <div id="@contenidoOut">
+            <div id="@contenidoIn">
+                <div class="box @noCollapse" id="@Model.FacetModel.Key">
+                    @if (!string.IsNullOrEmpty(Model.Title))
+                    {
+                        <span class="faceta-title">@Model.Title</span>
+                    }
+                    else
+                    {
+                        <span class="faceta-title">@Model.FacetModel.Name</span>
+                    }
+                    @Html.PartialView("../CMSPagina/Faceta/_PintarCajaBusqueda", Model)
+                    <ul class="@ulClass">
+                        @foreach (FacetItemModel item in Model.FacetModel.FacetItemList)
+                        {
+                            @Html.PartialView("../CMSPagina/Faceta/_PintarItemFaceta", item)
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    }
+</div>
