@@ -9,8 +9,10 @@
 *@
 @{
     // Información de aviso de cookies para mostrar o no el panel
+    CommunityModel Comunidad = Html.GetComunidad();
     string avisoCookies = Html.GetCookiesWarning();
-
+    string rutaCookies = Comunidad.Url + "/" + Html.GetText("URLSEM", "POLITICACOOKIES");
+    string textoPoliticaCookies = Html.GetCookiesText();
 }
 
 @*
@@ -25,16 +27,23 @@
         <div class="contenido">
             @* Contenedor informativo de gestión de Cookies *@
             <div class="box aviso">
-                <p class="titulo">Uso de cookies</p>
+                <p class="titulo">@Html.GetText("POLITICACOOKIES", "TITULO")</p>
+                @if (!string.IsNullOrEmpty(textoPoliticaCookies))
+                {
+                   @Html.Raw(textoPoliticaCookies);
+                }
+                else
+                {
                 <p>
                     GNOSS usa cookies, propias y de terceros, con finalidad principalmente
                     técnica y necesaria para prestación de nuestros servicios y mostrarles
-                    contenido relevante. Más información en nuestra política de cookies.
+                    contenido relevante. Más información en nuestra <a href="@rutaCookies" target="_blank">política de cookies</a>.
                 </p>
                 <p>
                     ACEPTA para confirmar que has leído la información y aceptado su
                     instalación. Puedes modificar la configuración de tu navegador.
                 </p>
+                }            
             </div>
             @* Panel donde se mostrará posible error al guardar cookie*@
             <div id="modal-accept-coookie-wrapper" class="mt-2">
@@ -59,8 +68,7 @@
 }
 
 <script>
-    function MostrarConfiguracion() {
-        var selected = $("#modificarcookie").val();
+    function MostrarConfiguracion() {        
         $("#divAvisoCookie").hide();
         $('#modalAvisoCookies').show();
     }

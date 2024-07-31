@@ -1,0 +1,64 @@
+﻿@model RegistrarOrgViewModel;
+@{
+    string jsExtra = Html.GetJSExtra();
+    UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+}
+
+@*
+    ----------------------------------------------------------------
+    -------------------- Vista para crear una organización --------------------
+*@
+
+@{
+    Html.SetBodyClass("layout02 comunidad listado comGnoss");
+
+    Html.SetPintarH1(false);
+}
+
+<div class="row">
+    <div class="col">
+        <form method="post" action="registrar-org/create">
+            <div class="form panel-centrado">
+                <h1>@Model.PageName</h1>
+
+                <div class="form-group">
+                    <label for="nombre_corto" class="control-label">@Html.GetText("COMADMINPESTANYAS", "NOMBRECORTO")</label>
+                    <input name="nombre_corto"
+                           type="text"
+                           placeholder="@Html.GetText("COMADMINPESTANYAS", "NOMBRECORTO")"
+                           id="nombre_corto"
+                           class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label for="" class="control-label">@Html.GetText("COMADMINPESTANYAS", "NOMBRE")</label>
+                    <input name="@Html.GetText("COMADMINPESTANYAS", "NOMBRE")"
+                           type="text"
+                           placeholder="@Html.GetText("COMADMINPESTANYAS", "NOMBRE")"
+                           id="nombre"
+                           class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <input class="principal submit btn btn-primary"
+                           type="submit"
+                           id="btnCrearOrganizacion"
+                           value="@Html.GetText("COMMON", "CREAR")" />
+                </div>
+
+                @if (Model.Error)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        Error
+                    </div>
+                }
+                else if (Model.Success)
+                {
+                    <div class="alert alert-success" role="alert">
+                        Ok
+                    </div>
+                }
+            </div>
+        </form>
+    </div>
+</div>

@@ -25,14 +25,9 @@
 
     @Html.PartialView("EditorTesauro/_EditorTesauro", Model.ThesaurusEditorModel)
 
-    @* Botón para guardar los items
-        <div class="form-actions">
-            <a href="#" class="btn btn-primary text-uppercase">@Html.GetText("COMMON", "GUARDAR")</a>
-        </div>
-    *@
 
-    @* Inicializar los SELECT js-select ya que son creadod dinámicamente *@
-    <div class="acciones">
+    @* Inicializar los SELECT js-select ya que son creados dinámicamente *@
+    <div class="acciones mt-4">
         <a id="btnGuardarInf" class="btn btn-primary text-uppercase guardar">@Html.GetText("COMMON", "GUARDAR")</a>
         <a id="btnCancelarInf" class="btn btn-link text-uppercase volver pl-3">@Html.GetText("COMMON", "CANCELAR")</a>
     </div>

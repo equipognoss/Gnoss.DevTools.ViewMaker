@@ -1,0 +1,64 @@
+﻿@model PintarCategoriaEditorTesauro
+@*
+Descripción
+-----------------------------------------------
+Vista para pintar categorías sugeridas. Esta vista es utilizada en la sección de "Comunidad -> Categorias" donde se muestran categorías sugeridas por los usuarios de la comundiad.
+
+Variables
+----------------------------------------------------------------
+*@
+
+@{
+
+
+
+}
+@*
+----------------------------------------------------------------
+-------------------- Vista para gestionar el pintado de las categorías sugeridas a partir del Tesauro --------------------
+*@
+
+<li class="component-wrap bg-light text-dark">
+	<div class="component type-category" data-component-type="category" data-categoryname="@Model.categoryModel.Name" data-id="@Model.categoryModel.Key">
+		@* Contenedor de cada item de lista de categorías *@
+		<div class="component-header-wrap">
+			@* Header de cada item de la lista de categorías *@
+			<div class="component-header">
+				@* Contenedor de las acciones de la categoría + Nombre de la categoría *@
+				<div class="component-header-content">
+					@* Sección del nombre de la categoría + Desplegable de subcategorías *@
+					<div class="component-header-left">
+						<div class="component-name-wrap">
+							<span class="component-icon"></span>
+							@* Nombre de la categoría *@
+							<span class="component-name" data-categoryname="@Model.categoryModel.Name" data-categoryid="@Model.categoryModel.Key">@Model.categoryModel.Name</span>											
+						</div>
+					</div>
+					@* Contenedor de acciones del item de la categoría (Editar, Crear nueva subcategoría, Eliminar) *@
+					<div class="component-header-right">
+						<div class="component-actions-wrap">
+							<ul class="no-list-style component-actions">
+								<li>
+									@* Botón de Aceptar Categoría Sugerida *@
+									<a 	class="btn btn-outline-grey btnAcceptCategorySuggested"
+										data-categoryid="@Model.categoryModel.Key" 
+										data-categoryname="@Model.categoryModel.Name">
+										@Html.GetText("COMMON","ACEPTAR")
+									</a>
+								</li>
+								<li>
+									@* Botón de Cancelar Categoría Sugerida *@
+									<a	class="btn btn-outline-grey ml-3 btnRejectCategorySuggested"
+										data-categoryid="@Model.categoryModel.Key" 
+										data-categoryname="@Model.categoryModel.Name">
+										@Html.GetText("COMMON","RECHAZAR")
+									</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</li>

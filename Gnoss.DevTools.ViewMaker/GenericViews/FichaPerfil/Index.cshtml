@@ -1,37 +1,37 @@
 ﻿@model ProfilePageViewModel
 @*
-    Descripción
-    -----------------------------------------------
-    Vista principal que engloba las posibles subvistas para ver la información de un perfil de usuario de una comunidad.
+Descripción
+-----------------------------------------------
+Vista principal que engloba las posibles subvistas para ver la información de un perfil de usuario de una comunidad.
 
-    Variables
-    ----------------------------------------------------------------
+Variables
+----------------------------------------------------------------
 *@
 @{
-    //Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/ckeditor.js?v=" + Html.GetVersion());
-    //Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/adapters/jquery.js?v=" + Html.GetVersion());
+//Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/ckeditor.js?v=" + Html.GetVersion());
+//Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/adapters/jquery.js?v=" + Html.GetVersion());
 
-    ProfileModel Perfil = Model.Profile;
-    CommunityModel Comunidad = Html.GetComunidad();
-    UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+ProfileModel Perfil = Model.Profile;
+CommunityModel Comunidad = Html.GetComunidad();
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
 
-    string nombreCompleto = Html.ObtenerNombreCompletoDeFichaIdentidad(Perfil);
+string nombreCompleto = Html.ObtenerNombreCompletoDeFichaIdentidad(Perfil);
 
-    // Nº de Seguidores y Seguidos
-    var numFollowers = $"{(Model.ProfileFollowers != null ? Model.ProfileFollowers.Count : 0)}";
-    var numFollowed = $"{(Model.ProfileFollowed != null ? Model.ProfileFollowed.Count : 0)}";
-    // Fotografía del usuario (Se cargará la anónima o la del usuario)
-    var urlFoto = "";
-    // País y Localidad del usuario
-    var provinceAndCountryExtraInfo = "";
-    // Nº de contribuciones del usuario
-    int userContributions = 0;
+// Nº de Seguidores y Seguidos
+var numFollowers = $"{(Model.ProfileFollowers != null ? Model.ProfileFollowers.Count : 0)}";
+var numFollowed = $"{(Model.ProfileFollowed != null ? Model.ProfileFollowed.Count : 0)}";
+// Fotografía del usuario (Se cargará la anónima o la del usuario)
+var urlFoto = "";
+// País y Localidad del usuario
+var provinceAndCountryExtraInfo = "";
+// Nº de contribuciones del usuario
+int userContributions = 0;
 
-    // URL icono de la red del usuario para mostrar el icono. Si no es Linkedin, Twitter o Facebook (CSS), será necesario mostrar el icono de la web
-    bool containsSocialUrlIcon = false;
+// URL icono de la red del usuario para mostrar el icono. Si no es Linkedin, Twitter o Facebook (CSS), será necesario mostrar el icono de la web
+bool containsSocialUrlIcon = false;
 
-    // Controlar si dispone o no de fotografía el usuario
-    bool containsUrlFoto = true;
+// Controlar si dispone o no de fotografía el usuario
+bool containsUrlFoto = true;
 
 }
 
@@ -57,21 +57,20 @@ else
 @if (!string.IsNullOrEmpty(Perfil.ExtraInfo.ProvinceOrState) || !string.IsNullOrEmpty(Perfil.ExtraInfo.Country))
 {
     string separador = "";
-    if (!string.IsNullOrEmpty(Perfil.ExtraInfo.ProvinceOrState))
+    if (!string.IsNullOrEmpty(Perfil.ExtraInfo.ProvinceOrState) && Perfil.ExtraInfo.ProvinceOrState != Guid.Empty.ToString())
     {
+        provinceAndCountryExtraInfo += Perfil.ExtraInfo.ProvinceOrState;
+
         if (!string.IsNullOrEmpty(Perfil.ExtraInfo.Country))
         {
-            provinceAndCountryExtraInfo += Perfil.ExtraInfo.Country;
-        }
-        //@Perfil.ExtraInfo.ProvinceOrState@separador
-    }
-    if (!string.IsNullOrEmpty(Perfil.ExtraInfo.Country))
-    {
-        if (!string.IsNullOrEmpty(Perfil.ExtraInfo.ProvinceOrState))
-        {
             separador = " - ";
+
+            provinceAndCountryExtraInfo += @separador + Perfil.ExtraInfo.Country;
         }
-        provinceAndCountryExtraInfo += @separador + @Perfil.ExtraInfo.ProvinceOrState;
+    }
+    if (!string.IsNullOrEmpty(Perfil.ExtraInfo.Country) && string.IsNullOrEmpty(Perfil.ExtraInfo.ProvinceOrState))
+    {
+        provinceAndCountryExtraInfo += @Perfil.ExtraInfo.Country;
     }
 }
 
@@ -88,7 +87,14 @@ else
     <div class="col col-12 col-breadcrumb" id="breadcrumb">
         <ul>
             <li><a href="@Comunidad.Url"><strong>@Html.GetText("COMMON", "HOME")</strong></a></li>
-            <li><a href="@Comunidad.Url/@Html.GetText("URLSEM", "PERSONASYORGANIZACIONES")">@Html.GetText("COMMON", "PERSONASYORGANIZACIONES")</a></li>
+            @if (Context.Request.Headers.Referer.ToString().Contains(Html.GetText("URLSEM", "COMADMINCOMMIEMBROS")))
+            {
+                <li><a href="@Comunidad.Url/@Html.GetText("URLSEM", "COMADMINCOMMIEMBROS")">@Html.GetText("COMMON", "PERSONASYORGANIZACIONES")</a></li>
+            }
+            else
+            {
+                <li><a href="@Comunidad.Url/@Html.GetText("URLSEM", "PERSONASYORGANIZACIONES")">@Html.GetText("COMMON", "PERSONASYORGANIZACIONES")</a></li>
+            }
             <li>@nombreCompleto</li>
         </ul>
     </div>
@@ -96,11 +102,11 @@ else
     @* Sección izquierda-central*@
     <div class="col col-12 col-xl-8 col-contenido izquierda">
         @* Contenedor de columna *@
-        <div class="wrapCol">
+        <div class="wrapCol">        
             @* Contenido - Data de la columna izquierda-central *@
             <div class="contenido">
-                @* Cabecera de perfil del usuario - Nombre, Puesto, Fotografía... *@
-                @Html.PartialView("_SummaryBio",Model)
+                @* Cabecera de perfil del usuario - Nombre, Puesto, Fotografía... *@                
+                @Html.PartialView("_SummaryBio")
 
                 @* Menú Tab de navegación por (Actividad Reciente/ Siguiendo a y Seguidores ) *@
                 <ul class="nav nav-tabs grey big-no-padding" id="myTab" role="tablist">
@@ -111,19 +117,19 @@ else
                            href="#tab-pane-1"
                            role="tab"
                            aria-controls="tab-pane-1"
-                           aria-selected="true">Actividad reciente</a>
+                           aria-selected="true">@Html.GetText("CONTROLESLIVE", "TITULOCONTROLEVENTOS")</a>
                     </li>
                     @* Menú de Personas a las que está siguiendo *@
                     @if (Perfil.Key != Guid.Empty && !IdentidadActual.IsGuestIdentity)
                     {
                         <li class="nav-item">
                             <a class="nav-link"
-                           id="tab-2"
-                           data-toggle="tab"
-                           href="#tab-pane-2"
-                           role="tab"
-                           aria-controls="tab-pane-2"
-                           aria-selected="false">Siguiendo a @numFollowed</a>
+                               id="tab-2"
+                               data-toggle="tab"
+                               href="#tab-pane-2"
+                               role="tab"
+                               aria-controls="tab-pane-2"
+                               aria-selected="false">Siguiendo a @numFollowed</a>
                         </li>
                     }
                     @if (Perfil.Key != Guid.Empty && !IdentidadActual.IsGuestIdentity)
@@ -131,12 +137,12 @@ else
                         @* Menú de Personas que le siguen *@
                         <li class="nav-item">
                             <a class="nav-link"
-                           id="tab-3"
-                           data-toggle="tab"
-                           href="#tab-pane-3"
-                           role="tab"
-                           aria-controls="tab-pane-3"
-                           aria-selected="false">Seguidores @numFollowers</a>
+                               id="tab-3"
+                               data-toggle="tab"
+                               href="#tab-pane-3"
+                               role="tab"
+                               aria-controls="tab-pane-3"
+                               aria-selected="false">Seguidores @numFollowers</a>
                         </li>
                     }
                 </ul>
@@ -200,16 +206,18 @@ else
     <div class="col col-12 col-xl-4 col-contexto col-lateral derecha">
         @* Panel de información del usuario (Imagen, Nombre, Contribuciones...) *@
         <div class="perfil-lateral">
-            <div class="perfil-lateral-imagen" style="text-align: center; background-color: white; border: 1px solid var(--c-gris-borde);">
-                @if (containsUrlFoto)
-                {
+             @if (containsUrlFoto)
+            {
+                <div class="perfil-lateral-imagen" style="text-align: center; text-align: center; background-color: white; border: 1px solid var(--c-gris-borde);">                    
                     <img src="@urlFoto" />
-                }
-                else
-                {
-                    <span class="material-icons" style="font-size: 13rem">person</span>
-                }
-            </div>
+                </div>
+            }
+            else
+            {
+                <div class="perfil-lateral-imagen" style="text-align: center; text-align: center; background-color: white; border: 1px solid var(--c-gris-borde); ">
+                    <span class="material-icons" style="font-size: 13rem">person</span>                    
+                </div>
+            } 
             @* Contenedor de perfil lateral del usuario *@
             <div class="perfil-lateral-contenido">
                 @* Contenedor de Nombre y Localización *@
@@ -232,36 +240,32 @@ else
                         <ul class="lista-redes-sociales no-list-style">
                             @foreach (ProfileModel.SocialNetworkProfileModel redSocialPerfil in Perfil.SocialNetworks)
                             {
-                                string clase = redSocialPerfil.Name.ToLower();
+                                string clase = redSocialPerfil.Name.ToLower();                                                                
                                 @* Controlar que si no son redes sociales, habrá que pintar el icono de la url mostrada *@
-                                if (clase.Contains("twitter") || clase.Contains("facebook") || clase.Contains("linkedin"))
-                                {
-                                    containsSocialUrlIcon = true;
-                                }
-                                else
-                                {
-                                    containsSocialUrlIcon = false;
-                                }
-                                <li class="@clase">
-                                    @if (containsSocialUrlIcon)
+                                    if (clase.Contains("twitter") || clase.Contains("facebook") || clase.Contains("linkedin") )
                                     {
+                                        containsSocialUrlIcon = true;
+                                    }
+                                    else {
+                                        containsSocialUrlIcon = false;
+                                    }                                   
+                                <li class="@clase">
+                                    @if (containsSocialUrlIcon){
                                         <a title="@redSocialPerfil.Name" href="@redSocialPerfil.UrlProfile" target="_blank">
                                             <i class="fab fa-@clase"></i>
                                         </a>
-                                    }
-                                    else
-                                    {
+                                    }else {
                                         string urlSocialImage = "https://www.google.com/s2/favicons?domain=" + @redSocialPerfil.Url;
 
                                         <a title="@redSocialPerfil.Name" href="@redSocialPerfil.UrlProfile" target="_blank">
                                             <img src=@urlSocialImage width="30px">
-                                        </a>
+                                        </a>                                                                        
                                     }
 
                                 </li>
                             }
                         </ul>
-                    </div>
+                    </div>                
                 }
             </div>
         </div>
@@ -273,20 +277,19 @@ else
         @* Personas/Contactos/Seguidores de un usuario u Organización *@
         @if (Perfil.Key != Guid.Empty && !IdentidadActual.IsGuestIdentity)
         {
-            @Html.PartialView("_PersonasContactosSeguidores", Model)
-            ;
-        }
+            @Html.PartialView("_PersonasContactosSeguidores", Model);
+        }   
     </div>
 
-
+    
 </div>
 
 @* Cuando cargue la página hacer petición para obtener los recursos del usuario
     De momento dejarlo así para ver cómo poder acceder a los recursos de un usuario
     <script>
-    $(document).ready(function () {
-    var numResultadosBusq = 'panNumResultados'
-    AgregarFiltroPerfil("recursos");
-    });
+        $(document).ready(function () {
+            var numResultadosBusq = 'panNumResultados'
+            AgregarFiltroPerfil("recursos");
+        });
 
     </script>*@

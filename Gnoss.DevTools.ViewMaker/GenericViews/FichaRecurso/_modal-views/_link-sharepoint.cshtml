@@ -1,0 +1,60 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista modal que servirá para preguntar al publisher del recurso si se desea o no bloquear comentarios. Se mostrará cuando en la ficha del recurso, se pulse sobre "Bloquear comentarios".
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+ResourceModel fichaRecurso = Model.Resource;
+// Construcción para realizar la llamada JS para agregar vínculo
+string funcionVincularSP = "AccionRecurso_VincularSharepoint('" + fichaRecurso.ListActions.UrlLinkResourceSP +  "', '" + fichaRecurso.Key + "')";
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista Modal para Vincular un recurso a SharePoint--------------------
+*@
+
+      <div class="modal-header">
+        <p class="modal-title">
+          <span class="material-icons">attach_file</span>@Html.GetText("VINCULACIONDOCUMENTACION", "INFOVINCULARSP")
+        </p>
+        <span
+          class="material-icons cerrar"
+          data-dismiss="modal"
+          aria-label="Close"
+          >close</span
+        >
+      </div>
+      <div class="modal-body">
+        <div class="formulario-edicion">
+          <div class="form-group">
+            <label for="vincular-url-recurso" class="control-label">@Html.GetText("COMMON","URLDELDOCUMENTODESHAREPOINT")</label>
+            <input
+              placeholder="@Html.GetText("VINCULACIONDOCUMENTACION", "INFOVINCULARURLSP")"
+              type="text"
+              name="vincular-url-recurso"
+              id="txtUrlDocVinculado_@fichaRecurso.Key"
+              class="form-control not-outline"
+            />
+          </div>
+
+            @* Mensaje informativo del proceso*@
+            <div id="despAccionRec_@fichaRecurso.Key">
+                <div>
+                    <div id="menssages">
+                        <div class="ok"></div>
+                        <div class="ko"></div>
+                    </div>
+                </div>                        
+            </div>
+            <div class="form-actions">
+                @* Botón que guardará posibles cambios *@
+                <button onclick="@funcionVincularSP" class="btn btn-primary">@Html.GetText("VINCULACIONDOCUMENTACION", "VINCULAR")</button>                
+            </div>
+ 
+        </div>
+      </div>

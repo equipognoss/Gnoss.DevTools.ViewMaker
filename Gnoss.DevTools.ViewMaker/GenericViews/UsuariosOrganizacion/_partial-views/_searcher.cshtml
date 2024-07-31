@@ -27,9 +27,10 @@ Variables
     @* Formulario buscador*@
     <form>
         <fieldset style="display: block">
+            <legend class="sr-only">@Html.GetText("COMMON","BUSCAR")</legend>
             <div class="finderUtils" id="divCajaBusqueda">
                 <div class="group finderSection txtFiltrarMiembros">
-                    <label for="finderSection">Encontrar</label>
+                    <label for="txtFiltrarMiembros sr-only">@Html.GetText("COMMON","BUSCAR")</label>
                     <input type="text" id="txtFiltrarMiembros" 
                            name="txtFiltrarMiembros" 
                            value="@Model.SearchFilter" 

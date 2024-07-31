@@ -1,0 +1,39 @@
+﻿@model PintarSharedCommunity
+
+@* Nº máximo de comunidades que se mostrarán donde se está compartiendo el Recurso *@
+@{ 
+    int maxNumCommunityShared = 100;
+    for (int i = Model.position; i < Model.resourceModel.Shareds.Count; i++)
+    {
+        if (i < maxNumCommunityShared || Model.pintarNumerLimitado == false)
+        {
+            ResourceModel.SharedBRModel baseRecursos = Model.listaBaseRecursos[i];
+                <li>
+                    @if (baseRecursos.Private)
+                    {
+                        <span class="material-icons-outlined mr-1" style="font-size:15px;">
+                        lock
+                        </span>
+                    }
+                    <a href="@baseRecursos.Url" rel="sioc:has_space">
+                        <span resource="@baseRecursos.Url"
+                              property="dcterms:title"
+                              typeof="sioc:Space">
+                            @baseRecursos.Name
+                        </span>
+                    </a>
+                    @if (baseRecursos.DeleteAvailable)
+                    {
+                        <span style="cursor:pointer"
+                              onclick="AccionRecurso_Descompartir('@Model.resourceModel.ListActions.UrlUnshare', this, '@baseRecursos.Key', '@baseRecursos.ProyectKey', '@baseRecursos.OrganizationKey')"
+                              class="material-icons eliminar"
+                              alt="Dejar de compartir el recurso"
+                              title="Dejar de compartir el recurso">
+                            close
+                        </span>
+                    }
+                </li>
+
+            }
+        }
+    }

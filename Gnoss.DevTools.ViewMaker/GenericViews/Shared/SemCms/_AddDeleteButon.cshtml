@@ -1,0 +1,45 @@
+﻿@model SharedSemCms
+
+@{
+    Es.Riam.Semantica.OWL.Propiedad mPropiedad = Model.semanticPropertyModel.Element.Propiedad;
+    string idControl = Model.semanticPropertyModel.OntologyPropInfo.ControlID;
+    string metodoEliminar = null;
+
+    if (!Model.pTesauroSemSimple)
+    {
+        metodoEliminar = "EliminarObjectNoFuncionalSeleccEnt('" + Model.pNumValor + "','" + mPropiedad.ElementoOntologia.TipoEntidad + "','" + mPropiedad.Nombre + "','" + idControl.Replace("selEnt_", "contEntSelec_") + "');";
+    }
+    else
+    {
+        metodoEliminar = "$('#" + idControl + "').val('');$('#" + idControl.Replace("selEnt_", "divContControlTes_") + "').css('display','');$('#" + idControl.Replace("selEnt_", "contEntSelec_") + "').css('display','none');";
+    }
+
+    // metodoEliminar = metodoEliminar.Replace("'", "\\'");
+
+    /* Cambiar por nuevo Front */
+    /*
+    string metodoOnclick = "MostrarPanelConfirmacionEvento(event, '" + Html.GetText("CONTROLESCVSEM", "CONFIRMARELIMINAR", pValor).Replace("'", "\\'") + "', '" + metodoEliminar + "')";
+    <a class="remove" onclick="@metodoOnclick"></a>
+    */
+    string metodoOnclick = "MostrarPanelConfirmacionEvento(event, '" + Html.GetText("CONTROLESCVSEM", "CONFIRMARELIMINAR", Model.pValor).Replace("'", "\\'") + "', '" + metodoEliminar + "')";
+
+    <a      class="removeButton"
+            data-showmodalcentered="1"
+            onclick="
+                        $('#modal-container').modal('show', this);
+                        AccionFichaPerfil(
+                            '@Html.GetText("COMMON", "ELIMINAR")',
+                            '@Html.GetText("COMMON", "SI")',
+                            '@Html.GetText("COMMON", "NO")',
+                            '@Html.GetText("CONTROLESCVSEM", "CONFIRMARELIMINAR", Model.pValor).Replace("'", "\\'")',
+                            'sin-definir',
+                            function(){
+                                @metodoEliminar
+                            }
+                        );
+        ">
+        <span class="material-icons pr-0">delete</span>
+    </a>
+
+
+}

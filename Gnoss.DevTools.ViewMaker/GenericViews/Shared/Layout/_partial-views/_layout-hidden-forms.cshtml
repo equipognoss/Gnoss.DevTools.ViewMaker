@@ -7,7 +7,10 @@ Se utilizan para ayudar al Layout a contener información relacionada con el pro
 Variables
 ----------------------------------------------------------------
 *@
-
+@{
+    @* Header para obtener urls para búsquedas en componentes CMS *@
+    HeaderModel cabecera = Html.GetCabecera();
+}
 @*
 ----------------------------------------------------------------
 
@@ -36,3 +39,21 @@ Variables
         <input type="submit" style="display: none;" id="rdfHack" value="enviar" title="enviar" />
     </fieldset>
 </form>
+
+@* Inputs ocultos usados para búsquedas *@
+@foreach (HeaderModel.SearchHeaderModel.SearchSelectComboModel combo in cabecera.Searcher.ListSelectCombo)
+{
+    <input type="hidden" value="ub_@combo.ID@Html.Raw("@")@combo.Url" class="inpt_tipo_busqueda" />
+}
+
+@foreach (HeaderModel.SearchHeaderModel.SearchSelectComboModel combo in cabecera.Searcher.ListSelectCombo)
+{
+    if (!string.IsNullOrEmpty(combo.Autocomplete))
+    {
+        <input type="hidden" value="oa_@combo.ID@Html.Raw("@")@combo.Autocomplete" class="inpt_OrigenAutocompletar" />
+    }
+    if (!string.IsNullOrEmpty(combo.FacetAutocomplete))
+    {
+        <input type="hidden" value="fa_@combo.ID@Html.Raw("@")@combo.FacetAutocomplete" class="inpt_FacetasAutocompletar" />
+    }
+}

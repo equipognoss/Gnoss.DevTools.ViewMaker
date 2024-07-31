@@ -12,6 +12,7 @@ using Microsoft.Extensions.Primitives;
 using Gnoss.DevTools.ViewMaker.Areas.Gnoss.DevTools.ViewMaker.Extensions;
 using Es.Riam.Gnoss.Web.MVC.Models;
 using Es.Riam.Gnoss.Recursos;
+using System.Text.RegularExpressions;
 
 namespace Gnoss.DevTools.ViewMaker.Extensions
 {
@@ -19,6 +20,16 @@ namespace Gnoss.DevTools.ViewMaker.Extensions
     {
         public static bool PintandoFacetas = false;
         public static bool PintandoResultados = false;
+
+        /// <summary>
+        /// Método para conocer a través del ViewBag si el usuario es o no MetaAdministrador. Usado para necesidades del Front. En DevTools se puede realizar con permisosPaginas.        
+        /// </summary>
+        /// <param name="helper"></param>
+        /// <returns></returns>
+        public static bool GetEsMetaAdministrador(this IHtmlHelper helper)
+        {
+            return (bool)helper.ViewBag.EsMetaAdministrador;
+        }
 
         public static Dictionary<string, string> GetParametrosAplicacion(this IHtmlHelper helper)
         {
@@ -28,6 +39,7 @@ namespace Gnoss.DevTools.ViewMaker.Extensions
         /// <summary>
         /// Convertir la primera letra en maýuscula y dejar las demás en minúscula. Útil para evitar añadir nuevos textos traducidos y aprovechar los ya existentes
         /// </summary>
+        /// 
         public static string FirstLetterToUpper(this IHtmlHelper helper, string texto)
         {
             if (texto == null)
@@ -394,7 +406,61 @@ namespace Gnoss.DevTools.ViewMaker.Extensions
             }
         }
 
-       // Obtener el nombre de tipo de comunidad (Privada, Pública, Reservada, Restringida)
+        
+
+        
+
+        private static Dictionary<string, string> ELEMENTOS_HTML_LIMPIAR = new Dictionary<string, string>() { { "<pre ", "</pre>" }, { "<img ", ">" }, { "<iframe ", "</iframe>" }, { "<table", "</table>" }, { "<strong>", "<strong>" }, { "</strong>", "</strong>" }, { "<ul", ">" }, { "</ul>", "</ul>" }, { "<ol", ">" }, { "</ol>", "</ol>" }, { "<a", ">" }, { "</a>", "</a>" }, { "<span", ">" }, { "</span>", "</span>" }, { "<h1", ">" }, { "</h1>", "</h1>" }, { "<h2", ">" }, { "</h2>", "</h2>" }, { "<h3>", ">" }, { "</h3>", "</h3>" }, { "<h4>", ">" }, { "</h4>", "</h4>" }, { "<figure", ">" }, { "<em", ">" }, { "</em>", "</em>" }, { "<b>", ">" }, { "</b>", "</b>" }, { "<li>", ">" }, { "</li>", "</li>" }, { "<i>", "</i>" } };
+
+        
+
+
+        private static readonly List<string> ELEMENTOS_HTML_MENSAJES_LIMPIAR = new List<string> { "img", "iframe", "table", "strong", "ul", "ol", "a", "span", "h1", "h2", "h3", "h4", "figure", "em", "b", "li", "i", "article" };
+
+        /// <summary>
+        /// Método para limpiar las etiquetas de los mensajes con el objetivo de que su visualización sea correcta en la Bandeja de entrada       
+        /// </summary>
+        /// <param name="helper"></param>
+        /// <param name="stringHtml"></param>
+        /// <returns></returns>
+        public static string CleanHtmlInMessages(this IHtmlHelper helper, string stringHtml)
+        {
+            if (!string.IsNullOrEmpty(stringHtml))
+            {
+                foreach (string elemento in ELEMENTOS_HTML_MENSAJES_LIMPIAR)
+                {
+                    // Eliminar etiquetas de apertura
+                    stringHtml = Regex.Replace(stringHtml, $"<{Regex.Escape(elemento)}[^>]*>", " ", RegexOptions.IgnoreCase);
+                    // Eliminar etiquetas de cierre correspondientes
+                    stringHtml = Regex.Replace(stringHtml, $"</{Regex.Escape(elemento)}>", " ", RegexOptions.IgnoreCase);
+                }
+            }
+            return stringHtml;
+        }
+
+
+
+        private static string LimpiarFragmentoHTML(string stringHtml, string inicio, string fin)
+        {
+            int inicioIndex = stringHtml.IndexOf(inicio);
+            while (inicioIndex != -1)
+            {
+                int finIndex = stringHtml.IndexOf(fin, inicioIndex);
+                if (finIndex != -1)
+                {
+                    stringHtml = stringHtml.Remove(inicioIndex, finIndex - inicioIndex + fin.Length);
+                }
+                else
+                {
+                    break;
+                }
+                inicioIndex = stringHtml.IndexOf(inicio, inicioIndex);
+            }
+            return stringHtml;
+        }
+
+
+        // Obtener el nombre de tipo de comunidad (Privada, Pública, Reservada, Restringida)
         public static string getCommunityNameType(this IHtmlHelper helper, CommunityModel pCommunity)
         {
             string communityNameType = "";
@@ -416,6 +482,72 @@ namespace Gnoss.DevTools.ViewMaker.Extensions
                     return communityNameType;
             }
             return communityNameType;
+        }
+        public static string GetLogoForSocialNetworkName(this IHtmlHelper helper, string socialNetworkName, int tamanyo = 30)
+        {
+            // Logo que se devolverá. En caso de no encontrar ninguno, se devolverá "vacío".
+            string currentLogo = "";
+
+            string logoTwitterSvg = $@"
+            <div style=""background-color: #000; display: inline-block;"">
+                <svg fill=""#FFFFFF"" xmlns=""http://www.w3.org/2000/svg"" viewBox=""0 0 48 48"" width=""{tamanyo}px"" height=""{tamanyo}px"">
+                <path d=""M 6.9199219 6 L 21.136719 26.726562 L 6.2285156 44 L 9.40625 44 L 22.544922 28.777344 L 32.986328 44 L 43 44 L 28.123047 22.3125 L 42.203125 6 L 39.027344 6 L 26.716797 20.261719 L 16.933594 6 L 6.9199219 6 z"" />
+                </svg>
+            </div>";
+
+            string logoFacebookSvg = $@"
+            <div style=""background-color: #1877F2; display: inline-block;"">
+                <svg xmlns=""http://www.w3.org/2000/svg"" xmlns:xlink=""http://www.w3.org/1999/xlink"" viewBox=""0,0,256,256"" width=""{tamanyo}px"" height=""{tamanyo}px"">
+                <g fill=""#ffffff"" fill-rule=""nonzero"" stroke=""none"" stroke-width=""1"" stroke-linecap=""butt"" stroke-linejoin=""miter"" stroke-miterlimit=""10"" stroke-dasharray="""" stroke-dashoffset=""0"" font-family=""none"" font-weight=""none"" font-size=""none"" text-anchor=""none"" style=""mix-blend-mode: normal"">
+                    <g transform=""scale(5.12,5.12)"">
+                        <path d=""M32,11h5c0.552,0 1,-0.448 1,-1v-6.737c0,-0.524 -0.403,-0.96 -0.925,-0.997c-1.591,-0.113 -4.699,-0.266 -6.934,-0.266c-6.141,0 -10.141,3.68 -10.141,10.368v6.632h-7c-0.552,0 -1,0.448 -1,1v7c0,0.552 0.448,1 1,1h7v19c0,0.552 0.448,1 1,1h7c0.552,0 1,-0.448 1,-1v-19h7.222c0.51,0 0.938,-0.383 0.994,-0.89l0.778,-7c0.066,-0.592 -0.398,-1.11 -0.994,-1.11h-8v-5c0,-1.657 1.343,-3 3,-3z""></path>
+                    </g>
+                </g>
+                 </svg>
+            </div>";
+
+            string logoGoogleSvg = $@"
+            <div style=""background-color: #fff; display: inline-block;"">
+                <svg xmlns=""http://www.w3.org/2000/svg"" viewBox=""0 0 48 48"" width=""{tamanyo}px"" height=""{tamanyo}px"">
+                <path fill=""#FFC107""                d=""M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"" />
+                <path fill=""#FF3D00""                d=""M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"" />
+                <path fill=""#4CAF50""               d=""M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"" />
+                <path fill=""#1976D2""                d=""M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"" />
+                </svg>
+            </div>";
+
+            string logoAppleSvg = $@"
+            <div style=""background-color: #fff; display: inline-block;"">
+                <svg xmlns=""http://www.w3.org/2000/svg"" viewBox=""0 0 26 26"" width=""{tamanyo}px"" height=""{tamanyo}px"">
+                <path
+                    d=""M 23.933594 18.945313 C 23.335938 20.269531 23.050781 20.863281 22.28125 22.03125 C 21.210938 23.667969 19.695313 25.707031 17.820313 25.71875 C 16.15625 25.734375 15.726563 24.632813 13.464844 24.652344 C 11.203125 24.660156 10.730469 25.738281 9.0625 25.722656 C 7.191406 25.707031 5.757813 23.867188 4.683594 22.238281 C 1.679688 17.664063 1.363281 12.300781 3.21875 9.449219 C 4.53125 7.425781 6.609375 6.238281 8.5625 6.238281 C 10.546875 6.238281 11.796875 7.328125 13.441406 7.328125 C 15.035156 7.328125 16.003906 6.234375 18.304688 6.234375 C 20.039063 6.234375 21.878906 7.179688 23.191406 8.816406 C 18.894531 11.167969 19.59375 17.304688 23.933594 18.945313 Z M 16.558594 4.40625 C 17.394531 3.335938 18.027344 1.820313 17.800781 0.277344 C 16.433594 0.371094 14.839844 1.242188 13.90625 2.367188 C 13.0625 3.394531 12.363281 4.921875 12.636719 6.398438 C 14.125 6.445313 15.664063 5.558594 16.558594 4.40625 Z"" />
+                </svg>
+            </div>";
+
+
+            if (socialNetworkName.Contains("Facebook", StringComparison.OrdinalIgnoreCase) || socialNetworkName.Contains("Meta", StringComparison.OrdinalIgnoreCase))
+            {
+                currentLogo = logoFacebookSvg;
+            }
+            else if (socialNetworkName.Contains("Twitter", StringComparison.OrdinalIgnoreCase) || socialNetworkName.Contains("X", StringComparison.OrdinalIgnoreCase))
+            {
+                currentLogo = logoTwitterSvg;
+            }
+            else if (socialNetworkName.Contains("Google", StringComparison.OrdinalIgnoreCase))
+            {
+                currentLogo = logoGoogleSvg;
+            }
+            else if (socialNetworkName.Contains("Apple", StringComparison.OrdinalIgnoreCase))
+            {
+                currentLogo = logoAppleSvg;
+            }
+
+            // Si no se encuentra un logo asociable a la red Social, devolver la inicial de la red para que pinte algo
+            if (string.IsNullOrEmpty(currentLogo))
+            {
+                currentLogo = $"<strong>{socialNetworkName.Substring(0, 1)}</strong>";
+            }
+            return currentLogo;
         }
 
         // Obtener el nombre del icono de material-icons dependiendo del tipo de Comunidad
@@ -472,6 +604,74 @@ namespace Gnoss.DevTools.ViewMaker.Extensions
         {
             return (string)helper.ViewBag.SessionTimeout;
         }
+        public static string GetCookiesText(this IHtmlHelper helper)
+        {
+            return (string)helper.ViewBag.TextoPoliticaCookies;
+        }
+        /// <summary>
+        /// Devolver el nombre del usuario dependiendo del modo del perfil del usuario (Personal, ProfessionalPersonal, ProfessionalCorporate)
+        /// </summary>
+        public static string GetUserNameByProfileMode(this IHtmlHelper helper, UserProfileModel perfil)
+        {
+            // Nombre de la persona
+            string userNameByProfileMode = "";
+
+            switch (perfil.TypeProfile)
+            {
+                case ProfileType.Personal:
+                    userNameByProfileMode = perfil.Name;
+                    break;
+                case ProfileType.ProfessionalPersonal:
+                    if (!String.IsNullOrEmpty(perfil.NameOrg))
+                    {
+                        userNameByProfileMode = perfil.Name + " @ " + perfil.NameOrg;
+                    }
+                    else
+                    {
+                        userNameByProfileMode = perfil.Name;
+                    }
+                    break;
+                case ProfileType.ProfessionalCorporate:
+                    userNameByProfileMode = perfil.NameOrg;
+                    break;
+                case ProfileType.Organization:
+                    userNameByProfileMode = perfil.NameOrg;
+                    break;
+                default:
+                    userNameByProfileMode = perfil.Name;
+                    break;
+            }
+            return userNameByProfileMode;
+        }
+        /// <summary>
+        /// Devolver el nombre de la foto/icono anonima dependiendo del modo del perfil del usuario (Personal, ProfessionalPersonal, ProfessionalCorporate)
+        /// </summary>
+        public static string GetAnonimousIconByProfileMode(this IHtmlHelper helper, UserProfileModel perfil)
+        {
+            // Nombre del icono a devolver
+            string iconName = "";
+
+            switch (perfil.TypeProfile)
+            {
+                case ProfileType.Personal:
+                    iconName = "person";
+                    break;
+                case ProfileType.ProfessionalPersonal:
+                    iconName = "person";
+                    break;
+                case ProfileType.ProfessionalCorporate:
+                    iconName = "corporate_fare";
+                    break;
+                case ProfileType.Organization:
+                    iconName = "corporate_fare";
+                    break;
+                default:
+                    iconName = "person";
+                    break;
+            }
+            return iconName;
+        }
+
 
         public static Dictionary<Guid, ProfileModel> GetIdentitiesByID(this IHtmlHelper helper, List<Guid> pListIdentities, bool pExtraData = false)
         {
@@ -573,10 +773,11 @@ namespace Gnoss.DevTools.ViewMaker.Extensions
             return ObtenerTextoDeIdioma(helper, pTexto, helper.GetUtilIdiomas().LanguageCode, null, !pTraerPrimeroSiNoEncuentra);
         }
 
-        public static IHtmlContent PartialView(this IHtmlHelper IHtmlHelper, string partialViewName) => PartialView(IHtmlHelper, partialViewName, null);
+        public static IHtmlContent PartialView(this IHtmlHelper IHtmlHelper, string partialViewName) => PartialView(IHtmlHelper, partialViewName, IHtmlHelper.ViewData.Model);
 
         public static IHtmlContent PartialView(this IHtmlHelper IHtmlHelper, string partialViewName, object model)
         {
+           
             IHtmlContent resultado = null;
 
             
@@ -584,13 +785,19 @@ namespace Gnoss.DevTools.ViewMaker.Extensions
 
             string rutaVistasPersonalizadas = IHtmlHelper.ViewBag.rutaVistasPersonalizadas;
 
+            
+            if (partialViewName.StartsWith("/Views/CMSPagina"))
+            {
+                partialViewName = partialViewName.Replace("/Views", $"~/{rutaVistasPersonalizadas + "/Views"}");
+            }
             string partialViewNameOld = partialViewName;
 
-            if (IHtmlHelper.ViewBag.ViewPath == null && IHtmlHelper.ViewBag.ControllerName == "CMSPagina")
+            if (IHtmlHelper.ViewBag.ViewPath == null && (IHtmlHelper.ViewBag.ControllerName == "CMSPagina"|| IHtmlHelper.ViewBag.ControllerName == "HomeComunidad"))
             {
                 IHtmlHelper.ViewBag.ViewPath = $"~/{rutaVistasPersonalizadas}/CMSPagina";
             }
 
+           
             Guid guid;
             //if (partialViewName.StartsWith("../Shared/"))
             if (partialViewName.StartsWith("../") && !partialViewName.Contains("../CargadorFacetas/CargarFacetas") && !partialViewName.Contains("../CargadorResultados/CargarResultados"))
@@ -641,18 +848,30 @@ namespace Gnoss.DevTools.ViewMaker.Extensions
                 }
             }
             else if (IHtmlHelper.ViewBag.ViewPath != null && IHtmlHelper.ViewBag.ViewPath.Contains($"~/{rutaVistasPersonalizadas}/Views/Busqueda"))
-            { 
-                if (partialViewName.Equals("../CargadorResultados/CargarResultados"))
+            {
+                string contexto = IHtmlHelper.ViewContext.ExecutingFilePath;
+                if (contexto==null)
+                {
+                    contexto = string.Empty;
+                }
+                if (IHtmlHelper.ViewBag.ViewPath != null && !contexto.Contains("CargadorResultados") && (partialViewName.StartsWith("_partial-views") || partialViewName.StartsWith("_modal-views")))
+                {
+                    partialViewName = IHtmlHelper.ViewBag.ViewPath.Replace("/" + rutaVistasPersonalizadas, "") + "/" + partialViewName;
+                    partialViewName = $"~/{rutaVistasPersonalizadas}{partialViewName.Replace("~", "")}.cshtml";
+                    PintandoResultados = false;
+                    PintandoFacetas = false;
+                }
+                if (partialViewName.Equals("../CargadorResultados/CargarResultados") )
                 {
                     PintandoResultados = true;
                     PintandoFacetas = false;
+
                 }
                 else if (partialViewName.Equals("../CargadorFacetas/CargarFacetas"))
                 {
-                    PintandoResultados = false;
                     PintandoFacetas = true;
+                    PintandoResultados = false;
                 }
-
                 if (PintandoResultados)
                 {
                     partialViewName = $"~/{rutaVistasPersonalizadas}/Views/CargadorResultados/{partialViewName.Replace("../CargadorResultados/", "")}.cshtml";
@@ -668,6 +887,12 @@ namespace Gnoss.DevTools.ViewMaker.Extensions
             }
             else
             {
+                if (IHtmlHelper.ViewBag.ViewPath != null && (partialViewName.StartsWith("_partial-views") || partialViewName.StartsWith("_modal-views") || !partialViewName.Contains("/")))
+                {
+                    partialViewName = IHtmlHelper.ViewBag.ViewPath.Replace("/" + rutaVistasPersonalizadas, "") + "/" + partialViewName;
+                    partialViewName = $"~/{rutaVistasPersonalizadas}{partialViewName.Replace("~", "")}.cshtml";
+                }
+
                 string partialPath = IHtmlHelper.ViewBag.ViewPath;
 
                 if (partialPath.Equals($"~/{rutaVistasPersonalizadas}/Views/FichaRecurso") || partialPath.Equals($"~/{rutaVistasPersonalizadas}/Recursos"))
@@ -675,20 +900,11 @@ namespace Gnoss.DevTools.ViewMaker.Extensions
                     if (partialViewName.StartsWith("SemCms/_") || partialViewName.StartsWith("ControlesMVC/"))
                     {
                         partialPath = $"~/{rutaVistasPersonalizadas}/Views/Shared";
-                    }
-                    /*else if (partialViewName.StartsWith("HTML/_") )
-                    {
-                        partialPath = $"~/{rutaVistasPersonalizadas}/Views/CMSPagina";
-                    }*/
-
-                    else
-                    {
-                        partialPath = $"~/{rutaVistasPersonalizadas}/Views/FichaRecurso";
+                        partialViewName = $"{partialPath}/{partialViewName}.cshtml";
                     }
                 }
-                partialViewName = $"{partialPath}/{partialViewName}.cshtml";
-                
             }
+
 
             if (!System.IO.File.Exists(AppContext.GetData("rutaBase") + partialViewName.Replace("~/", "")))
             {

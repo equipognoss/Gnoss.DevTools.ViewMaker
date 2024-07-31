@@ -74,7 +74,7 @@ textoEnlace = textoLinkDesBloqCom;
         <div class="formulario-edicion">
           <div class="form-group">              
               <label class="control-label">                  
-                  @( (fichaRecurso.AllowComments) ? "¿Deseas bloquear los comentarios?" : "¿Deseas desbloquear los comentarios?")                  
+                  @( (fichaRecurso.AllowComments) ? Html.GetText("COMMON","DESEASBLOQUEARLOSCOMENTARIOS") : Html.GetText("COMMON","DESEASDESBLOQUEARLOSCOMENTARIOS"))                  
               </label>
           </div>
           <div class="form-group">
@@ -91,7 +91,7 @@ textoEnlace = textoLinkDesBloqCom;
               <label
                 class="custom-control-label"
                 for="input-bloquear-comentarios-no"
-                >No</label
+                >@Html.GetText("COMMON","NO")</label
               >
             </div>
             <div
@@ -108,7 +108,7 @@ textoEnlace = textoLinkDesBloqCom;
               <label
                 class="custom-control-label"
                 for="input-bloquear-comentarios-si"
-                >Sí</label
+                >@Html.GetText("COMMON","SI")</label
               >
             </div>
           </div>
@@ -123,7 +123,7 @@ textoEnlace = textoLinkDesBloqCom;
                 </div>                        
             </div>
           <div class="form-actions">
-            <button id="button-bloquear-desbloquear-comentarios" onclick="@accionEnlace" class="btn btn-primary">Guardar</button>              
+            <button id="button-bloquear-desbloquear-comentarios" onclick="@accionEnlace" class="btn btn-primary">@Html.GetText("COMMON","GUARDAR")</button>              
           </div>
         </div>
       </div>

@@ -1,0 +1,33 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista modal de documentación de la sección
+
+
+@*
+Variables
+----------------------------------------------------------------
+*@
+@{    
+}
+
+<div class="modal modal-right fade modal-documentation" id="right_modal_lg" tabindex="-1" role="dialog" aria-labelledby="right_modal_lg">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <p class="modal-title">
+                    <span class="material-icons">description</span>Ayuda / Documentación
+                </p>
+                <span class="material-icons cerrar" data-dismiss="modal" aria-label="Close">close</span>
+            </div>
+            <div class="modal-body meta-administrador documentationPage modalDocumentation">
+               @* Información General *@
+                <div id="accordion">
+                    <div class="contenido-central">
+                        @Html.PartialView("../AdministrarDocumentacion/_partial-views/_comunidad-sections/_comunidad-miembros")		                
+                    </div>                
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

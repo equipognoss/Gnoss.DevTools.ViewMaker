@@ -1,0 +1,27 @@
+﻿@model SemanticPropertyModel
+
+@{
+    string classDiv = "contSelEnt contSelEnt_" + Model.Element.Propiedad.NombreGeneracionClases;
+
+    foreach (SemanticPropertyModel.PropertyValue propertyValue in Model.OntologyPropInfo.PropertyValues)
+    {
+        <div class="@classDiv">
+            @foreach (SemanticPropertyModel semPropModel in propertyValue.RelatedEntity.Properties)
+            {
+                if (Model.EntityParent.Entity.Ontologia.ConfiguracionPlantilla.HtmlNuevo > 1 && semPropModel.Element != null && semPropModel.Element.Propiedad != null)
+                {
+                    string claseProp = "propSelEnt propSelEnt_" + semPropModel.Element.Propiedad.NombreGeneracionClases;
+
+                    <div class="@claseProp">
+                        @Html.PartialView("SemCms/_Propiedad", semPropModel)
+                    </div>
+                }
+                else
+                {
+                    @Html.PartialView("SemCms/_Propiedad", semPropModel)
+                }
+            }
+        </div>
+    }
+
+}

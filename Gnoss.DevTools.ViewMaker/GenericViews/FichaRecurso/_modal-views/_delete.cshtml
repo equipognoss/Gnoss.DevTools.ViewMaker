@@ -50,7 +50,7 @@ string funcionEliminarAceptar = "AccionRecurso_Eliminar_Aceptar('" + fichaRecurs
                     <span class="texto">@Html.GetText("PERFILBASERECURSOSFICHA", "ELIMINARSELECTIVO")</span>
                 </a>
             }            
-            <button onclick="@funcionEliminarAceptar" class="btn btn-primary">@Html.GetText("COMMON", "SI")</button>
+            <button id="btnDeleteResource" onclick="@funcionEliminarAceptar" class="btn btn-primary">@Html.GetText("COMMON", "SI")</button>
         </div>
 
         @* Mensaje informativo del proceso*@

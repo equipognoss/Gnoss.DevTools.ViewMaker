@@ -22,12 +22,12 @@
 
 <div class="col-buscador">
     @* Formularaio buscador*@
-    <form method="post" id="formCajaBusqueda" @*action="@(new Uri($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}").AbsoluteUri)"*@>
+    <form method="post" id="formCajaBusqueda" action="@($"{Html.GetBaseUrlIdioma()}{Context.Request.Path}")">
         <fieldset style="display: block">
-            <legend>Resource searcher of the community</legend>
+            <legend class="sr-only">@Html.GetText("COMMON","BUSCAR")</legend>
             <div class="finderUtils" id="divCajaBusqueda">
                 <div class="group finderSection">
-                    <label for="finderSection">Encontrar</label>
+                    <label for="finderSection" class="sr-only">@Html.GetText("COMMON","BUSCAR")</label>
                     <input type="text" id="finderSection" class="not-outline finderSectionText autocompletar ac_input" autocomplete="off" placeholder="@Html.GetText("METABUSCADOR", "ENCONTRAR")" />
                     <input title="@Html.GetText("METABUSCADOR", "ENCONTRAR")" type="button" class="encontrar findAction" id="inputLupa" />
 
@@ -77,5 +77,5 @@
 </div>
 
 @* Listado de TAGS usados para las búsquedas *@
-@Html.PartialView("../Busqueda/_partial-views/_list-header-tags", Model)
+@Html.PartialView("_partial-views/_list-header-tags", Model)
 

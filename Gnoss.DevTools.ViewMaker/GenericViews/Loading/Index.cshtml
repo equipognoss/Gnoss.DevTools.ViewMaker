@@ -38,7 +38,7 @@ if (!string.IsNullOrEmpty(Model.NombreComunidad))
 }
 
 <!DOCTYPE html>
-<html lang="@Html.GetUtilIdiomas().LanguageCode">
+<html>
 <head>
     <meta name="viewport" content="width=device-width" />
     <META http-equiv="refresh" content="5;URL='@Model.UrlRedireccion'">
@@ -86,14 +86,6 @@ if (!string.IsNullOrEmpty(Model.NombreComunidad))
     <!-- LIGHTGALLERY -->
     <script type="text/javascript"
             src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/lightgallery/js/lightgallery-all.min.js?v=@Html.GetVersion()"></script>
-
-    <!-- SCROLLMAGIC -->
-    <script type="text/javascript"
-            src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/scrollmagic/ScrollMagic.min.js?v=@Html.GetVersion()"></script>
-
-    <!-- ADDINDICATORS -->
-    <script type="text/javascript"
-            src="@Html.GetBaseUrlStatic()/responsive/theme/libraries/scrollmagic/debug.addIndicators.min.js?v=@Html.GetVersion()"></script>
 
     <!-- DATATABLES -->
     <script type="text/javascript"

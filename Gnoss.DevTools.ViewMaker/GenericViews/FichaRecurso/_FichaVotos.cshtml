@@ -24,23 +24,23 @@ Variables
 <div class="interacciones-recurso">
     @* Gestión de Votos positivos *@
 
-    <div class="likes @( (Model.IsVotedPositive) ? "activo" : null)">           
+    <div class="likes @( (Model.IsVotedPositive) ? "activo" : null)" @*onclick="_paq.push(['trackEvent', 'Voto', 'Click', 'Me gusta']);"*@>
         @if (!Model.IsOwnedAuthor)
         {
             if (Model.IsVotedPositive)
             {
                 if (Model.AllowNegativeVotes)
                 {
-                    <span id="op_Like" onclick="AccionRecurso_VotarEliminar(this, '@Model.UrlDeleteVote', '@Model.UrlVotePositive')" class="material-icons eleccionUsuario iconizer">thumb_up_alt</span>
+                    <span onclick="AccionRecurso_VotarEliminar(this, '@Model.UrlDeleteVote', '@Model.UrlVotePositive')" class="material-icons eleccionUsuario iconizer">thumb_up_alt</span>
                 }
                 else
                 {
-                    <span id="op_Like" onclick="AccionRecurso_VotarEliminar(this, '@Model.UrlDeleteVote', '@Model.UrlVotePositive')" class="material-icons eleccionUsuario iconizer">thumb_up_alt</span>
+                    <span onclick="AccionRecurso_VotarEliminar(this, '@Model.UrlDeleteVote', '@Model.UrlVotePositive')" class="material-icons eleccionUsuario iconizer">thumb_up_alt</span>
                 }
             }
             else
             {
-                <span id="op_Like" onclick="AccionRecurso_VotarPositivo(this, '@Model.UrlVotePositive', '@Model.UrlDeleteVote')" class="material-icons iconizer">thumb_up_alt</span>
+                <span onclick="AccionRecurso_VotarPositivo(this, '@Model.UrlVotePositive', '@Model.UrlDeleteVote')" class="material-icons iconizer">thumb_up_alt</span>
 
             }
         }

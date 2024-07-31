@@ -1,0 +1,47 @@
+﻿@using Microsoft.AspNetCore.Http
+
+@{
+    CommunityModel Comunidad = Html.GetComunidad();
+    string urlMatomo = ViewBag.UrlMatomo;
+}
+
+@if (!string.IsNullOrEmpty(urlMatomo))
+{
+    <!-- Matomo Tag Manager -->
+    <script>
+        var _mtm = window._mtm = window._mtm || [];
+        _mtm.push({ 'mtm.startTime': (new Date().getTime()), 'event': 'mtm.Start' });
+        (function () {
+            var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+            g.async = true; g.src = 'https://devmatomo.gnoss.com/js/container_fDF1S2hs.js'; s.parentNode.insertBefore(g, s);
+        })();
+    </script>
+
+    <!-- End Matomo Tag Manager -->
+    <!-- Matomo -->
+    <script type="text/javascript">
+        var _paq = window._paq = window._paq || [];
+
+        //Obtenemos el identificadorID y establecemos el id en matomo
+        var idUsuarioGnoss = $('#inpt_usuarioID').val();
+        var nombreCortoComunidad = '@Comunidad.ShortName';
+        if (idUsuarioGnoss != undefined && idUsuarioGnoss != 'ffffffff-ffff-ffff-ffff-ffffffffffff') {
+            _paq.push(['setUserId', idUsuarioGnoss]);
+            _paq.push(['setCustomDimension', 1, idUsuarioGnoss]);
+        }
+
+        _paq.push(['setCustomDimension', 3, nombreCortoComunidad]);
+
+        /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+        _paq.push(['trackPageView']);
+        _paq.push(['enableLinkTracking']);
+        (function () {
+            var u = "//@urlMatomo/";         //Url del servidor de Matomo
+            _paq.push(['setTrackerUrl', u + 'matomo.php']);
+            _paq.push(['setSiteId', '1']);          //Identificado del sitio de Matomo
+            var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+            g.async = true; g.src = u + 'matomo.js'; s.parentNode.insertBefore(g, s);
+        })();
+    </script>
+    <!-- End Matomo Code -->
+}

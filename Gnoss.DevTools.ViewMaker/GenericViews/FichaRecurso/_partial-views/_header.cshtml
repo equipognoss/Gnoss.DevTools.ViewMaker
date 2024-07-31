@@ -15,6 +15,7 @@ Variables
 *@
 @{
 ResourceModel FichaDocumento = Model.Resource;
+ResourceModel.ActionsModel acciones = FichaDocumento.Actions;
 // Guardar el tipo de recurso para gestionarlo en el título
 string privado = "";
     
@@ -49,14 +50,22 @@ string privado = "";
                 {
                     claseEnviarAccGogAnac = "class=\"linkDescargaFichero\"";
                 }
-                if (FichaDocumento.OpenInNewWindow)
+                if(acciones.Edit && FichaDocumento.EsEnlaceSharepoint)
                 {
-                    <a target="_blank" title="@FichaDocumento.Title" href="@FichaDocumento.UrlDocument" @Html.Raw(claseEnviarAccGogAnac)>@FichaDocumento.Title</a>
+                    if (FichaDocumento.OpenInNewWindow)
+                    {
+                        <a target="_blank" title="@FichaDocumento.Title" href="@FichaDocumento.UrlDocument" @Html.Raw(claseEnviarAccGogAnac)>@FichaDocumento.Title</a>
+                    }
+                    else
+                    {
+                        <a href="@FichaDocumento.UrlDocument" @Html.Raw(claseEnviarAccGogAnac)>@FichaDocumento.Title</a>
+                    }
                 }
                 else
                 {
-                    <a href="@FichaDocumento.UrlDocument" @Html.Raw(claseEnviarAccGogAnac)>@FichaDocumento.Title</a>
+                    @FichaDocumento.Title
                 }
+
             }
         </h1>
         

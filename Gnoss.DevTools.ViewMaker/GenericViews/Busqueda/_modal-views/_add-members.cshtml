@@ -1,0 +1,79 @@
+﻿
+@*
+ Descripción
+ -----------------------------------------------
+ Vista modal que se usará dentro de un contenedor de bootstrap para poder añadir miembros a una comunidad
+
+ Variables
+ ----------------------------------------------------------------
+*@
+@{
+    //CommunityModel Comunidad = Html.GetComunidad();
+}
+@*
+ ----------------------------------------------------------------
+ -------------------- Vista Modal para añadir miembros a la Comunidad --------------------
+*@
+
+<div id="add_member"
+	 class="modal modal-top fade"
+	 role="dialog"
+	 aria-modal="true">
+
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+                <p class="modal-title">
+                    <span class="material-icons">edit</span> @Html.GetText("COMMON","AÑADIRMIEMBRO")
+                </p>
+                <span class="material-icons cerrar" data-dismiss="modal" aria-label="Close">close</span>
+			</div>
+			<div class="modal-body">
+                <form>                    
+				    <div class="form-group">
+                        @* Input para el nombre *@
+                        <div class="form-group mb-3">
+                            <label class="control-label d-block">@Html.GetText("COMMON","NOMBRE") *</label>
+                            <input type="text" class="form-control" name="txtNombre"  id="txtNombre" />
+                            <small class="form-text text-muted">
+                                @Html.GetText("COMMON","NOMBREDELMIEMBRO")
+                            </small>
+                        </div>
+
+                        @* Input para los apellidos *@
+                        <div class="form-group mb-3">
+                            <label class="control-label d-block">@Html.GetText("REGISTRO","APELLIDOSSIN*")</label>
+                                <input type="text" class="form-control" name="txtApellidos" id="txtApellidos" />
+                            <small class="form-text text-muted">
+                                @Html.GetText("COMMON","APELLIDOSDELMIEMBRO")
+                           </small>
+                        </div>
+
+                        @* Input para el correo *@
+                        <div class="form-group mb-3">
+                            <label class="control-label d-block">Correo *</label>
+                                <input type="email" class="form-control" name="txtEmail" id="txtEmail" />
+                            <small class="form-text text-muted">
+                                @Html.GetText("COMMON","CORREOQUESEASOCIARAALACUENTADELNUEVOMIEMBRO")
+                            </small>
+                        </div>
+
+                        @* Input para la contraseña *@
+                        <div class="form-group mb-3">
+                            <label class="control-label d-block">@Html.GetText("INICIO","CONTRASEÑA") *</label>
+                                <input type="password" class="form-control" name="txtContrasenya" id="txtContrasenya" />
+                            <small class="form-text text-muted">
+                                @Html.GetText("COMMON","CONTRASEÑADEACCESOASUCUENTA")
+                            </small>
+                        </div>
+
+                        @* Botón de guardado y cierre del modal *@
+                        <div class="panelBotonera">
+                            <input type="button" class="btn btn-primary uppercase" id="btnAddMemberAdmin" value="@Html.GetText("COMMON","AÑADIR")"/>                                               
+                        </div>                
+				    </div>
+                </form>
+			</div>
+		</div>
+	</div>
+</div>

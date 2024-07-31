@@ -5,13 +5,13 @@
 Descripción
 ----------------------------------------------------------------
 Como su propio nombre indica, es el Header de la web. Contiene:
-- upper-row: Será la primera fila donde se muestra:
-  - Icono para mostrar panel izquierdo
-  - Nombre de la empresa
-  - Botón de nuevo
-  - Icono de usuario que permite sacar el menú lateral derecho del usuario
-  - Lupa para permitir sacar el menú lateral metabuscador
-- Menú de navegación de la comunidad (Home, Índice, Recursos, Debates, Preguntas, Encuestas, Personas y Organizaciones) dependiendo del tipo de usuario. Esto se muestra en una vista parcial "_menu-navegacion-comunidad".
+    - upper-row: Será la primera fila donde se muestra:
+        - Icono para mostrar panel izquierdo
+        - Nombre de la empresa
+        - Botón de nuevo
+        - Icono de usuario que permite sacar el menú lateral derecho del usuario
+        - Lupa para permitir sacar el menú lateral metabuscador
+        - Menú de navegación de la comunidad (Home, Índice, Recursos, Debates, Preguntas, Encuestas, Personas y Organizaciones) dependiendo del tipo de usuario. Esto se muestra en una vista parcial "_menu-navegacion-comunidad".
 
 @*
 Variables
@@ -20,6 +20,8 @@ Variables
 UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
 UserProfileModel perfil = Html.GetPerfil();
 CommunityModel Comunidad = Html.GetComunidad();
+// Obtiene si existe la url de la comunidad principal (ParametroAplicacion - ComunidadPrincipalID)
+string mainCommunityUrl = perfil.Url;
 // Permisos disponibles en la comunidad
 CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
 // URL de la foto del usuario
@@ -37,214 +39,209 @@ bool containsUrlFoto = true;
 @* Carga de vistas Modales desde Header para Menú Lateral del usuario *@
 @*************************************************@
 
-<header id="header" class="background-primario texto-blanco">
-    <div class="container-fluid">
-        <div class="row upper-row">
-            @* Icono hamburguesa para paneles y nombre myGnoss *@            
-                <div class="col col01">                  
-                        <div class="menu-logo-wrapper">
-                            @*Controlar usuario conectado - Mostrar hamburguesa para acceso a menú lateral*@
-                            @if (!IdentidadActual.IsGuestUser) // Si no está logeado, no mostrar icono Hamburgesa
-                            {
-                                <div class="menu-toggle">
-                                    <a href="javascript: void(0);"
-                                       id="menuLateralTrigger"
-                                       data-target="menuLateral"
-                                       class="texto-blanco">
-                                        <span class="material-icons">apps</span>
-                                    </a>
-                                </div>
-                            }
-                            @*Mostrar el logo de la comunidad corresondiente (Gnoss o la que corresponda) *@
-                            <div class="logo-wrapper">
-                                @if (Comunidad.MetaProyect)
-                                {
-                                    @* <a href="@Html.GetBaseUrlIdioma()/home" class="text-blanco"><img alt="Gnoss" title="Gnoss" src="@Html.GetBaseUrlStatic()/img/logo_gnoss.png" /></a>*@
-                                <a href="@Html.GetBaseUrlIdioma()/home" class="texto-blanco">@Comunidad.NameMetaComunidad</a>
-                                }
-                                else
-                                {
-                                <a href="@Html.GetBaseUrlIdioma()" class="texto-blanco">@Comunidad.NameMetaComunidad</a>
-                                    @* -- NO MOSTRAR DE MOMENTO EL LOGO
-                                    @if (!string.IsNullOrEmpty(Comunidad.Logo))
-                                    {
-                                        <img src="@Comunidad.Logo" title="@Comunidad.Name" alt="@Comunidad.Name" />
-                                    }
-                                    </a>*@
-                                }
+    <header id="header" class="background-primario texto-blanco">
+        <div class="container-fluid">
+            <div class="row upper-row">
+                @* Icono hamburguesa para paneles y nombre myGnoss *@
+                <div class="col col01">
+                    <div class="menu-logo-wrapper">
+                        @*Controlar usuario conectado - Mostrar hamburguesa para acceso a menú lateral*@
+                        @if (!IdentidadActual.IsGuestUser) // Si no está logeado, no mostrar icono Hamburgesa
+                        {
+                            <div class="menu-toggle">
+                                <a href="javascript: void(0);"
+                                   id="menuLateralTrigger"
+                                   data-target="menuLateral"
+                                   class="texto-blanco">
+                                    <span class="material-icons">apps</span>
+                                </a>
                             </div>
-                            @*Fin Mostrar logo de la comunidad*@
-                        </div>                    
-                </div>
-                            
-            @*Mostrar el nombre correspondiente de la comunidad junto con el tipo de comunidad (Pública, Privada...)*@
-            <div class="col col02">
-                @if (!Comunidad.NameMetaComunidad.ToLower().Equals(Comunidad.Name.ToLower()) || IdentidadActual.IsGuestUser)
-                {
-                    <div class="page-name-wrapper" style=" @( (IdentidadActual.IsGuestUser && Comunidad.NameMetaComunidad.ToLower().Equals(Comunidad.Name.ToLower()) ) ? "padding-left:0; border-left: none" : null)  ">
-                        @if (!string.IsNullOrEmpty(Comunidad.Name) && !Comunidad.MetaProyect && !Comunidad.NameMetaComunidad.ToLower().Equals(Comunidad.Name.ToLower()))
-                        {
-                            <a href="@Comunidad.Url"><span class="page-name texto-blanco">@Comunidad.Name</span></a>
                         }
-                        @* Mostrar tipo de comunidad siempre y cuando no sea Metaproject *@
-                        @if (!Comunidad.MetaProyect)
-                        {
-                            @* Mostrar icono de tipo de comunidad *@
-                            @*@Html.Raw(Html.getCommunityNameType(Comunidad))*@
-                        string communityIconType = Html.getCommunityIconType(Comunidad);
-                            <span class="material-icons">@communityIconType</span>
-                        }                    
-
-                        @* Mostrar si hay certificaciones en la comunidad *@
-                        @if (Comunidad.CertificationLevels != null && Comunidad.CertificationLevels.Count > 0)
-                        {
-                            @* @Html.GetText("COMMON", "CON") <a class="text-white ml-1" href="@Comunidad.Url/@Html.GetText("URLSEM", "ACERCADE")">@Html.GetText("COMUNIDADES", "CONTENIDOSCERTIFICADOS")</a> *@
-                        }
-
-                        @* Mostrar el estado de la Comunidad si es diferente a "Abierto" *@
-                        @if (Comunidad.ProjectState != CommunityModel.StateProject.Open)
-                        {
-                            <span style="display:block;">@Html.GetText("COMADMINCATEGORIAS", "COMUNIDAD") @Html.GetText("COMUNIDADES", "ENestadoComunidad") @Html.getCommunityStateType(Comunidad)</span>
-
-                            if (Comunidad.ProjectState == CommunityModel.StateProject.CloseTemporaly)
+                        @*Mostrar el logo de la comunidad corresondiente (Gnoss o la que corresponda) *@
+                        <div class="logo-wrapper">
+                            @if (!string.IsNullOrEmpty(mainCommunityUrl))
                             {
-                                <small class="ml-2">@Html.GetText("COMADMIN", "FECHAREAPERTURA") @Comunidad.OpenDate.ToShortDateString()</small>
+                                <a href="@mainCommunityUrl" class="texto-blanco">@Comunidad.NameMetaComunidad</a>
                             }
-                            else if (Comunidad.ProjectState == CommunityModel.StateProject.Closing)
+                            else if (Comunidad.MetaProyect)
                             {
-                                <small class="ml-2">@Html.GetText("COMADMIN", "DIASPARAELCIERRE") @Math.Truncate((Comunidad.PeriodoDeGracia - DateTime.Now).TotalDays + 1)</small>
+                                @* <a href="@Html.GetBaseUrlIdioma()/home" class="text-blanco"><img alt="Gnoss" title="Gnoss" src="@Html.GetBaseUrlStatic()/img/logo_gnoss.png" /></a>*@
+                                <a href="@mainCommunityUrl/home" class="texto-blanco">@Comunidad.NameMetaComunidad</a>
                             }
-                        }
+                            else
+                            {
+                                <a href="@mainCommunityUrl" class="texto-blanco">@Comunidad.NameMetaComunidad</a>
+                                @* -- NO MOSTRAR DE MOMENTO EL LOGO
+                                        @if (!string.IsNullOrEmpty(Comunidad.Logo))
+                                        {
+                                            <img src="@Comunidad.Logo" title="@Comunidad.Name" alt="@Comunidad.Name" />
+                                        }
+                                    </a>*@
+                            }
+                        </div>
+                        @*Fin Mostrar logo de la comunidad*@
                     </div>
-                }
+                </div>
 
-                @* Para Bandeja de mensajes -> Cuando se esté visualizando un mensaje *@
+                @*Mostrar el nombre correspondiente de la comunidad junto con el tipo de comunidad (Pública, Privada...)*@
+                <div class="col col02">
+                    @if (!Comunidad.NameMetaComunidad.ToLower().Equals(Comunidad.Name.ToLower()) || IdentidadActual.IsGuestUser)
+                    {
+                        <div class="page-name-wrapper" style=" @( (IdentidadActual.IsGuestUser && Comunidad.NameMetaComunidad.ToLower().Equals(Comunidad.Name.ToLower()) ) ? "padding-left:0; border-left: none" : null)  ">
+                            @if (!string.IsNullOrEmpty(Comunidad.Name) && !Comunidad.MetaProyect && !Comunidad.NameMetaComunidad.ToLower().Equals(Comunidad.Name.ToLower()))
+                            {
+                                <a href="@Comunidad.Url"><span class="page-name texto-blanco">@Comunidad.Name</span></a>
+                            }
+                            @* Mostrar tipo de comunidad siempre y cuando no sea Metaproject *@
+                            @if (!Comunidad.MetaProyect)
+                            {
+                                @* Mostrar icono de tipo de comunidad *@                                
+                                string communityIconType = Html.getCommunityIconType(Comunidad);
+                                <span class="material-icons comunidad">@communityIconType</span>
+
+                            }
+                            @* Mostrar si hay certificaciones en la comunidad *@
+                            @if (Comunidad.CertificationLevels != null && Comunidad.CertificationLevels.Count > 0)
+                            {
+                                @* @Html.GetText("COMMON", "CON") <a class="text-white ml-1" href="@Comunidad.Url/@Html.GetText("URLSEM", "ACERCADE")">@Html.GetText("COMUNIDADES", "CONTENIDOSCERTIFICADOS")</a> *@
+                            }
+
+                            @* Mostrar el estado de la Comunidad si es diferente a "Abierto" *@
+                            @if (Comunidad.ProjectState != CommunityModel.StateProject.Open)
+                            {
+                                <span style="display:block;">@Html.GetText("COMADMINCATEGORIAS", "COMUNIDAD") @Html.getCommunityStateType(Comunidad)</span>
+
+                                if (Comunidad.ProjectState == CommunityModel.StateProject.CloseTemporaly)
+                                {
+                                    <small class="ml-2">@Html.GetText("COMADMIN", "FECHAREAPERTURA") @Comunidad.OpenDate.ToShortDateString()</small>
+                                }
+                                else if (Comunidad.ProjectState == CommunityModel.StateProject.Closing)
+                                {
+                                    <small class="ml-2">@Html.GetText("COMADMIN", "DIASPARAELCIERRE") @Math.Truncate((Comunidad.PeriodoDeGracia - DateTime.Now).TotalDays + 1)</small>
+                                }
+                            }
+                        </div>
+                    }
+
+                    @* Para Bandeja de mensajes -> Cuando se esté visualizando un mensaje *@
                     @* Comprobar y asignar nombres para página asignada desde el controller vía ViewBag (Ej: Mensaje) *@
                     @if (!String.IsNullOrEmpty(ViewBag.TituloTipoPagina))
                     {
-                        <div class="page-name-wrapper">                        
+                        <div class="page-name-wrapper">
                             @{
                                 string pagina = ViewBag.TituloTipoPagina;
                                 switch (pagina)
                                 {
-                                        @* Pagina del mensaje *@
+                                    @* Pagina del mensaje *@
                                     case "mensaje":
                                         string urlVuelta = perfil.Url + Html.GetText("URLSEM", "MENSAJES") + ViewBag.UrlVuelta; @* perfil.Url + Html.GetText("URLSEM", "MENSAJES") *@
                                         <span class="page-name"><a href="@urlVuelta">@Html.GetText("BANDEJAENTRADA", "TITULOMENSAJES")</a></span>
                                         break;
-                                        default:
-                                            break;
+                                    default:
+                                        break;
                                 }
-                            }                            
+                            }
                         </div>
                     }
-            </div>
-            @* Mostrar opciones del usuario o mostrar "Iniciar sesión" *@
-            <div class="col col03">
-                <ul>
-                    @*Controlar usuario conectado - Mostrar opciones de usuario | Iniciar sesión | Registro*@
-                    @if (IdentidadActual.IsGuestUser) // Mostrar opciónes de "Login"
-                    {
-                        <li class="iniciar-sesion">
-                            <a id="link_iniciar-sesion" href="@Comunidad.Url/@Html.GetText("URLSEM", "LOGIN")" class="texto-blanco">@Html.GetText("COMMON", "INICIARSESION")</a>
-                        </li>
-                    }
-                    @* Acciones posibles a realizar por un usuario logeado *@
-                    else
-                    {
-                        @* Mostrar acciones posibles a realizar por un usuario. Tener en cuenta que pueda hacerlo en una determinada comunidad *@
-                        if (Comunidad.ProjectState != CommunityModel.StateProject.Closing && (Comunidad.ProjectState != CommunityModel.StateProject.Definition || IdentidadActual.IsProyectAdmin || IdentidadActual.IsProyectSupervisor))
+                </div>
+                @* Mostrar opciones del usuario o mostrar "Iniciar sesión" *@
+                <div class="col col03">
+                    <ul>
+                        @*Controlar usuario conectado - Mostrar opciones de usuario | Iniciar sesión | Registro*@
+                        @if (IdentidadActual.IsGuestUser) // Mostrar opciónes de "Login"
                         {
-                            @* Permitir o no crear recursos en la comunidad al pulsar en botón (+) añadir: *@
-                            if ((!Html.EsPaginaEdicionRecurso()) && (permisosComunidad.CreateResource || permisosComunidad.CreateQuestion || permisosComunidad.CreateDebate || permisosComunidad.CreatePoll) || (Html.EsPaginaContribuciones()) || (Html.EsPaginaEspacioPersonal()))
-                            {
-                                @Html.PartialView("../Shared/_cabecera/_partial-views/_add-resource")
-                            }
-                            @* Botón para enviar aun mensaje nuevo *@
-                            <li class="nuevo nuevo-mensaje">
-                                <a class="btn btn-outline-primary btn-round" href="@perfil.Url@Html.GetText("URLSEM", "MENSAJES")?nuevo">
-                                    <span class="material-icons">edit</span>
-                                    <span>
-                                        @{string textoRedactarMensaje = Html.GetText("CORREO", "NUEVO").Substring(0, 1).ToUpper() + Html.GetText("CORREO", "NUEVO").Substring(1).ToLower();}
-                                        @textoRedactarMensaje
-                                        @*+ @Html.GetText("CORREO", "NUEVO").Substring(1)                                        *@
-                                    </span>
-                                </a>
+                            <li class="iniciar-sesion">
+                                <a id="link_iniciar-sesion" href="@Comunidad.Url/@Html.GetText("URLSEM", "LOGIN")" class="texto-blanco">@Html.GetText("COMMON", "INICIARSESION")</a>
                             </li>
                         }
-                        <li class="usuario">
-                            @*Cargar fotografía del usuario*@
-                            @if (!IdentidadActual.IsGuestUser)
+                        @* Acciones posibles a realizar por un usuario logeado *@
+                        else
+                        {
+                            @* Mostrar acciones posibles a realizar por un usuario. Tener en cuenta que pueda hacerlo en una determinada comunidad *@
+                            if (Comunidad.ProjectState != CommunityModel.StateProject.Closing && (Comunidad.ProjectState != CommunityModel.StateProject.Definition || IdentidadActual.IsProyectAdmin || IdentidadActual.IsProyectSupervisor))
                             {
-                                if (string.IsNullOrEmpty(perfil.Foto))
-                                {
-                                    urlFoto = Html.ObtenerFotoAnonimaDePerfil(perfil.TypeProfile);
-                                    containsUrlFoto = false;
+                                @* Permitir o no crear recursos en la comunidad al pulsar en botón (+) añadir: *@
+                        if ((!Html.EsPaginaEdicionRecurso()) && permisosComunidad != null && (permisosComunidad.CreateResource || permisosComunidad.CreateQuestion || permisosComunidad.CreateDebate || permisosComunidad.CreatePoll) || (Html.EsPaginaContribuciones()) || (Html.EsPaginaEspacioPersonal()))
+                        {
+                                    @Html.PartialView("../Shared/_cabecera/_partial-views/_add-resource")
                                 }
-                                else
-                                {
-                                    urlFoto = perfil.Foto;
-                                }
+                                @* Botón para enviar aun mensaje nuevo *@
+                                <li class="nuevo nuevo-mensaje">
+                                    <a class="btn btn-outline-primary btn-round" href="@perfil.Url@Html.GetText("URLSEM", "MENSAJES")?nuevo">
+                                        <span class="material-icons">edit</span>
+                                        <span>
+                                            @{string textoRedactarMensaje = Html.GetText("CORREO", "NUEVO").Substring(0, 1).ToUpper() + Html.GetText("CORREO", "NUEVO").Substring(1).ToLower();}
+                                            @textoRedactarMensaje
+                                            @*+ @Html.GetText("CORREO", "NUEVO").Substring(1)                                        *@
+                                        </span>
+                                    </a>
+                                </li>
                             }
-                            @*Fin Cargar fotografía del usuario*@
-                            <span id="menuLateralUsuarioTrigger"
-                                  class="texto-blanco">
-                                <div class="user-miniatura">
-                                    <div class="imagen-usuario-wrap">
-                                        <a href="javascript: void(0);">
-                                            <div class="imagen @( (containsUrlFoto == false) ? "sinImagen" : null) ">
-                                                @if (containsUrlFoto == false)
-                                                {
-                                                    <span id="user-panel-trigger" class="material-icons">person</span>
-                                                }
-                                                else
-                                                {
-                                                    <span id="user-panel-trigger" style="background-image: url(@Html.GetBaseUrlContent()@urlFoto);"></span>
-                                                }
+                            <li class="usuario">
+                                @*Cargar fotografía del usuario*@
+                                @if (!IdentidadActual.IsGuestUser)
+                                {
+                                    if (string.IsNullOrEmpty(perfil.Foto))
+                                    {
+                                        urlFoto = Html.ObtenerFotoAnonimaDePerfil(perfil.TypeProfile);
+                                        containsUrlFoto = false;
+                                    }
+                                    else
+                                    {
+                                        urlFoto = perfil.Foto;
+                                    }
+                                }
+                                @*Fin Cargar fotografía del usuario*@
+                                <button class="btn pr-0 pl-0" id="menuLateralUsuarioTrigger" aria-label="@Html.GetText("COMMON","ABRIRPANELLATERALDEUSUARIO")">
+                                    <div class="user-miniatura">
+                                        <div class="imagen-usuario-wrap">
+                                                <div class="imagen @( (containsUrlFoto == false) ? "sinImagen" : null) ">
+                                                    @if (containsUrlFoto == false)
+                                                    {
+                                                        <span id="user-panel-trigger" class="material-icons">person</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span id="user-panel-trigger" style="background-image: url(@Html.GetBaseUrlContent()@urlFoto);"></span>
+                                                    }
 
-                                            </div>
-                                        </a>
+                                                </div>                                            
+                                        </div>
+                                        <div class="nombre-usuario-wrap">
+                                            <span>
+                                                <p class="nombre">@Html.AcortarTexto((string)perfil.Name, 10)</p>
+                                                @*<p class="nombre-completo">
+                                                        @Html.AcortarTexto((string)perfil.Name, 10)
+                                                    </p>*@
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div class="nombre-usuario-wrap">
-                                        <a href="javascript: void(0);">
-                                            <p class="nombre">@Html.AcortarTexto((string)perfil.Name, 10)</p>
-                                            @*<p class="nombre-completo">
-                                            @Html.AcortarTexto((string)perfil.Name, 10)
-                                        </p>*@
-                                        </a>
-                                    </div>
-                                </div>
-                            </span>
-                        </li>
-                    }
-                    @* Metabuscador lateral (Permitir incluso para usuarios no logueados) *@
-                    @if (!Comunidad.MetaProyect)
-                    {
-                        <li class="buscar">
-                            <a href="javascript: void(0);"
-                               id="menuLateralMetabuscadorTrigger"
-                               data-target="menuLateralMetabuscador"
-                               class="texto-blanco">
-                                <span class="material-icons">search</span>
-                            </a>
-                        </li>
-                        <input type="hidden" class="inpt_Pestañas_Model" id="inpt_Pestañas_Model" value="@Comunidad.ModelMetabusquedaJson.ToString()">
-                        <input type="hidden" class="inpt_Ontologias_Exclu_Model" id="inpt_Ontologias_Exclu_Model" value="@Comunidad.RdfTypesExcluidos.ToString()">
-                    }
-                </ul>
+                                </button>
+                            </li>
+                        }
+                        @* Metabuscador lateral (Permitir incluso para usuarios no logueados) *@
+                        @if (!Comunidad.MetaProyect)
+                        {
+                            <li class="buscar">
+                                <a href="javascript: void(0);"
+                                   id="menuLateralMetabuscadorTrigger"
+                                   data-target="menuLateralMetabuscador"
+                                   class="texto-blanco">
+                                    <span class="material-icons">search</span>
+                                </a>
+                            </li>
+                            <input type="hidden" class="inpt_Pestañas_Model" id="inpt_Pestañas_Model" value="@Comunidad.ModelMetabusquedaJson.ToString()">
+                            <input type="hidden" class="inpt_Ontologias_Exclu_Model" id="inpt_Ontologias_Exclu_Model" value="@Comunidad.RdfTypesExcluidos.ToString()">
+                        }
+                    </ul>
+                </div>
             </div>
+
+            @if (Comunidad.Key != ProyectoAD.MetaProyecto && (!Html.GetOcultarMenusComunidad().HasValue || !Html.GetOcultarMenusComunidad().Value))
+            {
+                @Html.PartialView("../Shared/_cabecera/_menu-navegacion-comunidad")
+            }
+
         </div>
-
-        @* Menú Administración de Comunidad ? Lo meto pero no se como lo pintará *@
-        @if (ViewBag.PermisosPaginas != null)
-        {
-            @Html.PartialView("../Shared/_MenuAdministracion")
-        }
-        else if (Comunidad.Key != ProyectoAD.MetaProyecto && (!Html.GetOcultarMenusComunidad().HasValue || !Html.GetOcultarMenusComunidad().Value))
-        {            
-            @Html.PartialView("../Shared/_cabecera/_menu-navegacion-comunidad")
-        }
-
-    </div>
-</header>
-        }
+    </header>
+}

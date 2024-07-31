@@ -82,35 +82,35 @@
 
 
 
-@functions{
+@{
 
-    private string QuitarEtiquetasTodoHTML(string cadena)
+    string QuitarEtiquetasTodoHTML(string cadena)
     {
-        foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(cadena, @"<(?<contenido>[^>]+)>"))
+        foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(cadena, "<(?<contenido>[^>]+)>"))
         {
             cadena = cadena.Replace(m.ToString(), " <" + m.Groups["contenido"].ToString().Replace(" ", "-|-") + "> ");
         }
         return cadena;
     }
 
-    private string PonerEtiquetasTodoHTML(string cadena)
+    string PonerEtiquetasTodoHTML(string cadena)
     {
-        foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(cadena, @"<(?<contenido>[^>]+)>"))
+        foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(cadena, "<(?<contenido>[^>]+)>"))
         {
             cadena = cadena.Replace(m.ToString(), "<" + m.Groups["contenido"].ToString().Replace("-|-", " ") + ">");
         }
         return cadena;
     }
     
-    private string diffString(string o, string n)
+    string diffString(string o, string n)
     {
         o = o.TrimEnd(null);
         n = n.TrimEnd(null);
 
         List<KeyValuePair<List<KeyValuePair<string, int>>, List<KeyValuePair<string, int>>>> salida = new List<KeyValuePair<List<KeyValuePair<string, int>>, List<KeyValuePair<string, int>>>>();
 
-        string[] auxO = System.Text.RegularExpressions.Regex.Split(o, @"\s+");
-        string[] auxN = System.Text.RegularExpressions.Regex.Split(n, @"\s+");
+        string[] auxO = System.Text.RegularExpressions.Regex.Split(o, "\\s+");
+        string[] auxN = System.Text.RegularExpressions.Regex.Split(n, "\\s+");
         List<string> listAuxO = new List<string>();
         List<string> listAuxN = new List<string>();
         for (int i = 0; i < auxO.Length; i++)
@@ -132,7 +132,7 @@
 
         string str = "";
 
-        System.Text.RegularExpressions.MatchCollection oSpaceAux = System.Text.RegularExpressions.Regex.Matches(o, @"\s+");
+        System.Text.RegularExpressions.MatchCollection oSpaceAux = System.Text.RegularExpressions.Regex.Matches(o, "\\s+");
         List<string> oSpace = new List<string>();
         for (int i = 0; i < oSpaceAux.Count; i++)
         {
@@ -140,7 +140,7 @@
         }
         oSpace.Add("\n");
 
-        System.Text.RegularExpressions.MatchCollection nSpaceAux = System.Text.RegularExpressions.Regex.Matches(n, @"\s+");
+        System.Text.RegularExpressions.MatchCollection nSpaceAux = System.Text.RegularExpressions.Regex.Matches(n, "\\s+");
         List<string> nSpace = new List<string>();
         for (int i = 0; i < nSpaceAux.Count; i++)
         {
@@ -212,7 +212,7 @@
         return str;
     }
 
-    private List<KeyValuePair<List<KeyValuePair<string, int>>, List<KeyValuePair<string, int>>>> Diff(List<string> o, List<string> n)
+    List<KeyValuePair<List<KeyValuePair<string, int>>, List<KeyValuePair<string, int>>>> Diff(List<string> o, List<string> n)
     {
         Dictionary<string, List<int>> ns = new Dictionary<string, List<int>>();
         Dictionary<string, List<int>> os = new Dictionary<string, List<int>>();

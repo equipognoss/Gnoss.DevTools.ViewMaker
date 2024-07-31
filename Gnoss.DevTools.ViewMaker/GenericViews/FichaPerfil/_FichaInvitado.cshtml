@@ -78,7 +78,9 @@ string nombreCompleto = Html.ObtenerNombreCompletoDeFichaIdentidad(Perfil);
                 else if (Perfil.Key == Guid.Empty)
                 {
                     <div class="group content">
-                        <p>No se ha encontrado el perfil que está buscando</p>
+                        <p>
+                            @Html.GetText("COMMON","NOSEHAENCONTRADOELPERFILQUEESTABUSCANDO")
+                        </p>
                     </div>
                 }
             </div>

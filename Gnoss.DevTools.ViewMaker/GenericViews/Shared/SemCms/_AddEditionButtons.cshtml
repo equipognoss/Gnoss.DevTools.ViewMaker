@@ -1,0 +1,49 @@
+﻿@model SharedSemCms
+
+@{
+    Es.Riam.Semantica.OWL.Propiedad mPropiedad = Model.semanticPropertyModel.Element.Propiedad;
+    string idControl = Model.semanticPropertyModel.OntologyPropInfo.ControlID;
+
+    if (!Model.semanticPropertyModel.OntologyPropInfo.UniqueValue && mPropiedad.EspecifPropiedad.SelectorEntidad.TipoSeleccion != "Tesauro")
+    {
+        string idBtnCrear = idControl.Replace("selEnt_", "lbCrear_");
+        string idBtnGuardar = idControl.Replace("selEnt_", "lbGuardar_");
+
+        string displayCrear = "";
+
+        if (mPropiedad.EspecifPropiedad.SelectorEntidad.TipoSeleccion == "Autocompletar" || mPropiedad.EspecifPropiedad.SelectorEntidad.TipoSeleccion == "ListaCheck")
+        {
+            displayCrear = "style=\"display:none;\"";
+        }
+
+        string mensajeCrear = null;
+
+        if (mPropiedad.EspecifPropiedad.TextoAgregarElem != null)
+        {
+            mensajeCrear = mPropiedad.EspecifPropiedad.TextoAgregarElem;
+        }
+        else
+        {
+            mensajeCrear = Html.GetText("CONTROLESDOCUMENTACION", "ANYADIR");
+        }
+
+        string onclickCrear = "AgregarObjectNoFuncionalSeleccEnt('" + mPropiedad.ElementoOntologia.TipoEntidad + "','" + mPropiedad.Nombre + "','" + idControl.Replace("selEnt_", "contEntSelec_") + "');";
+
+        string mensajeGuardar = null;
+
+        if (mPropiedad.EspecifPropiedad.TextoBotonAceptarElemento != null)
+        {
+            mensajeGuardar = mPropiedad.EspecifPropiedad.TextoBotonAceptarElemento;
+        }
+        else
+        {
+            mensajeGuardar = Html.GetText("CONTROLESDOCUMENTACION", "ACEPTAR");//"Aceptar";
+        }
+
+        string onclickGuardar = "GuardarObjectNoFuncionalSeleccEnt('" + mPropiedad.ElementoOntologia.TipoEntidad + "','" + mPropiedad.Nombre + "','" + idControl.Replace("selEnt_", "contEntSelec_") + "');";
+
+        <input id="@idBtnCrear" type="button" class="btn btn-primary mb-3" @Html.Raw(displayCrear) value="@mensajeCrear" onclick="@onclickCrear" />
+        <input id="@idBtnGuardar" type="button" style="display:none;" value="@mensajeGuardar" onclick="@onclickGuardar" />
+    }
+
+}

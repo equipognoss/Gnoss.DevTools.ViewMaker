@@ -129,10 +129,10 @@ Variables
                 data-target="#modal-container"
                 onclick="AccionEnviarMensajeMVC('@Html.GetUrlPagina()',
                                                 '@Model.Key',
-                                                'Enviar mensaje'
+                                                '@Html.GetText("PERSONAS","ENVIARMENSAJE")'
                                                 );">
                 <span class="material-icons">send</span>
-                <span class="texto">Enviar mensaje</span>                
+                <span class="texto">@Html.GetText("PERSONAS","ENVIARMENSAJE")</span>                
             </a>
         </li>
         }

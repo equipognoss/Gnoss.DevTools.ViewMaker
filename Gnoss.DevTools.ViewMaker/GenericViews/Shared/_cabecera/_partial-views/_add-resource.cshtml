@@ -32,7 +32,8 @@ CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
        id="menuNuevoDropdown"
        data-toggle="dropdown"
        aria-haspopup="true"
-       aria-expanded="true">@Html.GetText("QUEPUEDOHACER", "CREARRECURSO")</a>
+       aria-label="@Html.GetText("QUEPUEDOHACER", "CREARRECURSO")"
+       aria-expanded="false">@Html.GetText("QUEPUEDOHACER", "CREARRECURSO")</a>
     <div id="menuDropdownCrear"
          class="dropdown-menu dropdown-menu-right basic-dropdown"
          aria-labelledby="menuNuevoDropdown">
@@ -41,7 +42,7 @@ CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
             @if (permisosComunidad.DocumentPermissions.Contains(ResourceModel.DocumentType.Nota))
             {
                 <li id="liNota">
-                    <a id="linkNota" class="item-dropdown">
+                    <a id="linkNota" class="item-dropdown" aria-label="@Html.GetText("PERFILBASESUBIR", "NOTA")">
                         <span class="material-icons">note_add</span>
                         <span class="texto">@Html.GetText("PERFILBASESUBIR", "NOTA")</span>
                     </a>
@@ -49,13 +50,9 @@ CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
             }else if (Html.EsPaginaEspacioPersonal() || Html.EsPaginaContribuciones()) {
                 // Si el usuario está al menos en la página Mi espacio personal
                 <li id="liNota">
-                    <a id="linkNota" class="item-dropdown">
-                        <span class="material-icons">
-                            note_add
-                        </span>
-                        <span class="texto">
-                            @Html.GetText("PERFILBASESUBIR", "NOTA")
-                        </span>
+                    <a id="linkNota" class="item-dropdown" aria-label="@Html.GetText("PERFILBASESUBIR", "NOTA")">
+                        <span class="material-icons">note_add</span>
+                        <span class="texto">@Html.GetText("PERFILBASESUBIR", "NOTA")</span>
                     </a>
                 </li>
             }
@@ -64,7 +61,7 @@ CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
             @if (permisosComunidad.DocumentPermissions.Contains(ResourceModel.DocumentType.FicheroServidor))
             {
                 <li id="liArchivo">
-                    <a class="item-dropdown" data-toggle="modal" data-target="#modal-add-resource-file">
+                    <a class="item-dropdown" data-toggle="modal" data-target="#modal-add-resource-file" aria-label="@Html.GetText("PERFILBASESUBIR", "NUEVOARCHIVO", "50")">
                         <span class="material-icons">
                             description
                         </span>
@@ -76,7 +73,7 @@ CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
             }else if (Html.EsPaginaEspacioPersonal() || Html.EsPaginaContribuciones()) {
                 // Si el usuario está al menos en la página Mi espacio personal
                 <li id="liArchivo">
-                    <a class="item-dropdown" data-toggle="modal" data-target="#modal-add-resource-file">
+                    <a class="item-dropdown" data-toggle="modal" data-target="#modal-add-resource-file" aria-label="@Html.GetText("PERFILBASESUBIR", "NUEVOARCHIVO", "50")">
                         <span class="material-icons">
                             description
                         </span>
@@ -90,7 +87,7 @@ CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
             @if (permisosComunidad.DocumentPermissions.Contains(ResourceModel.DocumentType.Hipervinculo))
             {
                 <li id="liURL">
-                    <a class="item-dropdown" data-toggle="modal" data-target="#modal-add-resource-url">
+                    <a class="item-dropdown" data-toggle="modal" data-target="#modal-add-resource-url" aria-label="@Html.GetText("PERFILBASESUBIR", "DIRECCIONURL")">
                         <span class="material-icons">
                             link
                         </span>
@@ -102,7 +99,7 @@ CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
             }else if (Html.EsPaginaEspacioPersonal() || Html.EsPaginaContribuciones()) {
                 // Si el usuario está al menos en la página Mi espacio personal
                 <li id="liURL">
-                    <a class="item-dropdown" data-toggle="modal" data-target="#modal-add-resource-url">
+                    <a class="item-dropdown" data-toggle="modal" data-target="#modal-add-resource-url" aria-label="@Html.GetText("PERFILBASESUBIR", "DIRECCIONURL")">
                         <span class="material-icons">
                             link
                         </span>
@@ -130,12 +127,12 @@ CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
             @if (permisosComunidad.DocumentPermissions.Contains(ResourceModel.DocumentType.ReferenciaADoc))
             {
                 <li id="liReferenciaDoc">
-                    <a class="item-dropdown" data-toggle="modal" data-target="#modal-add-resource-reference">
+                    <a class="item-dropdown" data-toggle="modal" data-target="#modal-add-resource-reference" aria-label="@Html.GetText("PERFILBASESUBIR", "REFERENCIAADOC")">
                         <span class="material-icons">
                             bookmark_border
                         </span>
-                        <span class="texto">
-                            @Html.GetText("PERFILBASESUBIR", "ARTICULOWIKI")
+                        <span class="texto">                            
+                            @Html.GetText("PERFILBASESUBIR", "REFERENCIAADOC")
                         </span>
                     </a>
                 </li>
@@ -151,7 +148,7 @@ CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
             @if (permisosComunidad.CreateQuestion)
             {
                 <li class="addPregunta">
-                    <a class="item-dropdown" href="@Comunidad.Url/@Html.GetText("URLSEM", "SUBIRPREGUNTA")/@Guid.NewGuid()/15">
+                    <a class="item-dropdown" href="@Comunidad.Url/@Html.GetText("URLSEM", "SUBIRPREGUNTA")/@Guid.NewGuid()/15" aria-label="@Html.GetText("QUEPUEDOHACER", "CREAPREGUNTA")">
                         <span class="material-icons">
                             contact_support
                         </span>
@@ -165,7 +162,7 @@ CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
             @if (permisosComunidad.CreateDebate)
             {
                 <li class="addDebate">
-                    <a class="item-dropdown" href="@Comunidad.Url/@Html.GetText("URLSEM", "SUBIRENCUESTA")/@Guid.NewGuid()/16">
+                    <a class="item-dropdown" href="@Comunidad.Url/@Html.GetText("URLSEM", "SUBIRDEBATE")/@Guid.NewGuid()/16" aria-label="@Html.GetText("QUEPUEDOHACER", "CREADEBATE")">
                         <span class="material-icons">
                             question_answer
                         </span>
@@ -179,7 +176,7 @@ CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
             @if (permisosComunidad.CreatePoll)
             {
                 <li class="addEncuesta">
-                    <a class="item-dropdown" href="@Comunidad.Url/@Html.GetText("URLSEM", "SUBIRDEBATE")/@Guid.NewGuid()/18">
+                    <a class="item-dropdown" href="@Comunidad.Url/@Html.GetText("URLSEM", "SUBIRENCUESTA")/@Guid.NewGuid()/18" aria-label="@Html.GetText("QUEPUEDOHACER", "CREAENCUESTA")">
                         <span class="material-icons">
                             how_to_vote
                         </span>
@@ -199,7 +196,7 @@ CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
                     {
                         string textoNombreOnto = nombreOnto + ": ";
                         <li>
-                            <a class="item-dropdown" href="@permisosComunidad.OntologyPermissionsNameUrls[nombreOnto].Key">
+                            <a class="item-dropdown" href="@permisosComunidad.OntologyPermissionsNameUrls[nombreOnto].Key" aria-label="@Html.GetText("CREARDOCUMENTO", "SOLOUNO")">
                                 <span class="material-icons">
                                     integration_instructions
                                 </span>
@@ -208,7 +205,7 @@ CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
                                 </span>
                             </a>
                             |
-                            <a class="item-dropdown" href="@permisosComunidad.OntologyPermissionsNameUrls[nombreOnto].Value">
+                            <a class="item-dropdown" href="@permisosComunidad.OntologyPermissionsNameUrls[nombreOnto].Value" aria-label="@Html.GetText("CREARDOCUMENTO", "VARIOSALAVEZ")">
                                 <span class="material-icons">
                                     integration_instructions
                                 </span>
@@ -222,7 +219,7 @@ CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
                     else
                     {
                         <li>
-                            <a class="item-dropdown" href="@permisosComunidad.OntologyPermissionsNameUrls[nombreOnto].Key">
+                            <a class="item-dropdown" href="@permisosComunidad.OntologyPermissionsNameUrls[nombreOnto].Key" aria-label="@nombreOnto">
                                 <span class="material-icons">
                                     integration_instructions
                                 </span>
@@ -238,15 +235,38 @@ CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
     </div>
 </li>
 
+
+string urlSem = Html.GetText("URLSEM", Html.EsPaginaEspacioPersonal() || Html.EsPaginaContribuciones() ? "SUBIRRECURSOMYGNOSS" : "SUBIRRECURSO");
+
+string metodoInicializarSubirRecurso = $"InicializarSubirRecursoExt('{Comunidad.Url}/{urlSem}')";
+
+
 <script>
+
+    $(document).ready(function () {
+
+        @Html.Raw(metodoInicializarSubirRecurso);
+
+    });
+
+</script>
+
+    @*       
     /**
      * Llamada a acción para inicializar la opción de crear el recurso de tipo Nota al pulsar sobre "Nueva Nota o artículo"
      *
      */
     $(document).ready(function () {
+        @if (Html.EsPaginaEspacioPersonal() || Html.EsPaginaContribuciones())
+        {
+            InicializarSubirRecursoExt("@Comunidad.Url/@Html.GetText("URLSEM", "SUBIRRECURSOMYGNOSS")");
+        }
+        else
+        {
+            InicializarSubirRecursoExt("@Comunidad.Url/@Html.GetText("URLSEM", "SUBIRRECURSO")");
+        }
         InicializarSubirRecursoExt("@Comunidad.Url/@Html.GetText("URLSEM", "SUBIRRECURSO")");
-    });
-</script>
+    });*@
 }
 
 

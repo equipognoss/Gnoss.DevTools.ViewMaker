@@ -1,0 +1,170 @@
+﻿@model SearchViewModel
+@*
+Descripción
+-----------------------------------------------
+Vista para administrar los miembros de la comunidad mediante DevTools.
+
+Variables
+----------------------------------------------------------------
+*@
+
+@{
+    CommunityModel Comunidad = Html.GetComunidad();
+    Layout = "~/Views/Shared/Layout/_Layout_Admin.cshtml";
+	// Nombre de la pestaña actual
+	string nombrePestanyaActual = Model.PageName;
+	// Html de resultados
+	string htmlResultados = Model.HTMLResourceList;
+	// Html de facetas
+	string htmlFacetas = Model.HTMLFaceted;
+	// Lista de los filtros para ordenar los resultados 
+	Dictionary<string, string> listaFiltrosOrden = Model.FilterOrderList;
+	string FiltroOrdenSeleccionado = Model.FilterOrderSelected;
+    // Código JS insertado desde el Controlador
+    string jsExtra = Html.GetJSExtra();
+}
+
+@* Contenedor central *@
+    @* Migas de Pan *@
+    <div class="col col-12 col-breadcrumb">
+        <ul>
+            <li>
+                <a href="@Comunidad.Url/@Html.GetText("URLSEM", "ADMINISTRARCOMUNIDADHOME")">@Html.GetText("ADMINISTRACIONPAGINAS","HOME")</a>
+            </li>
+            <li>                
+                <a href="@Html.GetText("URLSEM", "ADMINISTRARCOMUNIDADSECTION")/comunidad">@Html.GetText("ADMINISTRACIONSEMANTICA","COMUNIDAD")</a>
+            </li>
+            <li>
+                @Html.GetText("COMADMIN","MIEMBROS")
+            </li>
+        </ul>
+
+        @* Botón de documentación *@
+        <div class="col-breadcrumb__documentation" style="display: flex; align-items: center;">    
+            <button type="button" class="btn btn-light border rounded-pill shadow-sm mb-1" data-toggle="modal" data-target="#right_modal_lg">
+                <span class="material-icons texto-primario documentation__icon" data-toggle="modal" data-target="#right_modal_lg" style="cursor:pointer">description</span>
+                <span class="documentation__text" style="font-weight: 300;">Documentación</span>
+            </button>
+        </div>
+    </div>
+
+    @* Contenido central de Administración de Miembros *@
+    <div class="formulario-edicion background-blanco">
+        <div class="row">
+
+            @* Cabecera de la página *@
+            <div class="col col-12 col-xl-3 pl-4">
+                <div class="row">
+                    <div class="col header-listado mt-2">
+                        @* Título + nº de resultados *@
+				        <div class="h1-container">            				
+					        <h1>@Html.GetText("COMADMIN","MIEMBROS")<span id="panNumResultados" class="numResultados"></span></h1>            				          
+				        </div>
+                    </div>				    
+                </div>
+                <div class="row">
+
+                    @* Facetas *@
+                    <div class="col col-facetas">
+                        @Html.PartialView("_partial-views/_list-content-facetes", Model)
+                    </div>
+                </div>
+            </div>
+
+        @* Contenido central derecho *@
+        <div class="col col-12 col-xl-9 col-contenido derecha">
+
+            <div class="col col-12 header-buscador">
+
+                @* Botones para añadir miembros y grupos*@
+                <div class="acciones d-flex align-items-center justify-content-end" style="margin-bottom: 18px;">
+                    <a href="@Html.GetText("URLSEM", "GRUPOS")/@Html.GetText("URLSEM", "CREARGRUPO")" class="btn btn-outline-primary dropdown-toggle no-flecha" style="margin-right: 20px;">
+                        <span class="material-icons">add</span>
+                        <span>@Html.GetText("COMADMIN","ANADIRNUEVOGRUPO")</span>
+                    </a>
+                    <a class="btn btn-outline-primary dropdown-toggle no-flecha" data-toggle="modal" data-target="#add_member">
+                        <span class="material-icons">add</span>
+                        <span>@Html.GetText("COMADMIN","ANADIRNUEVOMIEMBRO")</span>
+                    </a>                    
+                </div>
+                @* Barra de búsqueda *@
+                <div class="header-buscador max-width">
+                    @* Buscador de la sección + Sección de Tags usados de facetas *@
+                    @Html.PartialView("_partial-views/_searcher", Model)
+                </div>
+
+            </div>
+
+            
+
+            @* Listado de resultados *@
+                <div id="panResultados" class="resource-list listView">
+                	@* Mostrado de resultados *@
+                	@if (string.IsNullOrEmpty(htmlResultados) && Model.JSONResourceList != null)
+                	{
+                		Html.PartialView("../CargadorResultados/CargarResultados", Model.JSONResourceList);
+                	}
+                	else
+                	{														
+                        @* Cargar los resultados obtenidos del servicio "Cargador Resultados". Mostrarlos en la Tabla*@
+                		@* Tabla de resultado de miembros *@
+                		<table class="display nowrap table table-sm">
+                			@* Cabecera de la tabla *@
+                			<thead>
+                				<tr>
+                					<th class="th-nombre">@Html.GetText("ADMINISTRACIONBASICA","NOMBRE")</th>
+                					<th class="th-rol">@Html.GetText("DEVTOOLS","ROL")</th>
+                					<th class="th-boletin">@Html.GetText("DEVTOOLS","BOLETIN")</th>
+                					<th class="th-expulsado">@Html.GetText("DEVTOOLS","EXPULSADO")</th>
+                					<th class="th-bloqueado">@Html.GetText("DEVTOOLS","BLOQUEADO")</th>
+                					<th class="th-fecha">@Html.GetText("ADMINISTRACIONSEMANTICA","FECHA")</th>
+                					<th class="th-acciones">@Html.GetText("ADMINISTRACIONBASICA","ACCIONES")</th>
+                				</tr>
+                			</thead>
+                			@* Cuerpo de la tabla. Clase resource-list-wrap para rellenar al hacer click en facetas *@
+                			<tbody class="resource-list-wrap">
+                				@* Fila del Miembro de la comunidad (Traído del servicio Resultados) *@
+                				@Html.Raw(htmlResultados)
+                			</tbody>
+                		</table>							       
+                	}
+                </div>   
+            </div>
+        </div>
+    </div>
+
+    @Html.PartialView("_modal-views/_documentation-section")  
+    @Html.PartialView("_modal-views/_add-members") 
+
+@* Carga de operativa *@
+@section operativaScript{
+    <script type="text/javascript" src="@Html.GetBaseUrlStatic()/responsive/theme/logic/comunidad.js?v=@Html.GetVersion()"></script>
+    <script type="text/javascript">
+
+        @Html.Raw(jsExtra)
+        @if (htmlFacetas == null && htmlResultados == null && Model.JSONResourceList == null && Model.JSONFaceted == null)
+        {
+            <text>
+                $(document).ready(function () {
+                    FiltrarPorFacetas(filtrosDeInicio);
+                });
+            </text>
+        }
+
+        @if (!string.IsNullOrEmpty(Html.GetJSMapa()))
+        {
+            @Html.Raw(Html.GetJSMapa())
+        }
+
+        @if (!string.IsNullOrEmpty(Html.GetJSGraficos()))
+        {
+            @Html.Raw(Html.GetJSGraficos())
+        }
+
+        (function ($) {
+            // Operativa funcionamiento de Administrar Miembros
+            operativaGestionMiembros.init();
+
+        })();
+</script>
+}

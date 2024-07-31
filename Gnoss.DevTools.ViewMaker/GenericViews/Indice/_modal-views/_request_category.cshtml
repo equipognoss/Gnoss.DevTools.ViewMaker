@@ -1,0 +1,107 @@
+﻿@model IndexViewModel
+@*
+Descripción
+-----------------------------------------------
+Vista modal para poder solicitar una nueva categoría en una comunidad. Se podrá elegir donde estará la categoría nueva a crear. Requerirá la aceptación posterior del administrador.
+
+Variables
+----------------------------------------------------------------
+*@
+
+
+@*
+----------------------------------------------------------------
+-------------------- Vista modal para la solicitud o petición de categorías en una comunidad --------------------
+*@
+
+@* Modal para visualización de solicitud de categorías *@
+<div class="modal modal-top fade"
+     tabindex="-1"
+     role="dialog"
+     id="modal-request-category">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            @* Título del modal *@
+            <div class="modal-header">
+                <p class="modal-title">
+                    <span class="material-icons">add</span>@Html.GetText("TESAURO", "SOLICITARCATEGORIA")
+                </p>
+                <span class="material-icons cerrar"
+                      data-dismiss="modal"
+                      aria-label="Close">close</span>
+            </div>
+            <div class="modal-body">
+                @* Seleccionar que la categoría sea el índice *@
+                <div class="form-group form-check d-flex">
+                    <input id="chkSeleccionarIndiceCategoria" name="tesauro-category" data-item="@Guid.Empty" class="form-check-input" type="checkbox" checked>
+                    <label class="control-label" data-indiceid="@Guid.Empty" for="chkSeleccionarIndiceCategoria">@Html.GetText("TESAURO", "INDICE")</label>
+                    <input type="hidden" />
+                </div>
+
+                @* Input para guardar las selecciones de categorías *@
+                <div id="selectorCategoriasSusc" class="d-none">
+                    <input type="hidden" id="txtHackCatTesSel" class="hackCatTesSel" value="@Guid.Empty" />
+                </div>
+
+                @* Nombre de la categoría a solicitar *@
+                <div class="form-group mb-3">
+                    <label class="control-label d-block" for="">@Html.GetText("TESAURO", "NOMBRE")</label>
+                    <input placeholder=""
+                           onkeydown="if(event.which || event.keyCode){if ((event.which == 13) || (event.keyCode == 13)) {return false;}}"
+                           type="text"
+                           name=""
+                           id="txtBoxNombreNuevaCategoria"
+                           value=""
+                           class="form-control not-outline" />
+                </div>
+                @* Listado de categorías donde se desea crear la nueva a solicitar*@
+                <div id="panelListaCategorias">
+                    @{ 
+                        PintarCategoriasIndice pintar = new PintarCategoriasIndice();
+                        pintar.indexView = Model;
+                    }
+                    @Html.PartialView("_partial-views/_categories-tesauro-arbol", pintar)
+                </div>
+
+                @* Texto informativo acerca de cómo funciona la solicitud de categorías *@
+                <div class="form-group mt-3">
+                    <label class="control-label">
+                        @Html.GetText("TESAURO", "OPCIONESSOLICITARCATEGORIA")
+                    </label>
+                </div>
+
+                <div class="panel-acciones mt-5">
+                    @* Botones de acciones *@
+                    @{string funcion_Categorias_SolicitarCategoria = "Categorias_SolicitarCategoria('" + Html.GetUrlPagina() + "')";}
+                    <a class="btn btn-outline-primary" data-dismiss="modal" style="cursor:pointer" title="@Html.GetText("COMMON", "CANCELAR")">@Html.GetText("COMMON", "CANCELAR")</a>
+                    <a class="btn btn-primary" style="cursor:pointer" onclick="@funcion_Categorias_SolicitarCategoria">@Html.GetText("TESAURO", "SOLICITAR")</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    @* Permitir solo una opción activada *@
+    $("input:checkbox").on('click', function () {
+        // in the handler, 'this' refers to the box clicked on
+        const $box = $(this);
+        const hackedInput = $('#txtHackCatTesSel');
+        const categoryIndice = $(`#chkSeleccionarIndiceCategoria`)
+
+        hackedInput.val('');
+        if ($box.is(":checked")) {            
+            var group = "input:checkbox[name='" + $box.attr("name") + "']";            
+            $(group).prop("checked", false);            
+            $box.prop("checked", true);                                   
+            hackedInput.val($box.data("item"));
+        } else {
+            // Deseleccionar posibles categorías
+            $box.prop("checked", false);            
+            // Si no se marca ninguna dejar al menos la del índice
+            categoryIndice.prop("checked", true);
+            hackedInput.val(categoryIndice.data("item"));
+        }        
+    });
+</script>

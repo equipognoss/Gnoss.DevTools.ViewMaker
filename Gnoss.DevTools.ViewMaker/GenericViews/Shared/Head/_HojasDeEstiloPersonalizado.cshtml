@@ -17,7 +17,7 @@ CommunityModel Comunidad = Html.GetComunidad();
 *@
 
 
-@if (Comunidad != null && Comunidad.VersionCSS.HasValue)
-{    
-    <link media="screen" type="text/css" rel="stylesheet" href="@Html.GetBaseUrlPersonalizacion()/community.css?v=@Comunidad.VersionCSS" />    
+@if (Comunidad != null)
+{
+    <link media="screen" type="text/css" rel="stylesheet" href="@Html.GetBaseUrlPersonalizacion()/community.css?v=@Html.GetVersion()" />
 }

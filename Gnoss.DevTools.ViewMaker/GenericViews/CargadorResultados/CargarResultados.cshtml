@@ -39,74 +39,70 @@ Variables
             if (Model.NumeroResultadosTotal != -1)
             {
                 <div id="numResultadosRemover">
-                    @Model.NumeroResultadosTotal                   
+                    @Model.NumeroResultadosTotal
                 </div>
             }
             @*<div class="@claseResource">*@
-                
                 if (Model.ListaResultados != null && Model.ListaResultados.Count > 0)
                 {
                     foreach (ObjetoBuscadorModel resultado in Model.ListaResultados)
                     {
                         if (resultado is CommunityModel)
                         {
-                            @Html.PartialView("_ResultadoComunidad", (CommunityModel)resultado)
+                            @Html.PartialView("../CargadorResultados/_ResultadoComunidad", (CommunityModel)resultado)
                         }
                         if (resultado is BlogModel)
                         {
-                            @Html.PartialView("_ResultadoBlog", (BlogModel)resultado)
+                            @Html.PartialView("../CargadorResultados/_ResultadoBlog", (BlogModel)resultado)
                         }
                         else if (resultado is ResourceModel)
                         {
                             if (Model.TipoBusqueda == ResultadoModel.TiposBusquedaMVC.Contribuciones)
                             {
-                                @Html.PartialView("_ResultadoRecursoContribuciones", (ResourceModel)resultado)
+                                @Html.PartialView("../CargadorResultados/_ResultadoRecursoContribuciones", (ResourceModel)resultado)
                             }
                             else if (Model.TipoBusqueda == ResultadoModel.TiposBusquedaMVC.EditarRecursosPerfil)
                             {
-                                @Html.PartialView("_ResultadoRecursoMisRecursos", (ResourceModel)resultado)
+                                @Html.PartialView("../CargadorResultados/_ResultadoRecursoMisRecursos", (ResourceModel)resultado)
                             }
                             else
                             {
-                                
-                                    @Html.PartialView("_ResultadoRecurso", (ResourceModel)resultado)
-                                
-                               
+                                @Html.PartialView("../CargadorResultados/_ResultadoRecurso", (ResourceModel)resultado)
                             }
                         }
                         else if (resultado is ProfileModel)
                         {
-                            @Html.PartialView("_ResultadoPerfil", (ProfileModel)resultado)
+                            @Html.PartialView("../CargadorResultados/_ResultadoPerfil", (ProfileModel)resultado)
                         }
                         else if (resultado is GroupCardModel)
                         {
-                            @Html.PartialView("_ResultadoGrupo", (GroupCardModel)resultado)
+                            @Html.PartialView("../CargadorResultados/_ResultadoGrupo", (GroupCardModel)resultado)
                         }
                         else if (resultado is MessageModel)
                         {
-                            @Html.PartialView("_ResultadoMensaje", (MessageModel)resultado)
+                            @Html.PartialView("../CargadorResultados/_ResultadoMensaje", (MessageModel)resultado)
                         }
                         else if (resultado is CommentSearchModel)
                         {
                             if (Model.TipoBusqueda == ResultadoModel.TiposBusquedaMVC.Contribuciones)
                             {
-                                @Html.PartialView("_ResultadoComentarioContribuciones", (CommentSearchModel)resultado)}
+                                @Html.PartialView("../CargadorResultados/_ResultadoComentarioContribuciones", (CommentSearchModel)resultado)}
                             else
                             {
-                                @Html.PartialView("_ResultadoComentario", (CommentSearchModel)resultado)
+                                @Html.PartialView("../CargadorResultados/_ResultadoComentario", (CommentSearchModel)resultado)
                             }
                         }
                         else if (resultado is InvitationModel)
                         {
-                            @Html.PartialView("_ResultadoInvitacion", (InvitationModel)resultado)
+                            @Html.PartialView("../CargadorResultados/_ResultadoInvitacion", (InvitationModel)resultado)
                         }
                         else if (resultado is ContactModel)
                         {
-                            @Html.PartialView("_ResultadoContacto", (ContactModel)resultado)
+                            @Html.PartialView("../CargadorResultados/_ResultadoContacto", (ContactModel)resultado)
                         }
                         else if (resultado is PaginaCMSModel)
                         {
-                            @Html.PartialView("_ResultadoPaginaCMS", (PaginaCMSModel)resultado)
+                            @Html.PartialView("../CargadorResultados/_ResultadoPaginaCMS", (PaginaCMSModel)resultado)
                         }
                     }
                 }

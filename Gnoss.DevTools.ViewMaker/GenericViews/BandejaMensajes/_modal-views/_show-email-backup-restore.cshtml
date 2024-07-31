@@ -1,0 +1,46 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista modal donde se indica la posibilidad de restaurar contenido del email que no se ha podido enviar debido a algún problema o por eliminación por error por parte del usuario.
+
+Variables
+----------------------------------------------------------------
+*@
+
+@{
+                      
+}
+
+<div
+	id="modal-email-backup-content"
+	class="modal modal-top fade"           
+	role="dialog"	
+	aria-modal="true">
+
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			@* Modal para controlar restaurar la página cms *@
+			<div class="modal-header">
+				@* Título del Modal *@
+				<p class="modal-title">
+					<span class="material-icons">restore</span>
+					Restaurar mensaje
+				</p>
+				@* Cierre del Modal *@
+				<span class="material-icons cerrar"
+					  data-dismiss="modal"
+					  aria-label="Close">close</span>
+			</div>
+			<div class="modal-body">				
+				<div class="form-group">
+					<label class="control-label">Se ha encontrado una copia de seguridad de un email que no se envió. ¿Deseas restaurarlo para su envío?</label>
+				</div>
+				<div class="form-actions">
+					<button class="btn btn-outline-primary btnNotConfirmRestoreEmailContent" data-dismiss="modal">@Html.GetText("COMMON","NO")</button>
+					<button class="btn btn-primary btnConfirmRestoreEmailContent" data-dismiss="modal" >@Html.GetText("COMMON","SI")</button>
+				</div>				
+			</div>
+		</div>
+	</div>
+</div>
+

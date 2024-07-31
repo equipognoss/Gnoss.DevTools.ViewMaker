@@ -55,7 +55,7 @@ string urlLinkedin = "";
 <div class="form-group mb-4 edit-red-social">
     <label class="control-label d-block">Twitter</label>
     <div class="input-wrap form-social">
-        <input placeholder="Introduce tu cuenta de Twitter"
+        <input placeholder="@Html.GetText("PERFIL", "INTRODUCETWITTER")"
                type="text"
                name=""
                value="@urlTwitter"
@@ -69,7 +69,7 @@ string urlLinkedin = "";
 <div class="form-group mb-4 edit-red-social">
     <label class="control-label d-block">Facebook</label>
     <div class="input-wrap form-social">
-        <input placeholder="Introduce tu cuenta de Facebook"
+        <input placeholder="@Html.GetText("PERFIL", "INTRODUCEFACEBOOK")"
                type="text"
                name=""
                value="@urlFacebook"
@@ -83,7 +83,7 @@ string urlLinkedin = "";
 <div class="form-group mb-4 edit-red-social">
     <label class="control-label d-block">Linkedin</label>
     <div class="input-wrap form-social">
-        <input placeholder="Introduce tu cuenta de Linkedin"
+        <input placeholder="@Html.GetText("PERFIL", "INTRODUCELINKEDIN")"
                type="text"
                name=""
                value="@urlLinkedin"
@@ -98,18 +98,18 @@ string urlLinkedin = "";
 @* Sección añadir sitios web de interés *@
 <div class="form-group mb-5 edit-etiquetas">
     <div class="form-group">
-        <label class="control-label d-block">Otros sitios web de interés</label>
+        <label class="control-label d-block">@Html.GetText("PERFIL", "OTROSSTIOSINTERES")</label>
         <div class="input-wrap form-sticky-button autocompletar">
             <span class="icon material-icons">insert_link</span>
             @* Input de sitios web *@
             <input type="text"
-                   placeholder="Introduce una url y añádela"                   
+                   placeholder="@Html.GetText("PERFIL", "INTRODUCEURL")"
                    class="form-control"
                    id="@idUrlUsuario"                   
                    autocomplete="off" />
 
             @* Botón de Añadir Etiqueta/Tag *@
-            <a id="@idBtnRedSocial" class="btn btn-grey uppercase">Añadir</a>                        
+            <a id="@idBtnRedSocial" class="btn btn-grey uppercase">@Html.GetText("PERFIL", "ADD")</a>
         </div>
         @* Tabla con el listado de URLs del usuario *@      
         <table id="@idTblRedesSociales" class="table @( (@Model.SocialNetworks.Count == 0) ? "d-none" : "") ">          
@@ -126,7 +126,7 @@ string urlLinkedin = "";
                       <td><img src="https://www.google.com/s2/favicons?domain=@RedSocial.Domain" /></td>                  
                       <td class="urlName">@RedSocial.Name</td>
                       <td class="urlTitle">@RedSocial.Url</td>
-                      <td><span data-urlname="@RedSocial.Name" class="material-icons-outlined @idBtnBorrarUrl" title="Eliminar" alt="Eliminar" style="cursor: pointer">delete</span></td>
+                        <td><span data-urlname="@RedSocial.Name" class="material-icons-outlined @idBtnBorrarUrl" title="Eliminar" alt="Eliminar" style="cursor: pointer"></span></td>
                   </tr>
               }                  
           </tbody>

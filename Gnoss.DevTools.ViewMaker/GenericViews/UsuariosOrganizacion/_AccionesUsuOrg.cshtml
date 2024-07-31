@@ -46,7 +46,7 @@ Variables
         />
         <label class="custom-control-label"
                for="mostrarParticipa">
-            Mostrar solo comunidades en las que participa
+            @Html.GetText("COMMON","MOSTRARSOLOCOMUNIDADESENLASQUEPARTICIPA")
         </label>
     </div>
 
@@ -54,9 +54,9 @@ Variables
     <table id="tblAccionesUsuOrgProyOrg" class="table">
         <thead>
             <tr>
-                <th scope="col">Nombre</th>
-                <th scope="col">Personal</th>
-                <th scope="col">Corporativo</th>
+                <th scope="col">@Html.GetText("COMMON","NOMBRE")</th>
+                <th scope="col">@Html.GetText("REGISTROUSUARIOORGANIZACION","PERSONAL")</th>
+                <th scope="col">@Html.GetText("REGISTROUSUARIOORGANIZACION","CORPORATIVO")</th>
             </tr>
         </thead>
         <tbody>
@@ -79,7 +79,7 @@ Variables
                             <label class="custom-control-label" for="chkProyecto_@proyParticipa.Key">@proyParticipa.Nombre</label>
                             @if (administra)
                             {
-                                <label class="text-muted">Administrador</label>                                
+                                <label class="text-muted">@Html.GetText("USUARIOS","Administrador")</label>
                             }
                         </div>
                     </td>

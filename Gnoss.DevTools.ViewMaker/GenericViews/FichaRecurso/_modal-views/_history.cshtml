@@ -1,163 +1,166 @@
 ﻿@model List<ResourceModel>
 @*
-Descripción
------------------------------------------------
-Vista modal que servirá para ver el historial de un recurso. Se mostrará cuando en la ficha del recurso, se pulse sobre "Historial" o "Ver historial".
-* Atención: * Solo es necesario mostrar el contenido del modal ya que es cargado de forma dinámica mediante petición AJAX realizada al FichaRecursoController.
+    Descripción
+    -----------------------------------------------
+    Vista modal que servirá para ver el historial de un recurso. Se mostrará cuando en la ficha del recurso, se pulse sobre "Historial" o "Ver historial".
+    * Atención: * Solo es necesario mostrar el contenido del modal ya que es cargado de forma dinámica mediante petición AJAX realizada al FichaRecursoController.
 
-Variables
-----------------------------------------------------------------
+    Variables
+    ----------------------------------------------------------------
 *@
 @{
-ResourceModel DocActual = Model.OrderByDescending(recurso => recurso.Version).First();    
-// Contador para recorrer las versiones del documento y pintarlas
-int cont = 0;
+    ResourceModel DocActual = Model.OrderByDescending(recurso => recurso.Version).First();
+    // Contador para recorrer las versiones del documento y pintarlas
+    int cont = 0;
 }
 
 @*
-----------------------------------------------------------------
--------------------- Vista Modal ver el historial de un Recurso --------------------
+    ----------------------------------------------------------------
+    -------------------- Vista Modal ver el historial de un Recurso --------------------
 *@
-  
-      <div class="modal-header">
-        <p class="modal-title">
-          <span class="material-icons">dns</span>@Html.GetText("COMPARARVERSIONES", "HISTORIAL")
-        </p>
-        <span
-          class="material-icons cerrar"
+
+<div class="modal-header">
+    <p class="modal-title">
+        <span class="material-icons">dns</span>@Html.GetText("COMPARARVERSIONES", "HISTORIAL")
+    </p>
+    <span class="material-icons cerrar"
           data-dismiss="modal"
-          aria-label="Close"
-          >close</span
-        >
-      </div>
-      <div class="modal-body">
-          <div class="formulario-edicion">
-              @* Mostrar título, y fecha del recurso*@
-              <div class="header-resource">
-                  <div class="title-wrap">
-                      <p class="title">@DocActual.Title</p>
-                  </div>
-                  <div class="upper-wrap">
-                      <div class="user-miniatura">
-                          <div class="nombre-usuario-wrap">
-                              @* <p class="nombre-completo">@DocActual.Publisher.NamePerson - @DocActual.Publisher.NameOrganization</p> *@
-                              <p class="nombre-completo">@DocActual.Publisher.NamePerson</p>
-                          </div>
-                      </div>
-                      <p class="fecha">@DocActual.PublishDate</p>
-                  </div>
-              </div>
-
-              @* Tabla con las versiones de los documentos  *@
-              <table class="display nowrap table table-sm tabla-versiones" id="panHistorial_table">
-                  <thead>
-                      <tr>
-                          <th></th>
-                          <th scope="col">@Html.GetText("HISTORIALVERSIONES", "VERSION")</th>
-                          <th scope="col">@Html.GetText("HISTORIALVERSIONES", "HORA")</th>
-                          <th scope="col">@Html.GetText("HISTORIALVERSIONES", "FECHA")</th>
-                          <th scope="col">@Html.GetText("HISTORIALVERSIONES", "EDITOR")</th>
-                          <th scope="col">@Html.GetText("HISTORIALVERSIONES", "RESTAURAR")</th>
-                          @if (DocActual.TypeDocument == ResourceModel.DocumentType.FicheroServidor)
-                          {
-                              <th scope="col">@Html.GetText("HISTORIALVERSIONES", "DESCARGAR")</th>
-                          }
-                      </tr>
-                  </thead>
-                  <tbody>
-                      @foreach (ResourceModel doc in Model.OrderByDescending(recurso => recurso.Version))
-                      {
-                      <tr>
-                          @* Columnas de DataTables*@
-                          @* INPUT CHECKBOX *@
-                          <td>
-                              <div class="check-wrapper">
-                                  <div class="custom-control custom-checkbox">
-                                      <input style="z-index:9999" type="checkbox" class="custom-control-input" onclick="ComprobarChecks(this);" id="@doc.Key">
-                                      <label class="custom-control-label" for="version3"></label>
-                                  </div>
-                              </div>
-                          </td>
-                          @* VERSION *@
-                          <td><a href="@doc.CompletCardLink">@doc.Version</a></td>
-                          @* HORA *@
-                          <td>@doc.PublishDate.ToString("HH:mm")</td>
-                          @* FECHA *@
-                          <td>@doc.PublishDate.ToString("dd/MM/yyyy")</td>
-                          @* AUTOR *@
-                          <td>@doc.Publisher.NamePerson</td>
-                          @* RESTAURAR *@
-                          @if (doc.Key == DocActual.Key)
-                          {
-                              <td>@Html.GetText("HISTORIALVERSIONES", "VERSIONACTUAL")</td>
-                          }
-                          else
-                          {
-                              @*<td><div class="restaurar btn btn-sm"><span class="material-icons">replay</span><a onclick="DesplegarRestaurar(this, '@doc.ListActions.UrlLoadActionRestoreVersion', '@doc.Key.ToString()')">@Html.GetText("HISTORIALVERSIONES", "RESTAURAR")</a></div></td>*@
-                              <td><div class="restaurar btn btn-sm"><span class="material-icons">replay</span><a onclick="DesplegarRestaurar(this, '@doc.ListActions.UrlLoadActionRestoreVersion', '@doc.Key.ToString()')">@Html.GetText("HISTORIALVERSIONES", "RESTAURAR")</a></div></td>
-                          }
-                          @* DESCARGAR *@
-                          @if (DocActual.TypeDocument == ResourceModel.DocumentType.FicheroServidor)
-                          {
-                              <td><a href="@doc.UrlPreview">@Html.GetText("HISTORIALVERSIONES", "DESCARGAR")</a></td>
-                          }
-                      </tr>
-                          cont++;
-                      }
-                  </tbody>
-              </table>
-
-              @* Confirmación de Restaurar *@
-              <div class="confirmRestaurar">
-                  <div style="display: none;" class="stateShowForm" id="panels">
-                      <div class="loading" id="loading" style="display: none;">
-                          <p><span class="spinner-border mr-2 texto-primario"></span>Cargando formulario, un momento por favor</p>
-                      </div>
-                      <div class="box form activeForm" id="action" style="display: block;">
-                          <div id="panAccionDoc">
-                          </div>
-                      </div>                      
-                  </div>
-              </div>
-
-              @* Acciones a realizar *@
-              <div class="form-actions">
-                  <a onclick="DesplegarComparar()" class="btn btn-primary uppercase">@Html.GetText("HISTORIALVERSIONES", "COMPARAR")</a>
-              </div>
-
-              @* Panel donde se mostrará la comparación de Versiones*@
-              <div style="display:none" id="despleCompVer">
-                  <div style="display: block;" class="stateShowForm" id="panels">
-                      <div class="box form activeForm" id="action" style="display: block;">
-                          <div id="panDiffDoc"></div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-
-        @* Mensaje informativo del proceso*@     
-        <div id="despAccionRec_@DocActual.Key">
-            <div>
-                <div id="menssages">
-                    <div class="ok"></div>
-                    <div class="ko"></div>
+          aria-label="Close">close</span>
+</div>
+<div class="modal-body">
+    <div class="formulario-edicion">
+        @* Mostrar título, y fecha del recurso*@
+        <div class="header-resource">
+            <div class="title-wrap">
+                <p class="title">@DocActual.Title</p>
+            </div>
+            <div class="upper-wrap">
+                <div class="user-miniatura">
+                    <div class="nombre-usuario-wrap">
+                        @* <p class="nombre-completo">@DocActual.Publisher.NamePerson - @DocActual.Publisher.NameOrganization</p> *@
+                        <p class="nombre-completo">@DocActual.Publisher.NamePerson</p>
+                    </div>
                 </div>
-            </div>                        
-        </div>
-        
-       @* Panel donde se mostrará el Despliegue *@
-        <div id='despAccionRec_history' style="display:none">
-
+                <p class="fecha">@DocActual.PublishDate</p>
+            </div>
         </div>
 
-        @* Input oculto para guardar los ids de los checks chequeados *@
-       <input type="hidden"  id="txtHackCheckSeleccionados" />
+        @* Tabla con las versiones de los documentos  *@
+        <table class="display nowrap table table-sm tabla-versiones" id="panHistorial_table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th scope="col">@Html.GetText("HISTORIALVERSIONES", "VERSION")</th>
+                    <th scope="col">@Html.GetText("HISTORIALVERSIONES", "HORA")</th>
+                    <th scope="col">@Html.GetText("HISTORIALVERSIONES", "FECHA")</th>
+                    <th scope="col">@Html.GetText("HISTORIALVERSIONES", "EDITOR")</th>
+                    <th scope="col">@Html.GetText("HISTORIALVERSIONES", "RESTAURAR")</th>
+                    @if (DocActual.TypeDocument == ResourceModel.DocumentType.FicheroServidor)
+                    {
+                        <th scope="col">@Html.GetText("HISTORIALVERSIONES", "DESCARGAR")</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (ResourceModel doc in Model.OrderByDescending(recurso => recurso.Version))
+                {
+                    <tr>
+                        @* Columnas de DataTables*@
+                        @* INPUT CHECKBOX *@
+                        <td>
+                            <div class="check-wrapper">
+                                <div class="custom-control custom-checkbox">
+                                    <input style="z-index:9999" type="checkbox" class="custom-control-input" onclick="ComprobarChecks(this);" id="@doc.Key">
+                                    <label class="custom-control-label" for="version3"></label>
+                                </div>
+                            </div>
+                        </td>
+                        @* VERSION *@
+                        <td><a href="@doc.CompletCardLink">@doc.Version</a></td>
+                        @* HORA *@
+                        <td>@doc.PublishDate.ToString("HH:mm")</td>
+                        @* FECHA *@
+                        <td>@doc.PublishDate.ToString("dd/MM/yyyy")</td>
+                        @* AUTOR *@
+                        <td>@doc.Publisher.NamePerson</td>
+                        @* RESTAURAR *@
+                        @if (doc.Key == DocActual.Key)
+                        {
+                            <td>@Html.GetText("HISTORIALVERSIONES", "VERSIONACTUAL")</td>
+                        }
+                        else
+                        {
+                            <td>
+                                <div class="restaurar btn btn-sm">
+                                    <a class="d-flex align-items-center" style="text-decoration:none; color:inherit" onclick="DesplegarRestaurar(this, '@doc.ListActions.UrlLoadActionRestoreVersion', '@doc.Key.ToString()')">
+                                        <span class="material-icons">replay</span>
+                                        <span class="texto">@Html.GetText("HISTORIALVERSIONES", "RESTAURAR")</span>
+                                    </a>
+                                </div>
+                            </td>
+                        }
+                        @* DESCARGAR *@
+                        @if (DocActual.TypeDocument == ResourceModel.DocumentType.FicheroServidor)
+                        {
+                            <td><a href="@doc.UrlPreview">@Html.GetText("HISTORIALVERSIONES", "DESCARGAR")</a></td>
+                        }
+                    </tr>
+                    cont++;
+                }
+            </tbody>
+        </table>
+
+        @* Confirmación de Restaurar *@
+        <div class="confirmRestaurar">
+            <div style="display: none;" class="stateShowForm" id="panels">
+                <div class="loading" id="loading" style="display: none;">
+                    <p><span class="spinner-border mr-2 texto-primario"></span>Cargando formulario, un momento por favor</p>
+                </div>
+                <div class="box form activeForm" id="action" style="display: block;">
+                    <div id="panAccionDoc">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Acciones a realizar *@
+        <div class="form-actions">
+            <a onclick="DesplegarComparar()" class="btn btn-primary uppercase">@Html.GetText("HISTORIALVERSIONES", "COMPARAR")</a>
+        </div>
+
+        @* Panel donde se mostrará la comparación de Versiones*@
+        <div style="display:none" id="despleCompVer">
+            <div style="display: block;" class="stateShowForm" id="panels">
+                <div class="box form activeForm" id="action" style="display: block;">
+                    <div id="panDiffDoc"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Mensaje informativo del proceso*@
+<div id="despAccionRec_@DocActual.Key">
+    <div>
+        <div id="menssages">
+            <div class="ok"></div>
+            <div class="ko"></div>
+        </div>
+    </div>
+</div>
+
+@* Panel donde se mostrará el Despliegue *@
+<div id='despAccionRec_history' style="display:none">
+
+</div>
+
+@* Input oculto para guardar los ids de los checks chequeados *@
+<input type="hidden" id="txtHackCheckSeleccionados" />
 
 
-       <script>
+<script>
         function DesplegarRestaurar(boton, url, id)
-        {            
+        {
             var panelID = 'despAccionRec_history';
 
             $('.confirmRestaurar').attr('id', panelID);
@@ -218,7 +221,7 @@ int cont = 0;
                 $(input[i]).prop('checked', false);
             }
         }
-       </script>
-      
+</script>
+
 
 

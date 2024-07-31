@@ -45,7 +45,7 @@ bool isOwnedAuthor = false;
 
     <div class="interacciones-recurso">
         @* Gestión de Votos positivos *@
-        <div class="likes @( (isVotedPositive) ? "activo" : null)">
+        <div class="likes @( (isVotedPositive) ? "activo" : null)" @*onclick="_paq.push(['trackEvent', 'Voto', 'Click', 'Me gusta']);"*@>
             @if (!isOwnedAuthor)
             {
                 if (isVotedPositive)

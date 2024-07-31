@@ -71,7 +71,7 @@ else {
             <span class="material-icons">close</span>
         </a>
     </div>
-    <form method="post" id="formPanFacetas" action="@(new Uri($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}").AbsoluteUri)">
+    <form method="post" id="formPanFacetas" autocomplete="off" action="@($"{Html.GetBaseUrlIdioma()}{Context.Request.Path}")">
         <fieldset style="display: block">
             <div id="panFacetas" class="facetas-wrap custom-css-scroll">
                 @Html.Raw(htmlFacetas)

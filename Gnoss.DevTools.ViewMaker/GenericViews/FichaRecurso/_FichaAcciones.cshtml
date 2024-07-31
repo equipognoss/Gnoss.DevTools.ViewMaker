@@ -21,7 +21,7 @@
                 </div>
                 break;
             case "add-personal-space":
-                @Html.PartialView("_modal-views/_add-personal-space", Model);
+                @Html.PartialView("_modal-views/_add-personal-space", Model)
                 break;
             case "restore-version":
                 <div>
@@ -38,14 +38,14 @@
                 </div>
                 break;
             case "add-categories":
-                @Html.PartialView("_modal-views/_categories", Model);
+                @Html.PartialView("_modal-views/_categories", Model)
                 break;
 
             case "add-tags":
-                @Html.PartialView("_modal-views/_tag", Model);
+                @Html.PartialView("_modal-views/_tag", Model)
                 break;
             case "share":
-                @Html.PartialView("_modal-views/_share", Model);
+                @Html.PartialView("_modal-views/_share", Model)
                 break;
             case "duplicate":
                 <div>
@@ -97,9 +97,10 @@
                 </div>
                 break;
             case "send-newsletter":
-                @Html.PartialView("_modal-views/_send-newsletter", Model);
+                @Html.PartialView("_modal-views/_send-newsletter", Model)
                 break;
             case "send-newsletter-groups":
+            @*
                 <div>
                     <fieldset>
                         <p>@Html.GetText("INVITACIONES", "SELECCIONAGRUPOS")</p>
@@ -144,47 +145,34 @@
                         </script>
                     </div>
                 </div>
+            *@
+                @Html.PartialView("_modal-views/_send-newsletter-group", Model)
+                
                 break;
             case "link-resource":
-                @Html.PartialView("_modal-views/_link", Model);
+                @Html.PartialView("_modal-views/_link", Model)
+                break;
+            case "link-resourceSP":
+                @Html.PartialView("_modal-views/_link-sharepoint", Model)
                 break;
             case "lock-unlock-comments":
-                @Html.PartialView("_modal-views/_lock-comments", Model);
-                break;
-                
+                @Html.PartialView("_modal-views/_lock-comments", Model)
+                break;               
             case "certify":
-                @Html.PartialView("_modal-views/_certify", Model);
+                @Html.PartialView("_modal-views/_certify", Model)
                 break;
             case "delete":
-                @Html.PartialView("_modal-views/_delete", Model);
+                @Html.PartialView("_modal-views/_delete", Model)
                 break;
             case "delete-selective":
-                @Html.PartialView("_modal-views/_delete-selective", Model);                
+                @Html.PartialView("_modal-views/_delete-selective", Model)              
+                break;
+            case "add-metatitle":
+                @Html.PartialView("_modal-views/_metatitle", Model)
+                break;
+            case "add-metadescription":
+                @Html.PartialView("_modal-views/_metadescription", Model)
                 break;
         }
-    }
-}
-
-@functions{
-    string PintarCategoria(CategoryModel pCategoriaTesauro, int pNivel)
-    {
-        ResourceModel fichaRecurso = Model.Resource;
-        bool tieneHijos = ((List<CategoryModel>)Model.Categories).Count(cat => cat.ParentCategoryKey == pCategoriaTesauro.Key) > 0;
-
-        string nombre = "";
-        for (int i = 0; i < pNivel; i++)
-        {
-            nombre += "&nbsp;";
-        }
-        nombre += pCategoriaTesauro.Name;
-        <option value="@pCategoriaTesauro.Key">@Html.Raw(nombre)</option>
-        if (tieneHijos)
-        {
-            foreach (CategoryModel categoria in ((List<CategoryModel>)Model.Categories).Where(cat => cat.ParentCategoryKey == pCategoriaTesauro.Key).OrderBy(cat => cat.Order))
-            {
-                @PintarCategoria(categoria, pNivel + 1);
-            }
-        }
-        return string.Empty;
     }
 }

@@ -19,8 +19,7 @@ Variables
 *@
 
 <div id="modal-container"
-     class="modal modal-top fade modal-edicion show"
-     tabindex="-1"
+     class="modal modal-top fade modal-edicion"     
      role="dialog">
     <div class="modal-dialog" role="document">
         @* HAY QUE CARGAR EL MODAL-CONTENT de los demás modales en el #modal-dinamic-content *@
@@ -34,7 +33,7 @@ Variables
                     <div class="modal-header">
                         <p class="modal-title">
                             <span class="spinner-border white-color mr-2"></span>
-                            Cargando ...
+                            @Html.GetText("COMMON","CARGANDO")
                         </p>
                         <span class="material-icons cerrar" data-dismiss="modal" aria-label="Close">close</span>
                     </div>

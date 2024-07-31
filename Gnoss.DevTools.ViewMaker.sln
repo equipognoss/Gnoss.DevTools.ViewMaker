@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gnoss.DevTools.ViewMaker", "Gnoss.DevTools.ViewMaker/Gnoss.DevTools.ViewMaker.csproj", "{9F677462-ECEC-4C43-BE4F-2D0FD1FCF6D5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gnoss.DevTools.ViewMaker", "Gnoss.DevTools.ViewMaker\Gnoss.DevTools.ViewMaker.csproj", "{9F677462-ECEC-4C43-BE4F-2D0FD1FCF6D5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

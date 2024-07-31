@@ -10,21 +10,22 @@ Variables
 ----------------------------------------------------------------
 *@
 @{
-ResourceModel FichaDocumento = Model.Resource;
-CommunityModel Comunidad = Html.GetComunidad();
-UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+    ResourceModel FichaDocumento = Model.Resource;
+    CommunityModel Comunidad = Html.GetComunidad();
+    UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
 
-//Url de la pestaña para mostrarla en el Breadcrumb
-string urlPestanya = Comunidad.Url + "/" + Html.GetNombreUrlPestanya();
-//Nombre o título de la pestaña para ponerlo en el Breadcrumb
-string nombrePestanya = Html.GetNombrePestanya();
-// Nombre de la clase para un div del recurso
-string claseItem = "resource"; 
-// Nombre adicional para el tipo de recurso y ser usado a modo de clase
-string claseTipoRecurso = Html.ObtenerNombreClasePorTipoRecurso(FichaDocumento.TypeDocument);
-// Comprobar si el recurso es privado o no
-string privado = "";
-
+    //Url de la pestaña para mostrarla en el Breadcrumb
+    string urlPestanya = Comunidad.Url + "/" + Html.GetNombreUrlPestanya();
+    //Nombre o título de la pestaña para ponerlo en el Breadcrumb
+    string nombrePestanya = Html.GetNombrePestanya();
+    // Nombre de la clase para un div del recurso
+    string claseItem = "resource"; 
+    // Nombre adicional para el tipo de recurso y ser usado a modo de clase
+    string claseTipoRecurso = Html.ObtenerNombreClasePorTipoRecurso(FichaDocumento.TypeDocument);
+    // Comprobar si el recurso es privado o no
+    string privado = "";
+    bool recursoEspacioPersonal = ViewBag.RecursoEspacioPersonal;
+    UserProfileModel perfil = Html.GetPerfil();
 }
 @*
     ----------------------------------------------------------------
@@ -33,11 +34,11 @@ string privado = "";
 
 
 @{
-@* Comprobar si el recurso es privado*@
+    @* Comprobar si el recurso es privado*@
     if (FichaDocumento.Private) { 
         privado = " private";
     }
-@* Dependiendo del recurso, cargar un estilo u otro*@
+    @* Dependiendo del recurso, cargar un estilo u otro*@
     if (Comunidad.IsCatalog)
     {
         Html.SetBodyClass("layout03 fichaComunidad comunidad fichaCatalogo comGnoss fichaRecurso " + claseTipoRecurso + privado);
@@ -74,7 +75,14 @@ string privado = "";
     <div class="col col-12 col-breadcrumb" id="breadcrumb">
         <ul>
             <li><a href="@Comunidad.Url"><strong>@Html.GetText("COMMON", "HOME")</strong></a></li>
-            <li><a href="@urlPestanya">@nombrePestanya</a></li>
+            @if (recursoEspacioPersonal)
+            {
+               <li><a href="@perfil.Url@Html.GetText("URLSEM", "MISRECURSOS")">@Html.GetText("COMMON","MIESPACIOPERSONAL")</a></li> 
+            }
+            else
+            {
+                <li><a href="@urlPestanya">@nombrePestanya</a></li>
+            }           
             <li>@FichaDocumento.Title</li>
         </ul>
     </div>
@@ -97,7 +105,7 @@ string privado = "";
             {
                 if (!PresentacionNoSocial)
                 {
-                    @Html.PartialView("_partial-views/_header-utils-panel",Model);
+                    @Html.PartialView("_partial-views/_header-utils-panel", Model);
                 }
             }
             @* Mostrar Descripción del documento *@
@@ -161,7 +169,7 @@ string privado = "";
             @* Mostrar Comentarios de un recurso *@
             @if (FichaDocumento.Comments != null)
             {
-                @Html.PartialView("_partial-views/_comments",Model);
+                @Html.PartialView("_partial-views/_comments");
                 @* Aviso Legal - No mostrar el aviso legal por defecto
                 <p class="text-muted text-center font-weight-light">@Html.GetText("FREEBASE", "AVISOLEGAL")</p>
                 *@
@@ -181,7 +189,7 @@ string privado = "";
             <div id="divContPanGadgets">
                 @foreach (GadgetModel gadget in ((List<GadgetModel>)FichaDocumento.Gadgets).OrderBy(gadget => gadget.Order))
                 {
-                    @Html.PartialView("ControlesMVC/_FichaGadget", gadget)
+                    @Html.PartialView("../Shared/ControlesMVC/_FichaGadget", gadget)
                 }
             </div>              
         }
@@ -294,9 +302,3 @@ string privado = "";
                                 }
                             }
 </script>
-
-
-
-
-
-

@@ -1,0 +1,44 @@
+﻿@model CMSComponentFacet
+
+@{
+    string inputID1 = Model.FacetModel.Key + "f1";
+    string inputID2 = Model.FacetModel.Key + "f2";
+}
+
+@if (Model.FacetModel.SearchBoxType.Equals(SearchBoxType.Simple))
+{
+    @Html.PartialView("../CMSPagina/Faceta/_PintarCajaBusquedaSimple", Model)
+}
+else if (Model.FacetModel.SearchBoxType.Equals(SearchBoxType.FromToRank))
+{
+    <div class="facetedSearchBox fechaDesdeHasta">
+        <label for="@inputID1" class="botonBuscarFaceta"></label>
+        <input type="text" value="@Html.GetText("METABUSCADOR", "DESDE")" onblur="if(this.value == ''){this.value = '@Html.GetText("METABUSCADOR", "DESDE")'; this.style.color = 'gray';} return true;" onfocus="if(this.value == '@Html.GetText("METABUSCADOR", "DESDE")'){this.value = ''; this.style.color = '';} return true;" name="@inputID1" class="filtroFaceta ac_input" id="@inputID1" style="color: gray;"><input type="text" value="@Html.GetText("METABUSCADOR", "HASTA")" onblur="if(this.value == ''){this.value = '@Html.GetText("METABUSCADOR", "HASTA")'; this.style.color = 'gray';} return true;" onfocus="if(this.value == '@Html.GetText("METABUSCADOR", "HASTA")'){this.value = ''; this.style.color = '';} return true;" name="@inputID2" class="filtroFaceta ac_input" id="@inputID2" style="color: gray;">
+        <a name="@Model.FacetModel.FacetKey" class="searchButton"></a>
+    </div>
+}
+else if (Model.FacetModel.SearchBoxType.Equals(SearchBoxType.FromToDates))
+{
+    <div class="facetedSearchBox fechaDesdeHasta">
+        <label for="@inputID1" class="botonBuscarFaceta"></label>
+        <input type="text" class="filtroFacetaFecha ac_input hasDatepicker" value="@Html.GetText("METABUSCADOR", "DESDE")" onchange="ComprobarFechas(this, this, 2);" name="@inputID1" id="@inputID1"><input type="text" class="filtroFacetaFecha ac_input hasDatepicker" value="@Html.GetText("METABUSCADOR", "HASTA")" onchange="ComprobarFechas(this, this, 2);" name="@inputID2" id="@inputID2">
+        <a name="@Model.FacetModel.FacetKey" class="searchButton"></a>
+    </div>
+}
+else if (Model.FacetModel.SearchBoxType.Equals(SearchBoxType.Calendar))
+{
+    <div name="@Model.FacetModel.Key" class="divdatepicker"></div>
+}
+else if (Model.FacetModel.SearchBoxType.Equals(SearchBoxType.TreeList))
+{
+    <div style="height: 20px;">
+        <p>
+            @{
+                string cambioTipoPresentacion = Model.FacetModel.FacetKey + "_Lista";
+            }
+
+            <a onclick="VerFaceta('@cambioTipoPresentacion', '@Model.FacetModel.Key');" style="display: inline; float:right;">@Html.GetText("TESAURO", "LISTA")</a>
+            <span style="float: right;">@Html.GetText("TESAURO", "ARBOL") | </span>
+        </p>
+    </div>
+}

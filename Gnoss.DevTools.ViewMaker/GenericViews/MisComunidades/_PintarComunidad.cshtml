@@ -1,0 +1,71 @@
+﻿@model PintarComunidad
+
+@{
+    @* Tipo de la comunidad (Abierta, Privada...)*@
+    string communityType = "";
+    @* Logo de la comunidad *@
+    bool hasLogo = false;
+
+    switch ((CommunityModel.TypeAccessProject)Model.communityModel.AccessType)
+    {
+        case CommunityModel.TypeAccessProject.Private:
+            communityType = Html.GetText("COMUNIDADES", "COMUNIDADPRIVADA");
+            break;
+        case CommunityModel.TypeAccessProject.Public:
+            communityType = Html.GetText("COMUNIDADES", "COMUNIDADPUBLICA");
+            break;
+        case CommunityModel.TypeAccessProject.Reserved:
+            communityType = Html.GetText("COMUNIDADES", "COMUNIDADRESERVADA");
+            break;
+        case CommunityModel.TypeAccessProject.Restricted:
+            communityType = Html.GetText("COMUNIDADES", "COMUNIDADRESTRINGIDA");
+            break;
+    }
+
+    @* Logo de la comunidad *@
+    if (!String.IsNullOrEmpty(Model.communityModel.Logo))
+    {
+        hasLogo = true;
+    }
+}
+<div id="card-community-@Model.communityModel.Key" class="col-md-4 card-community">
+    <div class="card p-3 mb-2">
+        <div class="d-flex justify-content-between">
+            <div class="d-flex flex-row align-items-center">
+                <div class="user-miniatura" style="align-items: center">
+                    <div class="imagen-usuario-wrap">
+                        <a href="@Model.communityModel.Url">
+                            <div class="imagen @( !hasLogo ? "sinImagen" : null) ">
+                                @if (hasLogo)
+                                {
+                                    <span style="background-image: url(@Model.communityModel.Logo);"></span>
+                                }
+                                else
+                                {
+                                    <span class="material-icons">language</span>
+                                }
+                            </div>
+                        </a>
+                    </div>
+                    <div class="nombre-usuario-wrap">
+                        <a href="@Model.communityModel.Url">
+                            @* Nombre de la comunidad *@
+                            <p class="nombre">@Model.communityModel.Name</p>
+                            @* Privacidad de la Comunidad *@
+                            <span class="text-muted">@Html.Raw(communityType)</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*Acceder a posibles comunidades hijas con X niveles *@
+@foreach (MyCommunitiesViewModel.MyCommunityModel comunidadHija in Model.myCommunitiesView.Communities.Where(com => com.ParentKey == Model.communityModel.Key))
+{
+    PintarComunidad pintar = new PintarComunidad();
+    pintar.myCommunitiesView = Model.myCommunitiesView;
+    pintar.communityModel = comunidadHija;
+    @Html.PartialView("_PintarComunidad", pintar)
+}

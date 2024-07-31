@@ -30,21 +30,24 @@ UserProfileModel Perfil = Html.GetPerfil();
         </ul>
     </div>
 
-    <div class="col col-12 col-xl-12 col-contenido izquierda">
-        <div class="wrapCol">
-            <div class="header-contenido">
-                <div class="h1-container">
-                    <h1>@Html.GetText("MENU", "SUSCRIPCIONES")</h1>
-                </div>
-                @* Ocultar de momento la gestión de suscripciones (url)
-                    <div class="col-xl-2">                   
-                        <a class="btn btn-primary" href="@Perfil.Url@Html.GetText("URLSEM", "ADMINISTRARSUSCRIPCIONES")">@Html.GetText("SUSCRIPCIONES", "ADMINISTRARSUSCRIPCIONES")</a>
-                    </div>
-                *@
-                <div class="resource-list listView resource-list-personas">
-                    @Html.PartialView("ControlesMVC/_ActividadReciente", Model)
-                </div>
+    <div class="col col-12 header-listado">
+        <div class="h1-container">
+            <h1>@Html.GetText("MENU", "SUSCRIPCIONES")</h1>
+        </div>
+        @* Ocultar Administrar suscripciones ya que gestiona las del MetaEspacio -> Sin sentido *@
+        <div class="acciones-listado">
+            <div class="wrap">
+                <a class="btn btn-outline-grey" href="@Perfil.Url@Html.GetText("URLSEM", "ADMINISTRARSUSCRIPCIONES")">
+                    <span class="material-icons">edit_notifications</span>
+                    <span>@Html.GetText("SUSCRIPCIONES", "ADMINISTRARSUSCRIPCIONES")</span>
+                </a>
             </div>
-        </div>                
+        </div>
+        
+    </div>
+    <div class="col col-12">
+        <div class="resource-list listView resource-list-personas">
+            @Html.PartialView("ControlesMVC/_ActividadReciente", Model)
+        </div>
     </div>
 </div>

@@ -1,45 +1,24 @@
-﻿@*[security|||shared/head/_ficherosjavascriptpersonalizado.cshtml|||elprado]*@
-@using Es.Riam.Gnoss.Web.MVC.Models
-@using Es.Riam.Gnoss.Web.MVC.Models.ViewModels
-@using Es.Riam.Gnoss.Web.MVC.Models.Administracion
-@using Newtonsoft.Json
-@using Es.Riam.Util
-@using Microsoft.AspNetCore.Http
+﻿@*
+Descripción
+-----------------------------------------------
+Vista donde se podrá añadir código JS personalizado por cualquier persona que necesite añadir funcionalidad adicional al Front. Por defecto estará vacío.
+Esta vista se carga desde FicherosJavascript.cshtml
 
-@*
-    Descripción
-    -----------------------------------------------
-    Vista donde se podrá añadir código JS personalizado por cualquier persona que necesite añadir funcionalidad adicional al Front. Por defecto estará vacío.
-    Esta vista se carga desde FicherosJavascript.cshtml
-
-    Variables
-    ----------------------------------------------------------------
+Variables
+----------------------------------------------------------------
 *@
 @{
-    CommunityModel Comunidad = Html.GetComunidad();
-    string urlPersonalizacion = ViewBag.BaseURLContent + "/imagenes/proyectos/personalizacion/" + Comunidad.Key.ToString();
-    string versionJS = "";
-    if (Comunidad.VersionJS.HasValue)
-    {
-        versionJS = Comunidad.VersionJS.Value.ToString();
-    }
-    string version = versionJS + "-" + Html.GetVersion();
+CommunityModel Comunidad = Html.GetComunidad();
 }
 
 @*
-    ----------------------------------------------------------------
-    -------------------- Vista parcial para código JS personalizado --------------------
+----------------------------------------------------------------
+-------------------- Vista parcial para código JS personalizado --------------------
 *@
 
 @if (Comunidad != null && Comunidad.VersionJS.HasValue)
 {
-
-    <script type="text/javascript" src="@urlPersonalizacion/ElPrado/js/unificado.js?v=@version"></script>
-    <script type="text/javascript" src="@urlPersonalizacion/ElPrado/js/jquery.scrollsteps-full-min.js?v=@version"></script>
-    <script type="text/javascript" src="@urlPersonalizacion/community.js?v=@version"></script>
-
-
-    <!--TIMELINE-->
-    <input type="hidden" id="inpt_url_external_service" value="@Html.Translate("URL_SERVICIOEXTERNO")">
-    <input type="hidden" id="inpt_url_cronoscopio" value="@Html.GetComunidad().Url/@Html.Translate("URL_CRONOSCOPIO")">
+    @*  Este es un posible ejemplo de como se deberían de incluir los Javascript.
+    <script type="text/javascript" src="@Html.GetBaseUrlPersonalizacion()/community.js?v=@Comunidad.VersionJS"></script>    
+    *@
 }

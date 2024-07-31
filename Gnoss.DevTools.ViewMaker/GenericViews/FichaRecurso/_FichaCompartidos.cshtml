@@ -17,56 +17,20 @@ int positionCommunity = 0;
 ----------------------------------------------------------------
 -------------------- Vista que muestra las comunidades donde se está compartiendo un recurso --------------------*@
 
-@functions{
-
-    @* Función para pintar cada comunidad donde el recurso se está compartiendo *@
-    string PintarSharedCommunity(List<ResourceModel.SharedBRModel> listaBaseRecursos, int position, bool pintarNumerLimitado)
-    {
-        @* Nº máximo de comunidades que se mostrarán donde se está compartiendo el Recurso *@
-        int maxNumCommunityShared = 100;
-        for (int i = position; i < listaBaseRecursos.Count; i++)
-        {
-            if (i < maxNumCommunityShared || pintarNumerLimitado == false)
-            {
-                ResourceModel.SharedBRModel baseRecursos = listaBaseRecursos[i];
-                <li>
-                    @if (baseRecursos.Private) {
-                        <span class="material-icons-outlined mr-1" style="font-size:15px;">
-                        lock
-                        </span>
-                    }
-                    <a href="@baseRecursos.Url" rel="sioc:has_space">
-                        <span resource="@baseRecursos.Url"
-                              property="dcterms:title"
-                              typeof="sioc:Space">
-                            @baseRecursos.Name
-                        </span>
-                    </a>
-                    @if (baseRecursos.DeleteAvailable)
-                    {
-                        <span style="cursor:pointer"
-                              onclick="AccionRecurso_Descompartir('@Model.ListActions.UrlUnshare', this, '@baseRecursos.Key', '@baseRecursos.ProyectKey', '@baseRecursos.OrganizationKey')"
-                              class="material-icons eliminar"
-                              alt="Dejar de compartir el recurso"
-                              title="Dejar de compartir el recurso">
-                            close
-                        </span>
-                    }
-                </li>
-
-            }
-        }
-        return string.Empty;
-    }
-}
-
 @if (Model.Shareds != null && Model.Shareds.Count > 0)
 {
     <p class="group-title">@Html.GetText("LISTARECURSOS", "COMPARTIDOEN"):</p>
     <div>
         <div class="listado-comunidades">
             <ul class="no-list-style d-flex">
-                @PintarSharedCommunity(Model.Shareds, positionCommunity, true)
+                @{
+                    PintarSharedCommunity pintar1 = new PintarSharedCommunity();
+                    pintar1.resourceModel = Model;
+                    pintar1.pintarNumerLimitado = true;
+                    pintar1.listaBaseRecursos = Model.Shareds;
+                    pintar1.position = positionCommunity;
+                }
+                @Html.PartialView("../FichaRecurso/_PintarSharedCommunity", pintar1)
             </ul>
         </div>
 
@@ -75,7 +39,14 @@ int positionCommunity = 0;
         {
             <div class="listado-comunidades listado-comunidades-extra collapse" id="js-lista-comunidades-extra">
                 <ul class="no-list-style d-flex">
-                    @PintarSharedCommunity(Model.Shareds, maxNumCommunityShared, false)
+                    @{
+                        PintarSharedCommunity pintar2 = new PintarSharedCommunity();
+                        pintar2.resourceModel = Model;
+                        pintar2.pintarNumerLimitado = false;
+                        pintar2.listaBaseRecursos = Model.Shareds;
+                        pintar2.position = maxNumCommunityShared;
+                    }
+                    @Html.PartialView("../FichaRecurso/_PintarSharedCommunity", pintar2)
                 </ul>
             </div>
             <a class="btn ver-mas icono-flecha-abajo con-icono-after collapsed"

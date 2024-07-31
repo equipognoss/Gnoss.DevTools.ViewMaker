@@ -1,0 +1,32 @@
+﻿@model ResultadoModel
+
+@*Descripción
+-----------------------------------------------
+Vista es llamada desde el contexto de Mensajes para poder a su vez cargar cada uno de los mensajes relacionados.
+Esta vista llamará a su vez a _ResultadoMensaje para mostrar cada mensaje relacionado a modo de "contextos".
+
+Variables
+----------------------------------------------
+*@
+
+
+@*
+
+--------------------  Vista para cargar/recorrer mensajes relacionados --------------------*@
+
+@if (Model != null)
+{    
+    
+    if (Model.ListaResultados != null)
+    {
+        @* Recorrer cada uno de los mensajes relacionados *@
+        foreach (ObjetoBuscadorModel resultado in Model.ListaResultados)
+        {
+            if (resultado is MessageModel)
+            {
+                @*Mostrar la vista de cada mensajes y mostrarlo en la sección contextos *@
+                @Html.PartialView("_ResultadoMensaje", (MessageModel)resultado)
+            }
+        }
+    }       
+}

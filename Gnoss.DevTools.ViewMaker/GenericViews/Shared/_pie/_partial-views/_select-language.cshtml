@@ -20,7 +20,7 @@ HeaderModel cabecera = Html.GetCabecera();
     @* Contenedor idiomas *@
     <div class="idiomas">
         @* Título/Label del Idioma *@
-        <p>Idioma:</p>
+        <p>@Html.GetText("COMMON","IDIOMA"):</p>
         <div class="dropdown">
             @* Mostrar el idioma que está seleccionado*@
             <a href="#" class="dropdown-toggle" role="button" id="dropdownIdiomas" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -31,7 +31,7 @@ HeaderModel cabecera = Html.GetCabecera();
                 <p class="dropdown-title">
                     @* Icono + Título de Idiomas *@
                     <span class="material-icons language">language</span>
-                    Seleccionar idioma
+                     @Html.GetText("CONTROLESCVSEM", "SELECCIONAR")
                     <span class="material-icons cerrar-dropdown">close</span>
                 </p>
                 @* Listado de idiomas disponibles *@

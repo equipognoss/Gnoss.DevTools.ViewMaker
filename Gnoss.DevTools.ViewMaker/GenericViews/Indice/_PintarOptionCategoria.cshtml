@@ -1,0 +1,17 @@
+﻿@model PintarCategoriasIndice
+@{
+    bool tieneHijos = ((List<CategoryModel>)Model.indexView.Categories).Count(cat => cat.ParentCategoryKey == Model.categoryModel.Key) > 0;
+}
+
+<option value="@Model.categoryModel.Key">@Model.categoryModel.Name</option>
+
+@if (tieneHijos)
+{
+    foreach (CategoryModel categoria in Model.indexView.Categories.Where(cat => cat.ParentCategoryKey == Model.categoryModel.Key).OrderBy(cat => cat.Order))
+    {
+        PintarCategoriasIndice pintar = new PintarCategoriasIndice();
+        pintar.indexView = Model.indexView;
+        pintar.categoryModel = categoria;
+        @Html.PartialView("../Indice/_PintarOptionCategoria", pintar)
+    }
+}

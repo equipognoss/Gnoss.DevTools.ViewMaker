@@ -1,4 +1,5 @@
-﻿@*
+﻿@model ResourceViewModel
+@*
 Descripción
 -----------------------------------------------
 Vista que contiene información acerca de la interacción de los usuarios con un determinado recurso:
@@ -20,6 +21,7 @@ string textoVisitas = Html.GetText("LISTARECURSOS", "VISITAS");
 CommunityModel Comunidad = Html.GetComunidad();
 bool PresentacionNoSocial = Comunidad.ProyectType == CommunityModel.TypeProyect.CatalogoNoSocial || Comunidad.ProyectType == CommunityModel.TypeProyect.CatalogoNoSocialConUnTipoDeRecurso;
 UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+string idioma = Html.GetUtilIdiomas().LanguageCode;
 }
 
 @*
@@ -52,7 +54,7 @@ textoVisitas = Html.GetText("LISTARECURSOS", "REPRODUCCIONES");
         @* Mostrar interacciones del recurso (Likes, Dislikes) *@
         @if (FichaDocumento.Votes != null && FichaDocumento.AllowVotes)
         {            
-            @Html.PartialView("../FichaRecurso/_FichaVotos", FichaDocumento.Votes)
+            @Html.PartialView("_FichaVotos", FichaDocumento.Votes)
         }
 
         @* Mostrar certificación del recurso *@
@@ -60,7 +62,7 @@ textoVisitas = Html.GetText("LISTARECURSOS", "REPRODUCCIONES");
         {
             <div class="certificar-recurso">
 	            <span class="material-icons">verified_user</span>
-                <span class="texto">@Html.Raw(FichaDocumento.Certification.Value)</span>
+                <span class="texto">@Html.Raw(UtilCadenas.ObtenerTextoDeIdioma(FichaDocumento.Certification.Value, idioma, null))</span>
             </div>           
         }
     </div>
@@ -69,7 +71,7 @@ textoVisitas = Html.GetText("LISTARECURSOS", "REPRODUCCIONES");
     <div class="derecha">
         @if (!PresentacionNoSocial || IdentidadActual.IsProyectAdmin || IdentidadActual.IsProyectSupervisor || Model.Resource.Actions.Edit)
         {                        
-            @Html.PartialView("../FichaRecurso/_FichaAccionesMenu", model)
+            @Html.PartialView("_FichaAccionesMenu", model)
         }    
     </div>
 </div>

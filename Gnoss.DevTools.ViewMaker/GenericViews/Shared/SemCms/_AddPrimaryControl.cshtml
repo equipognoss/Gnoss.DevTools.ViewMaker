@@ -1,0 +1,30 @@
+﻿@model SharedSemCms
+
+
+@if (Model.semanticPropertyModel.ReadMode && Model.propertyValue != null && !string.IsNullOrEmpty(Model.propertyValue.UrlAuxiliaryLinkControl))
+{
+    string hrefLinkAux = "";
+    string targetLinkAux = "";
+
+    if (!Model.semanticPropertyModel.EntityParent.SemanticResourceModel.HideInfoIsNotMember)
+    {
+        hrefLinkAux = "href=\"" + Model.propertyValue.UrlAuxiliaryLinkControl + "\"";
+
+        if (Model.semanticPropertyModel.Element.TargetLink == null)
+        {
+            targetLinkAux = "target=\"_blank\"";
+        }
+        else if (Model.semanticPropertyModel.Element.TargetLink != "")
+        {
+            targetLinkAux = "target=\"" + Model.semanticPropertyModel.Element.TargetLink + "\"";
+        }
+    }
+
+    <a @Html.Raw(hrefLinkAux) @Html.Raw(targetLinkAux)>
+        @Html.PartialView("../Shared/SemCMS/_AddPrimaryControlInt", Model)
+    </a>
+}
+else
+{
+    @Html.PartialView("../Shared/SemCMS/_AddPrimaryControlInt", Model)
+}

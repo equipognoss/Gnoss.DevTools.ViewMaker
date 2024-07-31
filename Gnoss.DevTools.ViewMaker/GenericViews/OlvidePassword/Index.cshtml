@@ -38,7 +38,7 @@ string idBtnEnviar = "btnEnviar";
                     </div>
                     <div class="form-group">
                         <label for="@idTxtuserLogin" class="control-label">@Html.GetText("SOLICITARCAMBIOPASSWORD", "NOMBREUSU") </label>
-                        <input placeholder="Introduce tu correo electrónico" type="text" id="@idTxtuserLogin" class="form-control" value="@Model.Login">
+                        <input placeholder="@Html.GetText("COMMON","INTRODUCETUCORREOELECTRONICO")" type="text" id="@idTxtuserLogin" class="form-control" value="@Model.Login">
                     </div>
                     @* Divs con los mensajes de informativos o de error *@
                     <div id="@idForgetPasswordInfoPanel" style="display: none;" class="alert alert-danger" role="alert">
@@ -51,7 +51,8 @@ string idBtnEnviar = "btnEnviar";
         <div class="fieldset actionButtons">
             <fieldset>
                 <div class="fieldsetContent">
-                    <input type="button" value="Enviar" class="submit principal btn btn-primary" id="@idBtnEnviar">
+                    <input type="button" value="@Html.GetText("COMMON","ENVIAR")" class="submit principal btn btn-primary" id="@idBtnEnviar">
+                    
                 </div>
             </fieldset>
         </div>
@@ -74,6 +75,4 @@ string idBtnEnviar = "btnEnviar";
         // Gestión de operativa para cambio de contraseña
         operativaOlvidoPassword.init(pParams);
     })();
-
 </script>
-

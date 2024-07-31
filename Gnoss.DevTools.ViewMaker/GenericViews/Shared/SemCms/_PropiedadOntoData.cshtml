@@ -19,16 +19,25 @@
         string claseProp = "prop prop_" + Model.Element.Propiedad.NombreGeneracionClases;
 
         <div class="@claseProp">
-            @AddTitleAndPrimaryControl(propValue)
+            @{
+                SharedSemCms sharedSemCms = new SharedSemCms();
+                sharedSemCms.semanticPropertyModel = Model;
+                sharedSemCms.propertyValue = propValue;
+            }
+            @Html.PartialView("../Shared/SemCMS/_AddTitleAndPrimaryControl", sharedSemCms)
         </div>
     }
     else if (!readMode || mPropiedad.EspecifPropiedad.TipoCampo == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.Tiny)
     {
-        @AddTitleAndPrimaryControl(propValue)
+        SharedSemCms sharedSemCms = new SharedSemCms();
+        sharedSemCms.semanticPropertyModel = Model;
+        sharedSemCms.propertyValue = propValue;
+        @Html.PartialView("../Shared/SemCMS/_AddTitleAndPrimaryControl", sharedSemCms)
 
         if (!readMode)
         {
-            @AddErrorDiv()
+            string idDivError = Model.OntologyPropInfo.ControlID.Replace("Campo_", "divError_");
+            <div id="@idDivError"></div>
         }
     }
     else
@@ -38,9 +47,15 @@
         if (Model.Element.TipoPresentacion == "SinParrafo")
         {
             string classSpan = "values " + claseProp;
-            @AddTitle()
+            @Html.PartialView("SemCms/_TituloPropiedad", Model)
             <span class="@classSpan">
-                @AddPrimaryControl(propValue, null)
+                @{
+                    SharedSemCms sharedSemCms = new SharedSemCms();
+                    sharedSemCms.semanticPropertyModel = Model;
+                    sharedSemCms.propertyValue = propValue;
+                    sharedSemCms.pIdioma = null;
+                }
+                @Html.PartialView("../Shared/SemCMS/_AddPrimaryControl", sharedSemCms)
             </span>
         }
         else
@@ -48,18 +63,30 @@
             if (Model.EntityParent.Entity.Ontologia.ConfiguracionPlantilla.HtmlNuevo > 0 || mPropiedad.EspecifPropiedad.TipoCampo == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.EmbebedObject)
             {
                 <div class="@claseProp">
-                    @AddTitle()
+                    @Html.PartialView("SemCms/_TituloPropiedad", Model)
                     <span class="values">
-                        @AddPrimaryControl(propValue, null)
+                        @{
+                            SharedSemCms sharedSemCms = new SharedSemCms();
+                            sharedSemCms.semanticPropertyModel = Model;
+                            sharedSemCms.propertyValue = propValue;
+                            sharedSemCms.pIdioma = null;
+                        }
+                        @Html.PartialView("../Shared/SemCMS/_AddPrimaryControl", sharedSemCms)
                     </span>
                 </div>
             }
             else
             {
                 <p class="@claseProp">
-                    @AddTitle()
+                    @Html.PartialView("SemCms/_TituloPropiedad", Model)
                     <span class="values">
-                        @AddPrimaryControl(propValue, null)
+                        @{
+                            SharedSemCms sharedSemCms = new SharedSemCms();
+                            sharedSemCms.semanticPropertyModel = Model;
+                            sharedSemCms.propertyValue = propValue;
+                            sharedSemCms.pIdioma = null;
+                        }
+                        @Html.PartialView("../Shared/SemCMS/_AddPrimaryControl", sharedSemCms)
                     </span>
                 </p>
             }
@@ -73,943 +100,51 @@ else
         <div>
             @if (Model.EntityParent.Entity.Ontologia.ConfiguracionPlantilla.HtmlNuevo > 0)
             {
-                <div class="fila">
-                    @AddTitleAndPrimaryControl(null)
+                <div class="fila form-group">
+                    @{
+                        SharedSemCms sharedSemCms1 = new SharedSemCms();
+                        sharedSemCms1.semanticPropertyModel = Model;
+                        sharedSemCms1.propertyValue = null;
+                        sharedSemCms1.pIdioma = null;
+                    }
+                    @Html.PartialView("../Shared/SemCMS/_AddTitleAndPrimaryControl", sharedSemCms1)
                 </div>
             }
             else
             {
                 <p class="fila">
-                    @AddTitleAndPrimaryControl(null)
+                    @{
+                        SharedSemCms sharedSemCms2 = new SharedSemCms();
+                        sharedSemCms2.semanticPropertyModel = Model;
+                        sharedSemCms2.propertyValue = null;
+                        sharedSemCms2.pIdioma = null;
+                    }
+                    @Html.PartialView("../Shared/SemCMS/_AddTitleAndPrimaryControl", sharedSemCms2)
                 </p>
             }
-            @AddErrorDiv()
-            @AddValuesList()
+            @{
+                string idDivError = Model.OntologyPropInfo.ControlID.Replace("Campo_", "divError_");
+            }
+            <div id="@idDivError"></div>
+            @{
+                SharedSemCms sharedSemCms = new SharedSemCms();
+                sharedSemCms.semanticPropertyModel = Model;
+            }
+            @Html.PartialView("../Shared/SemCMS/_AddValuesList", sharedSemCms)
         </div>
     }
     else
     {
-        @AddTitle()
+        @Html.PartialView("SemCms/_TituloPropiedad", Model)
         <span class="values">
             @foreach (SemanticPropertyModel.PropertyValue propValue in Model.OntologyPropInfo.PropertyValues)
             {
-                @AddPrimaryControl(propValue, null)
+                SharedSemCms sharedSemCms = new SharedSemCms();
+                sharedSemCms.semanticPropertyModel = Model;
+                sharedSemCms.propertyValue = propValue;
+                sharedSemCms.pIdioma = null;
+                @Html.PartialView("../Shared/SemCMS/_AddPrimaryControl", sharedSemCms)
             }
         </span>
-    }
-}
-
-@functions{
-
-    string AddTitleAndPrimaryControl(SemanticPropertyModel.PropertyValue pValorProp)
-    {
-        if (!Model.ReadMode && Model.OntologyPropInfo.MultiLanguage && !Model.OntologyPropInfo.MultiLanguageWithTabs)
-        {
-            <div>
-                @AddTitle()
-                @AddPrimaryControl(pValorProp, null)
-            </div>
-
-            foreach (string idioma in Model.EntityParent.SemanticResourceModel.AvailableLanguages.Keys)
-            {
-                if (idioma != Model.EntityParent.SemanticResourceModel.DefaultLanguage)
-                {
-                    string claseTitulo = "lb lb_" + Model.Element.Propiedad.NombreGeneracionClases;
-
-                    if (Model.Element.Propiedad.EspecifPropiedad.ClaseCssPanelTitulo != null)
-                    {
-                        claseTitulo = Model.Element.Propiedad.EspecifPropiedad.ClaseCssPanelTitulo;
-                    }
-
-                    string textoLabel = Model.OntologyPropInfo.LabelTitle + " (" + Model.EntityParent.SemanticResourceModel.AvailableLanguages[idioma] + ")";
-                    SemanticPropertyModel.PropertyValue propValueIdioma = null;
-
-                    if (pValorProp != null && Model.OntologyPropInfo.PropertyLanguageValues.ContainsKey(idioma))
-                    {
-                        propValueIdioma = Model.OntologyPropInfo.PropertyLanguageValues[idioma][0];
-                    }
-
-                    <div>
-                        <label class="@claseTitulo">@textoLabel</label>
-                        @AddPrimaryControl(propValueIdioma, idioma)
-                    </div>
-                }
-            }
-        }
-        else
-        {
-            @AddTitle()
-            @AddPrimaryControl(pValorProp, null)
-        }
-
-        if (!Model.ReadMode && !Model.OntologyPropInfo.UniqueValue)
-        {
-            @AddMultivalueButtons()
-        }
-        return string.Empty;
-    }
-
-    string AddTitle()
-    {
-        @Html.PartialView("SemCms/_TituloPropiedad", Model)
-        return string.Empty;
-    }
-
-string AddPrimaryControl(SemanticPropertyModel.PropertyValue pValorProp, string pIdioma)
-{
-    if (Model.ReadMode && pValorProp != null && !string.IsNullOrEmpty(pValorProp.UrlAuxiliaryLinkControl))
-    {
-        string hrefLinkAux = "";
-        string targetLinkAux = "";
-
-        if (!Model.EntityParent.SemanticResourceModel.HideInfoIsNotMember)
-        {
-            hrefLinkAux = "href=\"" + pValorProp.UrlAuxiliaryLinkControl + "\"";
-
-            if (Model.Element.TargetLink == null)
-            {
-                targetLinkAux = "target=\"_blank\"";
-            }
-            else if (Model.Element.TargetLink != "")
-            {
-                targetLinkAux = "target=\"" + Model.Element.TargetLink + "\"";
-            }
-        }
-
-        <a @Html.Raw(hrefLinkAux) @Html.Raw(targetLinkAux)>
-            @AddPrimaryControlInt(pValorProp, pIdioma)
-        </a>
-    }
-    else
-    {
-        @AddPrimaryControlInt(pValorProp, pIdioma)
-    }
-        return string.Empty;
-}
-
-string AddPrimaryControlInt(SemanticPropertyModel.PropertyValue pValorProp, string pIdioma)
-{
-    bool readMode = Model.ReadMode;
-    Es.Riam.Semantica.OWL.Propiedad mPropiedad = Model.Element.Propiedad;
-    string idControl = Model.OntologyPropInfo.ControlID;
-
-    if (!string.IsNullOrEmpty(pIdioma))
-    {
-        idControl += "_lang_" + pIdioma;
-    }
-
-    string classControl = "";
-    string valorPropTexto = null;
-
-    if (pValorProp != null)
-    {
-        valorPropTexto = pValorProp.Value;
-    }
-
-    if (mPropiedad.EspecifPropiedad.ClaseCss != null)
-    {
-        classControl = mPropiedad.EspecifPropiedad.ClaseCss;
-    }
-    else
-    {
-        if (!readMode)
-        {
-            classControl = "form-control not-outline edit edit_" + mPropiedad.NombreGeneracionClases;
-        }
-        else
-        {
-            classControl = "value";
-        }
-    }
-
-    if (!readMode)
-    {
-        if (Model.OntologyPropInfo.MultiLanguage && Model.OntologyPropInfo.MultiLanguageWithTabs)
-        {
-            @AddMultiLanguageTabs(pValorProp)
-        }
-
-        string disabledControl = "";
-
-        if (mPropiedad.EspecifPropiedad.CampoDeshabilitado)
-        {
-            disabledControl = "disabled=\"disabled\"";
-        }
-
-        string metodoComprValCampos = null;
-
-        if (Model.EntityParent.SemanticResourceModel.RootEntities.Contains(Model.EntityParent))
-        {
-            metodoComprValCampos = "ComprobarValorCampoCorrecto('" + mPropiedad.ElementoOntologia.TipoEntidad + "','" + mPropiedad.Nombre + "',this.value,TxtRegistroIDs,TxtCaracteristicasElem);";
-        }
-        else
-        {
-            metodoComprValCampos = "ComprobarValorCampoCorrectoInt('" + mPropiedad.ElementoOntologia.TipoEntidad + "','" + mPropiedad.Nombre + "',this.value,TxtRegistroIDs,TxtCaracteristicasElem,false);";
-        }
-
-        string onblurControl = "onblur=\"" + metodoComprValCampos + "\"";
-
-        if (Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.Boleano)
-        {//Booleano
-            string nameRadio = "grupoRadio_" + idControl;
-            string idChkSi = "chkSi_" + idControl;
-            string idChkNo = "chkNo_" + idControl;
-            string valorBool = "true";
-            string chechkSiBool = "checked=\"checked\"";
-            string chechkNoBool = "";
-
-            if (!string.IsNullOrEmpty(valorPropTexto))
-            {
-                valorBool = valorPropTexto;
-            }
-
-            if (valorBool != "true")
-            {
-                chechkSiBool = "";
-                chechkNoBool = "checked=\"checked\"";
-            }
-
-            <input type="hidden" id="@idControl" value="@valorBool" />
-            <div class="@classControl">
-                <label style="padding-right:5px;" for="@idChkSi">@Html.GetText("CONTROLESDOCUMENTACION", "SI")</label>
-                <input type="radio" name="@nameRadio" id="@idChkSi" @Html.Raw(chechkSiBool) onclick="$('#@idControl').val('true');" @Html.Raw(disabledControl) />
-                <label style="padding-right:5px;" for="@idChkNo">@Html.GetText("CONTROLESDOCUMENTACION", "NO")</label>
-                <input type="radio" name="@nameRadio" id="@idChkNo" @Html.Raw(chechkNoBool) onclick="$('#@idControl').val('false');" @Html.Raw(disabledControl) />
-            </div>
-        }
-        else if ((Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.ListaBoleanos || Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.ListaDates || Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.ListaTimes || Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.ListaDateTimes || Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.ListaEnteros || Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.ListaNumeros || Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.ListaTexto))
-        {//Lista de Valores
-            string onclickSelect = "";
-            string styleSelect = "";
-
-            if (Model.OntologyPropInfo.DefaultUnselectableValue != null)
-            {
-                onclickSelect = "onclick=\"if(this.selectedIndex=='0'){this.style.color='gray';}else{this.style.color='';}\"";
-
-                if (string.IsNullOrEmpty(valorPropTexto) || valorPropTexto == Model.OntologyPropInfo.DefaultUnselectableValue)
-                {
-                    styleSelect = "style=\"color:gray;\"";
-                }
-            }
-
-            string claseSelect = classControl + " select big form-control not-outline";
-
-            <select id="@idControl" @Html.Raw(onclickSelect) @Html.Raw(styleSelect) @Html.Raw(disabledControl) class="@claseSelect">
-                @if (Model.OntologyPropInfo.DefaultUnselectableValue != null)
-                {
-                    string selected = "";
-
-                    if (string.IsNullOrEmpty(valorPropTexto) || valorPropTexto == Model.OntologyPropInfo.DefaultUnselectableValue)
-                    {
-                        selected = "selected";
-                    }
-
-                    <option value="@Model.OntologyPropInfo.DefaultUnselectableValue" @Html.GetParam("selected", selected) style="color:gray;">@Model.OntologyPropInfo.DefaultUnselectableValue</option>
-
-                }
-
-                @foreach (string valor in mPropiedad.ListaValoresPermitidos)
-                {
-                    string selected = "";
-
-                    if (valorPropTexto == valor)
-                    {
-                        selected = "selected";
-                    }
-
-                    <option value="@valor" @Html.GetParam("selected", selected) style="color:black;">@valor</option>
-
-                }
-            </select>
-        }
-        else if ((Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.Imagen || Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.Video || Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.Archivo || Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.Checks || Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.ArchivoLink))
-        {//Imágen, video, archivo edición o checks
-            <input type="hidden" id="@idControl" value="@valorPropTexto" />
-
-            if (Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.Checks)
-            {
-                <div>
-                    @foreach (string valor in mPropiedad.ListaValoresPermitidos)
-                    {
-                        string checkedCheck = "";
-
-                        if (valorPropTexto == valor)
-                        {
-                            checkedCheck = "checked=\"checked\"";
-                        }
-
-                        <div class="top5">
-                            @if (mPropiedad.FunctionalProperty || mPropiedad.CardinalidadMenorOIgualUno)
-                            {
-                                string nameRadio = "checkGroup_" + mPropiedad.Nombre;
-                                <input type="radio" name="@nameRadio" onclick="$('#@idControl').val('@valor');" @Html.Raw(checkedCheck) class="right5" @Html.Raw(disabledControl) />
-                            }
-                            else
-                            {
-                                <input type="checkbox" onclick="ClickCheckPropMultiple(this, '@valor', '@idControl');" @Html.Raw(checkedCheck) class="right5" @Html.Raw(disabledControl) />
-                            }
-                            <span>@valor</span>
-                        </div>
-                    }
-                </div>
-            }
-            else
-            {
-                string idDivFileForm = idControl.Replace("Campo_", "divAgregarArchivo_");
-                string idDivAgregando = idControl.Replace("Campo_", "divArchivoAgregandose_");
-                string idDivAgregado = idControl.Replace("Campo_", "divArchivoAgregado_");
-                string idSpanVisPre = idControl.Replace("Campo_", "archVistaPre_");
-                string tipoArchivo = null;
-
-                if (Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.Imagen)
-                {
-                    tipoArchivo = "imgfileUpLoad";
-                }
-                else if (Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.Video)
-                {
-                    tipoArchivo = "videofileUpLoad";
-                }
-                else if (Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.ArchivoLink)
-                {
-                    tipoArchivo = "archivoLinkfileUpLoad";
-                }
-                else
-                {
-                    tipoArchivo = "archivofileUpLoad";
-                }
-
-                string srcImagenEspera = Html.GetBaseUrlStatic() + "/images/espera.gif";
-
-                string displayAgregar = "";
-                string displayAgregado = "";
-
-                if (!string.IsNullOrEmpty(valorPropTexto))
-                {
-                    displayAgregar = "style=\"display:none;\"";
-                }
-                else
-                {
-                    displayAgregado = "style=\"display:none;\"";
-                }
-
-                if (mPropiedad.EspecifPropiedad.CampoDeshabilitado)
-                {
-                    displayAgregar = "style=\"display:none;\"";
-                }
-
-                @* Contenedor de agregar fichero adjunto para Objeto de Conocimiento *@
-                <div class="dragdropArea-wrap"
-                     onclick="AgregarAchivoClick(event,'@idControl', '@tipoArchivo');event.stopPropagation(); event.preventDefault();" 
-                     ondrop="AgregarArchivoDragEvent(event,'@idControl', '@tipoArchivo');"
-                     ondragenter="event.stopPropagation(); event.preventDefault();"
-                     ondragover="event.stopPropagation(); event.preventDefault();"
-                     ondragleave="event.stopPropagation(); event.preventDefault();"
-
-                     >
-                    @* Contenedor para agregar fichero adjunto *@
-                    <div id="@idDivFileForm" class="fileFormSem" @Html.Raw(displayAgregar)>                        
-                        <div class="dragdropArea-wrap-info">
-                            <span class="material-icons">file_upload</span>
-                            <a style="cursor:pointer" onclick="AgregarAchivoClick(event,'@idControl', '@tipoArchivo');event.stopPropagation(); event.preventDefault();">@Html.GetText("CREARDOCUMENTO", "ADJUNTARARCHIVO")</a>
-                        </div>
-                    </div>
-
-                    @* Contenedor informativo de Agregando fichero adjunto *@
-                    <div id="@idDivAgregando" class="imgCargandoFichFormSem" style="display:none;">
-                        <div class="m-2">
-                            <div class="spinner-border spinner-border-sm" role="status">
-                                <span class="sr-only">Cargando...</span>
-                            </div>
-                            <span>@Html.GetText("CREARDOCUMENTO", "SUBIENDOARCHIVO")</span>
-                        </div>
-                    </div>
-
-                    @* Contenedor del fichero adjunto agregado *@
-                    <div id="@idDivAgregado" @Html.Raw(displayAgregado)>
-                        <div class="dragdropArea-preview-wrap-content">                        
-                            @if (Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.Imagen && mPropiedad.EspecifPropiedad.VistaPrevEnEdicion)
-                            {
-                                string idImgViPreEdi = idControl.Replace("Campo_", "imgVistaPre_");
-                                string urlImgViPreEdi = Html.GetBaseUrlContent() + valorPropTexto;
-                                <img id="@idImgViPreEdi" class="@classControl" src="@urlImgViPreEdi" />
-                            }
-                            <span id="@idSpanVisPre" class="prevArcFormSem">
-                                @if (!string.IsNullOrEmpty(valorPropTexto))
-                                {
-                                    if (Model.OntologyPropInfo.FieldType != Es.Riam.Semantica.Plantillas.TipoCampoOntologia.Imagen && valorPropTexto.Contains(".") && valorPropTexto.Contains("_"))
-                                    {
-                                        string guidValor = valorPropTexto.Substring(0, valorPropTexto.LastIndexOf("."));
-                                        guidValor = guidValor.Substring(guidValor.LastIndexOf("_") + 1);
-                                        Guid aux = Guid.Empty;
-
-                                        if (Guid.TryParse(guidValor, out aux))
-                                        {
-                                            valorPropTexto = valorPropTexto.Substring(0, valorPropTexto.LastIndexOf("_")) + valorPropTexto.Substring(valorPropTexto.LastIndexOf("."));
-                                        }
-                                    }
-
-                                    if (Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.Imagen)
-                                    {
-                                        string srcVisPre = Html.GetBaseUrlContent() + "/" + valorPropTexto;
-                                        <img src="@srcVisPre" alt="@valorPropTexto" />
-                                    }
-                                    else if (Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.ArchivoLink)
-                                    {
-                                        @Html.Raw(valorPropTexto.Substring(valorPropTexto.LastIndexOf("/") + 1));
-                                    }
-                                    else
-                                    {
-                                        @Html.Raw(valorPropTexto);
-                                    }
-                                }
-                            </span>
-                            @if (!mPropiedad.EspecifPropiedad.CampoDeshabilitado)
-                            {                            
-                                @* <input type="button" value="@Html.GetText("CONTROLESDOCUMENTACION", "ELIMINARARCHI")" class="btn btn-outline-primary" onclick="MostrarPanelConfirmacionEvento(event, '@Html.GetText("CONTROLESCVSEM", "CONFIRMARELIMINARARCHI")    ', 'EliminarArchivoDePropiedad(\'@mPropiedad.ElementoOntologia.TipoEntidad\', \'@mPropiedad.Nombre\',TxtValorRdf,TxtRegistroIDs,TxtCaracteristicasElem,TxtElemEditados, \'txtHackValorImgRepresentante\');')" /> *@
-                                <button type="button"
-                                        class="btn editButton ml-4"
-                                        onclick="AgregarAchivoClick(event,'@idControl', '@tipoArchivo');event.stopPropagation(); event.preventDefault();">
-                                        <span class="material-icons pr-0">edit</span>
-                                </button>
-                                                                
-                                <button type="button"
-                                        class="btn btn-outline-primary ml-2"
-                                        onclick="MostrarPanelConfirmacionEvento(event, '@Html.GetText("CONTROLESCVSEM", "CONFIRMARELIMINARARCHI")    ', 'EliminarArchivoDePropiedad(\'@mPropiedad.ElementoOntologia.TipoEntidad\', \'@mPropiedad.Nombre\',TxtValorRdf,TxtRegistroIDs,TxtCaracteristicasElem,TxtElemEditados, \'txtHackValorImgRepresentante\');')">
-                                        <span class="material-icons-outlined pr-0">delete</span>
-                                </button>
-                                @*<input type="button" value="@Html.GetText("CONTROLESDOCUMENTACION", "ELIMINARARCHI")" onclick="MostrarPanelConfirmacionEvento(event, '@Html.GetText("CONTROLESCVSEM", "CONFIRMARELIMINARARCHI")    ', 'EliminarArchivoDePropiedad(\'@mPropiedad.ElementoOntologia.TipoEntidad\', \'@mPropiedad.Nombre\',TxtValorRdf,TxtRegistroIDs,TxtCaracteristicasElem,TxtElemEditados, \'txtHackValorImgRepresentante\');')" />*@
-                            }
-                        </div>
-                    </div>
-                </div>
-                if (Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.Imagen && mPropiedad.Ontologia.ConfiguracionPlantilla.PropiedadImagenRepre.Key == mPropiedad.Nombre && (mPropiedad.Ontologia.ConfiguracionPlantilla.PropiedadImagenRepre.Value == mPropiedad.ElementoOntologia.TipoEntidadLimpioDeApanioRepeticiones|| mPropiedad.ElementoOntologia.SuperclasesUtiles.Contains(mPropiedad.Ontologia.ConfiguracionPlantilla.PropiedadImagenRepre.Value)))
-                {
-                    string idcheckImgPrinc = idControl.Replace("Campo_", "chkImgPrincfileUpLoad_");
-                    string checkedImgPrinc = "";
-                    string disabled = "";
-
-                    if (!string.IsNullOrEmpty(valorPropTexto) && Model.EntityParent.SemanticResourceModel.ImageRepresentativeValue != null && Model.EntityParent.SemanticResourceModel.ImageRepresentativeValue.Contains(valorPropTexto))
-                    {
-                        checkedImgPrinc = "checked=\"checked\"";
-                    }
-
-                    if (string.IsNullOrEmpty(valorPropTexto))
-                    {
-                        disabled = "disabled=\"disabled\"";
-                    }
-
-                    string onClickImgPrinc = "SeleccionarImagenPrincipal(this,'" + mPropiedad.ElementoOntologia.TipoEntidad + "','" + mPropiedad.Nombre + "')";
-
-                    <div>
-                        <input id="@idcheckImgPrinc" type="checkbox" @Html.Raw(checkedImgPrinc) @Html.Raw(disabled) onclick="@onClickImgPrinc" />
-                        <span>@Html.GetText("CONTROLESCVSEM", "IMGREPRESENTANTE")</span>
-                    </div>
-                }
-            }
-        }
-        else if (Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.Tiny)
-        {//CKEditor
-            string clasetext = classControl + " cke recursos";
-            string onblurControlTextArea = "onblur=\"ComprobarValorCampoCorrecto('" + mPropiedad.ElementoOntologia.TipoEntidad + "','" + mPropiedad.Nombre + "',this.getData(),TxtRegistroIDs,TxtCaracteristicasElem);\"";
-            <textarea id="@idControl" class="@clasetext" @Html.Raw(disabledControl) @Html.Raw(onblurControlTextArea)>@valorPropTexto</textarea>
-        }
-        else if ((Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.DateTime || Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.Date || Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.Time))
-        {//Control edición fechas
-            string tipoInput = "text";
-            string classInput = classControl + " text big";
-            string onchange = "";
-
-            if (mPropiedad.EspecifPropiedad.FechaMesAnio)
-            {
-                if (pValorProp == null)
-                {
-                    pValorProp = new SemanticPropertyModel.PropertyValue();
-                    pValorProp.Property = Model;
-                }
-                tipoInput = "hidden";
-                <div id="@idControl" class="@classControl">
-                    @Html.PartialView("SemCms/_SelectorFechaDual", pValorProp)
-                </div>
-            }
-            else if (!mPropiedad.EspecifPropiedad.FechaLibre)
-            {
-                if (mPropiedad.EspecifPropiedad.FechaConHora)
-                {
-                    classInput += " calenTimeFormSem";
-                }
-                else
-                {
-                    classInput += " calenFormSem";
-                }
-                onchange = "onchange=\"" + metodoComprValCampos + "\"";
-            }
-
-            <input type="@tipoInput" id="@idControl" class="@classInput" value="@valorPropTexto" @Html.Raw(disabledControl) @Html.Raw(onblurControl) @Html.Raw(onchange) />
-        }
-        else if (mPropiedad.EspecifPropiedad.GrafoDependiente != null && Model.OntologyPropInfo.UniqueValue)
-        {
-            <input type="hidden" id="@idControl" value="@valorPropTexto" />
-            <span>
-                @if (mPropiedad.EspecifPropiedad.TipoDependiente == "AutoCompletar")
-                {
-                    string idControlHack = idControl.Replace("Campo_", "hack_");
-                    string disabled = "";
-
-                    if (Model.OntologyPropInfo.AuxiliaryControlDisabled || mPropiedad.EspecifPropiedad.CampoDeshabilitado)
-                    {
-                        disabled = "disabled=\"disabled\"";
-                    }
-
-                    string claseTxt = classControl + " text big";
-                    string onclick = "autocompletarGrafoDependiente(this, '" + mPropiedad.ElementoOntologia.TipoEntidad + "','" + mPropiedad.Nombre + "', '" + Model.OntologyPropInfo.PropDependentGraph + "', '" + mPropiedad.EspecifPropiedad.TipoEntDependiente + "', '" + mPropiedad.EspecifPropiedad.PropDependiente.Key + "', '" + mPropiedad.EspecifPropiedad.PropDependiente.Value + "');";
-
-                    <input type="text" id="@idControlHack" class="@claseTxt" @Html.Raw(disabled) @Html.Raw(onblurControl) value="@Model.OntologyPropInfo.AuxiliaryControlValue" onclick="@onclick" onkeydown="if(event.which || event.keyCode){if ((event.which == 13) || (event.keyCode == 13)) {return false;}} else {return true;}" />
-                }
-            </span>
-        }
-        else if (mPropiedad.EspecifPropiedad.GrafoAutocompletar != null)
-        {
-            string tipoResultado = "0";
-
-            if (mPropiedad.EspecifPropiedad.TipoResulAutocompletar != null)
-            {
-                tipoResultado = mPropiedad.EspecifPropiedad.TipoResulAutocompletar;
-            }
-
-            string claseTxt = classControl + " text big";
-
-            if (!mPropiedad.EspecifPropiedad.NoPermitirNuevosValores)
-            {
-                <input type="text" id="@idControl" @Html.Raw(onblurControl) class="@claseTxt" value="@valorPropTexto" @Html.Raw(disabledControl) onfocus="autocompletarGenericoFormSem(this, '@mPropiedad.EspecifPropiedad.GrafoAutocompletar', '@tipoResultado');" onkeydown="if(event.which || event.keyCode){if ((event.which == 13) || (event.keyCode == 13)) {return false;}} else {return true;}" />
-            }
-            else
-            {
-                string idControAux = idControl.Replace("Campo_", "hackSec_");
-                tipoResultado = idControl;
-
-                <input type="hidden" id="@idControl" value="@valorPropTexto" />
-                <input type="text" id="@idControAux" @Html.Raw(onblurControl) class="@claseTxt" value="@valorPropTexto" @Html.Raw(disabledControl) onfocus="autocompletarGenericoFormSem(this, '@mPropiedad.EspecifPropiedad.GrafoAutocompletar', '@tipoResultado');" onkeydown="if(event.which || event.keyCode){if ((event.which == 13) || (event.keyCode == 13)) {return false;}} else {return true;}" onchange="if (this.value == ''){$('#@idControl').val('');}" />
-            }
-        }
-        else
-        {
-            string claseTxt = classControl + " text big";
-            <input type="text" id="@idControl" @Html.Raw(onblurControl) class="@claseTxt" value="@valorPropTexto" @Html.Raw(disabledControl) onkeydown="if(event.which || event.keyCode){if ((event.which == 13) || (event.keyCode == 13)) {return false;}} else {return true;}" />
-        }
-    }
-    else
-    {
-        string aboutRDFa = "";
-        string propRDFa = "";
-        string relRDFa = "";
-
-        if (!string.IsNullOrEmpty(Model.OntologyPropInfo.AboutRDFA))
-        {
-            aboutRDFa = "about=\"" + Model.OntologyPropInfo.AboutRDFA + "\"";
-            propRDFa = "property=\"" + Model.OntologyPropInfo.PropertyRDFA + "\"";
-            relRDFa = "rel=\"" + Model.OntologyPropInfo.PropertyRDFA + "\"";
-        }
-
-        string microDatos = "";
-
-        if (mPropiedad.EspecifPropiedad.Microdatos != null)
-        {
-            microDatos = "itemprop=\"" + mPropiedad.EspecifPropiedad.Microdatos + "\"";
-        }
-
-        string microFormatos = "";
-
-        foreach (string microKey in mPropiedad.EspecifPropiedad.Microformatos.Keys)
-        {
-            if (microKey != "class")
-            {
-                microFormatos += microKey + "=\"" + mPropiedad.EspecifPropiedad.Microformatos[microKey] + "\" ";
-            }
-            else
-            {
-                classControl += " " + mPropiedad.EspecifPropiedad.Microformatos[microKey];
-            }
-        }
-
-        if (Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.Tiny)
-        {//CKEditor
-            string dataTypeRDFa = "";
-
-            if (!string.IsNullOrEmpty(aboutRDFa))
-            {
-                dataTypeRDFa = "xsd:string";
-            }
-
-            if (!string.IsNullOrEmpty(valorPropTexto) && ((!valorPropTexto.Contains("<p>") && !valorPropTexto.Contains("<p ")) || !valorPropTexto.Contains("</p>")))
-            {
-                valorPropTexto = string.Concat("<p>", valorPropTexto, "</p>");
-            }
-
-            <div class="@classControl" @Html.Raw(aboutRDFa) @Html.Raw(propRDFa) @Html.GetParam("datatype", dataTypeRDFa) @Html.Raw(microDatos) @Html.Raw(microFormatos)>@Html.Raw(valorPropTexto)</div>
-        }
-        else if (Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.Imagen)
-        {//Imagen
-            string valor = valorPropTexto;
-
-            if (!valor.StartsWith("http://"))
-            {
-                valor = Html.GetBaseUrlContent() + "/" + valor;
-            }
-
-            string resourceRDFa = "";
-
-            if (!string.IsNullOrEmpty(aboutRDFa))
-            {
-                resourceRDFa = "resource=\"" + valor + "\"";
-            }
-
-            string alternative = Model.EntityParent.SemanticResourceModel.DocumentTitle;
-
-            if ((mPropiedad.EspecifPropiedad.ImagenMini != null || Model.Element.SizeFoto != null) && !valorPropTexto.Contains("_"))
-            {
-                string extension = valorPropTexto.Substring(valorPropTexto.LastIndexOf('.'));
-                if (Model.Element.SizeFoto != null)
-                {
-                    if (Model.Element.SizeFoto != "")
-                    {
-                        valor = Html.GetBaseUrlContent() + "/" + valorPropTexto.Replace(extension, "_" + Model.Element.SizeFoto + extension);
-                    }
-                }
-                else
-                {
-                    foreach (int key in mPropiedad.EspecifPropiedad.ImagenMini.Tamanios.Keys)
-                    {
-                        if (key > 0)
-                        {
-                            valor = Html.GetBaseUrlContent() + "/" + valorPropTexto.Replace(extension, "_" + key + extension);
-                        }
-                        else
-                        {
-                            valor = Html.GetBaseUrlContent() + "/" + valorPropTexto.Replace(extension, "_" + mPropiedad.EspecifPropiedad.ImagenMini.Tamanios[key] + extension);
-                        }
-                        break;
-                    }
-                }
-
-                if (!Model.EntityParent.SemanticResourceModel.HideInfoIsNotMember && (Model.Element.SizeFoto == null || Model.Element.SizeFoto != "") && ((Model.Element.SizeAumentoFoto == null || Model.Element.SizeAumentoFoto != "")) && string.IsNullOrEmpty(pValorProp.UrlAuxiliaryLinkControl))
-                {
-                    string hrefFoto = null;
-
-                    if (Model.Element.SizeAumentoFoto == null)
-                    {
-                        hrefFoto = Html.GetBaseUrlContent() + "/" + valorPropTexto;
-                    }
-                    else
-                    {
-                        hrefFoto = Html.GetBaseUrlContent() + "/" + valorPropTexto.Replace(extension, "_" + Model.Element.SizeAumentoFoto + extension);
-                    }
-
-                    <a href="@hrefFoto">
-                        <img class="@classControl" src="@valor" alt="@alternative" @Html.Raw(aboutRDFa) @Html.Raw(relRDFa) @Html.Raw(resourceRDFa) @Html.Raw(microDatos) @Html.Raw(microFormatos) />
-                    </a>
-                }
-                else
-                {
-                    <img class="@classControl" src="@valor" alt="@alternative" @Html.Raw(aboutRDFa) @Html.Raw(relRDFa) @Html.Raw(resourceRDFa) @Html.Raw(microDatos) @Html.Raw(microFormatos) />
-                }
-            }
-            else
-            {
-                <img class="@classControl" src="@valor" alt="@alternative" @Html.Raw(aboutRDFa) @Html.Raw(relRDFa) @Html.Raw(resourceRDFa) @Html.Raw(microDatos) @Html.Raw(microFormatos) />
-            }
-        }
-        else if (Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.ImagenExterna)
-        {//Imagen Externa
-            string resourceRDFa = "";
-
-            if (!string.IsNullOrEmpty(aboutRDFa))
-            {
-                resourceRDFa = "resource=\"" + valorPropTexto + "\"";
-            }
-
-            <img class="@classControl" src="@valorPropTexto" @Html.Raw(aboutRDFa) @Html.Raw(relRDFa) @Html.Raw(resourceRDFa) @Html.Raw(microDatos) @Html.Raw(microFormatos) />
-        }
-        else if (Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.Archivo)
-        {//archivo
-            string href = "";
-            string title = "";
-
-            if (!Model.EntityParent.SemanticResourceModel.HideInfoIsNotMember)
-            {
-                href = "href=\"" + pValorProp.DownloadUrl + "\"";
-            }
-
-            string archivo = valorPropTexto.Substring(0, valorPropTexto.LastIndexOf("."));
-
-            if (archivo.Contains("##idgoogle##"))
-            {
-                string extension = System.IO.Path.GetExtension(valorPropTexto).ToLower();
-                title = archivo.Substring(0, archivo.IndexOf("##idgoogle##")) + extension;
-            }
-            else
-            {
-                title = valorPropTexto;
-            }
-
-            <span class="value">
-                <a class="@classControl" target="_blank" @Html.Raw(href) title="@title" @Html.Raw(aboutRDFa) @Html.Raw(propRDFa) @Html.Raw(microDatos) @Html.Raw(microFormatos)>@Html.GetText("CONTROLESDOCUMENTACION", "DESCARGARFICH")</a>
-            </span>
-        }
-        else if (Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.ArchivoLink)
-        {//archivo link
-            string href = "";
-            string title = valorPropTexto;
-
-            if (title.Contains("/"))
-            {
-                title = title.Substring(title.LastIndexOf("/") + 1);
-            }
-
-            if (!Model.EntityParent.SemanticResourceModel.HideInfoIsNotMember)
-            {
-                href = "href=\"" + pValorProp.DownloadUrl + "\"";
-            }
-
-            <span class="value">
-                <a class="@classControl" target="_blank" @Html.Raw(href) title="@title" @Html.Raw(aboutRDFa) @Html.Raw(propRDFa) @Html.Raw(microDatos) @Html.Raw(microFormatos)>@Html.GetText("CONTROLESDOCUMENTACION", "DESCARGARFICH")</a>
-            </span>
-        }
-        else if (Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.EmbebedLink)
-        {
-            <div class="@classControl" @Html.Raw(aboutRDFa) @Html.Raw(propRDFa) @Html.Raw(microDatos) @Html.Raw(microFormatos)>
-                @if (pValorProp.EmbebedLinkYoutube != null)
-                {
-                    <iframe src="@pValorProp.EmbebedLinkYoutube" width="360" height="291" frameborder="0" style="z-index:0;" allowfullscreen="true"></iframe>
-                }
-                else if (pValorProp.EmbebedLinkVimeo != null)
-                {
-                    <iframe src="@pValorProp.EmbebedLinkVimeo" width="360" height="202" frameborder="0" style="z-index:0;" allowfullscreen="true"></iframe>
-                }
-                else if (pValorProp.EmbebedLinkSlideshare != null)
-                {
-                    <iframe src="@pValorProp.EmbebedLinkSlideshare" width="360" height="257" frameborder="0" style="z-index:0;" allowfullscreen="true"></iframe>
-                }
-            </div>
-        }
-        else if (Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.EmbebedObject)
-        {
-            <div class="@classControl" @Html.Raw(aboutRDFa) @Html.Raw(propRDFa) @Html.Raw(microDatos) @Html.Raw(microFormatos)>@Html.Raw(pValorProp.EmbebedObject)</div>
-        }
-        else if (mPropiedad.EspecifPropiedad.GrafoDependiente != null && Model.OntologyPropInfo.UniqueValue)
-        {
-            <span class="@classControl" @Html.Raw(aboutRDFa) @Html.Raw(propRDFa) @Html.Raw(microDatos) @Html.Raw(microFormatos)>@valorPropTexto</span>
-        }
-        else if (Model.OntologyPropInfo.FieldType == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.Link || !string.IsNullOrEmpty(mPropiedad.EspecifPropiedad.UrlLinkDelValor))
-        {
-            string href = "";
-            string target = "";
-
-            if (!Model.EntityParent.SemanticResourceModel.HideInfoIsNotMember)
-            {
-                href = "href=\"" + pValorProp.DownloadUrl + "\"";
-
-                if (mPropiedad.EspecifPropiedad.NuevaPestanya)
-                {
-                    target = "target=\"_blank\"";
-                }
-            }
-
-            <span class="value">
-                <a class="@classControl" @Html.Raw(target) @Html.Raw(href) @Html.Raw(aboutRDFa) @Html.Raw(propRDFa) @Html.Raw(microDatos) @Html.Raw(microFormatos)>@valorPropTexto</a>
-            </span>
-        }
-        else if (mPropiedad.EspecifPropiedad.TipoCampoLectura != null)
-        {
-            if (!string.IsNullOrEmpty(aboutRDFa))
-            {
-                aboutRDFa = " " + aboutRDFa;
-                propRDFa = " " + propRDFa;
-            }
-
-            if (!string.IsNullOrEmpty(microDatos))
-            {
-                microDatos = " " + microDatos;
-            }
-
-            if (!string.IsNullOrEmpty(microFormatos))
-            {
-                microFormatos = " " + microFormatos;
-            }
-
-            @Html.Raw("<" + mPropiedad.EspecifPropiedad.TipoCampoLectura + " class=\"" + classControl + "\"" + aboutRDFa + propRDFa + microDatos + microFormatos + ">" + valorPropTexto + "</" + mPropiedad.EspecifPropiedad.TipoCampoLectura + ">");
-        }
-        else
-        {
-            string extraBooleano = "";
-
-            if (mPropiedad.EspecifPropiedad.TipoCampo == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.Boleano && mPropiedad.ValoresUnificados.Count > 0)
-            {
-                extraBooleano = "bool=\"" + mPropiedad.ValoresUnificados.Keys.ToArray()[0] + "\"";
-            }
-
-            <span class="@classControl" @Html.Raw(aboutRDFa) @Html.Raw(propRDFa) @Html.Raw(microDatos) @Html.Raw(microFormatos) @Html.Raw(extraBooleano)>@valorPropTexto</span>
-        }
-    }
-
-    if (Model.OntologyPropInfo.HelpText != null)
-    {
-        <em class="help">@Model.OntologyPropInfo.HelpText</em>
-    }
-        return string.Empty;
-}
-
-string AddMultivalueButtons()
-{
-    Es.Riam.Semantica.OWL.Propiedad mPropiedad = Model.Element.Propiedad;
-    string idControl = Model.OntologyPropInfo.ControlID;
-    string idBtnCrear = idControl.Replace("Campo_", "lbCrear_");
-    string idBtnGuardar = idControl.Replace("Campo_", "lbGuardar_");
-    string idControlValoresAg = idControl.Replace("Campo_", "contedor_Valores_");
-    string mensajeCrear = null;
-    string mensajeGuardar = null;
-
-    if (mPropiedad.EspecifPropiedad.TextoAgregarElem != null)
-    {
-        mensajeCrear = mPropiedad.EspecifPropiedad.TextoAgregarElem;
-    }
-    else
-    {
-        mensajeCrear = Html.GetText("CONTROLESDOCUMENTACION", "ANYADIR");
-    }
-
-
-    if (mPropiedad.EspecifPropiedad.TextoBotonAceptarElemento != null)
-    {
-        mensajeGuardar = mPropiedad.EspecifPropiedad.TextoBotonAceptarElemento;
-    }
-    else
-    {
-        mensajeGuardar = Html.GetText("CONTROLESDOCUMENTACION", "ACEPTAR");
-    }
-
-    <input id="@idBtnCrear" class="btn btn-primary mt-2" type="button" value="@mensajeCrear" onclick="AgregarValorADataNoFuncionalProp('@mPropiedad.ElementoOntologia.TipoEntidad','@mPropiedad.Nombre','@idControlValoresAg',TxtValorRdf,TxtRegistroIDs,TxtCaracteristicasElem,TxtElemEditados);" />
-    <input id="@idBtnGuardar" class="btn btn-primary mt-2" type="button" value="@mensajeGuardar" onclick="GuardarValorADataNoFuncionalProp('@mPropiedad.ElementoOntologia.TipoEntidad','@mPropiedad.Nombre','@idControlValoresAg',TxtValorRdf,TxtRegistroIDs,TxtCaracteristicasElem,TxtElemEditados);" style="display:none;" />
-
-    return string.Empty;
-}
-
-string AddErrorDiv()
-{
-    string idDivError = Model.OntologyPropInfo.ControlID.Replace("Campo_", "divError_");
-    <div id="@idDivError"></div>
-    return string.Empty;
-}
-
-string AddValuesList()
-{
-    Es.Riam.Semantica.OWL.Propiedad mPropiedad = Model.Element.Propiedad;
-    string idControl = Model.OntologyPropInfo.ControlID;
-    string idControlValoresAg = idControl.Replace("Campo_", "contedor_Valores_");
-
-    if (Model.OntologyPropInfo.PropertyValues.Count > 0)
-    {
-        string claseFila = "par";
-        int count = 0;
-
-        <div id="@idControlValoresAg">
-            <table class="table">
-                @foreach (SemanticPropertyModel.PropertyValue propValue in Model.OntologyPropInfo.PropertyValues)
-                {
-                    string imgEditar = Html.GetBaseUrlStatic() + "/img/icoEditar.gif";
-                    string texto = propValue.Value;
-
-                    if (texto.Length > 143)
-                    {
-                        texto = texto.Substring(0, 143);
-                    }
-
-                    string metodoEliminar = "EliminarValorDeDataNoFuncionalProp('" + count + "', '" + mPropiedad.ElementoOntologia.TipoEntidad + "', '" + mPropiedad.Nombre + "', '" + idControlValoresAg + "',TxtValorRdf,TxtRegistroIDs,TxtCaracteristicasElem,TxtElemEditados);";
-                    metodoEliminar = metodoEliminar.Replace("'", "\\'");
-                    metodoEliminar = "MostrarPanelConfirmacionEvento(event, '" + Html.GetText("CONTROLESCVSEM", "CONFIRMARELIMINAR", propValue.Value).Replace("'", "\\'") + "', '" + metodoEliminar + "')";
-
-                    <tr class="@claseFila">
-                        <td><span>@texto</span></td>
-                        <td>
-                            <a onclick="SeleccionarElementoGrupoValores('@mPropiedad.ElementoOntologia.TipoEntidad', '@mPropiedad.Nombre', '@count',TxtValorRdf,TxtRegistroIDs,TxtCaracteristicasElem,TxtElemEditados)">
-                                <span class="material-icons">
-                                    edit
-                                </span>
-                            </a>
-                        </td>
-                        <td><a class="remove" onclick="@metodoEliminar"></a></td>
-                    </tr>
-
-                    if (claseFila == "par")
-                    {
-                        claseFila = "impar";
-                    }
-                    else
-                    {
-                        claseFila = "par";
-                    }
-
-                    count++;
-                }
-            </table>
-        </div>
-    }
-    else
-    {
-        <div id="@idControlValoresAg"></div>
-    }
-        return string.Empty;
-}
-
-string AddMultiLanguageTabs(SemanticPropertyModel.PropertyValue pValorProp)
-{
-    Es.Riam.Semantica.OWL.Propiedad mPropiedad = Model.Element.Propiedad;
-    string idControl = Model.OntologyPropInfo.ControlID;
-    string divTabsID = idControl.Replace("Campo_", "divContPesIdioma_");
-    string langActual = "";
-
-    if (Model.OntologyPropInfo.UniqueValue)
-    {
-        foreach (string idioma in mPropiedad.ListaValoresIdioma.Keys)
-        {
-            if (mPropiedad.ListaValoresIdioma[idioma].Count > 0)
-            {
-                langActual += mPropiedad.ListaValoresIdioma[idioma].Keys.ToArray()[0].Replace("<", "[--C]").Replace(">", "[C--]") + "@" + idioma + "[|lang|]";
-            }
-        }
-    }
-
-    <div id="@divTabsID" class="block tabsGroup" langActual="@langActual">
-        <div class="acciones tabspresentation">
-            <ul>
-                @AddLanguageToMultiLanguageTabs(Model.EntityParent.SemanticResourceModel.DefaultLanguage)
-                @foreach (string idioma in Model.EntityParent.SemanticResourceModel.AvailableLanguages.Keys)
-                {
-                    if (idioma != Model.EntityParent.SemanticResourceModel.DefaultLanguage)
-                    {
-                        @AddLanguageToMultiLanguageTabs(idioma)
-                    }
-                }
-            </ul>
-        </div>
-    </div>
-    return string.Empty;
-}
-
-string AddLanguageToMultiLanguageTabs(string pIdioma)
-{
-    Es.Riam.Semantica.OWL.Propiedad mPropiedad = Model.Element.Propiedad;
-    string clase = "";
-
-    if (pIdioma == Model.EntityParent.SemanticResourceModel.DefaultLanguage)
-    {
-        clase = "active";
-    }
-
-    string onclick = "SeleccionarIdioma(this, '" + mPropiedad.ElementoOntologia.TipoEntidad + "', '" + mPropiedad.Nombre + "', '" + pIdioma + "', " + (!Model.OntologyPropInfo.UniqueValue).ToString().ToLower() + ")";
-
-    <li class="@clase" rel="@pIdioma">
-        <a onclick="@onclick">@Model.EntityParent.SemanticResourceModel.AvailableLanguages[pIdioma]</a>
-    </li>
-        return string.Empty;
     }
 }

@@ -8,8 +8,8 @@
 }
 
 <div id="col01">
-    <h3>Activación de cuenta de alumno</h3>
-    <p>Los alumnos menores de 14 años necesitan que su padre, madre o tutor legal activen su cuenta para acceder a las clases de Didactalia creadas por sus profesores.</p>
+    <h3>@Html.GetText("COMMON","ACTIVACIONDECUENTADEALUMNO")</h3>
+    <p>@Html.GetText("COMMON","LOSALUMNOSMENORESDE14AÑOSNECESITANQUESUPADREMADREOTUTORLEGA")</p>
 </div>
 
 <div class="fieldset fieldset02">
@@ -19,7 +19,7 @@
             <ul class="radioList" id="condicionesUso">
                 <li>
                     <input type="checkbox" class="" id="clausula-menores" />
-                    <span class="clauAdicional">  He leído y acepto las <a onclick="MostrarPanelExtra();$('#condicionesUsoGenericas').parent().children().each(function(){var div = $(this);div.hide();});$('#condicionesUsoGenericas').show();return false;">condiciones de acceso y uso</a> y la <a onclick="MostrarPanelExtra();$('#clausulasTextoGenericas').parent().children().each(function(){var div = $(this);div.hide();});$('#clausulasTextoGenericas').show();return false;">política de privacidad</a> de Didactalia  </span>
+                    <span class="clauAdicional">@Html.GetText("COMMON","HELEIDOYACEPTOLAS") <a onclick="MostrarPanelExtra();$('#condicionesUsoGenericas').parent().children().each(function(){var div = $(this);div.hide();});$('#condicionesUsoGenericas').show();return false;">@Html.GetText("COMMON","CONDICIONESDEACCESOYUSO")</a> @Html.GetText("COMMON","YLA") <a onclick="MostrarPanelExtra();$('#clausulasTextoGenericas').parent().children().each(function(){var div = $(this);div.hide();});$('#clausulasTextoGenericas').show();return false;">@Html.GetText("COMMON","POLITICADEPRIVACIDAD")</a></span>
                 </li>
                 @*{
                         foreach (Guid clausula in Model.Clauses.Keys)

@@ -36,40 +36,41 @@
                 {
                     if (Comunidad == null)
                     {
-                        <h1>Inicia sesión en <strong>myGNOSS</strong></h1>
+                        <h1>@Html.GetText("COMMON","INICIASESION") <strong>myGNOSS</strong></h1>
                     }
-                    else { 
-                        <h1>Inicia sesión en <strong>@Comunidad.Name</strong></h1>
+                    else {
+                        <h1>@Html.GetText("COMMON","INICIASESION") <strong>@Comunidad.Name</strong></h1>
                     }
                 }
                 else if (Model.TypePage == AutenticationModel.TypeAutenticationPage.Registro || Model.TypePage == AutenticationModel.TypeAutenticationPage.RegistroConRedesSociales)
                 {
                    // <text>@Html.GetText("COMMON", "REGISTRO")</text>
                 }
-            <!--</h2>-->
             <div>
-                <!--<div class="box box01">-->
                 @if (Model.TypePage == AutenticationModel.TypeAutenticationPage.Login)
                 {
-                    @Html.PartialView("_FormularioLogin");
+                    @Html.PartialView("_FormularioLogin")
                 }
                 else if (Model.TypePage == AutenticationModel.TypeAutenticationPage.Registro || Model.TypePage == AutenticationModel.TypeAutenticationPage.RegistroConRedesSociales)
                 {
-                    @Html.PartialView("_FormularioRegistro", Model);
+                    @Html.PartialView("_FormularioRegistro", Model)
                 }
                 else if (Model.TypePage == AutenticationModel.TypeAutenticationPage.InvitacionUsada)
                 {
-                    @Html.PartialView("_InvitacionUsada");
+                    @Html.PartialView("_InvitacionUsada")                    
                 }
-                <!--</div>-->
+                else
+                {                               
+                    <p class="text-center">Actualmente no tienes permisos para acceder a la comunidad. Si has sido recientemente añadido a la comunidad, por favor, cierra sesión y vuelve a logearte.</p>                                                                    
+                }
                 @if (Model.TypePage != AutenticationModel.TypeAutenticationPage.InvitacionUsada && Model.TypePage != AutenticationModel.TypeAutenticationPage.RegistroConRedesSociales)
-                {
-                <!-- Eliminado Panel de "Registro" . EAD"-->            
+                {      
                 }
             </div>
         </div>
     </div> 
 </div>
+
 <div id="col02">
     @if (!string.IsNullOrEmpty(Comunidad.ProjectLoginConfiguration))
     {

@@ -26,7 +26,7 @@ bool compactView = Model.CompactView;
     <div class="wrap">
         @* Opciones - Acciones para ordenar lista de recursos *@                
             @* Opciones de Ordenar los resultados obtenidos *@
-            <div id="panel-orderBy" class="ordenar dropdown dropdown-select">
+        <div id="panel-orderBy" class="ordenar dropdown dropdown-select">
 
                 @* No debe aparecer la opción de "Ordenar por. Por defecto la vista activa"
                 <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -34,7 +34,7 @@ bool compactView = Model.CompactView;
                     <span class="texto">@Html.GetText("BANDEJAENTRADA", "ORDENADOPOR")</span>
                 </a>
                 *@
-                <a class="dropdown-toggle active" data-toggle="dropdown" aria-expanded="false">
+                <a class="dropdown-toggle active" data-toggle="dropdown" aria-expanded="false" aria-label="@Html.GetText("COMMON","SELECCIONARORDEN")">
                     <span class="material-icons">swap_vert</span>
                     <span class="texto">@Html.GetText("COMMON", "FECHA") @Html.GetText("COMMON", "DESCENDENTE").ToLower()</span>
                 </a>
@@ -46,19 +46,19 @@ bool compactView = Model.CompactView;
                 </div>
                 *@
                 <div id="cmbOrdenarPor" class="dropdown-menu basic-dropdown dropdown-icons dropdown-menu-right filtro" style="will-change: transform;">
-                    <a href="javascript: void(0)" class="item-dropdown activeView" data-orderBy="nmo:sentDate" data-order="orden|desc">
+                <a href="javascript: void(0)" class="item-dropdown activeView" data-orderBy="nmo:sentDate" data-order="orden|desc" aria-label="@Html.GetText("COMMON","SELECCIONARORDENDESCENDENTE")">
                         <span class="material-icons">swap_vert</span>
                         <span class="texto">@Html.GetText("COMMON", "FECHA") @Html.GetText("COMMON", "DESCENDENTE").ToLower()</span>
                     </a>
-                    <a href="javascript: void(0)" class="item-dropdown" data-orderBy="nmo:sentDate" data-order="orden|asc">
+                    <a href="javascript: void(0)" class="item-dropdown" data-orderBy="nmo:sentDate" data-order="orden|asc" aria-label="@Html.GetText("COMMON","SELECCIONARORDENASCENDENTE")">
                         <span class="material-icons">swap_vert</span>
                         <span class="texto">@Html.GetText("COMMON", "FECHA") @Html.GetText("COMMON", "ASCENDENTE").ToLower()</span>
                     </a>
-                    <a href="javascript: void(0)" class="item-dropdown" data-orderBy="nmo:from"  data-order="orden|desc">
+                    <a href="javascript: void(0)" class="item-dropdown" data-orderBy="nmo:from"  data-order="orden|desc" aria-label="@Html.GetText("COMMON","SELECCIONARORDENDESCENDENTE")">
                         <span class="material-icons">swap_vert</span>
                         <span class="texto">@Html.GetText("CORREO", "REMITENTE") @Html.GetText("COMMON", "DESCENDENTE").ToLower()</span>
                     </a>
-                    <a href="javascript: void(0)" class="item-dropdown" data-orderBy="nmo:from"  data-order="orden|asc">
+                    <a href="javascript: void(0)" class="item-dropdown" data-orderBy="nmo:from"  data-order="orden|asc"  aria-label="@Html.GetText("COMMON","SELECCIONARORDENDESCENDENTE")">
                         <span class="material-icons">swap_vert</span>
                         <span class="texto">@Html.GetText("CORREO", "REMITENTE") @Html.GetText("COMMON", "DESCENDENTE").ToLower()</span>
                     </a>
@@ -87,11 +87,7 @@ bool compactView = Model.CompactView;
 
             @* Opciones de visualización los resultados *@
             <div id="panel-viewBy" class="visualizacion dropdown dropdown-select">
-                <a id="buscador" class="dropdown-toggle active" data-toggle="dropdown">
-                    @* Se debe mostrar el filtro actual
-                    <span class="material-icons">view_agenda</span>
-                    <span class="texto">Visualizar</span>
-                    *@
+            <a id="buscador" class="dropdown-toggle active" data-toggle="dropdown" aria-label="@Html.GetText("COMMON","SELECCIONARVISUALIZACION")">
                     @if (compactView)
                     {
                         <span class="material-icons">reorder</span>
@@ -103,18 +99,19 @@ bool compactView = Model.CompactView;
                         <span class="texto">@Html.GetText("COMBUSQUEDAAVANZADA", "LISTADO")</span>
                     }
                 </a>
-                <div class="dropdown-menu basic-dropdown dropdown-icons dropdown-menu-right">
+            <div class="dropdown-menu basic-dropdown dropdown-icons dropdown-menu-right">
                     <a class="item-dropdown aCompacView" 
                        data-class-resource-list="compacView"
-                       onclick="CambiarVistaActiva(true)"                       
+                       onclick="CambiarVistaActiva(true)" 
+                       aria-label="@Html.GetText("COMMON","SELECCIONARVISUALIZACION") @Html.GetText("CORREO", "COMPACTADA")"
                        >
                         <span class="material-icons">reorder</span>
                         <span class="texto">@Html.GetText("CORREO", "COMPACTADA")</span>
                     </a>
                     <a class="item-dropdown aListView activeView" 
                        data-class-resource-list="listView"
-                       onclick="CambiarVistaActiva(false)"                       
-                       >
+                       onclick="CambiarVistaActiva(false)"
+                       aria-label="@Html.GetText("COMMON","SELECCIONARVISUALIZACION") @Html.GetText("COMBUSQUEDAAVANZADA", "LISTADO")">
                         <span class="material-icons">view_agenda</span>
                         <span class="texto">@Html.GetText("COMBUSQUEDAAVANZADA", "LISTADO")</span>
                     </a>

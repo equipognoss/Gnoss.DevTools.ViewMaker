@@ -171,12 +171,12 @@ string instrucciones = "";
                                 <div class="autocompletar autocompletar-tags form-group">
                                     <div class="input-wrap form-sticky-button">
                                         <input type="text"
-                                               placeholder="Introduce los correos separados por comas y haz clic en añadir"
+                                               placeholder="@Html.GetText("COMMON","INTRODUCELOSCORREOSSEPARADOSPORCOMASYHAZCLICENAÑADIR")"
                                                id="@idTxtCorreoAInvitar"
                                                class="form-control"
                                                autocomplete="off" />
                                         <a id="@idButtonLitAniadirCorreo"
-                                           class="btn btn-primary uppercase">Añadir</a>
+                                           class="btn btn-primary uppercase">@Html.GetText("COMMON","ANYADIRENMAYUSCULA")</a>                                                                                     
                                     </div>
                                 </div>
                             </div>
@@ -209,7 +209,7 @@ string instrucciones = "";
             <div id="@idPanContenedorInvitados" class="mb-4 @idPanContenedorInvitados">
                 @* Panel No Destinatarios *@
                 <span id="@idNoDestinatarios" class="@idNoDestinatarios texto-gris-claro mb-3"
-                  >Ningún destinatario añadido...</span
+                  >@Html.GetText("COMMON","NINGUNDESTINATARIOAÑADIDO")</span
                 >
                 @* Panel con Destinatarios ELEGIDOS PARA ENVIAR *@
                 <span class="tag-list @idListaDestinatarios" id="@idListaDestinatarios">
@@ -221,7 +221,7 @@ string instrucciones = "";
             <select id="@idDlIdioma" class="js-select2 form-control pmd-select2">
                 @foreach (KeyValuePair<string, string> idioma in Cabecera.Languajes)
                 {
-                <option value="@idioma.Key" @if (Html.GetUtilIdiomas().LanguageCode == idioma.Key){<text>selected="selected"</text>}>@idioma.Value</option>
+                    <option value="@idioma.Key" @if (Html.GetUtilIdiomas().LanguageCode == idioma.Key){<text>selected="selected"</text>}>@idioma.Value</option>
                 }
             </select>
           </div>

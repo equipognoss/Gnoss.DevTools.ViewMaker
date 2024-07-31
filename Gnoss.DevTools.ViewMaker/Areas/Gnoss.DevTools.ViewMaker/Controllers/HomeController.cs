@@ -284,14 +284,14 @@ namespace Gnoss.DevTools.ViewMaker.Areas.Gnoss.DevTools.ViewMaker.Controllers
             //CommunityModel Comunidad = (CommunityModel)ViewDataDeserializado["Comunidad"];
 
             //Dictionary<string, string> parametrosAplicacion = (Dictionary<string, string>)ViewDataDeserializado["ParametrosAplicacion"];
-            if (parametrosAplicacion.ContainsKey("NombreCortoProyectoPadreEcositema") && Comunidad.ParentKey.HasValue)
-            {
-                proyectoSeleccionado = parametrosAplicacion["NombreCortoProyectoPadreEcositema"];
-            }
-            else
-            {
+            //if (parametrosAplicacion.ContainsKey("NombreCortoProyectoPadreEcositema") && Comunidad.ParentKey.HasValue)
+            //{
+            //    proyectoSeleccionado = parametrosAplicacion["NombreCortoProyectoPadreEcositema"];
+            //}
+            //else
+            //{
                 proyectoSeleccionado = Comunidad.ShortName;
-            }
+            //}
 
             if (ViewDataDeserializado != null)
             {

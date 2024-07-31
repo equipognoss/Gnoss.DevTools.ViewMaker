@@ -31,6 +31,9 @@ string inputLastName = "ProfilePersonal.LastName";
 @* ID del input Email *@    
 string idEmail = "ProfilePersonal_Email";
 string inputEmail = "ProfilePersonal.Email";
+@* ID del input TwoFactorAuthentication *@
+string idTwoFactorAuthentication = "ProfilePersonal_TwoFactorAuthentication";
+string inputTwoFactorAuthentication = "ProfilePersonal.TwoFactorAuthentication";
 @* ID del input FechaNacimiento *@     
 string idBornDate = "ProfilePersonal_BornDate";
 string inputBornDate = "ProfilePersonal.BornDate";
@@ -70,7 +73,7 @@ string inputIsExternalSearched = "ProfilePersonal.IsExternalSearched";
 @* Nombre *@
 <div class="form-group mb-5 edit-nombre">
     <label class="control-label d-block" for="@idName">@Html.GetText("REGISTRO", "NOMBRE")</label>
-    <input placeholder="Introduce tu nombre"
+    <input placeholder="@Html.GetText("PERFIL", "INTRODUCENOMBRE")"
            type="text"
            name="@inputName"
            id="@idName"
@@ -80,17 +83,18 @@ string inputIsExternalSearched = "ProfilePersonal.IsExternalSearched";
 @* Apellidos *@
 <div class="form-group mb-5 edit-apellidos">
     <label class="control-label d-block" for="@idLastName">@Html.GetText("REGISTRO", "APELLIDOS")</label>
-    <input placeholder="Introduce tus apellidos"
+    <input placeholder="@Html.GetText("PERFIL", "INTRODUCEAPELLIDO")"
            type="text"
            name="@inputLastName"
            value="@Perfil.LastName"
            id="@idLastName"
            class="form-control not-outline" />
 </div>
+
 @* Correo electrónico - Email *@
 <div class="form-group mb-5 edit-correo">
     <label class="control-label d-block" for="@idEmail">@Html.GetText("REGISTROUSUARIOORGANIZACION", "EMAIL")</label>
-    <input placeholder="Introduce tu correo electrónico"
+    <input placeholder="@Html.GetText("PERFIL", "INTRODUCEEMAIL")"
            type="text"
            name="@inputEmail"
            id="@idEmail"
@@ -122,6 +126,20 @@ string inputIsExternalSearched = "ProfilePersonal.IsExternalSearched";
            value="@Perfil.EmailTutor" 
            name="ProfilePersonal.EmailTutor" />
 }
+
+@* Autenticacion de doble factor*@
+<div class="custom-control custom-checkbox" style="margin-bottom: 40px;">
+    <input type="checkbox"
+           name="@inputTwoFactorAuthentication"
+           class="custom-control-input"
+           id="@idTwoFactorAuthentication"
+           value="@Perfil.TwoFactorAuthentication"     
+    @(Perfil.TwoFactorAuthentication ? "checked" : "") />
+    <label class="custom-control-label" for="@idTwoFactorAuthentication">@Html.GetText("DOBLEFACTORAUTENTICACION", "AUTENTICACIONDOBLEFACTOR")</label>
+    <small class="form-text text-muted">@Html.GetText("DOBLEFACTORAUTENTICACION", "INDICAAUTENTICACIONDOBLEFACTORACTIVADA")</small>
+</div>
+
+
 
 @* Fecha de nacimiento *@
 <div class="form-group mb-5">
@@ -174,8 +192,8 @@ string inputIsExternalSearched = "ProfilePersonal.IsExternalSearched";
 <div class="form-group mb-5">
     <label class="control-label d-block" for="@idPostalCode">@Html.GetText("REGISTRO", "CODIGOPOSTAL")</label>
     <div class="input-wrap">
-        <input placeholder="Introduce tu código postal"
-            type="text"
+        <input placeholder="@Html.GetText("REGISTRO", "INTRODUCIRCODIGOPOSTAL")"
+            type="number"
             id="@idPostalCode"
             value="@Perfil.PostalCode"
             name="@inputPostalCode"
@@ -213,77 +231,37 @@ string inputIsExternalSearched = "ProfilePersonal.IsExternalSearched";
     <div id="panCamposConfigurablesProyecto">
         @foreach (AdditionalFieldAutentication campoExtra in Perfil.AdditionalFields)
         {
-            <div class="form-group mb-5">
-                <label for="@campoExtra.FieldName" class="control-label d-block" @(campoExtra.Required ? "required" : "")>@campoExtra.Title</label>            
-                @if (campoExtra.Options != null && campoExtra.Options.Count > 0)
-                {                    
-                    <select name="@campoExtra.FieldName" id="@campoExtra.FieldName" class="custom-select dato select @campoExtra.FieldName">
-                        <option value="@Guid.Empty">@Html.GetText("REGISTRO", "SINESPECIFICAR")</option>
-                        @foreach (Guid idCampo in campoExtra.Options.Keys)
+            if (campoExtra.Visible != null && campoExtra.Visible)
+            {
+                <div class="form-group mb-5">
+                    <label for="@campoExtra.FieldName" class="control-label d-block" @(campoExtra.Required ? "required" : "")>@campoExtra.Title</label>
+                    @if (campoExtra.Options != null && campoExtra.Options.Count > 0)
+                    {
+                        <select name="@campoExtra.FieldName" id="@campoExtra.FieldName" class="custom-select dato select @campoExtra.FieldName">
+                            <option value="@Guid.Empty">@Html.GetText("REGISTRO", "SINESPECIFICAR")</option>
+                            @foreach (Guid idCampo in campoExtra.Options.Keys)
+                            {
+                                bool selected = campoExtra.FieldValue == idCampo.ToString();
+                                <option @(selected ? "selected=selected" : "") value="@idCampo">@Html.ObtenerTextoDeIdioma(campoExtra.Options[idCampo])</option>
+                            }
+                        </select>
+                    }
+                    else
+                    {
+                        string claseInput = "text medium";
+                        if (campoExtra.AutoCompleted)
                         {
-                            bool selected = campoExtra.FieldValue == idCampo.ToString();
-                            <option @(selected ? "selected=selected" : "") value="@idCampo">@Html.ObtenerTextoDeIdioma(campoExtra.Options[idCampo])</option>
+                            claseInput += " txtBusqueda autocompletar " + campoExtra.FieldName;
                         }
-                    </select>
-                }
-                else
-                {
-                    string claseInput = "text medium";
-                    if (campoExtra.AutoCompleted)
-                    {
-                        claseInput += " txtBusqueda autocompletar " + campoExtra.FieldName;
+                        <input type="text" class="form-control not-outline @claseInput" id="@campoExtra.FieldName" name="@campoExtra.FieldName" value="@(campoExtra.FieldValue != null ? campoExtra.FieldValue : "")" />
+                        if (campoExtra.AutoCompleted)
+                        {
+                            string inputHack = campoExtra.FieldName + "hack";
+                            <input type="hidden" id="@inputHack" class="@inputHack" />
+                        }
                     }
-                    <input type="text" class="form-control not-outline @claseInput" id="@campoExtra.FieldName" name="@campoExtra.FieldName" value="@(campoExtra.FieldValue != null ? campoExtra.FieldValue : "")"/>                    
-                    if (campoExtra.AutoCompleted)
-                    {
-                        string inputHack = campoExtra.FieldName + "hack";
-                        <input type="hidden" id="@inputHack" class="@inputHack" />
-                    }
-                 }
-            </div>            
+                </div>
+            }                    
         }
-    </div>
-}
-
-@* Información Privacidad *@      
-@if (Perfil.IsSearched.HasValue || Perfil.IsExternalSearched.HasValue) { 
-
-    <div class="form-group mb-5">
-        <label for="" class="control-label d-block">
-            @Html.GetText("REGISTRO", "PORQUEPRIVACIDAD", Html.GetNombreProyectoEcosistema())
-        </label>
-        @* Información de porque hacer público mi perfil *@
-        <label class="control-label d-block">
-            <a class="link" data-toggle="collapse" href="#collapseDondeMostrarPerfil" role="button" aria-expanded="false" aria-controls="collapseDondeMostrarPerfil">
-                @Html.GetText("REGISTRO", "TITULOINFOVISIBILIDADPERFIL")
-            </a>
-        </label>
-
-        @* Primer Check para hacer publico el perfil de un usuario*@
-        @if (Perfil.IsSearched.HasValue)
-        {
-            <div class="custom-control custom-checkbox">
-                <input type="checkbox"
-                       class="custom-control-input" 
-                       @(Perfil.IsSearched.Value ? "checked=checked" : "") 
-                       id="@idIsSearched" 
-                       name="@inputIsSearched" />
-                <label for="@idIsSearched">@Html.GetText("REGISTRO", "LISTARPERFILCORTO", Html.GetNombreProyectoEcosistema())</label>
-            </div>
-        }
-        @* Segundo heck para hacer publico el perfil de un usuario*@
-        @if (Perfil.IsExternalSearched.HasValue)
-        {
-            <div class="custom-control custom-checkbox">
-                <input id="@idIsExternalSearched"
-                       class="custom-control-input" 
-                       type="checkbox" @(Perfil.IsExternalSearched.Value ? "checked=checked" : "") 
-                       name="@inputIsExternalSearched" />
-                <label for="@idIsExternalSearched">@Html.GetText("REGISTRO", "LISTARPERFILEXTERNOSCORTO")</label>
-            </div>
-        }
-
-        @* Panel Informativo de tipo Collapse de Donde mostrar el perfil *@
-        @Html.PartialView("../RegistroDatos/_partial-views/_public-profile-info")
     </div>
 }

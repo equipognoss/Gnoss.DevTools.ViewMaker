@@ -1,0 +1,100 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista modal que contiene la información necesaria para que el usuario se registre para realizar acciones en la comunidad. 
+Esta vista se hará visible ya que el método jquery 'operativaLoginEmergente' disparará la visualización de esta vista modal si es necesario.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+    CommunityModel Comunidad = Html.GetComunidad();
+    UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+    // Mensaje informativo de acceso a comunidad restringida/privada
+    string accessRestrictedCommunityMessage = "";
+    string accessRestrictedCommunityUrl = "";
+    string buttonText = "";
+    string buttonClass = "";
+    bool showMessageRestrictedCommunityAccess = false;
+}
+
+@{
+    @* Controlar mensaje de acceso a comunidad privada/restringida 
+    if (IdentidadActual.IsGuestIdentity)
+    {*@
+
+        @* Controlar la visualización en la Home de la comunidad dependiendo del tipo de Comunidad a visualizar*@
+        if (((CommunityModel.TypeAccessProject)Comunidad.AccessType).Equals(CommunityModel.TypeAccessProject.Public))
+        {
+            //Comunidad pública
+            accessRestrictedCommunityUrl = $"{@Comunidad.Url}/{@Html.GetText("URLSEM", "HAZTEMIEMBRO")}";
+            accessRestrictedCommunityMessage = @Html.GetText("COMINICIOLOGIN", "TIENESQUEHACERTEMIEMBRO");
+            buttonText = @Html.GetText("COMINICIOLOGIN", "REGISTRATEPARTICIPA");
+            showMessageRestrictedCommunityAccess = true;
+        }
+        else if (((CommunityModel.TypeAccessProject)Comunidad.AccessType).Equals(CommunityModel.TypeAccessProject.Restricted))
+        {
+            //Comunidad Restringida
+            switch (IdentidadActual.CommunityRequestStatus)
+            {
+                case UserIdentityModel.CommunityRequestStatusEnum.NoRequest:
+                    accessRestrictedCommunityUrl = $"{@Comunidad.Url}/{@Html.GetText("URLSEM", "SOLICITARACCESO")}";
+                    accessRestrictedCommunityMessage = @Html.GetText("COMINICIOLOGIN", "TIENESQUESOLICITAR");
+                    buttonText = @Html.GetText("COMINICIOLOGIN", "SOLICITARACCESO");
+                    showMessageRestrictedCommunityAccess = true;
+                    break;
+                case UserIdentityModel.CommunityRequestStatusEnum.RequestPending:
+                    accessRestrictedCommunityMessage = @Html.GetText("COMINICIOLOGIN", "SOLICITUDPENDIENTE");
+                    showMessageRestrictedCommunityAccess = true;
+                    break;
+
+                case UserIdentityModel.CommunityRequestStatusEnum.RequestedWithAnotherProfile:
+                    accessRestrictedCommunityMessage = @Html.GetText("COMINICIOLOGIN", "SOLICITUDPENDIENTEOTROPERFIL");
+                    showMessageRestrictedCommunityAccess = true;
+                    break;
+            }
+        }
+        else
+        {
+            accessRestrictedCommunityMessage = @Html.GetText("COMINICIOLOGIN", "NOACCESOPROY");
+            showMessageRestrictedCommunityAccess = true;
+        }
+    @*}*@
+}
+                
+@if (showMessageRestrictedCommunityAccess)
+{
+    <div
+	id="modal-restringed-community-access"
+	class="modal modal-top fade"           
+	role="dialog"	
+	aria-modal="true">
+
+	    <div class="modal-dialog" role="document">
+		    <div class="modal-content">
+			    <div class="modal-header">
+				    @* Título del Modal *@
+				    <p class="modal-title">
+					    <span class="material-icons">vpn_key</span>
+					    @Comunidad.Name
+				    </p>
+				    @* Cierre del Modal *@
+				    <span class="material-icons cerrar"
+					      data-dismiss="modal"
+					      aria-label="Close">close</span>
+			    </div>
+			    <div class="modal-body">				
+				    <div class="form-group">
+					     <p style="color: #999">@accessRestrictedCommunityMessage</p>
+				    </div>
+				    <div class="form-actions">
+                        @if (!string.IsNullOrEmpty(accessRestrictedCommunityUrl))
+                        {
+                            <a href="@accessRestrictedCommunityUrl" class="btn btn-primary btn-round acceso @buttonClass">@buttonText</a>
+                        }
+				    </div>				
+			    </div>
+		    </div>
+	    </div>
+    </div>
+}

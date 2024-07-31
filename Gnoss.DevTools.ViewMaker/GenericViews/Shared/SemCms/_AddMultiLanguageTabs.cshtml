@@ -1,0 +1,61 @@
+﻿@model SharedSemCms
+
+@*
+Descripción
+-----------------------------------------------
+Vista que pinta la cabecera donde irán los diferentes tabs multiidioma de una ontología. Es aquí donde se mostrará la vista AddLanguageToMultilanguageTabs
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+Es.Riam.Semantica.OWL.Propiedad mPropiedad = Model.semanticPropertyModel.Element.Propiedad;
+string idControl = Model.semanticPropertyModel.OntologyPropInfo.ControlID;
+string divTabsID = idControl.Replace("Campo_", "divContPesIdioma_");
+string langActual = "";
+string tabId = @divTabsID + "_tab";
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista que pinta la cabecera donde irán los diferentes tabs multiidioma de una ontología. --------------------
+*@
+
+
+@{
+
+    if (Model.semanticPropertyModel.OntologyPropInfo.UniqueValue)
+    {
+        foreach (string idioma in mPropiedad.ListaValoresIdioma.Keys)
+        {
+            if (mPropiedad.ListaValoresIdioma[idioma].Count > 0)
+            {
+                langActual += mPropiedad.ListaValoresIdioma[idioma].Keys.ToArray()[0].Replace("<", "[--C]").Replace(">", "[C--]") + "@" + idioma + "[|lang|]";
+            }
+        }
+    }
+
+    <div id="@divTabsID" class="mb-3" langActual="@langActual">
+        <div class="acciones tabspresentation">
+            <ul class="nav nav-tabs" id="@tabId" role="tablist">
+                @{
+                    SharedSemCms sharedSemCms = new SharedSemCms();
+                    sharedSemCms.semanticPropertyModel = Model.semanticPropertyModel;
+                    sharedSemCms.pIdioma = Model.semanticPropertyModel.EntityParent.SemanticResourceModel.DefaultLanguage;
+                }
+                @Html.PartialView("../Shared/SemCMS/_AddLanguageToMultiLanguageTabs", sharedSemCms)
+                @foreach (string idioma in Model.semanticPropertyModel.EntityParent.SemanticResourceModel.AvailableLanguages.Keys)
+                {
+                    if (idioma != Model.semanticPropertyModel.EntityParent.SemanticResourceModel.DefaultLanguage)
+                    {
+                        sharedSemCms.pIdioma = idioma;
+                        @Html.PartialView("../Shared/SemCMS/_AddLanguageToMultiLanguageTabs", sharedSemCms)
+                    }
+                }
+            </ul>
+        </div>
+    </div>
+
+}
+
+

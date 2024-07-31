@@ -7,7 +7,8 @@ Variables
 ----------------------------------------------------------------
 *@
 @{
-CommunityModel Comunidad = Html.GetComunidad();
+    CommunityModel Comunidad = Html.GetComunidad();
+    HeaderModel Cabecera = Html.GetCabecera();
 }
 @*
 ----------------------------------------------------------------
@@ -18,25 +19,26 @@ CommunityModel Comunidad = Html.GetComunidad();
 
 <form method="post"
       id="formPaginaLogin"
+      class="formPaginaLogin"
       action="@Html.GetUrlActionLogin()">
     <div class="fieldset fieldset01">
         <fieldset>
             <div class="fieldsetContent">
                 <div class="form-group">
                     <label for="usuario_Login" class="control-label">@Html.GetText("LOGIN", "NOMBREUSUARIOOCORREO")</label>
-                    <input placeholder="Introduce tu correo electrónico"
+                    <input placeholder="@Html.GetText("COMMON","INTRODUCETUCORREOELECTRONICO")"
                            type="text"
                            name="usuario"
                            id="usuario_Login"
-                           class="form-control" />
+                           class="form-control usuario_Login" />
                 </div>
                 <div class="form-group">
                     <label for="password_login" class="control-label">@Html.GetText("LOGIN", "CONTRASEÑA")</label>
-                    <input placeholder="Introduce tu contraseña"
+                    <input placeholder="@Html.GetText("COMMON","INTRODUCETUCONTRASEÑA")"
                            type="password"
                            name="password"
                            id="password_login"
-                           class="form-control" />
+                           class="form-control password_login" />
                 </div>
                 @{
                     UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
@@ -53,19 +55,25 @@ CommunityModel Comunidad = Html.GetComunidad();
                         </p>
                     }
                 }
-                <div id="loginError" class="error-wrap">
-                    <div class="ko">
-                        <p id="mensajeError">@Html.GetText("LOGIN", "CLAVEERRONEA")</p>
+
+                <div id="loginError" class="error-wrap loginError" aria-live="assertive">
+                    <div class="ko loginErrorKo">
+                        <p id="mensajeError">@Html.GetText("LOGIN", "CLAVEERRONEA")</p>                                           
                     </div>
                 </div>
-                <div id="loginErrorAutenticacionExterna" class="error-wrap">
-                    <div class="ko">                        
+                <div id="loginErrorAutenticacionExterna" class="error-wrap loginError">
+                    <div class="ko loginErrorAutenticacionExternaKo">
                         <p>@Html.GetText("LOGIN", "AUTENTICACIONEXTERNA")</p>
                     </div>
                 </div>
-                <div id="logintwice" class="error-wrap">
-                    <div class="ko">
+                <div id="logintwice" class="error-wrap loginError">
+                    <div class="ko logintwiceKo">
                         <p id="mensajeErrorLoginTwice">@Html.GetText("LOGIN", "LOGINTWICE", @Html.GetSessionTimeout())</p>
+                    </div>
+                </div>
+                <div id="loginErrorBloqueado" class="error-wrap loginError">
+                    <div class="ko loginErrorBloqueadoKo">
+                        <p id="mensajeError">@Html.GetText("LOGIN", "LOGINUSUARIOBLOQUEADO")</p>
                     </div>
                 </div>
             </div>
@@ -78,9 +86,10 @@ CommunityModel Comunidad = Html.GetComunidad();
                 @* Link para recuperar contraseña olvidada *@
                 <a class="olvidaste-password" href="@Comunidad.Url/@Html.GetText("URLSEM", "OLVIDEPASSWORD")">@Html.GetText("INICIO", "OLVIDOPASSWORD")</a>
 
-                <input class="principal submit btn btn-primary"
+                <input class="principal submit btn btn-primary btnSubmit"
                        id="btnSubmit"
                        type="button"
+                       aria-label="@Html.GetText("COMMON", "INICIARSESION")"
                        title="@Html.GetText("COMMON", "INICIARSESION")"
                        value="@Html.GetText("COMMON", "INICIARSESION")" />
             </div>
@@ -95,12 +104,12 @@ CommunityModel Comunidad = Html.GetComunidad();
 
                         if (Comunidad.AccessType == CommunityModel.TypeAccessProject.Restricted && (!Comunidad.MetaProyect))
                         {
-                            <span>Si todavía no tienes cuenta</span>
+                            <span>@Html.GetText("COMMON","SITODAVIANOTIENESCUENTA")</span>
                             <a id="link_hazte-miembro" class="olvidaste-password" href="@Comunidad.Url/@Html.GetText("URLSEM", "SOLICITARACCESO")">@Html.GetText("COMINICIOLOGIN", "SOLICITARACCESO")</a>
                         }
                         else if (Comunidad.AccessType == CommunityModel.TypeAccessProject.Public && (!Comunidad.MetaProyect))
                         {
-                            <span>Si todavía no tienes cuenta</span>
+                            <span>@Html.GetText("COMMON","SITODAVIANOTIENESCUENTA")</span>
                             <a id="link_hazte-miembro" class="olvidaste-password" href="@Comunidad.Url/@Html.GetText("URLSEM", "HAZTEMIEMBRO")">@Html.GetText("COMMON", "REGISTRARSE")</a>
                         }
                     }
@@ -110,7 +119,25 @@ CommunityModel Comunidad = Html.GetComunidad();
     </div>
 </form>
 
+@if (Cabecera.SocialNetworkRegister.Count > 0)
+{
+    <div class="box box02 registroRedesSociales mt-3">
+        <div class="separator">
+            <h2>@Html.GetText("REGISTRO", "OSILOPREFIERES")</h2>
+        </div>
+        @* Panel de Login Redes Sociales *@
+        <div class="redesSocialesActions">
+            @foreach (string nombre in Cabecera.SocialNetworkRegister.Keys)
+            {
+                string socialNetworkLogo = Html.GetLogoForSocialNetworkName(nombre);
+                <a class="redesSocialesAction__button" alt="@nombre" title="@nombre" href="@Cabecera.SocialNetworkRegister[nombre]">@Html.Raw(socialNetworkLogo)</a>
+            }
+        </div>
+    </div>
+}
+
+
 <script type="text/javascript">
-    // Gestión de operativa Login -> Este Login aprovecha la Lógica de la operativa Login Emergente
-    operativaLoginEmergente.init();
+    // Gestión de operativa Login -> Este Login aprovecha la Lógica de la operativa Login Emergente    
+    setTimeout(operativaLoginEmergente.init(), 500);    
 </script>

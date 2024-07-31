@@ -36,7 +36,8 @@ string inputAddressOrganization = "ProfileOrganization.Address";
 
 @* Título de labels*@
 string textoNombre = Html.GetText("REGISTROORGANIZACION", "RAZONSOCIAL");
-string textoAlias = Html.GetText("REGISTROORGANIZACION", "ALIAS");
+//string textoAlias = Html.GetText("REGISTROORGANIZACION", "ALIAS");
+string textoAlias = @Html.GetText("COMADMINPESTANYAS", "NOMBRE");
 string textoDireccion = Html.GetText("REGISTROORGANIZACION", "DIRECCIONSEDE");
 }
 
@@ -75,7 +76,7 @@ string textoDireccion = Html.GetText("REGISTROORGANIZACION", "DIRECCIONSEDE");
 <div class="form-group mb-5">
     <label class="control-label d-block" for="@idPostalCodeOrganization">@Html.GetText("REGISTRO", "CODIGOPOSTAL")</label>
     <div class="input-wrap">
-        <input placeholder="Introduce tu código postal"
+        <input placeholder="@Html.GetText("REGISTRO", "CODIGOPOSTAL")"
             type="text"
             id="@idPostalCodeOrganization"
             value="@Perfil.PostalCode"
@@ -99,7 +100,7 @@ string textoDireccion = Html.GetText("REGISTROORGANIZACION", "DIRECCIONSEDE");
 @* Nombre corto / Alias de la organización *@
 <div class="form-group mb-5 edit-nombre">
     <label class="control-label d-block" for="@idAliasOrganization">@textoAlias</label>
-    <input placeholder="Introduce un nombre corto para la organización"
+    <input placeholder="@textoAlias"
            type="text"
            name="@inputAliasOrganization"
            id="@idAliasOrganization"
@@ -110,7 +111,7 @@ string textoDireccion = Html.GetText("REGISTROORGANIZACION", "DIRECCIONSEDE");
 @* Web de la organización *@
 <div class="form-group mb-5 edit-nombre">
     <label class="control-label d-block" for="@idWebsiteOrganization">@Html.GetText("REGISTROORGANIZACION", "WEB")</label>
-    <input placeholder="Introduce la página web de la organización"
+    <input placeholder="@Html.GetText("REGISTROORGANIZACION", "WEB")"
            type="text"
            name="@inputWebOrganization"
            id="@idWebsiteOrganization"
@@ -127,7 +128,7 @@ string textoDireccion = Html.GetText("REGISTROORGANIZACION", "DIRECCIONSEDE");
 @* Dirección de organización *@
 <div class="form-group mb-5 edit-nombre">
     <label class="control-label d-block" for="@idAddressOrganization">@textoDireccion</label>
-    <input placeholder="Introduce un nombre corto para la organización"
+    <input placeholder="@textoDireccion"
            type="text"
            name="@inputAddressOrganization"
            id="@idAddressOrganization"

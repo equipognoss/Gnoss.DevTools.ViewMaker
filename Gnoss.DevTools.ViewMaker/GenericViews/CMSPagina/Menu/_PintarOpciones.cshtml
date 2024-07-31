@@ -1,0 +1,19 @@
+﻿@model CMSComponentMenu
+
+@foreach (CMSComponentMenu.CMSComponentMenuItem opcion in Model.ItemList)
+{
+    string activo = "";
+    if (opcion.Active)
+    {
+        activo = "class=\"activo\"";
+    }
+    <li @Html.Raw(activo)>
+        <a href="@opcion.Link">@opcion.Name</a>
+        @if (opcion.ItemList != null && opcion.ItemList.Count > 0)
+        {
+            <ul>
+                @Html.PartialView("../CMSPagina/Menu/_PintarOpciones", Model)
+            </ul>
+        }
+    </li>
+}

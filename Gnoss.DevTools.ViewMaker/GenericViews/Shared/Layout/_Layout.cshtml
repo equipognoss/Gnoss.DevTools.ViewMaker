@@ -1,4 +1,5 @@
-﻿@*Descripción
+﻿@*
+    Descripción
     ----------------------------------------------------------------
     Vista Layout del proyecto web. Estará formado por diferentes vistas parciales:
     - _layout-head-section: Contiene los datos relativos al <head>
@@ -25,8 +26,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="@Html.GetUtilIdiomas().LanguageCode" xmlns:og="http://ogp.me/ns#">
 
 <head>
-    <title>Head</title>
-    @* Carga de la vista que contiene información relativa a head *@
+    @* Carga de la vista que contiene información relativa a <head> *@
+    <link crossorigin="use-credentials" rel="manifest" href="@Html.GetBaseUrlStatic()/manifest.json" />
     @Html.PartialView("../Shared/Layout/_partial-views/_layout-head-section")
 </head>
 
@@ -36,7 +37,9 @@
     @if (Comunidad != null && Comunidad.ProjectExtraHTMLList != null)
     {
         @Html.PartialView("../Shared/ProyectoElementoHTML", Comunidad.ProjectExtraHTMLList.Where(a => a.Ubication == UbicacionHtmlProyecto.BeginBody).ToList())
-    } @* Carga de los formularios ocultos del Layout *@
+    }
+
+    @* Carga de los formularios ocultos del Layout *@
     @Html.PartialView("../Shared/Layout/_partial-views/_layout-hidden-forms")
 
     @* Carga de las vistas modales para que estén / o no disponibles *@
@@ -54,7 +57,9 @@
                 {
                     @Html.PartialView("../Shared/Layout/_modal-views/_accept-cookies")
                     @Html.PartialView("../Shared/Layout/_modal-views/_manage-cookies")
-                } @* Mostrar o no el posibles mensajes acerca del estado de la comunidad *@
+                }
+
+                @* Mostrar o no el posibles mensajes acerca del estado de la comunidad *@
                 @Html.PartialView("../Shared/Layout/_partial-views/_layout-admin-messages-community")
 
                 @* Carga de Migas de Pan*@
@@ -74,12 +79,14 @@
     @* Cargar o no la vista modal Login emergente*@
     @Html.PartialView("../Registro/_modal-views/_login")
 
+    @* Cargar la vista modal de Información de acceso restringido a la comunidad. Aparecerá si el usuario realiza alguna acción y necesita formar parte de la comunidad e incluso ya está logueado(Ej: Añadir al espacio personal) *@
+    @Html.PartialView("../Registro/_modal-views/_restringed-community-access")
+
     @* Menús del usuario -> Paneles Laterales *@
     @if (!IdentidadActual.IsGuestUser)
     {
         // Mostrar paneles asociados a la cabecera con usuario logeado
-        @Html.PartialView("../Shared/_cabecera/_menu-lateral")
-        ;
+        @Html.PartialView("../Shared/_cabecera/_menu-lateral")        
         @Html.PartialView("../Shared/_cabecera/_menu-lateral-usuario")
     }
     @Html.PartialView("../Shared/_cabecera/_menu-lateral-metabuscador")
@@ -102,6 +109,26 @@
         $(document).ready(function () {
             EjecutarScriptsIniciales2();
         });
+
+         function getSubscription(reg) {
+            reg.pushManager.getSubscription().then(function (sub) {
+                if (sub === null) {
+                    reg.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: "@ViewBag.applicationServerKey"
+                    }).then(function (sub) {
+                        fillSubscribeFields(sub);
+                    }).catch(function (e) {
+                        console.error("Unable to subscribe to push", e);
+                    });
+                } else {
+                    fillSubscribeFields(sub);
+                }
+            });
+        }
     </script>
+
+    @* Analytics Matomo *@
+    @Html.PartialView("../Shared/Layout/_partial-views/_AnalyticsMatomo")
 </body>
 </html>

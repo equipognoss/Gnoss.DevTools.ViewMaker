@@ -531,7 +531,7 @@ else
                             }
                             else
                             {
-                                srcIframeNewsletter = "src=\"" + Html.GetBaseUrlIdioma() + "/objetonewsletter.aspx?docid=" + Model.DocumentEditionModel.Key + "&temp=false\"";
+                                srcIframeNewsletter = "src=\"" + Html.GetBaseUrlIdioma() + "/objetonewsletter?docid=" + Model.DocumentEditionModel.Key + "&temp=false\"";
                                 classDivDescp = "class=\"oculto\"";
                             }
                             @* Newsletter *@
@@ -575,14 +575,14 @@ else
                         <div class="input-wrap form-sticky-button autocompletar" onclick="$('#txtTags').focus();">
                             @* Input de Tags *@
                             <input type="text"
-                                    placeholder="Introduce una etiqueta y pulsa AÑADIR"
+                                    placeholder="@Html.GetText("COMMON","INTRODUCEUNAETIQUETAYPULSAAÑADIR")"
                                     id="txtTags"
                                     class="form-control txtAutocomplete"
                                     value="@Model.DocumentEditionModel.Tags"
                                     autocomplete="off" />
 
                             @* Botón de Añadir Etiqueta/Tag *@
-                            <a id="anadir-tag" class="btn btn-grey uppercase">Añadir</a>
+                            <a id="anadir-tag" class="btn btn-grey uppercase">@Html.GetText("COMMON","ANYADIRENMAYUSCULA")</a>
 
                             @* Campo oculto que almacenará los Tags del recurso *@
                             <input type="hidden" id="@idTxtTags" />
@@ -1161,9 +1161,10 @@ else
                 }
                 }
 
-                @* Nombres que tendrán los botones para el proceso de guardado del recurso*@
+                @* Nombres e identificadores que tendrán los botones para el proceso de guardado del recurso*@
                 @{
                     string textoPublicacion = Html.GetText("PERFILBASESUBIRRECURSO", "GUARDAR");
+                    string identificadorBoton = "lbPublicar";
 
                     if (Model.DocumentType == ResourceModel.DocumentType.Semantico && Model.SemanticResourceModel.MassiveResourceLoad)
                     {
@@ -1182,6 +1183,7 @@ else
                         {
                             textoPublicacion = Html.GetText("CREARDOCUMENTO", "CREARVERSION");
                         }
+                        identificadorBoton = "lbCrearVersion";
                     }
                     else if (Model.DocumentEditionModel.Draft || Model.EditResourceModel.TypePage == EditResourceModel.TypePageEditResource.AddToGnossResource)
                     {
@@ -1201,7 +1203,7 @@ else
                                     onclickPublicar = "if (RecogerValoresRDF2(true)){$('#divContLblErrorDocumento').html('');EnviarDatosServidor('Publicar');}else{crearErrorFormSem(mensajeErrorFormSemPrinc, 'divContLblErrorDocumento');}";
                                 }
                             }
-                            <input class="submit principal btn btn-primary" id="lbPublicar" type="button" value="@textoPublicacion" onclick="@onclickPublicar" />
+                            <input class="submit principal btn btn-primary" id="@identificadorBoton" type="button" value="@textoPublicacion" onclick="@onclickPublicar" />
 
                             @if (Model.DocumentEditionModel.Draft || (Model.DocumentType == ResourceModel.DocumentType.Semantico && Model.SemanticResourceModel.MassiveResourceLoad))
                             {

@@ -8,10 +8,11 @@ Variables
 ----------------------------------------------------------------
 *@
 @{
-CommunityModel Comunidad = Html.GetComunidad();
-ResourceModel fichaRecurso = Model.Resource;
-@* Función de aceptar certificación al pulsar en "Aceptar" *@
-string funcionCertificarAceptar = "AccionRecurso_Certificar_Aceptar('" + fichaRecurso.ListActions.UrlCertify + "', '" + fichaRecurso.Key + "', '" + Html.GetText("PERFILBASERECURSOSFICHA", "RECURSOCERTIFICADO") + "')";
+    CommunityModel Comunidad = Html.GetComunidad();
+    ResourceModel fichaRecurso = Model.Resource;
+    string idioma = Html.GetUtilIdiomas().LanguageCode;
+    @* Función de aceptar certificación al pulsar en "Aceptar" *@
+    string funcionCertificarAceptar = "AccionRecurso_Certificar_Aceptar('" + fichaRecurso.ListActions.UrlCertify + "', '" + fichaRecurso.Key + "', '" + Html.GetText("PERFILBASERECURSOSFICHA", "RECURSOCERTIFICADO") + "')";
 }
 
 @*
@@ -43,7 +44,7 @@ string funcionCertificarAceptar = "AccionRecurso_Certificar_Aceptar('" + fichaRe
                          id="@Guid.Empty"
                          name="certificar-recurso"
                          @((@Guid.Empty == fichaRecurso.Certification.Key) ? "checked" : null)
-                         data-value="No certificado"
+                         data-value="@Html.GetText("COMBUSQUEDAAVANZADA", "NOCERTIFI")"
                          data-option="@Guid.Empty"
                          class="custom-control-input" />
                   <label class="custom-control-label"
@@ -58,11 +59,11 @@ string funcionCertificarAceptar = "AccionRecurso_Certificar_Aceptar('" + fichaRe
                              id="@certificacionID"
                              name="certificar-recurso"
                              @((certificacionID == fichaRecurso.Certification.Key) ? "checked" : null)
-                             data-value="@Comunidad.ListaCertificaciones[certificacionID]"
+                             data-value="@UtilCadenas.ObtenerTextoDeIdioma(Comunidad.ListaCertificaciones[certificacionID], idioma, null)"
                              data-option="@certificacionID"
                              class="custom-control-input" />
                       <label class="custom-control-label"
-                             for="@certificacionID">@Comunidad.ListaCertificaciones[certificacionID]</label>
+                       for="@certificacionID">@UtilCadenas.ObtenerTextoDeIdioma(Comunidad.ListaCertificaciones[certificacionID], idioma, null)</label>
                   </div>
               }
           </div>

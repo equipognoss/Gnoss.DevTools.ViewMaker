@@ -13,9 +13,12 @@ Variables
 ----------------------------------------------------------------
 *@
 @{
-// Nº máximo para el nombre de la comunidad que aparecerá en el Gadget correspondiente
-int numMaxCharactersForCommunityNameListItem = 15;
+    // Nº máximo para el nombre de la comunidad que aparecerá en el Gadget correspondiente
+    int numMaxCharactersForCommunityNameListItem = 15;
 
+    // Core trae 20, mostramos 3
+    int recursosDestacadosAMostrar = 3;
+    int cont = 0;
 }
 
 @*
@@ -79,7 +82,12 @@ else if (Model is GadgetResourceListModel)
             <div class="contexto resource-list activo">
                 @foreach (ResourceModel ficha in gadgetListado.Resources)
                 {
+                    if (cont.Equals(recursosDestacadosAMostrar))
+                    {
+                        break;
+                    }
                     @Html.PartialView(gadgetListado.ViewNameResources, ficha)
+                    cont++;
                 }
             </div>
 
@@ -87,8 +95,8 @@ else if (Model is GadgetResourceListModel)
             {
                 <div class="contexto resource-list" style="display:none">
                     @foreach (ResourceModel ficha in ((GadgetResourceListModel)Model).ResourcesPagers)
-                    {
-                        @Html.PartialView(gadgetListado.ViewNameResources, ficha)
+                    {                   
+                        @Html.PartialView(gadgetListado.ViewNameResources, ficha)                      
                     }
                 </div>
             }

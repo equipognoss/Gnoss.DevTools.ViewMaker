@@ -76,7 +76,7 @@ descriptionFormatted = Html.CleanHtmlParagraphsStringHtml(descriptionFormatted);
                 }
             </div>
         }
-        @* Sólo parece haber breve descripción *@
+
         else if(descriptionFormatted.Length > minimunDescriptionCharacters)
         {
             <div class="resumen">            
@@ -84,7 +84,6 @@ descriptionFormatted = Html.CleanHtmlParagraphsStringHtml(descriptionFormatted);
             </div>
         }
 
-        @* Ver ajustes - Sin diseño dewenir *@
         @if (Model.ViewSettings != null)
         {
             if (!string.IsNullOrEmpty(Model.ViewSettings.InfoExtraContext))
@@ -94,25 +93,22 @@ descriptionFormatted = Html.CleanHtmlParagraphsStringHtml(descriptionFormatted);
                 </div>
             }
         }
-        @* Eliminado el tipo de documento *@
-        @* <p class="autor">@Model.TypeDocument</p> *@
 
-        @* Ver acciones - Sin diseño dewenir*@
+        @* Acción Desvincular *@
         @if (Model.Actions != null && Model.Actions.UnLinkUp)
         {
-            @* Función desvincular aceptar*@
-            string funcionDesVincularAceptar = "AccionRecurso_DesVincular_Aceptar('" + new Uri($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}").AbsoluteUri + "/unlink-resource','" + Context.Request.Path.ToString() + "/load-linked-resources', '" + ViewContext.RouteData.Values["docID"] + "', '" + Model.Key + "')";
+            string funcionDesVincularAceptar = "AccionRecurso_DesVincular_Aceptar('" + Model.ListActions.UrlUnLinkResource + "','" + Context.Request.Path.ToString() + "/load-linked-resources', '" + ViewContext.RouteData.Values["docID"] + "', '" + Model.Key + "')";
 
             <a class="btn btn-outline-grey mt-2"
-               alt="Desvincular @Model.Title"
+               alt="@Html.GetText("COMMON","DESVINCULAR") @Model.Title"
                data-toggle="modal"
                data-target="#modal-container"
                title="Desvincular @Model.Title"
                style="cursor: pointer"
-               onclick="AccionFichaPerfil('Desvincular', // Título del panel,
+               onclick="AccionFichaPerfil('@Html.GetText("COMMON", "DESVINCULAR")', // Título del panel,
                                                '@Html.GetText("COMMON", "SI")', // Título del botón primario (Sí)
                                                '@Html.GetText("COMMON", "NO")', // Título del botón secundario (No)
-                                               '¿Deseas desvincular del documento actual el recurso @Model.Title ?', // Mensaje o pregunta de la acción a realizar por el usuario',
+                                               '@Html.GetText("COMMON", "DESEASDESVINCULARDELDOCUMENTOACTUALELRECURSO@1@", Model.Title)', // Mensaje o pregunta de la acción a realizar por el usuario',
                                                '@Model.Key',
                                                 function () {
                                                      @funcionDesVincularAceptar;
@@ -122,7 +118,7 @@ descriptionFormatted = Html.CleanHtmlParagraphsStringHtml(descriptionFormatted);
                 <span class="material-icons">
                     link_off
                 </span>
-                Desvincular
+                @Html.GetText("COMMON", "DESVINCULAR")
             </a>
         }
 

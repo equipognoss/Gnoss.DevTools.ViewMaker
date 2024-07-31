@@ -1,0 +1,43 @@
+﻿@model SharedSemCms
+
+@{
+    Es.Riam.Semantica.OWL.Propiedad mPropiedad = Model.semanticPropertyModel.Element.Propiedad;
+    string classCont = "edit edit_" + mPropiedad.NombreGeneracionClases;
+    SharedSemCms sharedSemCms = new SharedSemCms();
+    sharedSemCms.semanticPropertyModel = Model.semanticPropertyModel;
+    sharedSemCms.pRecLink = Model.pRecLink;
+
+    if (Model.pTipoCampo == 0)
+    {
+        classCont += "_TituloDoc";
+    }
+    else if (Model.pTipoCampo == 1)
+    {
+        classCont += "_ImagenDoc";
+    }
+    else if (Model.pTipoCampo == 2)
+    {
+        classCont += "_DescripcionDoc";
+    }
+    else if (Model.pTipoCampo == 3)
+    {
+        classCont += "_AutoresDoc";
+    }
+
+    if (Model.pTipoCampo == 2)
+    {
+        @Html.PartialView("../Shared/SemCMS/_AddLinkedResourcePropertyInt", sharedSemCms)
+    }
+    else if (Model.semanticPropertyModel.EntityParent.Entity.Ontologia.ConfiguracionPlantilla.HtmlNuevo > 0)
+    {
+        <div class="@classCont">
+            @Html.PartialView("../Shared/SemCMS/_AddLinkedResourcePropertyInt", sharedSemCms)
+        </div>
+    }
+    else
+    {
+        <p class="@classCont">
+            @Html.PartialView("../Shared/SemCMS/_AddLinkedResourcePropertyInt", sharedSemCms)
+        </p>
+    }
+}

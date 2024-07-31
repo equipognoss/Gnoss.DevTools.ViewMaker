@@ -1,0 +1,80 @@
+﻿@model SharedSemCms
+
+@{
+    Es.Riam.Semantica.OWL.Propiedad mPropiedad = Model.semanticPropertyModel.Element.Propiedad;
+    string idControl = Model.semanticPropertyModel.OntologyPropInfo.ControlID;
+    string idControlValoresAg = idControl.Replace("Campo_", "contedor_Valores_");
+
+    if (Model.semanticPropertyModel.OntologyPropInfo.PropertyValues.Count > 0)
+    {
+        string claseFila = "par";
+        int count = 0;
+
+        <div id="@idControlValoresAg">
+            <table class="table">
+                @foreach (SemanticPropertyModel.PropertyValue propValue in Model.semanticPropertyModel.OntologyPropInfo.PropertyValues)
+                {
+                    string imgEditar = Html.GetBaseUrlStatic() + "/img/icoEditar.gif";
+                    string texto = propValue.Value;
+
+                    if (texto.Length > 143)
+                    {
+                        texto = texto.Substring(0, 143);
+                    }
+
+                    // Cambiado por nuevo Front
+                    string metodoEliminar = "EliminarValorDeDataNoFuncionalProp('" + count + "', '" + mPropiedad.ElementoOntologia.TipoEntidad + "', '" + mPropiedad.Nombre + "', '" + idControlValoresAg + "',TxtValorRdf,TxtRegistroIDs,TxtCaracteristicasElem,TxtElemEditados);";
+                    //metodoEliminar = metodoEliminar.Replace("'", "\\'");
+                    //metodoEliminar = "MostrarPanelConfirmacionEvento(event, '" + Html.GetText("CONTROLESCVSEM", "CONFIRMARELIMINAR", propValue.Value).Replace("'", "\\'") + "', '" + metodoEliminar + "')";
+
+                    <tr class="@claseFila">
+                        <td><span>@texto</span></td>
+                        <td>
+                            <a onclick="SeleccionarElementoGrupoValores('@mPropiedad.ElementoOntologia.TipoEntidad', '@mPropiedad.Nombre', '@count',TxtValorRdf,TxtRegistroIDs,TxtCaracteristicasElem,TxtElemEditados)">
+                                <span class="material-icons">
+                                    edit
+                                </span>
+                            </a>
+                        </td>
+                        <td>                           
+                            @* <a class="remove" onclick="@metodoEliminar"></a> *@
+                            <a  
+                                onclick="
+                                    $('#modal-container').modal('show', this);
+                                        AccionFichaPerfil(
+                                            '@Html.GetText("COMMON", "ELIMINAR")',
+                                            '@Html.GetText("COMMON", "SI")',
+                                            '@Html.GetText("COMMON", "NO")',
+                                            '@Html.GetText("CONTROLESCVSEM", "CONFIRMARELIMINAR", propValue.Value).Replace("'", "\\'")',
+                                            'sin-definir',
+                                            function(){
+                                                @metodoEliminar
+                                                $('#modal-container').modal('hide');
+                                            }
+                                        );
+                                ">
+                                <span class="material-icons pr-0">delete</span>
+                            </a>
+
+                        </td>
+                    </tr>
+
+                    if (claseFila == "par")
+                    {
+                        claseFila = "impar";
+                    }
+                    else
+                    {
+                        claseFila = "par";
+                    }
+
+                    count++;
+                }
+            </table>
+        </div>
+    }
+    else
+    {
+        <div id="@idControlValoresAg"></div>
+    }
+}

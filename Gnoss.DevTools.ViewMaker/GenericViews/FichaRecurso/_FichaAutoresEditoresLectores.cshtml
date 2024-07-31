@@ -13,20 +13,23 @@ Variables
 ----------------------------------------------------------------
 *@
 @{
-// Nº de autores de un determinado recurso
-int numAutores = 0;
-// Nº de autores de un determinado recurso
-int numEditores = 0;
-// Nº de lectores de un determinado recurso
-int numLectores = 0;
+    // Nº de autores de un determinado recurso
+    int numAutores = 0;
+    // Nº de autores de un determinado recurso
+    int numEditores = 0;
+    // Nº de lectores de un determinado recurso
+    int numLectores = 0;
 
-// nombre de la clase de la red social para los iconos de "Compartir en redes sociales"
-string clase = "";
+    // nombre de la clase de la red social para los iconos de "Compartir en redes sociales"
+    string clase = "";
 
-// Obtener el dato pasado en la vista como dato adicional para saber si se puede o no compartir el recurso en comunidades
-var HideSharedCommunities = (bool) ViewData["HideSharedCommunities"];
+    // Obtener el dato pasado en la vista como dato adicional para saber si se puede o no compartir el recurso en comunidades
+    bool HideSharedCommunities = false;
 
-
+    if ((bool?)ViewData["HideSharedCommunities"] != null && (bool)ViewData["HideSharedCommunities"])
+    {
+        HideSharedCommunities = true;
+    }    
 }
 
 @*

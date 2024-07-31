@@ -32,7 +32,7 @@ CommunityModel Comunidad = Html.GetComunidad();
                             @* Label + Input para password anterior *@
                             <label for="txtOldPassword" class="control-label">@Html.GetText("CAMBIARPASSWORD", "PASSWORDANTERIOR")</label>
                             <input type="password"
-                                   placeholder="Introduce tu contraseña actual"
+                                   placeholder="@Html.GetText("CAMBIARPASSWORD", "INSERTARPASSWORDACTUAL")"
                                    id="txtOldPassword"
                                    class="form-control" />
 
@@ -41,7 +41,7 @@ CommunityModel Comunidad = Html.GetComunidad();
                             @* Label + Input para la contraseña nueva *@
                             <label for="txtNewPassword" class="control-label">@Html.GetText("CAMBIARPASSWORD", "PASSWORDNUEVA")</label>
                             <input type="password"
-                                   placeholder="Introduce tu nueva contraseña"
+                                   placeholder="@Html.GetText("CAMBIARPASSWORD", "INSERTARPASSWORDNUEVA")"
                                    id="txtNewPassword"
                                    class="form-control" />
                         </div>
@@ -49,7 +49,7 @@ CommunityModel Comunidad = Html.GetComunidad();
                             @* Label + Input para confirmar la contraseña nueva*@
                             <label for="txtConfirmedPassword" class="control-label">@Html.GetText("CAMBIARPASSWORD", "PASSWORDNUEVACONFIRMAR")</label>
                             <input type="password"
-                                   placeholder="Confirma la nueva contraseña"
+                                   placeholder="@Html.GetText("CAMBIARPASSWORD", "INSERTARPASSWORDCONFIRMAR")"
                                    id="txtConfirmedPassword"
                                    class="form-control" />
                         </div>

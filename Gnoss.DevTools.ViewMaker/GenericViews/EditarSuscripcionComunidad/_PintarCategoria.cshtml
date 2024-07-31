@@ -1,0 +1,41 @@
+﻿@model PintarCategoriasEditarSuscripcion
+
+<div>
+    @{
+        bool tieneHijos = Model.editSuscriptionView.Categories.Count(cat => cat.ParentCategoryKey == Model.categoryModel.Key) > 0;
+    }
+
+    @if (tieneHijos)
+    {
+        <img style="border-width:0px;margin-right:5px;cursor:pointer;" src="@Html.GetBaseUrlStatic()/img/verMas.gif" onclick="javascript:MVCDesplegarTreeView(this);" />
+    }
+    else
+    {
+        <img style="border-width:0px;" src="@Html.GetBaseUrlStatic()/img/miniWhiteSpace.gif" />
+    }
+    <span class="@Model.categoryModel.Key">
+        @{
+            string accionClick = "MVCMarcarElementoSelCat(this, 'selectorCategoriasSusc');";
+            string cadenaChecked = "";
+            if (Model.categoryModel.Selected)
+            {
+                cadenaChecked = "checked=\"checked\"";
+            }
+        }
+
+        <input type="checkbox" id="chk_arbol_@Model.categoryModel.Key" onclick="@accionClick" @cadenaChecked />
+        <label for="chk_arbol_@Model.categoryModel.Key">@Model.categoryModel.Name</label>
+    </span>
+    @if (tieneHijos)
+    {
+        <div style="display:none; margin-left:15px;" class="panHijos">
+            @foreach (CategoryModel categoria in Model.editSuscriptionView.Categories.Where(cat => cat.ParentCategoryKey == Model.categoryModel.Key).OrderBy(cat => cat.Order))
+            {
+                PintarCategoriasEditarSuscripcion pintar = new PintarCategoriasEditarSuscripcion();
+                pintar.editSuscriptionView = Model.editSuscriptionView;
+                pintar.categoryModel = categoria;
+                @Html.PartialView("../EditarSuscripcionComunidad/_PintarCategoria", pintar)
+            }
+        </div>
+    }
+</div>
