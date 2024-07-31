@@ -849,7 +849,12 @@ namespace Gnoss.DevTools.ViewMaker.Extensions
             }
             else if (IHtmlHelper.ViewBag.ViewPath != null && IHtmlHelper.ViewBag.ViewPath.Contains($"~/{rutaVistasPersonalizadas}/Views/Busqueda"))
             {
-                if (IHtmlHelper.ViewBag.ViewPath != null && (partialViewName.StartsWith("_partial-views") || partialViewName.StartsWith("_modal-views")))
+                string contexto = IHtmlHelper.ViewContext.ExecutingFilePath;
+                if (contexto==null)
+                {
+                    contexto = string.Empty;
+                }
+                if (IHtmlHelper.ViewBag.ViewPath != null && !contexto.Contains("CargadorResultados") && (partialViewName.StartsWith("_partial-views") || partialViewName.StartsWith("_modal-views")))
                 {
                     partialViewName = IHtmlHelper.ViewBag.ViewPath.Replace("/" + rutaVistasPersonalizadas, "") + "/" + partialViewName;
                     partialViewName = $"~/{rutaVistasPersonalizadas}{partialViewName.Replace("~", "")}.cshtml";

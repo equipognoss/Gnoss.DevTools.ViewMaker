@@ -142,7 +142,7 @@ Variables
     <script type="text/javascript">
 
         @Html.Raw(jsExtra)
-        @if (htmlFacetas == null && htmlResultados == null)
+        @if (htmlFacetas == null && htmlResultados == null && Model.JSONResourceList == null && Model.JSONFaceted == null)
         {
             <text>
                 $(document).ready(function () {
