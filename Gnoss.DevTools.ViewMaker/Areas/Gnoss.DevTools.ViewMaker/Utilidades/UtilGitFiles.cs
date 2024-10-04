@@ -237,7 +237,7 @@ namespace Gnoss.DevTools.ViewMaker.Areas.Gnoss.DevTools.ViewMaker.Utilidades
             {
                 option.BranchName = pNombreRama;
             }
-            option.CredentialsProvider = Credential;
+            option.FetchOptions.CredentialsProvider = Credential;
 
             Repository.Clone(pURL.ToString(), pPathDirectorio, option);
         }
