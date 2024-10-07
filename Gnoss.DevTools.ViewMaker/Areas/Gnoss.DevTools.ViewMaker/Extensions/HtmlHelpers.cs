@@ -13,6 +13,7 @@ using Gnoss.DevTools.ViewMaker.Areas.Gnoss.DevTools.ViewMaker.Extensions;
 using Es.Riam.Gnoss.Web.MVC.Models;
 using Es.Riam.Gnoss.Recursos;
 using System.Text.RegularExpressions;
+using Es.Riam.Gnoss.Web.MVC.Controles.Controladores;
 
 namespace Gnoss.DevTools.ViewMaker.Extensions
 {
@@ -59,251 +60,70 @@ namespace Gnoss.DevTools.ViewMaker.Extensions
         // 
         public static string ExtractValueInStringFromStartAndEnd(this IHtmlHelper helper, string stringExtractFrom, string characterStart, string characterEnd)
         {
-            var initialPosition = stringExtractFrom.IndexOf(characterStart) + characterStart.Length;
-            var finalPosition = stringExtractFrom.IndexOf(characterEnd, initialPosition + 1);
+            string extractString = stringExtractFrom;
+            if (!string.IsNullOrEmpty(stringExtractFrom) && stringExtractFrom.IndexOf(characterStart) != -1 && stringExtractFrom.IndexOf(characterEnd) != -1)
+            {
+                var initialPosition = stringExtractFrom.IndexOf(characterStart) + characterStart.Length;
+                var finalPosition = stringExtractFrom.IndexOf(characterEnd, initialPosition + 1);
 
-            // Fragmento que deberá eliminarse
-            string extractString = stringExtractFrom.Substring(initialPosition, finalPosition - initialPosition);
+                // Fragmento que deberá eliminarse
+                extractString = stringExtractFrom.Substring(initialPosition, finalPosition - initialPosition);
+            }
             return extractString;
         }
-
 
 
         // Método para limpiar un String que contiene imagenes, videos de youtube pero no se desean ser mostrados (Ej: Ficha Mini Recurso)
         public static string CleanHtmlFromMultimediaItems(this IHtmlHelper helper, string stringHtml) {
 
-            // Contendrá el stringHtml pero sin las img, vídeos incrustadas, enlaces, tablas, spa, h1-h4, ul, ol, strong                      
-            while (stringHtml.Contains("<img ") || stringHtml.Contains("<iframe ") || stringHtml.Contains("<table") || stringHtml.Contains("<ul") || stringHtml.Contains("<ol") || stringHtml.Contains("<a") || stringHtml.Contains("</a>") || stringHtml.Contains("<strong>") || stringHtml.Contains("</strong>") || stringHtml.Contains("<span") || stringHtml.Contains("</span>") || stringHtml.Contains("<h1>") || stringHtml.Contains("<h1 ") || stringHtml.Contains("<h2>") || stringHtml.Contains("<h2 ") || stringHtml.Contains("<h3>") || stringHtml.Contains("<h3 ") || stringHtml.Contains("<h4>") || stringHtml.Contains("<h4 ") || stringHtml.Contains("</h1>") || stringHtml.Contains("</h2>") || stringHtml.Contains("</h3>") || stringHtml.Contains("</h4>") || stringHtml.Contains("<u>") || stringHtml.Contains("</u>") || stringHtml.Contains("<figure"))
+            if (!string.IsNullOrEmpty(stringHtml))
             {
-                int initialPosition = 0;
-                int finalPosition = 0;
-
-                string descriptionToRemove = "";
-
-                // Controlar si dispone de imágenes
-                if (stringHtml.Contains("<img "))
+                foreach (string clave in ELEMENTOS_HTML_LIMPIAR.Keys)
                 {
-                    initialPosition = stringHtml.IndexOf("<img ");
-                    finalPosition = stringHtml.IndexOf(">", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 1);
+                    stringHtml = LimpiarFragmentoHTML(stringHtml, clave, ELEMENTOS_HTML_LIMPIAR[clave]);
                 }
-                else if (stringHtml.Contains("<iframe "))
-                {
-                    initialPosition = stringHtml.IndexOf("<iframe ");
-                    finalPosition = stringHtml.IndexOf("</iframe>", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 9);
-                }
-                else if (stringHtml.Contains("<table"))
-                {
-                    initialPosition = stringHtml.IndexOf("<table");
-                    finalPosition = stringHtml.IndexOf("</table>", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 8);
-                }
-                else if (stringHtml.Contains("<ul"))
-                {
-                    initialPosition = stringHtml.IndexOf("<ul");
-                    finalPosition = stringHtml.IndexOf("</ul>", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 5);
-                }
-                else if (stringHtml.Contains("<ol"))
-                {
-                    initialPosition = stringHtml.IndexOf("<ol");
-                    finalPosition = stringHtml.IndexOf("</ol>", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 5);
-                }
-                else if (stringHtml.Contains("<a"))
-                {
-                    initialPosition = stringHtml.IndexOf("<a");
-                    finalPosition = stringHtml.IndexOf(">", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 1);
-                }
-                else if (stringHtml.Contains("</a>"))
-                {
-                    initialPosition = stringHtml.IndexOf("</a>");
-                    finalPosition = stringHtml.IndexOf("</a>", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 4);
-                }
-                else if (stringHtml.Contains("<strong>"))
-                {
-                    initialPosition = stringHtml.IndexOf("<strong>");
-                    finalPosition = stringHtml.IndexOf("<strong>", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 8);
-                }
-                else if (stringHtml.Contains("</strong>"))
-                {
-                    initialPosition = stringHtml.IndexOf("</strong>");
-                    finalPosition = stringHtml.IndexOf("</strong>", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 9);
-                }
-                else if (stringHtml.Contains("<span"))
-                {
-                    initialPosition = stringHtml.IndexOf("<span");
-                    finalPosition = stringHtml.IndexOf(">", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 1);
-                }
-                else if (stringHtml.Contains("</span>"))
-                {
-                    initialPosition = stringHtml.IndexOf("</span>");
-                    finalPosition = stringHtml.IndexOf("</span>", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 7);
-                }
-                else if (stringHtml.Contains("<h1>"))
-                {
-                    initialPosition = stringHtml.IndexOf("<h1>");
-                    finalPosition = stringHtml.IndexOf("<h1>", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 4);
-                }
-                else if (stringHtml.Contains("<h1 "))
-                {
-                    initialPosition = stringHtml.IndexOf("<h1 ");
-                    finalPosition = stringHtml.IndexOf(">", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 1);
-                }
-                else if (stringHtml.Contains("<h2>"))
-                {
-                    initialPosition = stringHtml.IndexOf("<h2>");
-                    finalPosition = stringHtml.IndexOf("<h2>", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 4);
-                }
-                else if (stringHtml.Contains("<h2 "))
-                {
-                    initialPosition = stringHtml.IndexOf("<h2 ");
-                    finalPosition = stringHtml.IndexOf(">", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 1);
-                }
-                else if (stringHtml.Contains("<h3>"))
-                {
-                    initialPosition = stringHtml.IndexOf("<h3>");
-                    finalPosition = stringHtml.IndexOf("<h3>", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 4);
-                }
-                else if (stringHtml.Contains("<h3 "))
-                {
-                    initialPosition = stringHtml.IndexOf("<h3 ");
-                    finalPosition = stringHtml.IndexOf(">", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 1);
-                }
-                else if (stringHtml.Contains("<h4>"))
-                {
-                    initialPosition = stringHtml.IndexOf("<h4>");
-                    finalPosition = stringHtml.IndexOf("<h4>", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 4);
-                }
-                else if (stringHtml.Contains("<h4 "))
-                {
-                    initialPosition = stringHtml.IndexOf("<h4 ");
-                    finalPosition = stringHtml.IndexOf(">", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 1);
-                }
-                else if (stringHtml.Contains("</h1>"))
-                {
-                    initialPosition = stringHtml.IndexOf("</h1>");
-                    finalPosition = stringHtml.IndexOf("</h1>", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 5);
-                }
-                else if (stringHtml.Contains("</h2>"))
-                {
-                    initialPosition = stringHtml.IndexOf("</h2>");
-                    finalPosition = stringHtml.IndexOf("</h2>", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 5);
-                }
-                else if (stringHtml.Contains("</h3>"))
-                {
-                    initialPosition = stringHtml.IndexOf("</h3>");
-                    finalPosition = stringHtml.IndexOf("</h3>", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 5);
-                }
-                else if (stringHtml.Contains("</h4>"))
-                {
-                    initialPosition = stringHtml.IndexOf("</h4>");
-                    finalPosition = stringHtml.IndexOf("</h4>", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 5);
-                }
-                else if (stringHtml.Contains("<u>"))
-                {
-                    initialPosition = stringHtml.IndexOf("<u>");
-                    finalPosition = stringHtml.IndexOf("<u>", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 3);
-                }
-                else if (stringHtml.Contains("</u>"))
-                {
-                    initialPosition = stringHtml.IndexOf("</u>");
-                    finalPosition = stringHtml.IndexOf("</u>", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 4);
-                }
-                else if (stringHtml.Contains("<figure"))
-                {
-                    initialPosition = stringHtml.IndexOf("<figure");
-                    finalPosition = stringHtml.IndexOf("</figure>", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 9);
-                }
-
-                stringHtml = stringHtml.Replace(descriptionToRemove, "");
             }
-            return (stringHtml);
+            return stringHtml;
         }
 
         // Método para de parrafo (<p>) un texto para que no se muestre en pantalla para que no genere espacio adicional
         public static string CleanHtmlParagraphsStringHtml(this IHtmlHelper helper, string stringHtml)
         {
-            // Contendrá el stringHtml pero sin las imagenes, vídeos incrustadas                        
-            while (stringHtml.Contains("<p>") || stringHtml.Contains("</p>"))
+            if (!string.IsNullOrEmpty(stringHtml))
             {
-                int initialPosition = 0;
-                int finalPosition = 0;
-
-                string descriptionToRemove = "";
-
-                // Controlar si dispone de párrafos
-                if (stringHtml.Contains("<p>"))
+                // Contendrá el stringHtml pero sin las imagenes, vídeos incrustadas                        
+                while (stringHtml.Contains("<p>") || stringHtml.Contains("</p>"))
                 {
-                    initialPosition = stringHtml.IndexOf("<p>");
-                    finalPosition = stringHtml.IndexOf(">", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 1);
-                }
-                else if (stringHtml.Contains("</p>"))
-                {
-                    initialPosition = stringHtml.IndexOf("</p>");
-                    finalPosition = stringHtml.IndexOf(">", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 1);
-                }
-                else if (stringHtml.Contains("<p "))
-                {
-                    initialPosition = stringHtml.IndexOf("<p ");
-                    finalPosition = stringHtml.IndexOf(">", initialPosition);
-                    // Fragmento que deberá eliminarse
-                    descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 1);
-                }
+                    int initialPosition = 0;
+                    int finalPosition = 0;
 
-                stringHtml = stringHtml.Replace(descriptionToRemove, "");
+                    string descriptionToRemove = "";
+
+                    // Controlar si dispone de párrafos
+                    if (stringHtml.Contains("<p>"))
+                    {
+                        initialPosition = stringHtml.IndexOf("<p>");
+                        finalPosition = stringHtml.IndexOf(">", initialPosition);
+                        // Fragmento que deberá eliminarse
+                        descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 1);
+                    }
+                    else if (stringHtml.Contains("</p>"))
+                    {
+                        initialPosition = stringHtml.IndexOf("</p>");
+                        finalPosition = stringHtml.IndexOf(">", initialPosition);
+                        // Fragmento que deberá eliminarse
+                        descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 1);
+                    }
+                    else if (stringHtml.Contains("<p "))
+                    {
+                        initialPosition = stringHtml.IndexOf("<p ");
+                        finalPosition = stringHtml.IndexOf(">", initialPosition);
+                        // Fragmento que deberá eliminarse
+                        descriptionToRemove = stringHtml.Substring(initialPosition, finalPosition - initialPosition + 1);
+                    }
+
+                    stringHtml = stringHtml.Replace(descriptionToRemove, "");
+                }
             }
             return (stringHtml);
         }
@@ -316,7 +136,7 @@ namespace Gnoss.DevTools.ViewMaker.Extensions
         }
         
 
- //Obtener el nombre de la clase dependiendo del tipo de recurso
+        //Obtener el nombre de la clase dependiendo del tipo de recurso
         public static string ObtenerNombreClasePorTipoRecurso(this IHtmlHelper helper, ResourceModel.DocumentType pDocumentType)
         {
             // Devolver el nombre de recurso válido para ciertos casos:
@@ -407,14 +227,9 @@ namespace Gnoss.DevTools.ViewMaker.Extensions
         }
 
         
-
-        
-
         private static Dictionary<string, string> ELEMENTOS_HTML_LIMPIAR = new Dictionary<string, string>() { { "<pre ", "</pre>" }, { "<img ", ">" }, { "<iframe ", "</iframe>" }, { "<table", "</table>" }, { "<strong>", "<strong>" }, { "</strong>", "</strong>" }, { "<ul", ">" }, { "</ul>", "</ul>" }, { "<ol", ">" }, { "</ol>", "</ol>" }, { "<a", ">" }, { "</a>", "</a>" }, { "<span", ">" }, { "</span>", "</span>" }, { "<h1", ">" }, { "</h1>", "</h1>" }, { "<h2", ">" }, { "</h2>", "</h2>" }, { "<h3>", ">" }, { "</h3>", "</h3>" }, { "<h4>", ">" }, { "</h4>", "</h4>" }, { "<figure", ">" }, { "<em", ">" }, { "</em>", "</em>" }, { "<b>", ">" }, { "</b>", "</b>" }, { "<li>", ">" }, { "</li>", "</li>" }, { "<i>", "</i>" } };
 
         
-
-
         private static readonly List<string> ELEMENTOS_HTML_MENSAJES_LIMPIAR = new List<string> { "img", "iframe", "table", "strong", "ul", "ol", "a", "span", "h1", "h2", "h3", "h4", "figure", "em", "b", "li", "i", "article" };
 
         /// <summary>
@@ -985,15 +800,6 @@ namespace Gnoss.DevTools.ViewMaker.Extensions
                 return parametros;
             }
              return null;
-            /*
-           var httpRequest = HttpContext.Current.Request;
-            if (httpRequest.Params[nameParam] != null)
-              {
-                 return httpRequest.Params[nameParam];
-
-              }
-
-            return null;*/
 
         }
 
@@ -1031,6 +837,7 @@ namespace Gnoss.DevTools.ViewMaker.Extensions
             {
                 urlPerfil = Perfil.Url;
             }
+            //GnossUrlsSemanticas gnossUrlsSemanticas = GetGeneradorURLs(helper);
 
             //return GnossUrlsSemanticas.GetURLBaseRecursosFichaConIDs(helper.ViewBag.BaseUrlIdioma, helper.ViewBag.UtilIdiomas, Comunidad.ShortName, urlPerfil, Es.Riam.Util.UtilCadenas.EliminarCaracteresUrlSem(pNombreDocumento), idDocumento, null, false);
             return pNombreDocumento;
@@ -1327,6 +1134,13 @@ namespace Gnoss.DevTools.ViewMaker.Extensions
 
         public static string GetBodyClassPestanya(this IHtmlHelper helper)
         {
+            string BodyClassPestanya = (string)helper.ViewBag.BodyClassPestanya;
+
+            if (string.IsNullOrEmpty(BodyClassPestanya))
+            {
+                return "";
+            }
+
             return (string)helper.ViewBag.BodyClassPestanya;
         }
 
