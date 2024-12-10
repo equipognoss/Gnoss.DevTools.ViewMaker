@@ -192,15 +192,15 @@ int cont = 0;
                 <div class="description-wrap">
                     @* Clase adicional al contenido o descripción del artículo (Mantenida función para nuevo Front) *@
                     @{
-                        if ((Model.ViewSettings != null && ((!Model.MapView && (Model.ViewSettings.DescriptionOnList || Model.ViewSettings.DescriptionOnMosaic)) || (Model.MapView && Model.ViewSettings.DescriptionOnMap))))
+                        if ((Model.ViewSettings != null && ((!Model.MapView && (Model.ViewSettings.ListView.ShowDescription || Model.ViewSettings.MosaicView.ShowDescription)) || (Model.MapView && Model.ViewSettings.MapView.ShowDescription))))
                         {
                             if (Model.ViewSettings != null)
                             {
-                                if (!Model.ViewSettings.DescriptionOnList)
+                                if (!Model.ViewSettings.ListView.ShowDescription)
                                 {
                                     claseExtraDescripcion += " noListView";
                                 }
-                                if (!Model.ViewSettings.DescriptionOnMosaic)
+                                if (!Model.ViewSettings.MosaicView.ShowDescription)
                                 {
                                     claseExtraDescripcion += " noGridView";
                                 }
@@ -210,7 +210,7 @@ int cont = 0;
                     @* Descripción del contenido del artículo *@
                     <div class="desc @claseExtraDescripcion text-justify descripcionResumida">
                         @* Contenido o descripción preliminar del Recurso *@
-                        @if ((Model.ViewSettings == null) || (!Model.MapView && (Model.ViewSettings.DescriptionOnList || Model.ViewSettings.DescriptionOnMosaic)) || (Model.MapView && Model.ViewSettings.DescriptionOnMap))
+                        @if ((Model.ViewSettings == null) || (!Model.MapView && (Model.ViewSettings.ListView.ShowDescription || Model.ViewSettings.MosaicView.ShowDescription)) || (Model.MapView && Model.ViewSettings.MapView.ShowDescription))
                         {
                             if (!string.IsNullOrEmpty(Model.Description) && ((Model.Description.Substring(0, 3) == "<p ") || (Model.Description.Substring(0, 3) == "<p>")))
                             {
@@ -237,22 +237,22 @@ int cont = 0;
                 @* Opciones de visualización aplicando clase al div (Funcionalidad mantenida para el nuevo Front). *@
                 @if (Model.ViewSettings != null)
                 {
-                    if (!Model.MapView && !string.IsNullOrEmpty(Model.ViewSettings.InfoExtraList))
+                    if (!Model.MapView && !string.IsNullOrEmpty(Model.ViewSettings.ListView.InfoExtra))
                     {
                         <div class="listado">                            
-                            @Html.Raw(Model.ViewSettings.InfoExtraList)
+                            @Html.Raw(Model.ViewSettings.ListView.InfoExtra)
                         </div>
                     }
-                    if (!Model.MapView && !string.IsNullOrEmpty(Model.ViewSettings.InfoExtraMosaic))
+                    if (!Model.MapView && !string.IsNullOrEmpty(Model.ViewSettings.MosaicView.InfoExtra))
                     {
                         <div class="mosaico">
-                            @Html.Raw(Model.ViewSettings.InfoExtraMosaic)
+                            @Html.Raw(Model.ViewSettings.MosaicView.InfoExtra)
                         </div>
                     }
-                    if (Model.MapView && !string.IsNullOrEmpty(Model.ViewSettings.InfoExtraMap))
+                    if (Model.MapView && !string.IsNullOrEmpty(Model.ViewSettings.MapView.InfoExtra))
                     {
                         <div class="mapa">
-                            @Html.Raw(Model.ViewSettings.InfoExtraMap)
+                            @Html.Raw(Model.ViewSettings.MapView.InfoExtra)
                         </div>
                     }
                 }
