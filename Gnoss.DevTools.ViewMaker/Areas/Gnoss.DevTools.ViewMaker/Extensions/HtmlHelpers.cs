@@ -14,6 +14,7 @@ using Es.Riam.Gnoss.Web.MVC.Models;
 using Es.Riam.Gnoss.Recursos;
 using System.Text.RegularExpressions;
 using Es.Riam.Gnoss.Web.MVC.Controles.Controladores;
+using Es.Riam.Gnoss.Web.MVC.Models.ViewModels;
 
 namespace Gnoss.DevTools.ViewMaker.Extensions
 {
@@ -1246,16 +1247,14 @@ namespace Gnoss.DevTools.ViewMaker.Extensions
         {
             return (string)helper.ViewBag.URLRDF;
         }
-
-        public static List<KeyValuePair<string, string>> GetListaMetas(this IHtmlHelper helper)
+      
+        public static List<ViewMetaData> GetListaMetas(this IHtmlHelper helper)
         {
-                        
             if (helper.ViewBag.ListaMetas != null)
             {
-                return (List<KeyValuePair<string, string>>)helper.ViewBag.ListaMetas;
-                //return JsonConvert.DeserializeObject<List<KeyValuePair<string, string>>>(Convert.ToString(helper.ViewBag.ListaMetas));
+                return (List<ViewMetaData>)helper.ViewBag.ListaMetas;
             }
-            return new List<KeyValuePair<string, string>>();
+            return new List<ViewMetaData>();
         }
 
         public static List<string> GetListaJS(this IHtmlHelper helper)
