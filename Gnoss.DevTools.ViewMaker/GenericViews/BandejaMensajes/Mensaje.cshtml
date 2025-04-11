@@ -482,9 +482,17 @@ else
 
 <script lang="javascript" type="text/javascript">
     $(document).ready(function () {
-        let fechamoment = "@Model.ShippingDate.ToString("yyyy-MM-dd")" + "T" + "@Model.ShippingDate.ToString("HH:mm:ss")" + "Z";
-        var fechaServer = moment(fechamoment);
-        var fechaMsj = fechaServer.tz(Intl.DateTimeFormat().resolvedOptions().timeZone).format('DD/MM/YYYY[ a las ]HH:mm');
+        let fecha = "@Model.ShippingDate.ToString("yyyy-MM-dd")" + "T" + "@Model.ShippingDate.ToString("HH:mm:ss")" + "Z";
+        var fechaServer = new Date(fecha);
+        const formatter = new Intl.DateTimeFormat('es-Es', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+        });
+        var fechaMsj = formatter.format(fechaServer).replace(',', ' a las')
         $("#@Model.Key").text(fechaMsj);
     });
 </script>
