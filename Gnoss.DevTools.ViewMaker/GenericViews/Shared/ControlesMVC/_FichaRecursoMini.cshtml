@@ -86,10 +86,10 @@ descriptionFormatted = Html.CleanHtmlParagraphsStringHtml(descriptionFormatted);
 
         @if (Model.ViewSettings != null)
         {
-            if (!string.IsNullOrEmpty(Model.ViewSettings.InfoExtraContext))
+            if (!string.IsNullOrEmpty(Model.ViewSettings.ContextView.InfoExtra))
             {
                 <div class="group body">                    
-                    @Html.Raw(Model.ViewSettings.InfoExtraContext)                    
+                    @Html.Raw(Model.ViewSettings.ContextView.InfoExtra)        
                 </div>
             }
         }

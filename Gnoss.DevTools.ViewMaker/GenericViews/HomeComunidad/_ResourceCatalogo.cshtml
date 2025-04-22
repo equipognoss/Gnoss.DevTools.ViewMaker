@@ -47,15 +47,15 @@
 
                     @{
                         string claseExtraDescripcion = "";
-                        if ((Model.ViewSettings != null && ((!Model.MapView && (Model.ViewSettings.DescriptionOnList || Model.ViewSettings.DescriptionOnMosaic)) || (Model.MapView && Model.ViewSettings.DescriptionOnMap))))
+                        if ((Model.ViewSettings != null && ((!Model.MapView && (Model.ViewSettings.ListView.ShowDescription || Model.ViewSettings.MosaicView.ShowDescription)) || (Model.MapView && Model.ViewSettings.MapView.ShowDescription))))
                         {
                             if (Model.ViewSettings != null)
                             {
-                                if (!Model.ViewSettings.DescriptionOnList)
+                                if (!Model.ViewSettings.ListView.ShowDescription)
                                 {
                                     claseExtraDescripcion += " noListView";
                                 }
-                                if (!Model.ViewSettings.DescriptionOnMosaic)
+                                if (!Model.ViewSettings.MosaicView.ShowDescription)
                                 {
                                     claseExtraDescripcion += " noGridView";
                                 }
@@ -72,7 +72,7 @@
                                 </a>
                             </p>
                         }
-                        @if (Model.ViewSettings == null || (!Model.MapView && (Model.ViewSettings.DescriptionOnList || Model.ViewSettings.DescriptionOnMosaic)) || (Model.MapView && Model.ViewSettings.DescriptionOnMap))
+                        @if (Model.ViewSettings == null || (!Model.MapView && (Model.ViewSettings.ListView.ShowDescription || Model.ViewSettings.MosaicView.ShowDescription)) || (Model.MapView && Model.ViewSettings.MapView.ShowDescription))
                         {
                             if ((Model.Description.Contains("<p ") || Model.Description.Contains("<p>")) && Model.Description.Contains("</p>"))
                             {
@@ -91,36 +91,36 @@
                     </div>
                     @if (Model.ViewSettings != null)
                     {
-                        if (!Model.MapView && !string.IsNullOrEmpty(Model.ViewSettings.InfoExtraList))
+                        if (!Model.MapView && !string.IsNullOrEmpty(Model.ViewSettings.ListView.InfoExtra))
                         {
                         <div class="listado">
-                            @Html.Raw(Model.ViewSettings.InfoExtraList)
+                            @Html.Raw(Model.ViewSettings.ListView.InfoExtra)
                         </div>   
                         }
-                        if (!Model.MapView && !string.IsNullOrEmpty(Model.ViewSettings.InfoExtraMosaic))
+                        if (!Model.MapView && !string.IsNullOrEmpty(Model.ViewSettings.MosaicView.InfoExtra))
                         {
                         <div class="mosaico">
-                            @Html.Raw(Model.ViewSettings.InfoExtraMosaic)
+                            @Html.Raw(Model.ViewSettings.MosaicView.InfoExtra)
                         </div>   
                         }
-                        if (Model.MapView && !string.IsNullOrEmpty(Model.ViewSettings.InfoExtraMap))
+                        if (Model.MapView && !string.IsNullOrEmpty(Model.ViewSettings.MapView.InfoExtra))
                         {
                         <div class="mapa">
-                            @Html.Raw(Model.ViewSettings.InfoExtraMap)
+                            @Html.Raw(Model.ViewSettings.MapView.InfoExtra)
                         </div>   
                         }
                     }
                 </div>
-                @if (Model.ViewSettings == null || (!Model.MapView && (Model.ViewSettings.PublisherOnList || Model.ViewSettings.PublisherOnMosaic)) || (Model.MapView && Model.ViewSettings.PublisherOnMap))
+                @if (Model.ViewSettings == null || (!Model.MapView && (Model.ViewSettings.ListView.ShowPublisher || Model.ViewSettings.MosaicView.ShowPublisher)) || (Model.MapView && Model.ViewSettings.MapView.ShowPublisher))
                 {
                     string claseExtra = "";
                     if (Model.ViewSettings != null)
                     {
-                        if (!Model.ViewSettings.PublisherOnList)
+                        if (!Model.ViewSettings.ListView.ShowPublisher)
                         {
                             claseExtra += " noListView";
                         }
-                        if (!Model.ViewSettings.PublisherOnMosaic)
+                        if (!Model.ViewSettings.MosaicView.ShowPublisher)
                         {
                             claseExtra += " noGridView";
                         }
@@ -157,16 +157,16 @@
                         </p>
                     </div>
                 }
-                @if ((Model.ViewSettings == null || (!Model.MapView && (Model.ViewSettings.CategoriesOnList || Model.ViewSettings.CategoriesOnMosaic)) || (Model.MapView && Model.ViewSettings.CategoriesOnMap)) && Model.Categories != null && Model.Categories.Count() > 0)
+                @if ((Model.ViewSettings == null || (!Model.MapView && (Model.ViewSettings.ListView.ShowCategories || Model.ViewSettings.MosaicView.ShowCategories)) || (Model.MapView && Model.ViewSettings.MapView.ShowCategories)) && Model.Categories != null && Model.Categories.Count() > 0)
                 {
                     string claseExtra = "";
                     if (Model.ViewSettings != null)
                     {
-                        if (!Model.ViewSettings.CategoriesOnList)
+                        if (!Model.ViewSettings.ListView.ShowCategories)
                         {
                             claseExtra += " noListView";
                         }
-                        if (!Model.ViewSettings.CategoriesOnMosaic)
+                        if (!Model.ViewSettings.MosaicView.ShowCategories)
                         {
                             claseExtra += " noGridView";
                         }
@@ -191,16 +191,16 @@
                     </div>  
                 }
 
-                @if ((Model.ViewSettings == null || (!Model.MapView && (Model.ViewSettings.TagsOnList || Model.ViewSettings.TagsOnMosaic)) || (Model.MapView && Model.ViewSettings.TagsOnMap)) && Model.Tags != null && Model.Tags.Count() > 0)
+                @if ((Model.ViewSettings == null || (!Model.MapView && (Model.ViewSettings.ListView.ShowTags || Model.ViewSettings.MosaicView.ShowTags)) || (Model.MapView && Model.ViewSettings.MapView.ShowTags)) && Model.Tags != null && Model.Tags.Count() > 0)
                 {
                     string claseExtra = "";
                     if (Model.ViewSettings != null)
                     {
-                        if (!Model.ViewSettings.TagsOnList)
+                        if (!Model.ViewSettings.ListView.ShowTags)
                         {
                             claseExtra += " noListView";
                         }
-                        if (!Model.ViewSettings.TagsOnMosaic)
+                        if (!Model.ViewSettings.MosaicView.ShowTags)
                         {
                             claseExtra += " noGridView";
                         }

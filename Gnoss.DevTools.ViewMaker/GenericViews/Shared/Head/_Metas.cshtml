@@ -33,9 +33,9 @@ Variables
 
 @if (Html.GetListaMetas() != null)
 {
-    foreach (KeyValuePair<string, string> contentMeta in Html.GetListaMetas())
+    foreach (ViewMetaData contentMeta in Html.GetListaMetas())
     {
-        <meta name="@contentMeta.Key" content="@contentMeta.Value" />
+        <meta @contentMeta.AttributeName ="@contentMeta.AttributeValue" content="@contentMeta.ContentAttributeValue" />
     }
 }
 
