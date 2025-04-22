@@ -51,7 +51,7 @@ Variables
         @* Contenedor para visualizar las personas seleccioandas desde el buscador*@
         <div class="ususSeleccionados">
             
-                @foreach (Guid perfilID in Model.SelectedProfilesList.Keys)
+                @foreach (Guid perfilID in Model.SelectedProfilesList.Keys.Where(item => !item.Equals(Model.DocumentCreatorProfileId)))
                 {
                     //@Model.SelectedProfilesList[perfilID]<a class="remove" onclick="EliminarUsuarioSelecUsu(this, '@perfilID');">@Html.GetText("COMMON", "ELIMINAR")</a>
             

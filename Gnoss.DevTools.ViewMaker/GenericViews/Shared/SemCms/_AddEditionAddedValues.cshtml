@@ -67,7 +67,9 @@
                                 @if (mPropiedad.EspecifPropiedad.SelectorEntidad.TipoSeleccion != "Autocompletar" && mPropiedad.EspecifPropiedad.SelectorEntidad.TipoSeleccion != "GruposGnoss" && mPropiedad.EspecifPropiedad.SelectorEntidad.TipoSeleccion != "PersonaGnoss")
                                 {
                                     <td>
-                                        <a onclick="SeleccionarObjectNoFuncionalSeleccEnt('@mPropiedad.ElementoOntologia.TipoEntidad','@mPropiedad.Nombre','@count')"><img src="@imgEditar" alt="editar" /></a>
+                                        <a onclick="SeleccionarObjectNoFuncionalSeleccEnt('@mPropiedad.ElementoOntologia.TipoEntidad','@mPropiedad.Nombre','@count')">
+                                            <span class="material-icons pr-0">edit</span>
+                                        </a>
                                     </td>
                                 }
                                 <td>

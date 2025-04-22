@@ -25,7 +25,7 @@ string bandejaActiva = "";
 *@
 
 @* Nombre a añadir a modo de clase dependiendo del tipo de faceta *@
-    @{
+@{
     if (Model.Name != "")
     {
         clase = "faceta";
@@ -35,6 +35,11 @@ string bandejaActiva = "";
         clase += " applied";
         bandejaActiva = "applied";
     }
+    if (Model.IsChildren)
+    {
+        clase += " isChildren";
+    }
+
 }
 
 @if (Model != null)
@@ -61,7 +66,7 @@ string bandejaActiva = "";
             else
             {
                 @* Nombre de la Faceta sin nº de hijos *@
-                <span class="textoFaceta">@Model.Tittle <span class="num-resultados">@(Model.Number >= 0?"(" + Model.Number + ")":"")</span></span>
+                <span class="textoFaceta">@Model.Tittle <span class="num-resultados">@(Model.Number > 0?"(" + Model.Number + ")":"")</span></span>
             }
         </a>
 
@@ -71,6 +76,7 @@ string bandejaActiva = "";
             <ul id="cat_@Model.Tittle">
                 @foreach (FacetItemModel item in Model.FacetItemlist)
                 {
+                    item.IsChildren = true;
                     @Html.PartialView("_ItemFaceta", item)
                 }
             </ul>

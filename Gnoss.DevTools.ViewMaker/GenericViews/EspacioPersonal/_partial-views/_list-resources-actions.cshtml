@@ -10,10 +10,14 @@ Vista que se utiliza para mostrar las acciones que se pueden realizar con los re
 Variables
 ----------------------------------------------------------------
 *@
-@{ 
-string urlAdminCategoriesLoadAction = @Model.AdminCategoriesUrl + "/load-action";
-string urlOrganizeResourcesInCategoriesLoadAction = Html.GetBaseUrl () + Html.GetUrlPagina() + "/editcategories";
-    
+@{
+    string urlAdminCategoriesLoadAction = @Model.AdminCategoriesUrl + "/load-action";
+    string urlOrganizeResourcesInCategoriesLoadAction = Html.GetBaseUrl() + Html.GetUrlPagina() + "/editcategories";
+
+    if(!string.IsNullOrEmpty(ViewBag.RutaEjecucionWeb))
+    {
+        urlOrganizeResourcesInCategoriesLoadAction = $"{Html.GetBaseUrl()}/{Html.GetUrlPagina().Replace(ViewBag.RutaEjecucionWeb.Trim('/'), "").Trim('/')}/editcategories";
+    }
 }
 
 @*

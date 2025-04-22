@@ -100,60 +100,16 @@
                 @Html.PartialView("_modal-views/_send-newsletter", Model)
                 break;
             case "send-newsletter-groups":
-            @*
-                <div>
-                    <fieldset>
-                        <p>@Html.GetText("INVITACIONES", "SELECCIONAGRUPOS")</p>
-                        <fieldset class="filtroRapido">
-                            <p>
-                                <input type="text" autocomplete="off" class="filtroFaceta ac_input" id="txtFiltroGrupos_@fichaRecurso.Key" />
-                                <input type="hidden" id="txtFiltroGrupos_@{@fichaRecurso.Key}_Hack" />
-                                <span class="searchButton"></span>
-                            </p>
-                        </fieldset>
-                        <input type="hidden" id="txtHackGrupos_@fichaRecurso.Key" />
-                        <p></p>
-                    </fieldset>
-                    <div style="display:none" id="contenedorEnviar_@fichaRecurso.Key">
-                        <fieldset>
-                            <div id="panContenedorGrupos_@fichaRecurso.Key">
-                                <p>@Html.GetText("PERFILBASERECURSOSFICHA", "NEWSLETERGRUPOS")</p>
-                            </div>
-                        </fieldset>
-                        <fieldset>
-                            <p>@Html.GetText("PERFILBASERECURSOSFICHA", "PEGUNTAENVIARCORREOTODOSMIEMBROSGRUPOS")</p>
-                        </fieldset>
-                        <fieldset>
-                            <p>
-                                @foreach (KeyValuePair<string, string> idioma in cabecera.Languajes)
-                                {
-                                    string funcionEnviarNewsletterGrupoIdioma = "AccionRecurso_EnviarNewsletterGrupos_Aceptar('" + idioma.Key + "', '" + fichaRecurso.ListActions.UrlSendNewsletterGroups + "', '" + fichaRecurso.Key + "', $('#txtHackGrupos_" + fichaRecurso.Key + "').val())";
-
-                                    <input type="button" value="@idioma.Value" onclick="@funcionEnviarNewsletterGrupoIdioma" />
-                                }
-                            </p>
-                            <p>
-                                @{string funcionCancelarEnviarNewsletterGrupo = "CerrarPanelAccion('despAccionRec_" + fichaRecurso.Key + "')";}
-                                <input type="button" value="@Html.GetText("PERFILBASE", "CANCELAR")" onclick="@funcionCancelarEnviarNewsletterGrupo    ;" />
-                            </p>
-                        </fieldset>
-
-                        <script type="text/javascript">
-                                CargarAutocompletarGrupos('txtFiltroGrupos_@fichaRecurso.Key', 'txtHackGrupos_@fichaRecurso.Key', '@IdentidadActual.KeyIdentity', '@IdentidadActual.KeyMetaProyectIdentity', '@IdentidadActual.KeyOrganization', '@Comunidad.Key', $('input#inpt_urlServicioAutocompletar').val());
-
-                                $('#txtFiltroGrupos_@fichaRecurso.Key').result(function (event, data, formatted) { seleccionarAutocompletar(data[0], data[1], 'panContenedorGrupos_@fichaRecurso.Key', 'txtHackGrupos_@fichaRecurso.Key', 'contenedorEnviar_@fichaRecurso.Key', 'txtFiltroGrupos_@fichaRecurso.Key'); })
-                        </script>
-                    </div>
-                </div>
-            *@
-                @Html.PartialView("_modal-views/_send-newsletter-group", Model)
-                
+                @Html.PartialView("_modal-views/_send-newsletter-group", Model)                
                 break;
             case "link-resource":
                 @Html.PartialView("_modal-views/_link", Model)
                 break;
             case "link-resourceSP":
                 @Html.PartialView("_modal-views/_link-sharepoint", Model)
+                break;
+            case "unlink-resourceSP":
+                @Html.PartialView("_modal-views/_unlink-sharepoint", Model)
                 break;
             case "lock-unlock-comments":
                 @Html.PartialView("_modal-views/_lock-comments", Model)

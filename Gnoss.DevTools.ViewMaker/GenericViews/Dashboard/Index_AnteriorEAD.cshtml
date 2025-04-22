@@ -1,0 +1,310 @@
+﻿@model SearchViewModel
+@{
+    CommunityModel Comunidad = Html.GetComunidad();
+    UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+    string jsExtra = Html.GetJSExtra();
+
+    string nombrePestanyaActual = Model.PageName;
+    string htmlResultados = Model.HTMLResourceList;
+    string htmlFacetas = Model.HTMLFaceted;
+    Dictionary<string, string> listaFiltrosOrden = Model.FilterOrderList;
+    string FiltroOrdenSeleccionado = Model.FilterOrderSelected;
+
+    Html.SetBodyClass("layout02 listadoComunidad comGnoss");
+
+    Html.SetPintarH1(false);
+
+    if (Comunidad.ProyectType == CommunityModel.TypeProyect.Catalogo || Comunidad.ProyectType == CommunityModel.TypeProyect.CatalogoNoSocial)
+    {
+        Html.SetBodyClass( Html.GetBodyClass() + " listadoCatalogo ");
+    }
+    
+    if (IdentidadActual.IsProyectAdmin && ViewContext.RouteData.Values["admin"] != null && ViewContext.RouteData.Values["admin"].Equals("true"))
+    {
+        Html.GetListaCSS().Add(Html.GetBaseUrlStatic() + "/cssNuevo/administracion.css?v=" + Html.GetVersion());
+    }
+}
+@section breadcrumb{
+    @if (Comunidad.Key != ProyectoAD.MetaProyecto)
+    {
+        <div class="breadcrumb" id="breadcrumb">
+            <div class="box">
+                <p>Estás en:</p>
+                <ol>
+                    <li><a href="@Comunidad.Url"><strong>Home</strong></a></li>
+                    <li>@nombrePestanyaActual</li>
+                </ol>
+            </div>
+        </div>
+    }
+}
+
+<div id="col02">
+    <div class="textBox wrapper">
+        <div class="supertitle">
+            @{
+				string filtroTitulo = "";
+				if(((List<string>)Model.PageFiltersList).Count > 0)
+				{
+					filtroTitulo = "<span id=\"filtroInicio\"> > " + ((List<string>)Model.PageFiltersList)[0] + "</span>";
+				}
+			}
+            <h1>@(string.IsNullOrEmpty(nombrePestanyaActual)?Comunidad.Name:nombrePestanyaActual)@Html.Raw(filtroTitulo)</h1>
+        </div>
+
+        @{
+            bool mostrarPreviewMapa=false;
+        }
+        @if (IdentidadActual.IsGuestUser && nombrePestanyaActual == Html.GetText("COMMON", "PERSONASYORGANIZACIONES"))
+        {
+            <div id="messagetools" class="messagetools listToolBar">
+                <div id="divMensajeInicioCont">
+                    <div id="ctl00_ctl00_CPH1_CPHContenido_divMensajeInicio">
+                        <p>
+                            @Html.GetText("BUSQUEDAAVANZADA", "INICIOPEROSNASYORG")
+                            <span id="divBotonInicio" class="toolbar">
+                                <a id="hlBotonInicio" href="@Comunidad.Url/@Html.GetText("URLSEM", "HAZTEMIEMBRO")">@Html.GetText("COMINICIOLOGIN", "REGISTRATEPARTICIPA")</a>
+                            </span>
+                                @Html.GetText("PERFIL", "VISITANTEPERFILO") 
+                            <a id="hlBotonInicio2" href="@Comunidad.Url/@Html.GetText("URLSEM", "LOGIN")">@Html.GetText("COMINICIOLOGIN", "INICIASESION")</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            if (Model.ViewList.Count >= 1)
+            {
+                SearchViewModel.ViewTypeModel.ViewTypeSearch tipoVistaActiva = SearchViewModel.ViewTypeModel.ViewTypeSearch.List;
+                <div id="divVista" @(Model.ViewList.Count == 1 && (Model.ListExportation==null || Model.ListExportation.Count == 0) ? "style=display:none" : "style=display:block")>
+                    <div id="view">
+                        <p>@Html.GetText("COMBUSQUEDAAVANZADA", "VISUALIZACION")</p>
+                        <ul>
+                        @foreach (SearchViewModel.ViewTypeModel tipoVista in Model.ViewList)
+                        {
+                            string activo = "";
+                            if (tipoVista.Active)
+                            {
+                                activo = "activeView";
+                                tipoVistaActiva = tipoVista.ViewType;
+                            }
+                            switch (tipoVista.ViewType)
+                            {
+                                case SearchViewModel.ViewTypeModel.ViewTypeSearch.List:
+                                    <li id="liListView" class="listView @activo">
+                                        <a href="#vistaListado">
+                                            @Html.GetText("COMBUSQUEDAAVANZADA", "LISTADO")
+                                        </a>
+                                    </li>
+                                    break;
+                                case SearchViewModel.ViewTypeModel.ViewTypeSearch.Grid:
+                                    <li id="liGridView" class="gridView @activo" >
+                                        <a href="#vistaMosaico">
+                                            @Html.GetText("COMBUSQUEDAAVANZADA", "MOSAICO")
+                                        </a>
+                                    </li>
+                                    break;
+                                case SearchViewModel.ViewTypeModel.ViewTypeSearch.Map:
+                                    mostrarPreviewMapa = true;
+                                    <li id="liMapView" class="mapView @activo" >
+                                        <a href="#vista">
+                                            @Html.GetText("COMBUSQUEDAAVANZADA", "MAPA")
+                                        </a>
+                                    </li>
+                                    break;
+                                case SearchViewModel.ViewTypeModel.ViewTypeSearch.Chart:
+                                    //TODO
+                                    <li id="liChartViewAux" class="desplegablebis chartView @activo">
+                                        <a id="btnChartView">
+                                            @Html.GetText("COMBUSQUEDAAVANZADA", "GRAFICOS")
+                                        </a>
+                                        <ul id="ulOpcChart">
+                                            @foreach (SearchViewModel.ChartViewModel grafico in Model.ChartList)
+                                            {
+                                                <li id="liOpcChart_@grafico.Key">
+                                                    <a onclick="SeleccionarChart('@grafico.Key', '@grafico.JS');">@grafico.Name</a>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </li>
+                                            break;
+                            }
+                        }
+                        @if (Model.ListExportation != null && Model.ListExportation.Count == 1 && Model.ListExportation[0].ExportationFormats.Count == 1)
+                        {
+                            string nombreExportacion = Model.ListExportation[0].ExportationName;
+                            Guid exportacionID = Model.ListExportation[0].Key;
+                            string formatoExportacion = Model.ListExportation[0].ExportationFormats[0];
+                            string id = "liDescarga" + formatoExportacion.ToUpper();
+                            <li id="@id">
+                                <form method="post" id="FormExportarBusqueda">
+                                    <a onclick="ExportarBusqueda('@exportacionID','@nombreExportacion', '@formatoExportacion');" id="@nombreExportacion @formatoExportacion">@nombreExportacion @formatoExportacion.ToUpper()</a>
+                                    <input class="activo" type="hidden" id="ParametrosExportacion" name="ParametrosExportacion" />
+                                    @*<input class="activo" type="hidden" name="ParametrosExportacion" value="@exportacionID" />
+                                    <input class="activo" type="hidden" name="NombreExportacion" value="@nombreExportacion" />
+                                    <input class="activo" type="hidden" name="NombrePestanya" value="@nombrePestanya" />*@
+                                </form>
+                            </li>
+                        }
+                        else if (Model.ListExportation != null && Model.ListExportation.Count > 0)
+                        {
+                            <li id="liDescarga">
+                                <a>@Html.GetText("COMMON", "EXPORTARBUSQUEDA")</a>
+                                <form method="post" id="FormExportarBusqueda">
+                                    <input class="activo" type="hidden" id="ParametrosExportacion" name="ParametrosExportacion" />
+                                    <ul id="listaExportaciones">
+                                        @foreach (SearchViewModel.ExportationModel fila in Model.ListExportation)
+                                        {    
+                                            foreach(string formato in fila.ExportationFormats){
+            
+                                                string id = "liDescarga" + formato.ToUpper();                                   
+                                                <li id="@id">
+                                                    <a onclick="ExportarBusqueda('@fila.Key','@fila.ExportationName','@formato');" id="@fila.ExportationName @formato">@fila.ExportationName @formato.ToUpper()</a>
+                                                
+                                                    @*<input class="activo" type="hidden" name="ParametrosExportacion" value="@exportacionID" />
+                                                    <input class="activo" type="hidden" name="NombreExportacion" value="@nombreExportacion" />
+                                                    <input class="activo" type="hidden" name="NombrePestanya" value="@nombrePestanya" />*@
+                                                </li>
+                                            }
+                                        }
+                                    </ul>
+                                </form>
+                            </li>
+                        }
+                        </ul>
+                    </div>
+                </div>
+            }
+            <div>
+                @if (Model.SearchBoxVisible)
+                {                    
+                    <form method="post" id="formCajaBusqueda" @*action="@(new Uri($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}").AbsoluteUri)"*@>
+                        <fieldset style="display: block">
+                            <legend class="nota">facetas</legend>
+                            <div class="finderUtils" id="divCajaBusqueda">
+                                <div class="group finderSection">
+                                    <label for="finderSection">Encontrar</label>
+                                    <input type="text" id="finderSection" class="finderSectionText autocompletar ac_input" autocomplete="off" />
+                                    <input title="@Html.GetText("METABUSCADOR", "ENCONTRAR")" type="button" class="findAction" id="inputLupa" />
+
+                                    <input type="hidden" value="@Html.GetUrlPagina()" class="inpt_urlPaginaActual" />
+                                    <input type="hidden" value="sioc_t:Tag|foaf:firstName" class="inpt_facetasBusqPag" />
+                                    <input type="hidden" class="inpt_parametros" />
+                                </div>
+                                <div class="group filterSpace">
+                                    <div style="display: none;" id="panFiltros">
+                                        <p>
+                                            <span>@Html.GetText("COMBUSQUEDAAVANZADA", "FILTROS"): </span>
+                                            <a style="margin-left: 5px;" href="@Html.GetUrlPagina()" class="limpiarfiltros">@Html.GetText("COMBUSQUEDAAVANZADA","LIMPIARFILTROS")</a>
+                                        </p>
+                                        <ul class="facetedSearch tags" id="panListadoFiltros"><li style="display: none;"></li></ul>
+                                    </div>
+                                    <p id="panNumResultados">
+                                        @*<span class="counter" id="lblNumResultadosBusqueda"></span>*@
+                                    </p>
+                                    <input type="submit" style="display: none;" id="enviarFormCajaBusqueda" value="enviar" title="enviar" />
+                                </div>
+                            
+                                @if (listaFiltrosOrden != null && listaFiltrosOrden.Count > 0)
+                                {
+                                    <div class="panelOrdenContenedor">
+                                        <div>
+                                            <label for="orden">
+                                                <span class="literal indentado">@Html.GetText("BANDEJAENTRADA", "ORDENADOPOR")</span>
+                                                <select id="orden" class="select-custom filtro">
+                                                    @foreach (string filtro in listaFiltrosOrden.Keys)
+                                                    {
+                                                        <option value="@listaFiltrosOrden[filtro]" @if (FiltroOrdenSeleccionado == filtro) { @Html.Raw("selected=\"selected\""); }>@filtro</option>
+                                                    }
+                                                </select>
+                                            </label>
+                                            <ul>
+                                                <li class="ordenDescendente">
+                                                    <a class="filtro" name="orden|desc"></a></li>
+                                                <li class="ordenAscendente">
+                                                    <a class="filtro" name="orden|asc"></a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </fieldset>
+                    </form>
+                }
+                <div class="group listado-productos">
+                    <div id="panResultados">
+                        @if (string.IsNullOrEmpty(htmlResultados) && Model.JSONResourceList != null)
+                        {
+                            Html.PartialView("../CargadorResultados/CargarResultados", Model.JSONResourceList);
+                        }
+                        else
+                        {
+                            @Html.Raw(htmlResultados)
+                        }
+                    </div>
+                </div>
+            </div>
+            <div id="panNavegador">
+                @*<div id="NavegadorPaginasCorreo" class="paginadorResultados">
+                </div>*@
+            </div>
+        }
+    </div>
+</div>
+@if (!(IdentidadActual.IsGuestUser && nombrePestanyaActual == Html.GetText("COMMON", "PERSONASYORGANIZACIONES")))
+{
+    <div id="col01">
+        <div class="resaltarAccion" style="" id="facetaEncuentra">
+            <p>@Html.GetText("BUSCADORFACETADO", "ENCUENTRA")</p>
+        </div>
+        <form method="post" id="formPanFacetas" action="@($"{Html.GetBaseUrlIdioma()}{Context.Request.Path}")">
+            <fieldset style="display: block">
+                <legend class="nota">facetas</legend>
+                <div id="panFacetas">
+                    @if (Model.FacetedVisible)
+                    {
+                        if (string.IsNullOrEmpty(htmlFacetas) && Model.JSONFaceted != null)
+                        {
+                            @Html.PartialView("../CargadorFacetas/CargarFacetas", Model.JSONFaceted);
+                        }
+                        else
+                        {
+                            @Html.Raw(htmlFacetas);
+                        }
+                    }
+                </div>
+                <input type="submit" style="display: none;" id="enviarFormPanFacetas" value="enviar" title="enviar" />
+            </fieldset>
+        </form>
+    </div>
+}
+@if (mostrarPreviewMapa)
+{
+    <div id="listing-preview-map"></div>
+}
+
+@section javascript{
+    <script type="text/javascript">
+        @Html.Raw(jsExtra)
+
+        @if (htmlFacetas == null && htmlResultados == null)
+        {
+            <text>
+                $(document).ready(function () {
+                    FiltrarPorFacetas(filtrosDeInicio);
+                });
+        </text>
+        }
+
+        @if (!string.IsNullOrEmpty(Html.GetJSMapa()))
+        {
+            @Html.Raw(Html.GetJSMapa())
+        }
+
+        @if (!string.IsNullOrEmpty(Html.GetJSGraficos()))
+        {
+            @Html.Raw(Html.GetJSGraficos())
+        }
+    </script>
+}

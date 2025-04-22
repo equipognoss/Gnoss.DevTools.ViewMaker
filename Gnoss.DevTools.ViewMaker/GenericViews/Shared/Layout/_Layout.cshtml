@@ -106,16 +106,12 @@
     }
 
     <script type="text/javascript">
-        $(document).ready(function () {
-            EjecutarScriptsIniciales2();
-        });
-
-         function getSubscription(reg) {
+        function getSubscription(reg) {
             reg.pushManager.getSubscription().then(function (sub) {
-                if (sub === null) {
+                if (sub === null) {                
                     reg.pushManager.subscribe({
                         userVisibleOnly: true,
-                        applicationServerKey: "@ViewBag.applicationServerKey"
+                        applicationServerKey: "@ViewBag.applicationServerKey" 
                     }).then(function (sub) {
                         fillSubscribeFields(sub);
                     }).catch(function (e) {
@@ -124,10 +120,11 @@
                 } else {
                     fillSubscribeFields(sub);
                 }
+            }).catch(function (e) {
+                console.error("Failed to get subscription", e);
             });
-        }
+        }   
     </script>
-
     @* Analytics Matomo *@
     @Html.PartialView("../Shared/Layout/_partial-views/_AnalyticsMatomo")
 </body>

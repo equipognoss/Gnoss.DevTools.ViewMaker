@@ -17,7 +17,24 @@
 *@
 
 @using Es.Riam.Gnoss.Web.MVC.Models;
-
+@if (Html.GetComunidad() != null)
+{
+    <div id="mascaraBlanca">
+        <div class="wrap popup">
+            <div class="preloader-wrapper active">
+                <div class="spinner-layer spinner-blue-only">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div><div class="gap-patch">
+                        <div class="circle"></div>
+                    </div><div class="circle-clipper right">
+                        <div class="circle"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 @* Modales utilizados genéricos en la web (Cookies, Política de privacidad, Condiciones de uso)*@
 

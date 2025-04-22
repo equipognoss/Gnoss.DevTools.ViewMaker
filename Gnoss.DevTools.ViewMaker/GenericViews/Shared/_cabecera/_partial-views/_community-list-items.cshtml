@@ -27,9 +27,7 @@ Variables
             }
             @* Listado cada item de Comunidades del usuario *@
             @{
-                List<UserProfileModel.ProfileCommunitiesModel> masUsados = perfil.Communities.OrderByDescending(comunidadPerfil => comunidadPerfil.NumberOfConnections).Take(10).ToList();
-
-                foreach (UserProfileModel.ProfileCommunitiesModel comunidadPerfil in masUsados.OrderBy(comunidadPerfil => comunidadPerfil.Name))
+                foreach (UserProfileModel.ProfileCommunitiesModel comunidadPerfil in perfil.Communities)
                 {
                     string clase = "abierta";
                     if (comunidadPerfil.Type == 1 || comunidadPerfil.Type == 3) { clase = "cerrada"; }

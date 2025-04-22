@@ -51,6 +51,7 @@
     List<UserProfileModel> hiddenUserIdentities = new List<UserProfileModel>();
     // Conocer si el usuario es MetaAdministrador
     bool esUsuarioMetaAdministrador = Html.GetEsMetaAdministrador();
+    string dominioPaginasAdministracion = Html.GetAdministrationDomain();
 
     @*
         ----------------------------------------------------------------
@@ -130,7 +131,7 @@
                                     <span style="display: none;" class="infNumMensajesSinLeer badge badge-pill badge-primary" id="infNumMensajesSinLeer"></span>
                                 </li>
                                 @* Suscripciones *@
-                                @if (cabecera.SubscriptionsAvailable)
+                                @if (cabecera != null && cabecera.SubscriptionsAvailable)
                                 {
                                     <li class="liNotificaciones d-flex justify-content-between align-items-center">
                                         <a title="@Html.GetText("MENU", "SUSCRIPCIONES")" href="@perfil.Url@Html.GetText("URLSEM", "SUSCRIPCIONES")">@Html.GetText("MENU", "SUSCRIPCIONES")</a>
@@ -208,7 +209,21 @@
                                 @if (permisosComunidad.Manage)
                                 {
                                     <li class="liAdminComunidadAdministrar">
-                                        <a id="administrar_comunidad" href="@Comunidad.Url/@Html.GetText("URLSEM", "ADMINISTRARCOMUNIDADHOME")">@Html.GetText("QUEPUEDOHACER", "ADMINISTRARCOMUNIDAD")</a>
+                                        @if (string.IsNullOrEmpty(dominioPaginasAdministracion))
+                                        {
+                                            <a id="administrar_comunidad" href="@Comunidad.Url/@Html.GetText("URLSEM", "ADMINISTRARCOMUNIDADHOME")">@Html.GetText("QUEPUEDOHACER", "ADMINISTRARCOMUNIDAD")</a>
+                                        }
+                                        else
+                                        {
+                                            if (string.IsNullOrEmpty(ViewBag.RutaEjecucionWeb))
+                                            {
+                                                <a id="administrar_comunidad" href="@dominioPaginasAdministracion/@Html.GetText("URLSEM", "COMUNIDAD")/@Comunidad.ShortName/@Html.GetText("URLSEM", "ADMINISTRARCOMUNIDADHOME")">@Html.GetText("QUEPUEDOHACER", "ADMINISTRARCOMUNIDAD")</a>
+                                            }
+                                            else
+                                            {
+                                                <a id="administrar_comunidad" href="@dominioPaginasAdministracion/@ViewBag.RutaEjecucionWeb@Html.GetText("URLSEM", "COMUNIDAD")/@Comunidad.ShortName/@Html.GetText("URLSEM", "ADMINISTRARCOMUNIDADHOME")">@Html.GetText("QUEPUEDOHACER", "ADMINISTRARCOMUNIDAD")</a>
+                                            }                                          
+                                        }
                                     </li>
                                 }
                                 else if (esUsuarioMetaAdministrador)
@@ -535,7 +550,14 @@
 
                                 @* Administrar Ecosistema *@
                             <li class="liAdminEcosistema">
-                                <a href="@Comunidad.UrlMyGnoss/@Html.GetText("URLSEM", "ADMINISTRARECOSISTEMAHOME")">@Html.GetText("COMMON","CONFIGURACIONDELECOSISTEMA")</a>
+                                @if(string.IsNullOrEmpty(dominioPaginasAdministracion))
+                                {
+                                    <a href="@Comunidad.UrlMyGnoss/@Html.GetText("URLSEM", "ADMINISTRARECOSISTEMAHOME")">@Html.GetText("COMMON","CONFIGURACIONDELECOSISTEMA")</a>
+                                }
+                                else
+                                {
+                                    <a href="@dominioPaginasAdministracion/@Html.GetText("URLSEM", "ADMINISTRARECOSISTEMAHOME")">@Html.GetText("COMMON","CONFIGURACIONDELECOSISTEMA")</a>
+                                }                                   
                             </li>
 
                                 @* Gestión de las solicitudes *@
@@ -628,7 +650,7 @@
                                     @if (perfil.IsAdministrator)
                                     {
                                         @* Url administración para usuarios, grupos, comunidades *@
-                                        string urlAdministracion = Html.GetPerfil().Url + Html.GetText("URLSEM", "ADMINISTRACION") + "/";
+                                    string urlAdministracion = Html.GetPerfil().Url + Html.GetText("URLSEM", "ADMINISTRACION") + "/";
                                     <li class="admin-contactos" id="admin-contactos">
                                         <a href="@perfil.Url@Html.GetText("URLSEM", "CONTACTOSORG")">@Html.GetText("PERFIL", "CONTACTOS")</a>
                                     </li>
@@ -669,7 +691,7 @@
                 <div id="desconectar-usuario" class="collapse show">
                     <ul class="pmd-sidebar-nav">
                             @* Cambiar contraseña *@
-                            @if (cabecera.ChangePasswordVisible)
+                            @if (cabecera != null && cabecera.ChangePasswordVisible)
                             {
                                 @*Cambiar la contraseña si el usuario está en Metaproject *@
                                 if (Comunidad.MetaProyect)

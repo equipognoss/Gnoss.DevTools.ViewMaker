@@ -36,6 +36,10 @@ string funcionEliminarAceptar = "AccionRecurso_Eliminar_Aceptar('" + fichaRecurs
         @* Mensaje para Eliminar o no el recurso *@
         <div class="form-group">
             <label class="control-label">@Html.GetText("PERFILBASE", "ELIMINARUNO", fichaRecurso.Title)</label>
+            @if (fichaRecurso.EsEnlaceSharepoint)
+            {
+                <label class="control-label">@Html.GetText("COMMON", "INFOELIMINARSHAREPOINT")</label>
+            }
         </div>
 
         @* Botones de "SÍ-NO-BORRADO SELECTIVO" para borrar el recurso *@

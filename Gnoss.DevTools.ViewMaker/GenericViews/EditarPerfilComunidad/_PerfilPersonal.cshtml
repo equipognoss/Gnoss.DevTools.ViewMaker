@@ -231,7 +231,7 @@ string inputIsExternalSearched = "ProfilePersonal.IsExternalSearched";
     <div id="panCamposConfigurablesProyecto">
         @foreach (AdditionalFieldAutentication campoExtra in Perfil.AdditionalFields)
         {
-            if (campoExtra.Visible != null && campoExtra.Visible)
+            if (campoExtra.Visible || campoExtra.Required)
             {
                 <div class="form-group mb-5">
                     <label for="@campoExtra.FieldName" class="control-label d-block" @(campoExtra.Required ? "required" : "")>@campoExtra.Title</label>

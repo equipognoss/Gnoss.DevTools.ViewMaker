@@ -12,7 +12,7 @@ Variables
 @{
     // Obtener el nombre clave de la identidad para poder construir el envío de invitación correctamente
     UserProfileModel perfil = Html.GetPerfil();
-    string nombreIdentidadClave = Html.ExtractValueInStringFromStartAndEnd(perfil.Url, "/identidad/", "/");
+    string nombreIdentidadClave = Html.ExtractValueInStringFromStartAndEnd(perfil.Url, $"/{Html.GetText("URLSEM", "IDENTIDAD")}/", "/");
 
     // Identificadores para lógica JS
     // Id del input para buscar contactos
@@ -43,7 +43,7 @@ Variables
     // Evitar espacios en nombre de la identidad para el envío de la invitación
     string nombreIdentidadClaveUriString = Uri.EscapeUriString(nombreIdentidadClave);
     // Url a la que habrá que mandar la petición para invitar a comunidad
-    string urlSendInvitation_invite_organization = $"{@Html.GetBaseUrl()}/identidad/{nombreIdentidadClaveUriString}/{Html.GetText("URLSEM", "INVITARAORG")}/save-changes";   //$"{@Html.GetComunidad().Url}/{@Html.GetText("URLSEM", "INVITARAORG")}/save-changes";
+    string urlSendInvitation_invite_organization = $"{@Html.GetBaseUrlIdioma()}/{Html.GetText("URLSEM", "IDENTIDAD")}/{nombreIdentidadClaveUriString}/{Html.GetText("URLSEM", "INVITARAORG")}/save-changes";   //$"{@Html.GetComunidad().Url}/{@Html.GetText("URLSEM", "INVITARAORG")}/save-changes";
 
 }
 

@@ -87,22 +87,3 @@ string urlFormattedLeaveCommunity = $"{Html.GetComunidad().Url}/abandonar-comuni
         </div>
     </div>
 </div>
-
-<script>
-    function confirmLeaveCommunity(url) {
-        MostrarUpdateProgress();
-        GnossPeticionAjax(
-            url,
-            null,
-            true
-        ).done(function (data) {
-            // Abandono correcto de la comunidad - Redirigir a la url devuelta por el controller
-            window.location.href = data;
-        }).fail(function (data) {
-            // Error al abandonar la comunidad
-            mostrarNotificacion('error', data);
-        }).always(function () {
-            OcultarUpdateProgress();
-        });
-    }
-</script>
