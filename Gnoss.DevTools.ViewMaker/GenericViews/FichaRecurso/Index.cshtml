@@ -26,15 +26,17 @@ Variables
     string privado = "";
     bool recursoEspacioPersonal = ViewBag.RecursoEspacioPersonal;
     UserProfileModel perfil = Html.GetPerfil();
+    // Url para cargar mas comentarios
+    string urlLoadMoreComments = $"{@Html.GetUrlPagina()}/get-comments";
+    string btnLoadMoreCommentsClassName = "btnLoadMoreComments";
+    string panComentariosIdName = "panComentarios";
+    string comentarioClassName = "comentario";
+    string loadingMoreResultClassName = "loading-more-results";
+    string numComentariosIdName = "numComentarios";
 }
-@*
-    ----------------------------------------------------------------
-    -------------------- Indice Ficha de un recurso ------------------
-*@
-
 
 @{
-    @* Comprobar si el recurso es privado*@
+    @* Comprobar si el recurso es privado *@
     if (FichaDocumento.Private) { 
         privado = " private";
     }
@@ -52,17 +54,10 @@ Variables
         Html.SetBodyClass("layout03 fichaComunidad comunidad fichaRecurso comGnoss fichaRecurso " + claseTipoRecurso + privado);
     }
 
-    if (FichaDocumento.TypeDocument == ResourceModel.DocumentType.Semantico)
-    {
-        Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/jsNuevo/formsemactic.js?v=" + Html.GetVersion());
-        Html.GetListaCSS().Add(Html.GetBaseUrlStatic() + "/cssNuevo/formsemactic.css?v=" + Html.GetVersion());
-    }
-
     string url = Html.GetUrlContext(FichaDocumento.CompletCardLink, FichaDocumento.Key, Html.GetComunidad().ShortName);
 
     bool PresentacionNoSocial = Comunidad.ProyectType == CommunityModel.TypeProyect.CatalogoNoSocial || Comunidad.ProyectType == CommunityModel.TypeProyect.CatalogoNoSocialConUnTipoDeRecurso;
 
-    // No parece que se utilice.
     if (FichaDocumento.IsDraft)
     {
         claseItem += " resourceDraft";
@@ -92,12 +87,12 @@ Variables
             @* Control tipo recurso (SemanticFrom) del recurso -> Incluir vista parcial GeneradorSemCMS*@
             @if (Model.SemanticFrom != null && Model.SemanticFrom.SemCmsDrawOverMenu)
             {
-                @Html.PartialView("../Shared/SemCms/_GeneradorSemCms", Model.SemanticFrom);
+                @Html.PartialView("../Shared/SemCms/_GeneradorSemCms", Model.SemanticFrom)
             }
             @* Mostrar título, publisher y fecha del recurso - Vista parcial *@
             @if (Model.SemanticFrom == null || !Model.SemanticFrom.HideResourceTitle)
             {
-                @Html.PartialView("_partial-views/_header", Model);
+                @Html.PartialView("_partial-views/_header", Model)
             }
 
             @* Mostrar útiles del recurso *@
@@ -105,24 +100,25 @@ Variables
             {
                 if (!PresentacionNoSocial)
                 {
-                    @Html.PartialView("_partial-views/_header-utils-panel", Model);
+                    @Html.PartialView("_partial-views/_header-utils-panel")
                 }
             }
             @* Mostrar Descripción del documento *@
-            <div class="contenido">
-                @if (FichaDocumento.TypeDocument != ResourceModel.DocumentType.Semantico)
-                {
-                    <div class="grupo grupo-principal">
-                        @Html.PartialView("_FichaDescripcion", FichaDocumento)
-                    </div>
-
-                }
-            </div>
+            @if (FichaDocumento.TypeDocument != ResourceModel.DocumentType.Semantico)
+            {
+                <div class="contenido">                                     
+                        <div class="grupo grupo-principal">
+                            @Html.PartialView("_FichaDescripcion", FichaDocumento)
+                        </div>                    
+                </div>
+            }
 
             @* Mostrar Generador Semántico *@
             @if (Model.SemanticFrom != null && !Model.SemanticFrom.SemCmsDrawOverMenu)
             {
-                @Html.PartialView("../Shared/SemCms/_GeneradorSemCms", Model.SemanticFrom);
+                <div class="contenidoSemantico"> 
+                    @Html.PartialView("../Shared/SemCms/_GeneradorSemCms", Model.SemanticFrom)
+                </div>
             }
 
             @* Mostrar panel de autores/editores del recurso y Ficha Compartidos (Comunidades en las que está compartido un recurso) *@
@@ -140,7 +136,6 @@ Variables
                 }
                 
                 <div id="contAutoresEditoresLectores">
-                    @*@Html.PartialView("_FichaAutoresEditoresLectores", FichaDocumento)*@
                     @* Evitar posibles floats de imágenes que haya creado el editor del recurso *@
                     <div style="clear:both; display:block"></div>
                     @Html.PartialView("_FichaAutoresEditoresLectores", FichaDocumento)
@@ -169,7 +164,7 @@ Variables
             @* Mostrar Comentarios de un recurso *@
             @if (FichaDocumento.Comments != null)
             {
-                @Html.PartialView("_partial-views/_comments");
+                @Html.PartialView("_partial-views/_comments")
                 @* Aviso Legal - No mostrar el aviso legal por defecto
                 <p class="text-muted text-center font-weight-light">@Html.GetText("FREEBASE", "AVISOLEGAL")</p>
                 *@
@@ -196,13 +191,27 @@ Variables
     </div> 
     
 </div>
-
 <script type="text/javascript">
-                            var urlActionSemCms = '@FichaDocumento.ListActions.UrlActionSemCms';
+    // Parámetros para operativaEditarPerfilUsuario
+    (function ($) {
+        const pParams = {
+            config: {
+                urlLoadMoreComments: "@urlLoadMoreComments",
+                btnLoadMoreCommentsClassName: "@btnLoadMoreCommentsClassName",
+                panComentariosIdName: "@panComentariosIdName",
+                comentarioClassName: "@comentarioClassName",
+                loadingMoreResultClassName: "@loadingMoreResultClassName",
+                numComentariosIdName: "@numComentariosIdName",
+            },
+    };
+        // Gestión de operativa para funcionamiento de EditarPerfilUsuario
+        operativaCargarMasComentarios.init(pParams);
+    })();
+</script>
+<script type="text/javascript">
+                            var urlActionSemCms = window.location.href + '/actionsemcms';
 
                             $(document).ready(function () {
-                                MontarFechas();
-
                                 cargarGadgets();
                             });
 
@@ -277,7 +286,7 @@ Variables
 
                             @if (FichaDocumento.Graphs.Count > 0)
                             {
-                                @:var urlPaginaCallBackGrafos = '@FichaDocumento.ListActions.UrlCallbackGraph';
+                                 @:var urlPaginaCallBackGrafos = window.location.href + '/callback-graph';
 
                                 Guid docID = FichaDocumento.Key;
                                 string titulo = FichaDocumento.Title.Replace("'", "\\'");

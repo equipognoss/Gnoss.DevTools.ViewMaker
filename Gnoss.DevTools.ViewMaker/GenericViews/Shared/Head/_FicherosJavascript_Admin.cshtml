@@ -114,9 +114,6 @@ Variables
         src="@Html.GetBaseUrlStatic()/responsive/theme/logic/busquedas.js?v=@Html.GetVersion()"></script>
 <script type="text/javascript"  
         src="@Html.GetBaseUrlStatic()/responsive/theme/logic/WS.js?v=@Html.GetVersion()"></script>
-@* Peticiones jMsAjax *@
-<script type="text/javascript" src="@Html.GetBaseUrlStatic()/responsive/theme/logic/jMsAjax.js?v=@Html.GetVersion()"></script>
-
 
 <!-- Wizard Modal -->
 <script type="text/javascript"
@@ -170,13 +167,4 @@ Variables
     {
         <script type="text/javascript">@Html.Raw(Html.GetGoogleAnalytics())</script>
     }
-
-}
-else if (!string.IsNullOrEmpty(@Html.GetGoogleAnalyticsCode()))
-{
-    <script>
-        $(document).ready(function () {
-            contarVisitaNoCookie("@Html.GetGoogleAnalyticsCode()");
-        });
-    </script>
 }

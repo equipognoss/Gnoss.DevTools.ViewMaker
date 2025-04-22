@@ -12,19 +12,25 @@ Variables
 ----------------------------------------------------------------
 *@
 @{
-CommunityModel Comunidad = Html.GetComunidad();
-// Obtengo el tipo de item que se desea mostrar en _list-content (Comunidades, Grupos) pasado desde la vista "Comunidades" y "Grupos"
-var listItemType = (String)ViewData["UsuariosOrganizacionListItemType"];
-// Mostrar el botón de invitar a usuario en la sección de acciones. Solo mostrar si se están mostrando "usuarios"
-bool displayInviteUsersToCommunity = false;
-// Mostrar el botón de añadir grupos
-bool displayAddGroups = false;
-// Url para realizar la invitación a la organización
-string urlSendInvitation_invite_organization = "";
-// Url para añadir grupos
-string urlAddGrupo = "";
-// Conocer los permisos del usuario para adminstrar una comunidad
-CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
+    CommunityModel Comunidad = Html.GetComunidad();
+    // Obtengo el tipo de item que se desea mostrar en _list-content (Comunidades, Grupos) pasado desde la vista "Comunidades" y "Grupos"
+    var listItemType = (String)ViewData["UsuariosOrganizacionListItemType"];
+    // Mostrar el botón de invitar a usuario en la sección de acciones. Solo mostrar si se están mostrando "usuarios"
+    bool displayInviteUsersToCommunity = false;
+    // Mostrar el dropbox para filtrar por tipo de usuario
+    bool displayUserTypeFilter = false;
+    // Texto por defecto en el dropbox
+    string defaultTypeRole = "";
+    // Icono del item del dropdown de rol
+    string icono = "";
+    // Mostrar el botón de añadir grupos
+    bool displayAddGroups = false;
+    // Url para realizar la invitación a la organización
+    string urlSendInvitation_invite_organization = "";
+    // Url para añadir grupos
+    string urlAddGrupo = "";
+    // Conocer los permisos del usuario para adminstrar una comunidad
+    CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
 
 }
 
@@ -34,22 +40,43 @@ CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
 *@
 
 @*Controlar si es sección de Usuarios para mostrar un botón para invitar a usuario *@
-@if(listItemType == "Usuarios")
+@if (listItemType == "Usuarios")
 {
     displayInviteUsersToCommunity = true;
+    displayUserTypeFilter = true;
     urlSendInvitation_invite_organization = @Html.GetPerfil().Url + @Html.GetText("URLSEM", "INVITARAORG") + "/load-modal";
+    switch (Model.TypeRole)
+    {
+        case -1:
+            defaultTypeRole = @Html.GetText("USUARIOS", "TODOSLOSUSUARIOS");
+            icono = "select_all";
+            break;
+        case 0:
+            defaultTypeRole = @Html.GetText("USUARIOS", "ADMINISTRADOR");
+            icono = "admin_panel_settings";
+            break;
+        case 1:
+            defaultTypeRole = @Html.GetText("USUARIOS", "EDITOR");
+            icono = "edit";
+            break;
+        case 2:
+            defaultTypeRole = @Html.GetText("USUARIOS", "USUARIO");
+            icono = "person";
+            break;
+    }
 }
 @* Controlar si es sección de grupos para mostrar un botón para añadir grupos *@
-@if (listItemType == "Grupos") {
-
+@if (listItemType == "Grupos")
+{
     // Añadir grupos de la organización
     if (Comunidad.MetaProyect)
     {
         displayAddGroups = true;
         urlAddGrupo = Html.GetPerfil().Url + Html.GetText("URLSEM", "ADMINISTRACION") + "/" + Html.GetText("URLSEM", "GRUPOS") + "/" + Html.GetText("URLSEM", "CREARGRUPO");
     }
-    else { 
-    // Añadir grupos a la comunidad si lo permite
+    else
+    {
+        // Añadir grupos a la comunidad si lo permite
         if (permisosComunidad.CreateGroup)
         {
             displayAddGroups = true;
@@ -61,54 +88,91 @@ CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
 @* Listado de acciones para hacer con resultados *@
 <div class="acciones-listado">
     <div class="wrap">
-                      
-        @* Opciones de visualización los resultados - No tener en cuenta opciones de visualización según la configuración *@                   
-            <div id="panel-viewBy" class="visualizacion dropdown dropdown-select">
-                @* Visualizar por defecto los resultados *@
-                <a id="buscador" class="dropdown-toggle active" data-toggle="dropdown">
+        
+        @* Opciones de visualización los resultados - No tener en cuenta opciones de visualización según la configuración *@
+        <div id="panel-viewBy" class="visualizacion dropdown dropdown-select">
+            @* Visualizar por defecto los resultados *@
+            <a id="buscador" class="dropdown-toggle active" data-toggle="dropdown">
+                <span class="material-icons">view_agenda</span>
+                <span class="texto">@Html.GetText("COMBUSQUEDAAVANZADA", "LISTADO")</span>
+            </a>
+
+            @* Opciones disponibles para visualizar los resultados *@
+            <div class="dropdown-menu basic-dropdown dropdown-icons dropdown-menu-right">
+                @* Mostrar o no el tipo de vista para visualizar resultados *@
+                @* Visualización LISTA *@
+                <a class="item-dropdown aListView activeView" data-class-resource-list="listView">
                     <span class="material-icons">view_agenda</span>
                     <span class="texto">@Html.GetText("COMBUSQUEDAAVANZADA", "LISTADO")</span>
                 </a>
-                                                                                                        
+
+                @* Visualización GRID - MOSAICO*@
+                <a class="item-dropdown aCompacView" data-class-resource-list="mosaicView">
+                    <span class="material-icons">view_comfy</span>
+                    <span class="texto">@Html.GetText("COMBUSQUEDAAVANZADA", "MOSAICO")</span>
+                </a>
+            </div>
+        </div>
+        @if (displayUserTypeFilter)
+        {
+            @* Nº de página actual para Pagiador de resultados JS*@
+            <input type="hidden" value="@Model.TypeRole" id="tipoRol" />
+            @* Opciones de filtrado para los usuarios *@
+            <div id="panel-filterType" class="dropdown dropdown-select">
+                @* Visualizar por defecto los resultados *@
+                <a id="defaultFiltro" class="dropdown-toggle active" data-toggle="dropdown">
+                    <span class="material-icons">@icono</span>
+                    <span class="texto">@defaultTypeRole</span>
+                </a>
+
                 @* Opciones disponibles para visualizar los resultados *@
                 <div class="dropdown-menu basic-dropdown dropdown-icons dropdown-menu-right">
-                    @* Mostrar o no el tipo de vista para visualizar resultados *@                                                
-                    @* Visualización LISTA *@                    
-                    <a class="item-dropdown aListView activeView" data-class-resource-list="listView">
-                        <span class="material-icons">view_agenda</span>
-                        <span class="texto">@Html.GetText("COMBUSQUEDAAVANZADA", "LISTADO")</span>
+                    @* No filtrar*@
+                    <a class="item-dropdown @(Model.TypeRole == -1 ? "activeView": "")" rel=-1>
+                        <span class="material-icons">select_all</span>
+                        <span class="texto">@Html.GetText("USUARIOS", "TODOSLOSUSUARIOS")</span>
                     </a>
-                    
-                    @* Visualización GRID - MOSAICO*@                    
-                    <a class="item-dropdown aCompacView" data-class-resource-list="mosaicView">
-                        <span class="material-icons">view_comfy</span>
-                        <span class="texto">@Html.GetText("COMBUSQUEDAAVANZADA", "MOSAICO")</span>
-                    </a>                                                           
+                    @* Filtrar por - ADMINSTRADOR*@
+                    <a class="item-dropdown @(Model.TypeRole == 0 ? "activeView" : "")" rel=0>
+                        <span class="material-icons">admin_panel_settings</span>
+                        <span class="texto">@Html.GetText("USUARIOS", "ADMINISTRADOR")</span>
+                    </a>
+                    @* Filtrar por - EDITOR*@
+                    <a class="item-dropdown @(Model.TypeRole == 1 ? "activeView" : "")" rel=1>
+                        <span class="material-icons">edit</span>
+                        <span class="texto">@Html.GetText("USUARIOS", "EDITOR")</span>
+                    </a>
+                    @* Filtrar por - USUARIO*@
+                    <a class="item-dropdown @(Model.TypeRole == 2 ? "activeView" : "")" rel=2>
+                        <span class="material-icons">person</span>
+                        <span class="texto">@Html.GetText("USUARIOS", "USUARIO")</span>
+                    </a>
                 </div>
-            </div>  
-        
-            @* Botón de invitación a usuarios a la comunidad (Si la vista es de visualización de usuarios) *@
-            @if (displayInviteUsersToCommunity == true) { 
-                <div id="panel-invite-user">
-                    <span 
-                          id="list-header-actions-invite-user"
-                          class="btn btn-primary"                  
-                          onclick="DeployActionInModalPanel('@urlSendInvitation_invite_organization', this, 'modal-dinamic-content', '');"
-                          data-toggle="modal" 
-                          data-target="#modal-container">
-                        <span class="material-icons">mail</span>
-                        <span class="texto">@Html.GetText("USUARIOS", "INVITARAORGANIZACION")</span>                                    
-                    </span>
-                </div>
-            } 
-            
-            @* Botón de invitación a usuarios a la comunidad (Si la vista es de visualización de usuarios) *@
-            @if (displayAddGroups == true) {                
-                <a class="btn btn-outline-grey" href="@urlAddGrupo">
-                    <span class="material-icons">group_add</span>
-                    <span>@Html.GetText("GRUPO", "CREARGRUPO")</span>
-                </a>
-            } 
+            </div>
+        }
+        @* Botón de invitación a usuarios a la comunidad (Si la vista es de visualización de usuarios) *@
+        @if (displayInviteUsersToCommunity == true)
+        {
+            <div id="panel-invite-user">
+                <span id="list-header-actions-invite-user"
+                      class="btn btn-primary"
+                      onclick="DeployActionInModalPanel('@urlSendInvitation_invite_organization', this, 'modal-dinamic-content', '');"
+                      data-toggle="modal"
+                      data-target="#modal-container">
+                    <span class="material-icons">mail</span>
+                    <span class="texto">@Html.GetText("USUARIOS", "INVITARAORGANIZACION")</span>
+                </span>
+            </div>
+        }
+
+        @* Botón de invitación a usuarios a la comunidad (Si la vista es de visualización de usuarios) *@
+        @if (displayAddGroups == true)
+        {
+            <a class="btn btn-outline-grey" href="@urlAddGrupo">
+                <span class="material-icons">group_add</span>
+                <span>@Html.GetText("GRUPO", "CREARGRUPO")</span>
+            </a>
+        }
 
     </div>
 </div>

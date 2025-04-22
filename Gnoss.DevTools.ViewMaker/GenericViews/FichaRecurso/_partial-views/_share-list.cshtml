@@ -17,8 +17,6 @@ CommunityModel Comunidad = Html.GetComunidad();
 
 // Función a ejecutar cuando se decida cambiar un recurso a compartir
 string funcionAccionRecurso_Compartir_Cambiar = "AccionRecurso_Compartir_Cambiar('" + fichaRecurso.ListActions.UrlLoadActionShareChange + "', '" + fichaRecurso.Key + "', '" + IdentidadActual.KeyPerson + "', $('input#inpt_urlServicioAutocompletar').val())";
-// Función para ajustar la privacidad de un recurso (si se tienen permisos)
-string functionAjustarPrivacidadRecurso = "AccionRecurso_Compartir_AjustarPrivacidadRecurso('" + fichaRecurso.Key + "', this);";
 // Función para Agregar el recurso seleccionado
 string funcionAccionRecurso_Compartir_Agregar = "AccionRecurso_Compartir_Agregar('" + fichaRecurso.Key + "')";
 // Función para "Aceptar" el recurso seleccionado para compartir en la comunidad

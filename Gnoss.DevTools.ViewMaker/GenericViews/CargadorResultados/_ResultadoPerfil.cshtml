@@ -101,12 +101,12 @@ bool containsUrlFoto = true;
 			    //funcion_seguir = "AccionPerfil_NoSeguir(this, '" + @Model.ListActions.UrlUnfollow + "')";
                 funcion_seguir = "AccionPerfil_Seguir(this, '" + @Model.ListActions.UrlUnfollow + "')";
                 icono_seguir = "person_remove_alt_1";
-                titulo_seguir = "Dejar de seguir";	
+                titulo_seguir = @Html.GetText("COMMON","NOSEGUIR");		
 	        }else{
 			    //funcion_seguir = "AccionPerfil_Seguir(this, '" + @Model.ListActions.UrlFollow + "')";
                 funcion_seguir = "AccionPerfil_Seguir(this, '" + @Model.ListActions.UrlFollow + "')";
                 icono_seguir = "person_add_alt_1";
-                titulo_seguir = "Seguir";
+                titulo_seguir = @Html.GetText("COMMON","SEGUIR");
 	        }	   
         }
     }

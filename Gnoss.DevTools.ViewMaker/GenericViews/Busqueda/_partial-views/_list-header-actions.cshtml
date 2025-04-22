@@ -242,9 +242,9 @@ Variables
                                 @* Subopciones de gráficos *@
                                 foreach (SearchViewModel.ChartViewModel grafico in Model.ChartList)
                                 {
-                                    <a id="liOpcChart_@grafico.Key" class="item-dropdown aGraphView chartView" data-class-resource-list="graphView">
+                                    <a id="liOpcChart_@grafico.Key" class="item-dropdown aGraphView chartView" onclick="SeleccionarChart('@grafico.Key', '@grafico.JS');" data-class-resource-list="graphView">
                                         <span class="material-icons">leaderboard</span>
-                                        <span class="texto" onclick="SeleccionarChart('@grafico.Key', '@grafico.JS');">@grafico.Name</span>
+                                        <span class="texto">@grafico.Name</span>
                                     </a>
                                 }
 

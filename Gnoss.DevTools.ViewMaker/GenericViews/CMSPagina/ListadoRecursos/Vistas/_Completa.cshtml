@@ -49,7 +49,7 @@
                                     </a>
                                 </p>
                             }
-                            @if (Model.ViewSettings == null || (!Model.MapView && (Model.ViewSettings.ListView.ShowDescription|| Model.ViewSettings.MosaicView.ShowDescription)) || (Model.MapView && Model.ViewSettings.MapView.ShowDescription))
+                            @if (Model.ViewSettings == null || (!Model.MapView && (Model.ViewSettings.ListView.ShowDescription || Model.ViewSettings.MosaicView.ShowDescription)) || (Model.MapView && Model.ViewSettings.MapView.ShowDescription))
                             {
                                 if ((Model.Description.Contains("<p ") || Model.Description.Contains("<p>")) && Model.Description.Contains("</p>"))
                                 {

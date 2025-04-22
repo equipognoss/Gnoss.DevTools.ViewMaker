@@ -1,7 +1,7 @@
 ﻿@using Es.Riam.Gnoss.Web.MVC.Models;
 @if (Html.GetComunidad() != null)
 {
-@*
+    @*
 Descripción
 -----------------------------------------------
 Vista que contiene un input para realizar búsquedas, en este caso en comentarios del usuario.
@@ -10,67 +10,32 @@ Variables
 ----------------------------------------------------------------
 *@
 
-HeaderModel cabecera = Html.GetCabecera();
-//UserProfileModel perfil = Html.GetPerfil();
-CommunityModel Comunidad = Html.GetComunidad();
-//UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
-CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
+    HeaderModel cabecera = Html.GetCabecera();
+    //UserProfileModel perfil = Html.GetPerfil();
+    CommunityModel Comunidad = Html.GetComunidad();
+    //UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+    CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
 
-@*
+    @*
     ----------------------------------------------------------------
     -------------------- Vista de buscador de comentarios --------------------
 *@
 
-@*Buscador utilizado para buscar en toda la comunidad o en todo GNOSS*@
-<div class="header-contenido">
-    <div id="buscador" class="col-buscador">
-        @* Formulario del buscador *@
+    @*Buscador utilizado para buscar en toda la comunidad o en todo GNOSS*@
+    <div class="header-contenido">
+        <div id="buscador" class="col-buscador">
+            @* Formulario del buscador *@
             <form method="post" id="formBuscador" action="@($"{Html.GetBaseUrlIdioma()}{Context.Request.Path}")">
-            <fieldset style="display: block" class="form-inline">
-                <legend class="nota">buscador</legend>
-                @* SELECT + CAMPOS OCULTOS PARA EL BUSCADOR *@
-                <div class="fieldsetGroup searchGroup finderUtils">
-                    @*<label for="ddlCategorias">@Html.GetText("METABUSCADOR", "ENCUENTRAEN")</label>*@
-                    @* Select para elegir dónde buscar + Inputs vacíos para formulario -> Lo oculto para el nuevo Front *@
-                    <select style="display:none" class="ddlCategorias form-control" id="ddlCategorias">
-                        @foreach (HeaderModel.SearchHeaderModel.SearchSelectComboModel combo in cabecera.Searcher.ListSelectCombo)
-                        {
-                            if (combo.Selected)
-                            {
-                                <option value="@combo.ID" selected="selected">@combo.Name</option>
-                            }
-                            else
-                            {
-                                <option value="@combo.ID">@combo.Name</option>
-                            }
-                        }
-                    </select>
-                    @* Más campos ocultos para el buscador en base al SELECT -> Movido a _layout-hidden-forms para que esté disponible en todas las webs
-                    @foreach (HeaderModel.SearchHeaderModel.SearchSelectComboModel combo in cabecera.Searcher.ListSelectCombo)
-                    {
-                        <input type="hidden" value="ub_@combo.ID@Html.Raw("@")@combo.Url" class="inpt_tipo_busqueda" />
-                    }
-                    @foreach (HeaderModel.SearchHeaderModel.SearchSelectComboModel combo in cabecera.Searcher.ListSelectCombo)
-                    {
-                        if (!string.IsNullOrEmpty(combo.Autocomplete))
-                        {
-                            <input type="hidden" value="oa_@combo.ID@Html.Raw("@")@combo.Autocomplete" class="inpt_OrigenAutocompletar" />
-                        }
-                        if (!string.IsNullOrEmpty(combo.FacetAutocomplete))
-                        {
-                            <input type="hidden" value="fa_@combo.ID@Html.Raw("@")@combo.FacetAutocomplete" class="inpt_FacetasAutocompletar" />
-                        }
-                    }
-                    *@
-
+                <fieldset style="display: block" class="form-inline">
+                    <legend class="nota">buscador</legend>
                     @* Buscador *@
-                    <!-- #buscador //-->                    
+                    <!-- #buscador //-->
+                    <div class="finderUtils" id="divCajaBusqueda">
                         <div class="group finderSection">
-                            <label for="criterio" class="nota">Buscar en &nbsp;</label>
-                            @* Caja de texto para buscar *@
-                            <input type="text" id="txtBusquedaPrincipal" class="text txtBusqueda autocompletar not-outline finderSectionText ac_input" autocomplete="off" placeholder="@Html.GetText("COMMON","BUSCAR")" />
-                            @* Botón de búsqueda que será la propia lupa*@
-                            <input type="button" title="@Html.GetText("METABUSCADOR", "ENCONTRAR")" class="encontrar findAction" id="btnBuscarPrincipal" />
+                            <label for="finderSection" class="sr-only">@Html.GetText("COMMON", "BUSCAR")</label>
+                            <input type="text" id="finderSection" class="not-outline finderSectionText autocompletar ac_input" autocomplete="off" placeholder="@Html.GetText("METABUSCADOR", "ENCONTRAR")" />
+                            <input title="@Html.GetText("METABUSCADOR", "ENCONTRAR")" type="button" class="encontrar findAction" id="inputLupa" />
+                            <input type="hidden" value="@Html.GetUrlPagina()" class="inpt_urlPaginaActual" />
 
                             @* Opción buscador para dispositivos móviles *@
                             <a href="javascript: void(0);" class="btn-filtrar-movil">
@@ -78,24 +43,17 @@ CommunityModel.PermissionsModel permisosComunidad = Comunidad.Permissions;
                                 <span class="texto">@Html.GetText("COMMON", "FILTRAR")</span>
                                 <span class="texto resultados"></span>
                             </a>
-                        </div>                  
-                </div>
-
-                <!-- #buscador oculto para que funcione el submit y el comportamiento//-->
-                <div class="botonBuscar"></div>
-                <input type="submit" style="display: none;" id="enviarFormBuscador" value="enviar" title="enviar" />
-
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
 
 
-            </fieldset>
-        </form>
+        @* Listado de TAGS usados para las búsquedas *@
+        @Html.PartialView("_partial-views/_list-header-tags")
+        @* Listado de acciones a realizar (Cargar, Marcar, Leído, No leído, Actualizar...) - No hay en Comentarios
+    @Html.PartialView("_partial-views/_list-messages-actions")
+    *@
     </div>
-
-
-@* Listado de TAGS usados para las búsquedas *@
-@Html.PartialView("_partial-views/_list-header-tags")
-@* Listado de acciones a realizar (Cargar, Marcar, Leído, No leído, Actualizar...) - No hay en Comentarios
-@Html.PartialView("_partial-views/_list-messages-actions")
-*@
-</div>
 }

@@ -1,4 +1,4 @@
-﻿@model PintarCategoriaEditorTesauro
+﻿@model CategoryModel
 @*
 Descripción
 -----------------------------------------------
@@ -19,7 +19,7 @@ Variables
 *@
 
 <li class="component-wrap bg-light text-dark">
-	<div class="component type-category" data-component-type="category" data-categoryname="@Model.categoryModel.Name" data-id="@Model.categoryModel.Key">
+	<div class="component type-category" data-component-type="category" data-categoryname="@Model.Name" data-id="@Model.Key">
 		@* Contenedor de cada item de lista de categorías *@
 		<div class="component-header-wrap">
 			@* Header de cada item de la lista de categorías *@
@@ -31,7 +31,7 @@ Variables
 						<div class="component-name-wrap">
 							<span class="component-icon"></span>
 							@* Nombre de la categoría *@
-							<span class="component-name" data-categoryname="@Model.categoryModel.Name" data-categoryid="@Model.categoryModel.Key">@Model.categoryModel.Name</span>											
+							<span class="component-name" data-categoryname="@Model.Name" data-categoryid="@Model.Key">@Model.Name</span>											
 						</div>
 					</div>
 					@* Contenedor de acciones del item de la categoría (Editar, Crear nueva subcategoría, Eliminar) *@
@@ -41,16 +41,16 @@ Variables
 								<li>
 									@* Botón de Aceptar Categoría Sugerida *@
 									<a 	class="btn btn-outline-grey btnAcceptCategorySuggested"
-										data-categoryid="@Model.categoryModel.Key" 
-										data-categoryname="@Model.categoryModel.Name">
+										data-categoryid="@Model.Key" 
+										data-categoryname="@Model.Name">
 										@Html.GetText("COMMON","ACEPTAR")
 									</a>
 								</li>
 								<li>
 									@* Botón de Cancelar Categoría Sugerida *@
 									<a	class="btn btn-outline-grey ml-3 btnRejectCategorySuggested"
-										data-categoryid="@Model.categoryModel.Key" 
-										data-categoryname="@Model.categoryModel.Name">
+										data-categoryid="@Model.Key" 
+										data-categoryname="@Model.Name">
 										@Html.GetText("COMMON","RECHAZAR")
 									</a>
 								</li>

@@ -41,19 +41,22 @@ Variables
 </form>
 
 @* Inputs ocultos usados para búsquedas *@
-@foreach (HeaderModel.SearchHeaderModel.SearchSelectComboModel combo in cabecera.Searcher.ListSelectCombo)
+@if (cabecera != null && cabecera.Searcher != null && cabecera.Searcher.ListSelectCombo != null)
 {
-    <input type="hidden" value="ub_@combo.ID@Html.Raw("@")@combo.Url" class="inpt_tipo_busqueda" />
-}
+   foreach (HeaderModel.SearchHeaderModel.SearchSelectComboModel combo in cabecera.Searcher.ListSelectCombo)
+   {
+        <input type="hidden" value="ub_@combo.ID@Html.Raw("@")@combo.Url" class="inpt_tipo_busqueda" />
+   }
 
-@foreach (HeaderModel.SearchHeaderModel.SearchSelectComboModel combo in cabecera.Searcher.ListSelectCombo)
-{
-    if (!string.IsNullOrEmpty(combo.Autocomplete))
+    foreach (HeaderModel.SearchHeaderModel.SearchSelectComboModel combo in cabecera.Searcher.ListSelectCombo)
     {
-        <input type="hidden" value="oa_@combo.ID@Html.Raw("@")@combo.Autocomplete" class="inpt_OrigenAutocompletar" />
-    }
-    if (!string.IsNullOrEmpty(combo.FacetAutocomplete))
-    {
-        <input type="hidden" value="fa_@combo.ID@Html.Raw("@")@combo.FacetAutocomplete" class="inpt_FacetasAutocompletar" />
-    }
+        if (!string.IsNullOrEmpty(combo.Autocomplete))
+        {
+            <input type="hidden" value="oa_@combo.ID@Html.Raw("@")@combo.Autocomplete" data-tipoautocomplete="@combo.TipoAutocompletar.ToString()" class="inpt_OrigenAutocompletar" />
+        }
+        if (!string.IsNullOrEmpty(combo.FacetAutocomplete))
+        {
+            <input type="hidden" value="fa_@combo.ID@Html.Raw("@")@combo.FacetAutocomplete" class="inpt_FacetasAutocompletar" />
+        }
+    } 
 }

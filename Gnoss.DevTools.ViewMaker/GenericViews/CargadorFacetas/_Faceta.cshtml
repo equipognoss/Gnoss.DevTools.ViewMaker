@@ -15,6 +15,7 @@ string claveFacetaSinObjetoConocimiento = Model.FacetKey;
 // Variables para tesauro y contenidoID 
 string tesauroID = "";
 string contenidoID = "";
+bool esTesauroSemantico = Model.ThesaurusID.Equals(new Guid("11111111-1111-1111-1111-111111111111"));
 
 }
 
@@ -86,7 +87,10 @@ string contenidoID = "";
                        data-toggle="modal"
                        data-target="#modal-resultados-lista"
                        data-facetkey="@Model.FacetKey"
-                       data-facetname="@Model.Name">@Html.GetText("COMBUSQUEDAAVANZADA", "VERMAS")</a>
+                       data-facetissemantic="@esTesauroSemantico"
+                       data-facetalphabeticalorder="True"
+                       data-facetname="@Model.Name">@Html.GetText("COMBUSQUEDAAVANZADA", "VERMAS")
+                    </a>
                 </p>
 
             </div>
@@ -206,6 +210,7 @@ string contenidoID = "";
                                    data-target="#modal-resultados-paginado"
                                    data-facetkey="@Model.FacetKey"
                                    data-facetname="@Model.Name"
+                                   data-facetalphabeticalorder="True"
                                    >@Html.GetText("COMBUSQUEDAAVANZADA", "VERMAS")</a>
                             </p> 
                         }

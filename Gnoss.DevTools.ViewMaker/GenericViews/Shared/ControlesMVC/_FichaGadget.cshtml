@@ -65,18 +65,6 @@ else if (Model is GadgetResourceListModel)
                 {
                     classSiguiente += " desactivado";
                 }
-                @* Quito el paginado de momento 
-                <div class="paginadorSiguienteAnterior">
-                    <ul>
-                        <li id="btnAnterior_@Model.Key" class="anterior desactivado">
-                            <a onclick="paginadorGadget_Anterior('@Html.GetUrlPagina()', '@gadgetListado.Key')"></a>
-                        </li>
-                        <li id="btnSiguiente_@Model.Key" class="@classSiguiente">
-                            <a onclick="paginadorGadget_Siguiente('@Html.GetUrlPagina()', '@gadgetListado.Key')"></a>
-                        </li>
-                    </ul>
-                </div>
-                    *@
             }
 
             <div class="contexto resource-list activo">

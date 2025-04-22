@@ -16,7 +16,7 @@ CommunityModel Comunidad = Html.GetComunidad();
 UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
 
 string nombreCompleto = Html.ObtenerNombreCompletoDeFichaIdentidad(Perfil);
-
+string urlContribuciones = ViewBag.UrlPaginaMisContribuciones;
 // Nº de Seguidores y Seguidos
 var numFollowers = $"{(Model.ProfileFollowers != null ? Model.ProfileFollowers.Count : 0)}";
 var numFollowed = $"{(Model.ProfileFollowed != null ? Model.ProfileFollowed.Count : 0)}";
@@ -75,9 +75,9 @@ else
 }
 
 @* Nº Contribuciones del usuario *@
-@if (Perfil.ExtraInfo.IdentityResourceCounter != null)
+@if (Perfil.ExtraInfo != null && Perfil.ExtraInfo.IdentityResourceCounter != null)
 {
-    userContributions = @Perfil.ExtraInfo.IdentityResourceCounter.GetPublicationCounter();
+    userContributions = @Perfil.ExtraInfo.IdentityResourceCounter.ContributionsCounter;
 }
 
 @* Row principal *@
@@ -143,6 +143,21 @@ else
                                role="tab"
                                aria-controls="tab-pane-3"
                                aria-selected="false">Seguidores @numFollowers</a>
+                        </li>
+                    }
+                    @if (Perfil.Key != Guid.Empty && !IdentidadActual.IsGuestIdentity)
+                    {
+                        @* Menú de Personas que le siguen *@
+                        <li class="nav-item">
+                            <a class="nav-link"
+                           id="tab-4"
+                           data-toggle="tab"
+                           href="@urlContribuciones"
+                           role="tab"
+                           aria-controls="tab-pane-4"
+                           aria-selected="false"
+                           style="text-decoration: underline;">@Html.GetText("COMMON", "CONTRIBUCIONES") @userContributions
+                            </a>
                         </li>
                     }
                 </ul>

@@ -93,13 +93,14 @@ string idTagsContainer = "tagsContainer";
                                         @if (Model.AllowEditTags)
                                         {
                                             <span class="tag-remove material-icons">close</span>
-                                        }                                                                            
+                                        }
+                                        @* Valor para controlar la edición insitu del Tag*@
+                                        <input type="hidden" value="@etiqueta"/>
                                     </div>
                                 </div>
                                 cont++;                            
                             }                            
                          }
-
                 </span>
             </div>
         </div>

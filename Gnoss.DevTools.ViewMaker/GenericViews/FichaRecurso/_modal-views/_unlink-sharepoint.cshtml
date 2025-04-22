@@ -1,0 +1,50 @@
+﻿@*
+Descripción
+-----------------------------------------------
+Vista modal que servirá para preguntar al publisher del recurso si se desea o no bloquear comentarios. Se mostrará cuando en la ficha del recurso, se pulse sobre "Bloquear comentarios".
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+    ResourceModel fichaRecurso = Model.Resource;
+    // Construcción para realizar la llamada JS para agregar vínculo
+    string funcionDesvincular = "DesvincularSharepoint()";
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Vista Modal para Vincular un recurso a SharePoint--------------------
+*@
+
+<div class="modal-header">
+    <p class="modal-title">
+        <span class="material-icons">attach_file</span>@Html.GetText("VINCULACIONDOCUMENTACION", "INFODESVINCULAR")
+    </p>
+    <span class="material-icons cerrar"
+          data-dismiss="modal"
+          aria-label="Close">close</span>
+</div>
+<div class="modal-body">
+    <div class="formulario-edicion">
+        <div class="form-group">
+            <label for="desvincular-url-recurso" class="control-label">@Html.GetText("VINCULACIONDOCUMENTACION", "AVISODESVINCULAR")</label>
+        </div>
+
+        @* Mensaje informativo del proceso*@
+        <div id="despAccionRec_@fichaRecurso.Key">
+            <div>
+                <div id="menssages">
+                    <div class="ok"></div>
+                    <div class="ko"></div>
+                </div>
+            </div>
+        </div>
+        <div class="form-actions">
+            @* Botón que guardará posibles cambios *@
+            <button onclick="@funcionDesvincular" class="btn btn-primary">@Html.GetText("VINCULACIONDOCUMENTACION", "DESVINCULAR")</button>
+        </div>
+
+    </div>
+</div>

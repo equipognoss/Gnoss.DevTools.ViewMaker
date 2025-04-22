@@ -12,7 +12,6 @@ Variables
 ----------------------------------------------------------------
 *@
 @{ 
-
     CommunityModel Comunidad = Html.GetComunidad();
 
     Html.SetBodyClass("edicionRecurso usuarioConectado comunidad page-modal no-clonarMenuUsuario");
@@ -35,7 +34,7 @@ Variables
         urlCancelar = Model.ModifyResourceModel.UrlCancelButton;
     }
 
-    if (Model.TypePage == Es.Riam.Gnoss.Web.MVC.Models.EditResourceModel.TypePageEditResource.CreateResource || Model.TypePage == Es.Riam.Gnoss.Web.MVC.Models.EditResourceModel.TypePageEditResource.CreateSemanticResource)
+    if (Model.TypePage == Es.Riam.Gnoss.Web.MVC.Models.EditResourceModel.TypePageEditResource.CreateResource || Model.TypePage == Es.Riam.Gnoss.Web.MVC.Models.EditResourceModel.TypePageEditResource.CreateResource2 || Model.TypePage == Es.Riam.Gnoss.Web.MVC.Models.EditResourceModel.TypePageEditResource.CreateSemanticResource)
     {                
         titulo = $"{Html.GetText("COMMON","NUEVO")} {tipoRecurso}";
         //Model.CreateResourceModel.UrlCancelButton

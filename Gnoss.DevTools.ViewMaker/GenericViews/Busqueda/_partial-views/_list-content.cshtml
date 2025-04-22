@@ -51,9 +51,7 @@ if (!tipoPaginasSinEspaciado.Contains(tipoPagina) && tipoPagina != null) {
     @* Mostrado de resultados *@
     @if (string.IsNullOrEmpty(htmlResultados) && Model.JSONResourceList != null)
     {
-        <div class="resource-list-wrap">
-            @Html.PartialView("../CargadorResultados/CargarResultados", Model.JSONResourceList);
-        </div>
+        Html.PartialView("../CargadorResultados/CargarResultados", Model.JSONResourceList);
     }
     else
     {
@@ -62,7 +60,7 @@ if (!tipoPaginasSinEspaciado.Contains(tipoPagina) && tipoPagina != null) {
         <div class="resource-list-wrap">
             @* Cargar los resultados obtenidos del servicio "Cargador Resultados" *@
             @Html.Raw(htmlResultados)
-        </div>
+        </div>        
     }
 </div>
 

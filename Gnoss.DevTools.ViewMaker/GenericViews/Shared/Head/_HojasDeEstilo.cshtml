@@ -1,10 +1,7 @@
 ﻿@{
     CommunityModel Comunidad = Html.GetComunidad();
 }
-
-
     @* Ficheros CSS Cargados *@
-
     <!-- MATERIAL ICONS -->
     <link type="text/css"
           rel="stylesheet"
@@ -23,8 +20,10 @@
           rel="stylesheet"
           href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
 
+    <!-- DatetimePicker (Datepicker) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.css" integrity="sha512-bYPO5jmStZ9WI2602V2zaivdAnbAhtfzmxnEGh9RwtlI00I9s8ulGe4oBa5XxiC6tCITJH/QG70jswBhbLkxPw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-<!-- BOOTSTRAP 4 + PROPELLER -->
+    <!-- BOOTSTRAP 4 + PROPELLER -->
     <link rel="stylesheet"
           class="styleForCkEditorPreview"
           href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/bootstrap/bootstrap.min.css?v=@Html.GetVersion()"
@@ -34,21 +33,10 @@
           href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/propeller/css/propeller.min.css?v=@Html.GetVersion()"
           type="text/css" />
 
-    <!-- LIGHTGALLERY -->
-    <link type="text/css"
-          rel="stylesheet"
-          href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/lightgallery/css/lightgallery.min.css?v=@Html.GetVersion()" />
-
-
     <!-- JQUERY CUSTOM SCROLL BAR Version: 3.1.13 -->
     <link type="text/css"
           rel="stylesheet"
           href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/customscroller/css/jquery.mCustomScrollbar.min.css?v=@Html.GetVersion()" />
-
-    <!-- PRELOADER MATERIALIZE -->
-    <link type="text/css"
-          rel="stylesheet"
-          href="@Html.GetBaseUrlStatic()/responsive/theme/libraries/spinner-material/spinner-material.css?v=@Html.GetVersion()" />
 
     <!-- DATATABLES -->    
     <link rel="stylesheet" 
@@ -81,12 +69,6 @@
           rel="stylesheet"
           href="@Html.GetBaseUrlStatic()/responsive/theme/theme.css?v=@Html.GetVersion()" />
 
-    <!-- DatePicker -->
-    <link type="text/css"
-          class="styleForCkEditorPreview"
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" />
-
     <!-- BUSYLOAD -> VISTAS LOADING -->
     <link type="text/css"
       rel="stylesheet"
@@ -104,12 +86,5 @@
         <link media="screen" type="text/css" rel="stylesheet" href="@css" />
     }
 }
-
-@*Estilo para mygnoss*@
-@if (Comunidad != null && Comunidad.Key == ProyectoAD.MetaProyecto)
-{
-    //<link media="screen" type="text/css" rel="stylesheet" href="@Html.GetBaseUrlStatic()/cssNuevo/mygnoss.css?v=@Html.GetVersion()" />
-}
-
 @*Estilo sólo para comunidad*@
 @Html.PartialView("../Shared/Head/_HojasDeEstiloPersonalizado")

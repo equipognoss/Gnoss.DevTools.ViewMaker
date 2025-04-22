@@ -31,43 +31,78 @@
             @* Listado de resultados (resource-list) donde aparecerán los recursos-items *@
             <div id="panResultados" class="resource-list listView usuarios ">
                 <div class="listadoRecursos">
-                    <div class="resource-list listView">
+                    <div class="resource-list listView request-list">
                         @foreach (var item in Model.SolicitudesNuevasComunidades)
                         {
+                            string tipoComunidad = string.Empty;
+                            switch (item.TipoComunidad)
+                            {
+                                case 0:
+                                    tipoComunidad = Html.GetText("COMUNIDADES", "COMUNIDADPUBLICA");
+                                    break;
+                                case 1:
+                                    tipoComunidad = Html.GetText("COMUNIDADES", "COMUNIDADPRIVADA");
+                                    break;
+                                case 2:
+                                    tipoComunidad = Html.GetText("COMUNIDADES", "COMUNIDADRESTRINGIDA");
+                                    break;
+                                case 3:
+                                    tipoComunidad = Html.GetText("COMUNIDADES", "COMUNIDADRESERVADA");
+                                    break;
+                            }
+                            string plantilla = $"<p>{tipoComunidad}</p>";
+                            string nombreCreador = string.Empty;
+                            if (!string.IsNullOrEmpty(item.NombreCortoOrganizacion))
+                            {
+                                nombreCreador = $"{item.NombreCreador} @ {item.NombreCortoOrganizacion}";
+                            }
+                            else
+                            {
+                                nombreCreador = item.NombreCreador;
+                            }
                             <article class="resource" id="@item.PeticionID">
-                                <div class="wrap">
-                                    <div class="user-miniatura">
-                                        <div class="imagen-usuario-wrap">
-                                            <div class="imagen">
-                                                @if (item.IsPrivate)
-                                                {
-                                                    <span class="material-icons" style="font-size: 40px;">vpn_lock</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="material-icons" style="font-size: 40px;">public</span>
-                                                }
-                                            </div>
+                                <div class="request">
+                                  <div class="request_details">
+                                    <div class="request__detailsInfo">                                      
+                                        @* Logo de la Comunidad *@
+                                        @if (item.IsPrivate)
+                                        {
+                                            <span class="material-icons" data-html="true" data-toggle="tooltip" data-placement="bottom" title="@plantilla" style="font-size: 40px;">vpn_lock</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="material-icons" data-html="true" data-toggle="tooltip" data-placement="bottom" title="@plantilla" style="font-size: 40px;">public</span>
+                                        }                                        
+                                       @* Información de la solicitud *@
+                                      <div class="request__info">
+                                        <div class="request__mainInfo">
+                                          <h3>@item.Nombre - @item.NombreCorto</h3>
+                                          <h4>@Html.GetText("URLSEM", "SOLICITADOPOR")
+                                            <a class="text-decoration-none" href="@item.UrlPerfil">@nombreCreador</a>
+                                          </h4>
                                         </div>
-                                        <div class="nombre-usuario-wrap">
-                                            <a href="">
-                                                <p class="nombre">@item.Nombre - @item.NombreCorto</p>
-                                            </a>
-                                            @Html.Raw(item.Descripcion)
-                                        </div>
-                                        <div class="acciones-usuario-wrap">
-                                            @if (IdentidadActual.IsProyectAdmin == true)
-                                            {
-                                                string funcionSolicitud_RechazarSolicitudNuevaComunidad = "Peticion_RechazarSolicitudNuevaComunidad('" + @Html.GetText("URLSEM", "SOLICITDESACCESOCOM") +"/refuse" + "', '" + item.PeticionID + "');";
-                                                string funcionSolicitud_AceptarSolicitudNuevaComunidad = "Peticion_AceptarSolicitudNuevaComunidad('" + @Html.GetText("URLSEM", "SOLICITDESACCESOCOM") + "/accept" + "', '" + item.PeticionID + "');";
-                                                    <input type="text" name="solicitud_id" value="@item.PeticionID" hidden />
-                                                    <button type="button" onclick="@funcionSolicitud_AceptarSolicitudNuevaComunidad" class="btn btn-primary"><span class="material-icons">check</span> @Html.GetText("COMMON", "ACEPTAR")</button>
-
-                                                    <input type="text" name="solicitud_id" value="@item.PeticionID" hidden />
-                                                    <button type="button" onclick="@funcionSolicitud_RechazarSolicitudNuevaComunidad" class="btn btn-outline-primary ml-2"><span class="material-icons">close</span> @Html.GetText("COMMON", "RECHAZAR")</button>
-                                            }
-                                        </div>
+                                        <div class="request__extraInfo"><h4>@item.FechaPeticion.ToShortDateString()</h4></div>
+                                      </div>
                                     </div>
+
+                                    @* Acciones de Aceptar / Cancelar solicitud *@
+                                    @if (IdentidadActual.IsProyectAdmin == true)
+                                    {
+                                        string funcionSolicitud_RechazarSolicitudNuevaComunidad = "Peticion_RechazarSolicitudNuevaComunidad('" + @Html.GetText("URLSEM", "SOLICITDESACCESOCOM") + "/refuse" + "', '" + item.PeticionID + "');";
+                                        string funcionSolicitud_AceptarSolicitudNuevaComunidad = "Peticion_AceptarSolicitudNuevaComunidad('" + @Html.GetText("URLSEM", "SOLICITDESACCESOCOM") + "/accept" + "', '" + item.PeticionID + "');";
+                                        <div class="request__actions">                                            
+                                            <input type="text" name="solicitud_id" value="@item.PeticionID" hidden />
+                                            <button type="button" onclick="@funcionSolicitud_AceptarSolicitudNuevaComunidad" class="btn btn-primary"><span class="material-icons">check</span> @Html.GetText("COMMON", "ACEPTAR")</button>
+                                            <input type="text" name="solicitud_id" value="@item.PeticionID" hidden />
+                                            <button type="button" onclick="@funcionSolicitud_RechazarSolicitudNuevaComunidad" class="btn btn-outline-primary ml-2"><span class="material-icons">close</span> @Html.GetText("COMMON", "RECHAZAR")</button>
+                                        </div>
+                                    }                                    
+                                  </div>
+
+                                  @* Contenido / Texto de la solicitud *@
+                                  <div class="request__description">
+                                    @Html.Raw(item.Descripcion)
+                                  </div>
                                 </div>
                             </article>
                         }
@@ -80,16 +115,16 @@
     </div>
 </div>
 
-    <script type="text/javascript">
-        @Html.Raw(jsExtra)
+<script type="text/javascript">
+    @Html.Raw(jsExtra)
 
-        @if (!string.IsNullOrEmpty(Html.GetJSMapa()))
-        {
-            @Html.Raw(Html.GetJSMapa())
-        }
+    @if (!string.IsNullOrEmpty(Html.GetJSMapa()))
+    {
+        @Html.Raw(Html.GetJSMapa())
+    }
 
-        @if (!string.IsNullOrEmpty(Html.GetJSGraficos()))
-        {
-            @Html.Raw(Html.GetJSGraficos())
-        }
-    </script>
+    @if (!string.IsNullOrEmpty(Html.GetJSGraficos()))
+    {
+        @Html.Raw(Html.GetJSGraficos())
+    }
+</script>

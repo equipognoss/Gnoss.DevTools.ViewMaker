@@ -12,6 +12,10 @@ Variables
 @{
 string urlAcceptManageResourceInCategories = Html.GetBaseUrl () + Html.GetUrlPagina() + "/aceptcategories";
 // Eliminar de la url "editcategories/"
+if(!string.IsNullOrEmpty(ViewBag.RutaEjecucionWeb))
+{
+    urlAcceptManageResourceInCategories = $"{Html.GetBaseUrl()}/{Html.GetUrlPagina().Replace(ViewBag.RutaEjecucionWeb.Trim('/'), "").Trim('/')}/aceptcategories";
+}
 urlAcceptManageResourceInCategories = urlAcceptManageResourceInCategories.Replace("editcategories/","");
 }
 

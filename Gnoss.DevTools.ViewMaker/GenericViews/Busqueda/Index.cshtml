@@ -97,7 +97,7 @@ string FiltroOrdenSeleccionado = Model.FilterOrderSelected;
             @* Buscador de recursos *@
             @if (Model.SearchBoxVisible)
             {
-                @Html.PartialView("_partial-views/_searcher")
+                @Html.PartialView("_partial-views/_searcher", Model)
             }
 
             @* Listado de resultados (resource-list) donde aparecerán los recursos-items *@
@@ -143,7 +143,7 @@ string FiltroOrdenSeleccionado = Model.FilterOrderSelected;
 <script type="text/javascript">
         @Html.Raw(jsExtra)
 
-    @if (htmlFacetas == null && htmlResultados == null && Model.JSONResourceList == null && Model.JSONFaceted == null)
+    @if (string.IsNullOrWhiteSpace(htmlFacetas) && string.IsNullOrWhiteSpace(htmlResultados) && Model.JSONResourceList == null && Model.JSONFaceted == null)
         {
             <text>
                 $(document).ready(function () {

@@ -37,33 +37,36 @@ HeaderModel cabecera = Html.GetCabecera();
                 @* Listado de idiomas disponibles *@
             <ul class="no-list-style">
                 @* Pintar cada uno de los idiomas disponibles *@
-                @foreach (KeyValuePair<string, string> idioma in cabecera.Languajes)
+                @if(cabecera != null)
                 {
-                    string urlIdioma = "";
-                    if (cabecera.MultiLingualLinks != null && cabecera.MultiLingualLinks.ContainsKey(idioma.Key))
+                    @foreach (KeyValuePair<string, string> idioma in cabecera.Languajes)
                     {
-                        urlIdioma = cabecera.MultiLingualLinks[idioma.Key].Value;
-                    }
+                        string urlIdioma = "";
+                        if (cabecera.MultiLingualLinks != null && cabecera.MultiLingualLinks.ContainsKey(idioma.Key))
+                        {
+                            urlIdioma = cabecera.MultiLingualLinks[idioma.Key].Value;
+                        }
 
-                    @* Dejar marcado el idioma actual *@
-                    if (Html.GetUtilIdiomas().LanguageCode == idioma.Key)
-                    {
-                        <li>
-                            <a class="activo item-dropdown" lang="@idioma.Key" href="@urlIdioma" title="@idioma.Value">
-                                <span class="material-icons">done</span>
-                                <span class="texto">@idioma.Value</span>
-                            </a>
-                        </li>
+                        @* Dejar marcado el idioma actual *@
+                        if (Html.GetUtilIdiomas().LanguageCode == idioma.Key)
+                        {
+                            <li>
+                                <a class="activo item-dropdown" lang="@idioma.Key" href="@urlIdioma" title="@idioma.Value">
+                                    <span class="material-icons">done</span>
+                                    <span class="texto">@idioma.Value</span>
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li>
+                                <a class="item-dropdown" lang="@idioma.Key" href="@urlIdioma" title="@idioma.Value">
+                                    @idioma.Value
+                                </a>
+                            </li>
+                        }
                     }
-                    else
-                    {
-                        <li>
-                            <a class="item-dropdown" lang="@idioma.Key" href="@urlIdioma" title="@idioma.Value">
-                                @idioma.Value
-                            </a>
-                        </li>
-                    }
-                }
+                }               
             </ul>
             </div>
         </div>

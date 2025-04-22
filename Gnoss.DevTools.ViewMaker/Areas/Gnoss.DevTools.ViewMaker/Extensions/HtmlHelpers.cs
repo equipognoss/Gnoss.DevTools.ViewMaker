@@ -1613,6 +1613,11 @@ namespace Gnoss.DevTools.ViewMaker.Extensions
             return pestanya;
         }
 
+        public static string GetAdministrationDomain(this IHtmlHelper helper)
+        {
+            return (string)helper.ViewBag.DominioPaginasAdministracion;
+        }
+
         #endregion
 
         #region ViewBag Setters

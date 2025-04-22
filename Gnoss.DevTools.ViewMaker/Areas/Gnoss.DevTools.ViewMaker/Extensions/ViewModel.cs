@@ -42,6 +42,10 @@ namespace Gnoss.DevTools.ViewMaker.Extensions
         /// </summary>
         public short TypeFilter { get; set; }
         /// <summary>
+        /// Rol del usuario en la organizacion
+        /// </summary>
+        public short TypeRole { get; set; }
+        /// <summary>
         /// 
         /// </summary>
         public bool OrderAsc { get; set; }

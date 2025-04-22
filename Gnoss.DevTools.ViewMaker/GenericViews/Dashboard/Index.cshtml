@@ -1,0 +1,245 @@
+﻿@model DashboardViewModel
+@*
+Descripción
+-----------------------------------------------
+Vista que se utiliza para mostrar los gráficos configurados en una página de tipo Dashboard Analítico.
+
+Variables
+----------------------------------------------------------------
+*@
+@{
+CommunityModel Comunidad = Html.GetComunidad();
+UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
+string jsExtra = Html.GetJSExtra();
+
+string nombrePestanyaActual = Model.PageName;
+
+}
+
+@*
+----------------------------------------------------------------
+-------------------- Index de la página de "Dashboard analítico" dentro de una comunidad --------------------
+*@
+<div class="row">
+    @if (Comunidad.Key != ProyectoAD.MetaProyecto)
+    {
+        @*Breadcrumb / Migas de pan en la ficha del recurso*@
+        <div class="col col-12 col-breadcrumb" id="breadcrumb">
+            <ul>
+                <li><a href="@Comunidad.Url"><strong>@Html.GetText("COMMON", "HOME")</strong></a></li>
+                <li>@nombrePestanyaActual</li>
+            </ul>
+        </div>
+    }
+    else
+    {
+        @*Breadcrumb / Migas de pan en la ficha del recurso*@
+        <div class="col col-12 col-breadcrumb" id="breadcrumb">
+            <ul>
+                @if (@Comunidad.Url != null)
+                {
+                    <li><a href="@Comunidad.Url"><strong>@Html.GetText("COMMON", "HOME")</strong></a></li>
+                }
+                else
+                {
+                    <li><strong>@Html.GetText("COMMON", "HOME")</strong></li>
+                }
+
+                @if (@nombrePestanyaActual != null)
+                {
+                    <li>@nombrePestanyaActual</li>
+                }
+                else if (Comunidad.Url != null)
+                {
+                    <li>@Comunidad.Name</li>
+                }
+            </ul>
+        </div>
+    }
+    <div class="col col-12 header-listado">
+        <div class="h1-container">
+
+            @if (string.IsNullOrEmpty(nombrePestanyaActual))
+            {
+                <h1>Dashboard Analítico<span id="panNumResultados" class="numResultados"></span></h1>
+            }
+            else
+            {
+                <h1>@nombrePestanyaActual</h1>
+            }
+        </div>
+
+    </div>
+    <div class="col col-contenido">
+        @* Div que envuelve todo el contenido*@
+        <div class="wrapCol">
+            <div id="panResultados" class="resource-list listView">
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script type="text/javascript">
+        @Html.Raw(jsExtra)
+
+        @if (!string.IsNullOrEmpty(Html.GetJSMapa()))
+        {
+            @Html.Raw(Html.GetJSMapa())
+        }
+
+        @if (!string.IsNullOrEmpty(Html.GetJSGraficos()))
+        {
+            @Html.Raw(Html.GetJSGraficos())
+        }
+</script>
+<script type="text/javascript">
+
+    var opcionesGraficos = {};
+
+    var Operaciones = {
+        init: function () {
+            this.cargarOpciones();
+        },
+        cargarOpciones: function () {
+            var model = '@Html.Raw(Json.Serialize(Model.ListAsistente))';
+            var data = JSON.parse(model);
+            var asistentes = data['$values'];
+            this.pintarGraficos(asistentes);
+        },
+        pintarGraficos: function (asistentes) {
+            var panResultados = document.getElementById("panResultados");
+            for (var i = 0; i < asistentes.length; i++) {
+                var that = this;
+                var asistente = asistentes[i];
+                var divNuevo = document.createElement("div");
+                divNuevo.className = "generados";
+                panResultados.appendChild(divNuevo);
+                var config = {
+                    data: data,
+                    options:
+                    {
+                        responsive: true,
+                        plugins:
+                        {
+                            legend: {
+                                position: 'top',
+                            }, title: {
+                                display: asistente.titulo,
+                                text: asistente.asistenteName
+                            }
+                        }
+                    }
+                };
+                var tam = tamFijo;
+                switch (asistente.tamanyo) {
+                    case "1x":
+                        tam = tamFijo;
+                        break;
+                    case "2x":
+                        tam = 2 * tamFijo + 4;
+                        break;
+                    case "3x":
+                        tam = 3 * tamFijo + 8;
+                        break;
+                }
+                var data;
+                var tipo = asistente.tipo;
+                switch (tipo) {
+                    case 1:
+                        data = that.dataBarrasLineas(asistente, tipo);
+                        config.type = 'bar';
+                        var horizontal = asistente.horizontal;
+                        if (horizontal) {
+                            config.options.indexAxis = 'y';
+                        }
+                        break;
+                    case 2:
+                        data = that.dataBarrasLineas(asistente, tipo);
+                        config.type = 'line';
+                        break;
+                    case 3:
+                        data = that.dataCirculos(asistente);
+                        config.type = 'pie';
+                        config.options.plugins.legend.display = false;
+                        break;
+                }
+                if (tipo == "1" || tipo == "2") {
+                    divNuevo.style = "width:"+ tam +"px; height:" + tam / 2 + "px; display:inline-block";
+                } else {
+                    divNuevo.style = "width:"+ tam +"px; height:" + tam + "px; display:inline-block";
+                }
+                config.data = data;
+                that.ejemploGrafico(divNuevo, config);
+            }
+        },
+        dataBarrasLineas: function (asistente, tipo) {
+            var datasets = asistente.listDataset['$values'];
+            var datasetsInfo = [];
+            for (var i = 0; i < datasets.length; i++) {
+                //Datos valdrá lo que venga de la consulta
+                var datos = datasets[i].datos;
+                //for (var j = 0; j < DATA_COUNT; j++) {
+                //    datos.push(Math.floor(Math.random() * 100));
+                //}
+                var dataset = {
+                    label: datasets[i].nombre,
+                    data: datos,
+                    borderColor: datasets[i].color,
+                    backgroundColor: datasets[i].color,
+                };
+                datasetsInfo.push(dataset);
+            }
+            //Labels valdrá lo que venga en la consulta
+            var labels = asistente.labels;
+            var data = {
+                labels: labels,
+                datasets: datasetsInfo
+            };
+            return data;
+        },
+        dataCirculos: function (asistente) {
+            var datasets = asistente.listDataset['$values'];
+
+            var datos = [];
+            for (var j = 0; j < DATA_COUNT; j++) {
+                datos.push(Math.floor(Math.random() * 100));
+            }
+            var colores = [];
+            for (var j = 0; j < DATA_COUNT; j++) {
+                colores.push("#" + Math.floor(Math.random() * 16777215).toString(16));
+            }
+
+            var dataset = {
+                label: 'Dataset',
+                data: datos,
+                backgroundColor: colores
+            };
+
+            var labels = ["a", "b", "c", "d", "e", "f", "g"];
+            var data = {
+                labels: labels,
+                datasets: [dataset]
+            };
+            return data;
+        },
+        ejemploGrafico: function (divNuevo, config) {
+            var canvas = document.createElement("canvas");
+            canvas.className = "graficoCtx";
+            divNuevo.appendChild(canvas);
+            var ctx = canvas.getContext('2d');
+
+            new Chart(ctx, config);
+        }
+    }
+    const tamFijo = (document.getElementById("panResultados").clientWidth - 40) / 3;
+    const DATA_COUNT = 7;
+    $(document).ready(function () {
+        
+        Operaciones.init();
+
+    });
+</script>

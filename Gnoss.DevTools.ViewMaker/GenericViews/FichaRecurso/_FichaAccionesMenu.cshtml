@@ -275,7 +275,7 @@
                             @if (fichaRecurso.TypeDocument == ResourceModel.DocumentType.Hipervinculo && fichaRecurso.EsEnlaceSharepoint)
                             {
                                 <li>
-                                    <a id="op_Desvincular" class="item-dropdown" onclick="DesvincularSharepoint()">
+                                    <a id="op_Desvincular" class="item-dropdown" onclick="DeployActionInModalPanel('@fichaRecurso.ListActions.UrlLoadActionUnlinkResourceSP', this, 'modal-dinamic-content', '');" data-toggle="modal" data-target="#modal-container">
                                         <span class="material-icons">link_off</span>
                                         <span class="texto">@Html.GetText("HISTORIALVERSIONES", "DESVINCULARSHAREPOINT")</span>
                                     </a>

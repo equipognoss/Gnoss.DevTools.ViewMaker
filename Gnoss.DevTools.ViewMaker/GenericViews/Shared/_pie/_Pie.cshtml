@@ -16,7 +16,7 @@ CommunityModel Comunidad = Html.GetComunidad();
 @* Controlar NombreEcosistema para mostrar o no enlaces *@
 string NombreProyectoEcosistema = Html.GetNombreProyectoEcosistema();
 
-bool isGnossEcosistema = NombreProyectoEcosistema.ToLower().Contains("gnoss") ? true : false;
+bool isGnossEcosistema = (!string.IsNullOrEmpty(NombreProyectoEcosistema) && NombreProyectoEcosistema.ToLower().Contains("gnoss")) ? true : false;
 
 // Construcción de las rutas del footer
 string rutaPrivacidad = Comunidad.Url + "/" + Html.GetText("URLSEM", "PRIVACIDADENLACE");

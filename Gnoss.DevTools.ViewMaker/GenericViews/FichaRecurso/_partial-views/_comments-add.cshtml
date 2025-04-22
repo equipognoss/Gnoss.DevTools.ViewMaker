@@ -2,35 +2,22 @@
 @*
 Descripción
 -----------------------------------------------
-Vista que se utiliza para mostrar un editor de un comentario en un recurso. Tendrá un editor CKEditor o TextArea.
+Vista que se utiliza para mostrar un editor de un comentario en un recurso.
 
 Variables
 ----------------------------------------------------------------
 *@
 @{
-
 ResourceModel FichaDocumento = Model.Resource;
 CommunityModel Comunidad = Html.GetComunidad();
 UserIdentityModel IdentidadActual = Html.GetIdentidadActual();
 UserProfileModel perfil = Html.GetPerfil();
-
-    // Nombre función para "Enviar comentario"
-    string funcionComentario_CrearComentario = "Comentario_CrearComentario('" + FichaDocumento.ListActions.UrlCreateComment + "', '" + FichaDocumento.Key + "');";
-    // Fotografía del usuario que realizará el comentario
-    string urlFoto = "";
-    // Controlar si dispone o no de fotografía el usuario
-    bool containsUrlFoto = true;
-}
-
-@*
-    ----------------------------------------------------------------
-    -------------------- Vista Editor para añadir un comentario --------------------
-*@
-
-@* Carga de CKEditor*@
-@{
-    //Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/ckeditor.js?v=" + Html.GetVersion());
-    //Html.GetListaJS().Add(Html.GetBaseUrlStatic() + "/ckeditor/adapters/jquery.js?v=" + Html.GetVersion());
+// Nombre función para "Enviar comentario"
+string funcionComentario_CrearComentario = "Comentario_CrearComentario('" + FichaDocumento.ListActions.UrlCreateComment + "', '" + FichaDocumento.Key + "');";
+// Fotografía del usuario que realizará el comentario
+string urlFoto = "";
+// Controlar si dispone o no de fotografía el usuario
+bool containsUrlFoto = true;
 }
 
 
