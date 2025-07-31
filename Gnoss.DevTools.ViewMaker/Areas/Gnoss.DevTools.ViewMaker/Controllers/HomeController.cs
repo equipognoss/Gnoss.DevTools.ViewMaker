@@ -13,6 +13,7 @@ using System.IO.Compression;
 using Es.Riam.Gnoss.Web.MVC.Models;
 using Es.Riam.Gnoss.Web.MVC.Models.ViewModels;
 using Es.Riam.Semantica;
+using System.Text;
 
 namespace Gnoss.DevTools.ViewMaker.Areas.Gnoss.DevTools.ViewMaker.Controllers
 {
@@ -377,10 +378,18 @@ namespace Gnoss.DevTools.ViewMaker.Areas.Gnoss.DevTools.ViewMaker.Controllers
                     deflateStream.CopyTo(output);
                     deflateStream.Close();
                     output.Seek(0, SeekOrigin.Begin);
+                    JsonSerializerSettings jsonSerializerSettings = new JsonSerializerSettings
+                    {
+                        PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                        TypeNameHandling = TypeNameHandling.All
+                    };
+                    
+                    //object model = JsonConvert.DeserializeObject((string)System.Text.Json.JsonSerializer.Deserialize(output, typeof(string)), jsonSerializerSettings);
+                    object model = JsonConvert.DeserializeObject(Encoding.UTF8.GetString(output.ToArray()), jsonSerializerSettings);
 
-                    BinaryFormatter bformatter = new BinaryFormatter();
-                    object message = (object)bformatter.Deserialize(output);
-                    return message;
+                    //BinaryFormatter bformatter = new BinaryFormatter();
+                    //object message = (object)bformatter.Deserialize(output);
+                    return model;
                 }
 
                 //return model;
