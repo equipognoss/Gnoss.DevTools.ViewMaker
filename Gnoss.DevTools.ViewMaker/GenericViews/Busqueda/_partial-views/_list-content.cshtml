@@ -47,11 +47,11 @@ if (!tipoPaginasSinEspaciado.Contains(tipoPagina) && tipoPagina != null) {
 
 @* Contenedor de items (recursos) de resultados *@
 <div id="panResultados" class="resource-list listView">
-
+    <div id="santi"></div>
     @* Mostrado de resultados *@
     @if (string.IsNullOrEmpty(htmlResultados) && Model.JSONResourceList != null)
     {
-        Html.PartialView("../CargadorResultados/CargarResultados", Model.JSONResourceList);
+        @Html.PartialView("../CargadorResultados/CargarResultados", Model.JSONResourceList);
     }
     else
     {

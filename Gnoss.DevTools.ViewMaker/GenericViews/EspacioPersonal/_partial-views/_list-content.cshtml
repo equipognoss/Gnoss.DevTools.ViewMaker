@@ -24,7 +24,7 @@
     @* Mostrado de resultados *@
     @if (string.IsNullOrEmpty(htmlResultados) && Model.SearchViewModel.JSONResourceList != null)
     {
-        Html.PartialView("../CargadorResultados/CargarResultados", Model.SearchViewModel.JSONResourceList);
+        @Html.PartialView("../CargadorResultados/CargarResultados", Model.SearchViewModel.JSONResourceList);
     }
     else
     {
