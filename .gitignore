@@ -355,3 +355,4 @@ App_Data
 Gnoss.DevTools.ViewMaker/Views/*
 !Gnoss.DevTools.ViewMaker/Views/_ViewImports.cshtml
 !Gnoss.DevTools.ViewMaker/Views/_ViewStart.cshtml
+/Gnoss.DevTools.ViewMaker/Config
