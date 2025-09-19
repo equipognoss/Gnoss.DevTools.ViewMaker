@@ -381,7 +381,9 @@ namespace Gnoss.DevTools.ViewMaker.Areas.Gnoss.DevTools.ViewMaker.Controllers
                     JsonSerializerSettings jsonSerializerSettings = new JsonSerializerSettings
                     {
                         PreserveReferencesHandling = PreserveReferencesHandling.Objects,
-                        TypeNameHandling = TypeNameHandling.All
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                        TypeNameHandling = TypeNameHandling.All,
+                        MaxDepth = 128
                     };
                     
                     //object model = JsonConvert.DeserializeObject((string)System.Text.Json.JsonSerializer.Deserialize(output, typeof(string)), jsonSerializerSettings);
