@@ -383,7 +383,13 @@ namespace Gnoss.DevTools.ViewMaker.Areas.Gnoss.DevTools.ViewMaker.Controllers
                         PreserveReferencesHandling = PreserveReferencesHandling.Objects,
                         ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                         TypeNameHandling = TypeNameHandling.All,
-                        MaxDepth = 128
+                        MaxDepth = 128,
+                        MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
+                        Error = (sender, args) =>
+                        {
+                            Console.WriteLine($"Error: {args.ErrorContext.Error.Message}");
+                            args.ErrorContext.Handled = true; // Continúa aunque haya errores
+                        }
                     };
                     
                     //object model = JsonConvert.DeserializeObject((string)System.Text.Json.JsonSerializer.Deserialize(output, typeof(string)), jsonSerializerSettings);
