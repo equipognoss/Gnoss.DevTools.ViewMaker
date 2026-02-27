@@ -686,7 +686,7 @@
         {
             string extraBooleano = "";
 
-            if (mPropiedad.EspecifPropiedad.TipoCampo == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.Boleano && mPropiedad.ValoresUnificados.Count > 0)
+            if (mPropiedad.EspecifPropiedad.TipoCampo == Es.Riam.Semantica.Plantillas.TipoCampoOntologia.Boleano && mPropiedad.ValoresUnificados != null && mPropiedad.ValoresUnificados.Count > 0)
             {
                 extraBooleano = "bool=\"" + mPropiedad.ValoresUnificados.Keys.ToArray()[0] + "\"";
             }

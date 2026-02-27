@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Es.Riam.Interfaces", "Es.Ri
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Es.Riam.Semantica", "Es.Riam.Semantica\Es.Riam.Semantica.csproj", "{946B59E5-5E84-ACA2-F33F-19CD434A0147}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Es.Riam.Gnoss.AD", "Es.Riam.Gnoss.AD\Es.Riam.Gnoss.AD.csproj", "{8150856E-FD31-457F-AA40-C0BCABAB84CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{946B59E5-5E84-ACA2-F33F-19CD434A0147}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{946B59E5-5E84-ACA2-F33F-19CD434A0147}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{946B59E5-5E84-ACA2-F33F-19CD434A0147}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8150856E-FD31-457F-AA40-C0BCABAB84CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8150856E-FD31-457F-AA40-C0BCABAB84CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8150856E-FD31-457F-AA40-C0BCABAB84CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8150856E-FD31-457F-AA40-C0BCABAB84CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
