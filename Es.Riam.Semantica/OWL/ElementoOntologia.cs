@@ -8,6 +8,11 @@ namespace Es.Riam.Semantica.OWL
     public class ElementoOntologia
     {
         /// <summary>
+        /// Obtiene o establece las superclases útiles de la entidad
+        /// </summary>
+        private List<string> mSuperclasesUtiles;
+
+        /// <summary>
         /// Devuelve o establece la Url de la ontología.
         /// </summary>
         public string UrlOntologia { get; set; }
@@ -138,18 +143,20 @@ namespace Es.Riam.Semantica.OWL
         {
             get
             {
-                SuperclasesUtiles = new List<string>();
-
-                foreach (string superClase in Superclases)
+                if (mSuperclasesUtiles == null)
                 {
-                    if (superClase != "Thing" && !superClase.Contains("#Thing") && !EsClaseOntologiaImportada(superClase))
+                    mSuperclasesUtiles = new List<string>();
+
+                    foreach (string superClase in Superclases)
                     {
-                        SuperclasesUtiles.Add(superClase);
+                        if (superClase != "Thing" && !superClase.Contains("#Thing") && !EsClaseOntologiaImportada(superClase))
+                        {
+                            mSuperclasesUtiles.Add(superClase);
+                        }
                     }
                 }
 
-
-                return this.SuperclasesUtiles;
+                return this.mSuperclasesUtiles;
             }
             set { }
         }

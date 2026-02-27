@@ -480,6 +480,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Es.Riam.Gnoss.AD\Es.Riam.Gnoss.AD.csproj" />
     <ProjectReference Include="..\Es.Riam.Gnoss.Web.Controles\Es.Riam.Gnoss.Web.Controles.csproj" />
     <ProjectReference Include="..\Es.Riam.Gnoss.Web.MVC.Models\Es.Riam.Gnoss.Web.MVC.Models.csproj" />
     <ProjectReference Include="..\Es.Riam.Interfaces\Es.Riam.Interfaces.csproj" />
