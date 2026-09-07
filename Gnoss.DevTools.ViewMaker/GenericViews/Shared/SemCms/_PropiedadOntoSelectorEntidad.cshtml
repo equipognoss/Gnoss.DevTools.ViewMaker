@@ -146,7 +146,7 @@
                 {
                     string tipoInput = null;
                     string name = "";
-                    string onclickCheck = "AgregarEntidadSeleccListaCheck(this,'" + System.Net.WebUtility.UrlEncode(idControl) + "','" + entidadID + "','" + mPropiedad.ElementoOntologia.TipoEntidad + "','" + mPropiedad.Nombre + "');";
+                    string onclickCheck = "AgregarEntidadSeleccListaCheck(this,'" + UtilVistas.UrlEncode(idControl) + "','" + entidadID + "','" + mPropiedad.ElementoOntologia.TipoEntidad + "','" + mPropiedad.Nombre + "');";
 
                     if (Model.OntologyPropInfo.UniqueValue)
                     {
@@ -207,7 +207,7 @@
                     }
                     idCheck = "CheckTesSem_" + id;
 
-                    string onclickTes = "AgregarEntidadSeleccTesSem(this,'" + idDivCheckTes + "','" + System.Net.WebUtility.UrlEncode(idControl) + "','" + entidadID + "','" + mPropiedad.EspecifPropiedad.SelectorEntidad.Grafo + "','" + mPropiedad.EspecifPropiedad.SelectorEntidad.PropiedadesEdicion[5] + "','" + mPropiedad.EspecifPropiedad.SelectorEntidad.PropiedadesEdicion[3] + "','" + mPropiedad.EspecifPropiedad.SelectorEntidad.PropiedadesEdicion[2] + "','" + System.Net.WebUtility.UrlEncode(Model.OntologyPropInfo.EntitySelector.EditionEntitiesValues[entidadID]) + "','" + idDiv + "','','');";
+                    string onclickTes = "AgregarEntidadSeleccTesSem(this,'" + idDivCheckTes + "','" + UtilVistas.UrlEncode(idControl) + "','" + entidadID + "','" + mPropiedad.EspecifPropiedad.SelectorEntidad.Grafo + "','" + mPropiedad.EspecifPropiedad.SelectorEntidad.PropiedadesEdicion[5] + "','" + mPropiedad.EspecifPropiedad.SelectorEntidad.PropiedadesEdicion[3] + "','" + mPropiedad.EspecifPropiedad.SelectorEntidad.PropiedadesEdicion[2] + "','" + System.Net.WebUtility.UrlEncode(Model.OntologyPropInfo.EntitySelector.EditionEntitiesValues[entidadID]) + "','" + idDiv + "','','');";
 
                     <div @Html.GetParam("id", idDiv)>
                         <input @Html.GetParam("id", idCheck) type="checkbox" onclick="@onclickTes" />

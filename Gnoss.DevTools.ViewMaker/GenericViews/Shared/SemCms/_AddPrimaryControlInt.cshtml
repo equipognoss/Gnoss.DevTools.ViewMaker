@@ -587,7 +587,7 @@
 
             if (archivo.Contains("##idgoogle##"))
             {
-                string extension = System.IO.Path.GetExtension(valorPropTexto).ToLower();
+                string extension = UtilVistas.GetExtension(valorPropTexto).ToLower();
                 title = archivo.Substring(0, archivo.IndexOf("##idgoogle##")) + extension;
             }
             else

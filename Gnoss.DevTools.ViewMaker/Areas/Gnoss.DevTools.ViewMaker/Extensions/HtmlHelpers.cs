@@ -1543,7 +1543,6 @@ namespace Gnoss.DevTools.ViewMaker.Extensions
             Guid identidadActual = helper.GetIdentidadActual().KeyIdentity;
             Guid proyID = helper.GetComunidad().Key;
 
-            //string url = $"{HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Authority)}/VisualizarDocumento.aspx?doc={resourceID}&ext={fileInfo.Extension}&archivoAdjuntoSem={HttpUtility.UrlEncode(fileWithoutExtension)}&ontologiaAdjuntoSem={pOntologyID}&ID={identidadActual}&proy={proyID}";
             string url = $"//{httpContextAccessor.HttpContext.Request.Host}/VisualizarDocumento.aspx?doc={resourceID}&ext={fileInfo.Extension}&archivoAdjuntoSem={HttpUtility.UrlEncode(fileWithoutExtension)}&ontologiaAdjuntoSem={pOntologyID}&ID={identidadActual}&proy={proyID}";
 
             return url;

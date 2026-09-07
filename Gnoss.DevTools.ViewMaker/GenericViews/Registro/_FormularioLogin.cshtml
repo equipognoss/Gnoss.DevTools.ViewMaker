@@ -45,7 +45,7 @@ Variables
 
                     if (IdentidadActual.IsGuestUser && !string.IsNullOrEmpty(@Html.GetTokenLoginUsuario()) && IdentidadActual.NumberOfLoginAttemptsIP >= 2)
                     {
-                        string srcCaptcha = @Html.GetUrlServicioLogin() + "/LoginCaptcha.aspx?token=" + System.Net.WebUtility.UrlEncode(@Html.GetTokenLoginUsuario());
+                        string srcCaptcha = @Html.GetUrlServicioLogin() + "/LoginCaptcha.aspx?token=" + UtilVistas.UrlEncode(@Html.GetTokenLoginUsuario());
                         <p id="panCaptcha">
                             <label>
                                 @Html.GetText("LOGIN", "TEXTOCAPTCHA")
