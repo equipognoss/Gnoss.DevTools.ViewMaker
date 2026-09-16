@@ -147,38 +147,25 @@ else
                 @* Más acciones a realizar (Menú Hamburguesa) *@
                 @if (Perfil.Actions != null)
                 {
-                    foreach (System.Reflection.PropertyInfo propiedad in Perfil.Actions.GetType().GetProperties())
+                    foreach (string actionName in UtilVistas.GetActiveBooleanProperties(Perfil.Actions, "ActionsModel"))
                     {
-                        // Comprobar que la propiedad sea de tipo ActionsModel
-                        var tipoAction = propiedad.DeclaringType.Name;
-                        var dataType = propiedad.PropertyType.Name;
-
-                        if (tipoAction == "ActionsModel" && dataType == "Boolean")
+                        // Comprobar si la acción es "SendMessage".
+                        if (actionName == "SendMessage")
                         {
-                            // Comprobar valor Booleano y sumar contador si es true
-
-                            Boolean allowAction = (Boolean)propiedad.GetValue(Perfil.Actions);
-                            if (allowAction == true)
-                            {
-                                // Comprobar si la acción es "SendMessage".
-                                if (propiedad.Name == "SendMessage")
-                                {
-                                    canSendMessage = true;
-                                    // Desactivar la opción de enviar mensaje para no ser mostrado en "mas opciones".
-                                    Perfil.Actions.SendMessage = false;
-                                }
-                                else if (propiedad.Name == "AddContact")
-                                {
-                                    Perfil.Actions.AddContact = false;
-                                }
-                                else if (propiedad.Name == "Follow") {
-                                    Perfil.Actions.Follow = false;
-                                }
-                                else
-                                {
-                                    actionsAllowedCounter += 1;
-                                }
-                            }
+                            canSendMessage = true;
+                            // Desactivar la opción de enviar mensaje para no ser mostrado en "mas opciones".
+                            Perfil.Actions.SendMessage = false;
+                        }
+                        else if (actionName == "AddContact")
+                        {
+                            Perfil.Actions.AddContact = false;
+                        }
+                        else if (actionName == "Follow") {
+                            Perfil.Actions.Follow = false;
+                        }
+                        else
+                        {
+                            actionsAllowedCounter += 1;
                         }
                     }
 
